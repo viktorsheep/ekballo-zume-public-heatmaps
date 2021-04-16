@@ -56,7 +56,7 @@ function zume_public_heatmaps() {
     return Zume_Public_Heatmaps::instance();
 
 }
-add_action( 'after_setup_theme', 'zume_public_heatmaps', 20 );
+add_action( 'dt_network_dashboard_loaded', 'zume_public_heatmaps', 20 ); // hooks the network dashboard to load first
 
 /**
  * Singleton class for setting up the plugin.
@@ -76,8 +76,7 @@ class Zume_Public_Heatmaps {
 
     private function __construct() {
 
-        require_once('magic-link/training-map.php');
-
+        require_once('magic-link/heatmap-churches.php');
 
         if ( is_admin() ) {
             require_once( 'admin/admin-menu-and-tabs.php' ); // adds starter admin page and section for plugin

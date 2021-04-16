@@ -1,16 +1,27 @@
 <?php
 if ( !defined( 'ABSPATH' ) ) { exit; } // Exit if accessed directly.
 
-if ( strpos( dt_get_url_path(), 'zume_app' ) !== false ){
-    Zume_Public_Heatmap_Trainings::instance();
+if ( strpos( dt_get_url_path(), 'network_app' ) !== false ){
+    DT_Network_Dashboard_Public_Heatmap_Trainings::instance();
 }
 
-class Zume_Public_Heatmap_Trainings
+add_filter('dt_network_dashboard_supported_public_links', function( $supported_links ){
+    $supported_links[] = [
+    'name' => 'Training Map',
+    'description' => 'Maps training saturation by admin2 counties globally.',
+    'key' => 'network_app_trainings_goal_map',
+    'url' => 'network_app/trainings_goal_map'
+    ];
+    return $supported_links;
+}, 10, 1 );
+
+
+class DT_Network_Dashboard_Public_Heatmap_Trainings
 {
 
     public $magic = false;
     public $parts = false;
-    public $root = "zume_app";
+    public $root = "network_app";
     public $type = 'trainings_goal_map';
     public $post_type = 'trainings';
 
@@ -23,6 +34,12 @@ class Zume_Public_Heatmap_Trainings
     } // End instance()
 
     public function __construct() {
+
+        // check if enabled in admin area
+        $enabled = get_option( 'dt_network_dashboard_supported_public_links' );
+        if ( ! ( isset( $enabled[$this->root . '_' . $this->type] ) && 'enable' === $enabled[$this->root . '_' . $this->type] ) ){
+            return;
+        }
 
         // register type
         $this->magic = new DT_Magic_URL( $this->root );
@@ -93,6 +110,7 @@ class Zume_Public_Heatmap_Trainings
         ];
         return $types;
     }
+
     public function _register_url( $template_for_url ){
         $parts = $this->parts;
 
@@ -212,10 +230,11 @@ class Zume_Public_Heatmap_Trainings
         <script>
             let jsObject = [<?php echo json_encode([
                 'map_key' => DT_Mapbox_API::get_key(),
+                'theme_uri' => trailingslashit( get_stylesheet_directory_uri() ),
                 'root' => esc_url_raw( rest_url() ),
                 'nonce' => wp_create_nonce( 'wp_rest' ),
                 'parts' => $this->parts,
-                'translations' => [
+                'trans' => [
                     'add' => __( 'Add Magic', 'disciple_tools' ),
                 ],
             ]) ?>][0]
@@ -231,6 +250,22 @@ class Zume_Public_Heatmap_Trainings
                     contentType: "application/json; charset=utf-8",
                     dataType: "json",
                     url: jsObject.root + jsObject.parts.root + '/v1/' + jsObject.parts.type,
+                    beforeSend: function (xhr) {
+                        xhr.setRequestHeader('X-WP-Nonce', jsObject.nonce )
+                    }
+                })
+                    .fail(function(e) {
+                        console.log(e)
+                        jQuery('#error').html(e)
+                    })
+            }
+            window.get_grid_data = () => {
+                return jQuery.ajax({
+                    type: "POST",
+                    data: JSON.stringify({ action: 'POST', parts: jsObject.parts }),
+                    contentType: "application/json; charset=utf-8",
+                    dataType: "json",
+                    url: jsObject.root + jsObject.parts.root + '/v1/' + jsObject.parts.type + '/grid_totals',
                     beforeSend: function (xhr) {
                         xhr.setRequestHeader('X-WP-Nonce', jsObject.nonce )
                     }
@@ -258,15 +293,11 @@ class Zume_Public_Heatmap_Trainings
 
             }
         </script>
+<!--        <script src="--><?php //echo plugin_dir_url(__FILE__) . 'training-maps.js?ver=' . filemtime( plugin_dir_path( __FILE__ ) . 'training-maps.js' ) ?><!--" type="text/javascript" defer=""></script>-->
         <?php
         return true;
     }
     public function body(){
-
-//        $user = wp_get_current_user();
-//        $user->add_cap( 'view_any_trainings' );
-//
-//        new DT_Metrics_Mapbox_Trainings_Maps();
         ?>
         <div id="custom-style"></div>
         <div id="wrapper">
@@ -280,10 +311,6 @@ class Zume_Public_Heatmap_Trainings
 
                 /* LOAD */
                 let spinner = $('.loading-spinner')
-                let title = $('#title')
-
-                /* set title */
-                title.html( jsObject.translations.title )
 
                 /* set vertical size the form column*/
                 $('#custom-style').append(`
@@ -300,90 +327,95 @@ class Zume_Public_Heatmap_Trainings
                     </style>`)
 
 
-                window.get_geojson().then(function(data){
+                window.get_grid_data().then(function(grid_data){
                     $('#map').empty()
                     mapboxgl.accessToken = jsObject.map_key;
                     var map = new mapboxgl.Map({
                         container: 'map',
                         style: 'mapbox://styles/mapbox/light-v10',
                         center: [-98, 38.88],
-                        minZoom: 0,
-                        zoom: 0
+                        minZoom: 2,
+                        zoom: 2
                     });
 
                     // disable map rotation using right click + drag
-                    map.dragRotate.disable();
-
                     // disable map rotation using touch rotation gesture
+                    map.dragRotate.disable();
                     map.touchZoomRotate.disableRotation();
 
+                    // grid memory vars
+                    window.previous_grid_id = 0
+                    window.previous_grid_list = []
+
                     map.on('load', function() {
-                        map.addSource('layer-source-reports', {
-                            type: 'geojson',
-                            data: data,
-                        });
+                        window.previous_grid_id = '1'
+                        window.previous_grid_list.push('1')
+                        jQuery.get('https://storage.googleapis.com/location-grid-mirror/collection/1.geojson', null, null, 'json')
+                            .done(function (geojson) {
 
-                        /* groups */
-                        map.addLayer({
-                            id: 'layer-groups-circle',
-                            type: 'circle',
-                            source: 'layer-source-reports',
-                            paint: {
-                                'circle-color': '#90C741',
-                                'circle-radius': 22,
-                                'circle-stroke-width': 0.5,
-                                'circle-stroke-color': '#fff'
-                            },
-                            filter: ['==', 'groups', ['get', 'type'] ]
-                        });
-                        map.addLayer({
-                            id: 'layer-groups-count',
-                            type: 'symbol',
-                            source: 'layer-source-reports',
-                            layout: {
-                                "text-field": ['get', 'value']
-                            },
-                            filter: ['==', 'groups', ['get', 'type'] ]
-                        });
-
-                        /* baptism */
-                        map.addLayer({
-                            id: 'layer-baptisms-circle',
-                            type: 'circle',
-                            source: 'layer-source-reports',
-                            paint: {
-                                'circle-color': '#51bbd6',
-                                'circle-radius': 22,
-                                'circle-stroke-width': 0.5,
-                                'circle-stroke-color': '#fff'
-                            },
-                            filter: ['==', 'baptisms', ['get', 'type'] ]
-                        });
-                        map.addLayer({
-                            id: 'layer-baptisms-count',
-                            type: 'symbol',
-                            source: 'layer-source-reports',
-                            layout: {
-                                "text-field": ['get', 'value']
-                            },
-                            filter: ['==', 'baptisms', ['get', 'type'] ]
-                        });
-
-                        spinner.removeClass('active')
-
-                        // SET BOUNDS
-                        window.map_bounds_token = 'report_activity_map'
-                        window.map_start = get_map_start( window.map_bounds_token )
-                        if ( window.map_start ) {
-                            map.fitBounds( window.map_start, {duration: 0});
-                        }
-                        map.on('zoomend', function() {
-                            set_map_start( window.map_bounds_token, map.getBounds() )
-                        })
-                        map.on('dragend', function() {
-                            set_map_start( window.map_bounds_token, map.getBounds() )
-                        })
-                        // end set bounds
+                                // jQuery.each(geojson.features, function (i, v) {
+                                //     if (window.grid_data[geojson.features[i].properties.id]) {
+                                //         geojson.features[i].properties.value = parseInt(window.grid_data[geojson.features[i].properties.id].count)
+                                //     } else {
+                                //         geojson.features[i].properties.value = 0
+                                //     }
+                                // })
+                                map.addSource('1', {
+                                    'type': 'geojson',
+                                    'data': geojson
+                                });
+                                map.addLayer({
+                                    'id': '1',
+                                    'type': 'fill',
+                                    'source': '1',
+                                    'paint': {
+                                        'fill-color': [
+                                            'interpolate',
+                                            ['linear'],
+                                            ['get', 'value'],
+                                            0,
+                                            'rgba(0, 0, 0, 0)',
+                                            1,
+                                            '#547df8',
+                                            50,
+                                            '#3754ab',
+                                            100,
+                                            '#22346a'
+                                        ],
+                                        'fill-opacity': 0.75
+                                    }
+                                });
+                                map.addLayer({
+                                    'id': '1line',
+                                    'type': 'line',
+                                    'source': '1',
+                                    'paint': {
+                                        'line-color': 'black',
+                                        'line-width': 1
+                                    }
+                                });
+                            })
+                        // map.addSource('layer-source', {
+                        //     type: 'geojson',
+                        //     data: data,
+                        // });
+                        //
+                        //
+                        // spinner.removeClass('active')
+                        //
+                        // // SET BOUNDS
+                        // window.map_bounds_token = 'report_activity_map'
+                        // window.map_start = get_map_start( window.map_bounds_token )
+                        // if ( window.map_start ) {
+                        //     map.fitBounds( window.map_start, {duration: 0});
+                        // }
+                        // map.on('zoomend', function() {
+                        //     set_map_start( window.map_bounds_token, map.getBounds() )
+                        // })
+                        // map.on('dragend', function() {
+                        //     set_map_start( window.map_bounds_token, map.getBounds() )
+                        // })
+                        // // end set bounds
                     });
 
                 })
@@ -406,6 +438,70 @@ class Zume_Public_Heatmap_Trainings
                 ],
             ]
         );
+
+        register_rest_route(
+            $namespace,
+            '/'.$this->type .'/grid_totals/',
+            array(
+                array(
+                    'methods'  => WP_REST_Server::CREATABLE,
+                    'callback' => array( $this, 'grid_totals' ),
+                ),
+            )
+        );
+        register_rest_route(
+            $namespace,
+            '/get_grid_list',
+            array(
+                array(
+                    'methods'  => WP_REST_Server::CREATABLE,
+                    'callback' => array( $this, 'get_grid_list' ),
+                ),
+            )
+        );
+        register_rest_route(
+            $namespace,
+            '/grid_country_totals',
+            array(
+                array(
+                    'methods'  => WP_REST_Server::CREATABLE,
+                    'callback' => array( $this, 'grid_country_totals' ),
+                ),
+            )
+        );
+        register_rest_route(
+            $namespace,
+            '/points_geojson',
+            array(
+                array(
+                    'methods'  => WP_REST_Server::CREATABLE,
+                    'callback' => array( $this, 'points_geojson' ),
+                ),
+            )
+        );
+    }
+
+    public function grid_totals( WP_REST_Request $request ){
+        $params = $request->get_json_params() ?? $request->get_body_params();
+
+        $sites = DT_Network_Dashboard_Metrics_Base::get_sites();
+        $grid_list = array();
+        if ( ! empty( $sites ) ) {
+            foreach ( $sites as $key => $site ) {
+//                foreach ( $site['locations'][$post_type][$status] as $grid ) {
+//                    if ( ! isset( $grid_list[$grid['grid_id']] ) ) {
+//                        $grid_list[$grid['grid_id']] = array(
+//                            'grid_id' => $grid['grid_id'],
+//                            'count' => 0
+//                        );
+//                    }
+//
+//                    $grid_list[$grid['grid_id']]['count'] = $grid_list[$grid['grid_id']]['count'] + $grid['count'];
+//                }
+            }
+        }
+
+        return $grid_list;
     }
     public function endpoint( WP_REST_Request $request ) {
         $params = $request->get_params();
@@ -439,7 +535,7 @@ class Zume_Public_Heatmap_Trainings
         return $data;
     }
 
-    public function get_geojson( ) {
+    public function get_geojson() {
         global $wpdb;
         $results = $wpdb->get_results( "SELECT * FROM $wpdb->dt_location_grid WHERE post_type = 'trainings'", ARRAY_A );
 
@@ -457,8 +553,7 @@ class Zume_Public_Heatmap_Trainings
             // build feature
             $features[] = array(
                 'type' => 'Feature',
-                'properties' => array(
-                ),
+                'properties' => array(),
                 'geometry' => array(
                     'type' => 'Point',
                     'coordinates' => array(
