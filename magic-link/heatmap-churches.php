@@ -286,7 +286,7 @@ class DT_Network_Dashboard_Public_Heatmap_Churches
                     <div class="grid-x">
                         <div class="cell small-4"></div>
                         <div class="cell small-4" style="text-align:center;" id="name-id">Hover and zoom for locations</div>
-                        <div class="cell small-4"></div>
+                        <div class="cell small-4">zoom: <span id="zoom"></span></div>
                     </div>
                 </div>
 
@@ -308,6 +308,9 @@ class DT_Network_Dashboard_Public_Heatmap_Churches
                 </div>
                 <div class="cell">
                     <h2>Churches Needed: <span id="needed">0</span></h2>
+                </div>
+                <div class="cell">
+                    <h2>Churches Reported: <span id="reported">0</span></h2>
                 </div>
                 <div class="cell">
                     <hr>
@@ -474,8 +477,11 @@ class DT_Network_Dashboard_Public_Heatmap_Churches
                                     $('#saturation-goal').html(jsObject.grid_data[e.features[0].properties.grid_id].percent)
                                     $('#population').html(jsObject.grid_data[e.features[0].properties.grid_id].population)
 
-                                    let need = jsObject.grid_data[e.features[0].properties.grid_id].population / 25000
-                                    $('#needed').html(Math.ceil(need))
+                                    let reported = jsObject.grid_data[e.features[0].properties.grid_id].reported
+                                    $('#reported').html(reported)
+
+                                    let needed = jsObject.grid_data[e.features[0].properties.grid_id].needed
+                                    $('#needed').html(needed)
 
                                     let sc = $('#slider-content')
                                     sc.html('<span class="loading-spinner active"></span>')
@@ -505,7 +511,7 @@ class DT_Network_Dashboard_Public_Heatmap_Churches
         global $wpdb;
         $list = $wpdb->get_results("
         SELECT
-        lg0.grid_id, lg0.population
+        lg0.grid_id, lg0.population, lg0.country_code
         FROM $wpdb->dt_location_grid lg0
         LEFT JOIN $wpdb->dt_location_grid as a0 ON lg0.admin0_grid_id=a0.grid_id
         WHERE lg0.level < 1
@@ -520,7 +526,7 @@ class DT_Network_Dashboard_Public_Heatmap_Churches
         # Only admin1
         --
         SELECT
-        lg1.grid_id, lg1.population
+        lg1.grid_id, lg1.population, lg1.country_code
         FROM $wpdb->dt_location_grid as lg1
         LEFT JOIN $wpdb->dt_location_grid as a0 ON lg1.admin0_grid_id=a0.grid_id
         WHERE lg1.country_code NOT IN (
@@ -535,7 +541,7 @@ class DT_Network_Dashboard_Public_Heatmap_Churches
         # Has admin2
         --
         SELECT
-        lg2.grid_id, lg2.population
+        lg2.grid_id, lg2.population, lg2.country_code
         FROM $wpdb->dt_location_grid lg2
         LEFT JOIN $wpdb->dt_location_grid as a0 ON lg2.admin0_grid_id=a0.grid_id
         WHERE lg2.level_name = 'admin2'
@@ -547,7 +553,7 @@ class DT_Network_Dashboard_Public_Heatmap_Churches
         # Exceptions admin3
 
         SELECT
-        lge.grid_id, lge.population
+        lge.grid_id, lge.population, lge.country_code
         FROM $wpdb->dt_location_grid lge
         LEFT JOIN $wpdb->dt_location_grid as a0 ON lge.admin0_grid_id=a0.grid_id
         WHERE a0.name IN ('China', 'India', 'France', 'Spain', 'Pakistan', 'Bangladesh')
@@ -559,7 +565,7 @@ class DT_Network_Dashboard_Public_Heatmap_Churches
         # Exceptions admin1
 
         SELECT
-        lge1.grid_id, lge1.population
+        lge1.grid_id, lge1.population, lge1.country_code
         FROM $wpdb->dt_location_grid lge1
         LEFT JOIN $wpdb->dt_location_grid as a0 ON lge1.admin0_grid_id=a0.grid_id
         WHERE lge1.level_name = 'admin1'
@@ -567,20 +573,59 @@ class DT_Network_Dashboard_Public_Heatmap_Churches
 
         ", ARRAY_A );
 
+        $status = 'all';
+        $post_type = 'groups';
+        $sites = get_transient('DT_Network_Dashboard_Metrics_Base::get_sites' ); // @todo depends on the 24 hour transient to be present
+        $grid_list = array();
+        if ( ! empty( $sites ) ) {
+            foreach ( $sites as $key => $site ) {
+                foreach ( $site['locations'][$post_type][$status] as $grid ) {
+                    if ( ! isset( $grid_list[$grid['grid_id']] ) ) {
+                        $grid_list[$grid['grid_id']] = array(
+                            'grid_id' => $grid['grid_id'],
+                            'count' => 0
+                        );
+                    }
+
+                    $grid_list[$grid['grid_id']]['count'] = $grid_list[$grid['grid_id']]['count'] + $grid['count'];
+                }
+            }
+        }
+
+
         $data = [];
         foreach( $list as $v ){
-
-            $percent = rand( 0, 100 );
-
-            if($percent % 2 == 0){ // @todo sample maker all even are to 0
-                $percent = 0;
-            }
-
             $data[$v['grid_id']] = [
                 'grid_id' => $v['grid_id'],
-                'percent' => $percent,
+                'percent' => 0,
+                'reported' => 0,
+                'needed' => 1,
                 'population' => $v['population'],
             ];
+
+            $population_division = 25000;
+            if ( in_array( $v['country_code'], ['US'])) {
+                $population_division = 5000;
+            }
+
+            if ( isset( $grid_list[$v['grid_id']] ) && ! empty($grid_list[$v['grid_id']]['count']) ){
+                $count = $grid_list[$v['grid_id']]['count'];
+                $needed = round( $v['population'] / $population_division );
+                if ( $needed < 1 ){
+                    $needed = 1;
+                }
+
+                if ( ! empty($count) && ! empty($needed) ){
+                    $percent = round($count / $needed * 100 );
+
+                    $data[$v['grid_id']]['percent'] = $percent;
+                    $data[$v['grid_id']]['reported'] = $grid_list[$v['grid_id']]['count'];
+                    $data[$v['grid_id']]['needed'] = $needed;
+                }
+
+
+            }
+
         }
 
         return $data;
