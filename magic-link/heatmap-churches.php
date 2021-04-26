@@ -286,7 +286,7 @@ class DT_Network_Dashboard_Public_Heatmap_Churches
                     <div class="grid-x">
                         <div class="cell small-4"></div>
                         <div class="cell small-4" style="text-align:center;" id="name-id">Hover and zoom for locations</div>
-                        <div class="cell small-4">zoom: <span id="zoom"></span></div>
+                        <div class="cell small-4"></div>
                     </div>
                 </div>
 
@@ -300,14 +300,14 @@ class DT_Network_Dashboard_Public_Heatmap_Churches
                     <hr>
                 </div>
                 <div class="cell">
-                    <h2>Saturation: <span id="saturation-goal">0</span>%</h2>
+                    <h2>Goal: <span id="saturation-goal">0</span>%</h2>
                     <meter id="meter" style="height:3rem;width:100%;" value="30" min="0" low="33" high="66" optimum="100" max="100"></meter>
                 </div>
                 <div class="cell">
                     <h2>Population: <span id="population">0</span></h2>
                 </div>
                 <div class="cell">
-                    <h2>Churches Needed: <span id="needed">0</span></h2>
+                    <h2>New Churches Needed: <span id="needed">0</span></h2>
                 </div>
                 <div class="cell">
                     <h2>Churches Reported: <span id="reported">0</span></h2>
@@ -315,12 +315,52 @@ class DT_Network_Dashboard_Public_Heatmap_Churches
                 <div class="cell">
                     <hr>
                 </div>
-                <div class="cell ">
-                    <div class="callout" style="background-color:whitesmoke;">
-                        <h2>Details:</h2>
-                        <div id="slider-content"></div>
+                <div class="cell center">
+                    <button class="button" id="add-report">Add Report</button>
+                </div>
+<!--                <div class="cell ">-->
+<!--                    <div class="callout" style="background-color:whitesmoke;">-->
+<!--                        <h2>Details:</h2>-->
+<!--                        <div id="slider-content"></div>-->
+<!--                    </div>-->
+<!---->
+<!--                </div>-->
+            </div>
+            <button class="close-button" data-close aria-label="Close modal" type="button">
+                <span aria-hidden="true">&times;</span>
+            </button>
+        </div>
+        <!-- Report modal -->
+        <div class="reveal" id="report-modal" data-v-offset="10px" data-reveal>
+            <div>
+                <h1 id="title">Report New Simple Church <i class="fi-info primary-color small"></i> </h1>
+                <p id="report-modal-title"></p>
+            </div>
+            <div id="report-modal-content">
+
+                <div class="grid-x">
+                    <div class="cell">
+                        <input type="text" placeholder="Name" />
+                    </div>
+                    <div class="cell">
+                        <input type="text" placeholder="Email" />
+                    </div>
+                    <div class="cell">
+                        <input type="text" placeholder="Phone" />
+                    </div>
+                    <div class="cell callout">
+                        <div id="church-list"></div>
+                        <div class="grid-x">
+                            <div class="cell center">
+                                <button type="button" class="button clear small" id="add-another">add another</button>
+                            </div>
+                        </div>
                     </div>
 
+                    <div class="cell center">
+                        <input type="hidden" id="report-grid-id" />
+                        <button class="button" id="submit-report">Add Report</button>
+                    </div>
                 </div>
             </div>
             <button class="close-button" data-close aria-label="Close modal" type="button">
@@ -350,156 +390,204 @@ class DT_Network_Dashboard_Public_Heatmap_Churches
                     </style>`)
 
                  // window.get_grid_data().then(function(grid_data){
-                    $('#map').empty()
-                    mapboxgl.accessToken = jsObject.map_key;
-                    var map = new mapboxgl.Map({
-                        container: 'map',
-                        style: 'mapbox://styles/mapbox/light-v10',
-                        // style: 'mapbox://styles/mapbox/streets-v11',
-                        center: [-98, 38.88],
-                        minZoom: 2,
-                        maxZoom: 8,
-                        zoom: 2
-                    });
+                $('#map').empty()
+                mapboxgl.accessToken = jsObject.map_key;
+                var map = new mapboxgl.Map({
+                    container: 'map',
+                    style: 'mapbox://styles/mapbox/light-v10',
+                    // style: 'mapbox://styles/mapbox/streets-v11',
+                    center: [-98, 38.88],
+                    minZoom: 2,
+                    maxZoom: 8,
+                    zoom: 2
+                });
 
-                    map.addControl(new mapboxgl.NavigationControl());
-                    map.dragRotate.disable();
-                    map.touchZoomRotate.disableRotation();
+                map.addControl(new mapboxgl.NavigationControl());
+                map.dragRotate.disable();
+                map.touchZoomRotate.disableRotation();
 
-                    window.previous_hover = false
+                window.previous_hover = false
 
-                    map.on('load', function() {
+                map.on('load', function() {
 
-                        let asset_list = []
-                        var i = 1;
-                        while( i <= 46 ){
-                            asset_list.push(i+'.geojson')
-                            i++
-                        }
+                    let asset_list = []
+                    var i = 1;
+                    while( i <= 46 ){
+                        asset_list.push(i+'.geojson')
+                        i++
+                    }
 
-                        jQuery.each(asset_list, function(i,v){
+                    jQuery.each(asset_list, function(i,v){
 
-                            jQuery.get( jsObject.mirror_url + 'tiles/world/1000features/'+v, null, null, 'json')
-                            .done(function (geojson) {
+                        jQuery.get( jsObject.mirror_url + 'tiles/world/saturation/'+v, null, null, 'json')
+                        .done(function (geojson) {
 
-                                jQuery.each(geojson.features, function (i, v) {
-                                    if (jsObject.grid_data[v.id]) {
-                                        geojson.features[i].properties.value = parseInt(jsObject.grid_data[v.id].percent)
-                                    } else {
-                                        geojson.features[i].properties.value = 0
-                                    }
-                                })
-
-                                map.addSource(i.toString(), {
-                                    'type': 'geojson',
-                                    'data': geojson
-                                });
-                                map.addLayer({
-                                    'id': i.toString()+'line',
-                                    'type': 'line',
-                                    'source': i.toString(),
-                                    'paint': {
-                                        'line-color': '#323A68',
-                                        'line-width': .2
-                                    }
-                                });
-
-                                /**************/
-                                /* hover map*/
-                                /**************/
-                                map.addLayer({
-                                    'id': i.toString() + 'fills',
-                                    'type': 'fill',
-                                    'source': i.toString(),
-                                    'paint': {
-                                        'fill-color': 'black',
-                                        'fill-opacity': [
-                                            'case',
-                                            ['boolean', ['feature-state', 'hover'], false],
-                                            .8,
-                                            0
-                                        ]
-                                    }
-                                })
-                                /* end hover map*/
-
-                                /**********/
-                                /* heat map brown */
-                                /**********/
-                                map.addLayer({
-                                    'id': i.toString() + 'fills_heat',
-                                    'type': 'fill',
-                                    'source': i.toString(),
-                                    'paint': {
-                                        'fill-color': [
-                                            'interpolate',
-                                            ['linear'],
-                                            ['get', 'value'],
-                                            0,
-                                            'rgba(0,0,0,0)',
-                                            10,
-                                            'grey',
-                                            // 30,
-                                            // 'red',
-                                            70,
-                                            'yellow',
-                                            90,
-                                            'green',
-
-                                        ],
-                                        'fill-opacity': 0.7
-                                    }
-                                })
-                                /**********/
-                                /* end fill map */
-                                /**********/
-
-                                map.on('mousemove', i.toString()+'fills', function (e) {
-                                    if ( window.previous_hover ) {
-                                        map.setFeatureState(
-                                            window.previous_hover,
-                                            { hover: false }
-                                        )
-                                    }
-                                    window.previous_hover = { source: i.toString(), id: e.features[0].id }
-                                    if (e.features.length > 0) {
-                                        jQuery('#name-id').html(e.features[0].properties.full_name)
-                                        map.setFeatureState(
-                                            window.previous_hover,
-                                            {hover: true}
-                                        );
-                                    }
-                                });
-                                map.on('click', i.toString()+'fills', function (e) {
-
-                                    $('#title').html(e.features[0].properties.full_name)
-                                    $('#meter').val(jsObject.grid_data[e.features[0].properties.grid_id].percent)
-                                    $('#saturation-goal').html(jsObject.grid_data[e.features[0].properties.grid_id].percent)
-                                    $('#population').html(jsObject.grid_data[e.features[0].properties.grid_id].population)
-
-                                    let reported = jsObject.grid_data[e.features[0].properties.grid_id].reported
-                                    $('#reported').html(reported)
-
-                                    let needed = jsObject.grid_data[e.features[0].properties.grid_id].needed
-                                    $('#needed').html(needed)
-
-                                    let sc = $('#slider-content')
-                                    sc.html('<span class="loading-spinner active"></span>')
-
-                                    window.get_grid_data(e.features[0].properties.grid_id)
-                                    .done(function(data){
-                                        sc.empty()
-                                        $.each(data, function(i,v){
-                                            sc.append(`<div>${i} : ${v}</div>`)
-                                        })
-                                    })
-
-                                    $('#offCanvasNestedPush').foundation('toggle', e);
-
-                                });
+                            jQuery.each(geojson.features, function (i, v) {
+                                if (jsObject.grid_data[v.id]) {
+                                    geojson.features[i].properties.value = parseInt(jsObject.grid_data[v.id].percent)
+                                } else {
+                                    geojson.features[i].properties.value = 0
+                                }
                             })
+
+                            map.addSource(i.toString(), {
+                                'type': 'geojson',
+                                'data': geojson
+                            });
+                            map.addLayer({
+                                'id': i.toString()+'line',
+                                'type': 'line',
+                                'source': i.toString(),
+                                'paint': {
+                                    'line-color': '#323A68',
+                                    'line-width': .2
+                                }
+                            });
+
+                            /**************/
+                            /* hover map*/
+                            /**************/
+                            map.addLayer({
+                                'id': i.toString() + 'fills',
+                                'type': 'fill',
+                                'source': i.toString(),
+                                'paint': {
+                                    'fill-color': 'black',
+                                    'fill-opacity': [
+                                        'case',
+                                        ['boolean', ['feature-state', 'hover'], false],
+                                        .8,
+                                        0
+                                    ]
+                                }
+                            })
+                            /* end hover map*/
+
+                            /**********/
+                            /* heat map brown */
+                            /**********/
+                            map.addLayer({
+                                'id': i.toString() + 'fills_heat',
+                                'type': 'fill',
+                                'source': i.toString(),
+                                'paint': {
+                                    'fill-color': [
+                                        'interpolate',
+                                        ['linear'],
+                                        ['get', 'value'],
+                                        0,
+                                        'rgba(0,0,0,0)',
+                                        1,
+                                        'yellow',
+                                        // 10,
+                                        // 'grey',
+                                        // 30,
+                                        // 'red',
+                                        // 70,
+                                        // 'yellow',
+                                        100,
+                                        'darkgreen',
+
+                                    ],
+                                    'fill-opacity': 0.7
+                                }
+                            })
+                            /**********/
+                            /* end fill map */
+                            /**********/
+
+                            map.on('mousemove', i.toString()+'fills', function (e) {
+                                if ( window.previous_hover ) {
+                                    map.setFeatureState(
+                                        window.previous_hover,
+                                        { hover: false }
+                                    )
+                                }
+                                window.previous_hover = { source: i.toString(), id: e.features[0].id }
+                                if (e.features.length > 0) {
+                                    jQuery('#name-id').html(e.features[0].properties.full_name)
+                                    map.setFeatureState(
+                                        window.previous_hover,
+                                        {hover: true}
+                                    );
+                                }
+                            });
+                            map.on('click', i.toString()+'fills', function (e) {
+
+                                $('#title').html(e.features[0].properties.full_name)
+                                $('#meter').val(jsObject.grid_data[e.features[0].properties.grid_id].percent)
+                                $('#saturation-goal').html(jsObject.grid_data[e.features[0].properties.grid_id].percent)
+                                $('#population').html(jsObject.grid_data[e.features[0].properties.grid_id].population)
+
+                                //report
+                                $('#report-modal-title').html(e.features[0].properties.full_name)
+                                $('#report-grid-id').html(e.features[0].properties.grid_id)
+
+                                let reported = jsObject.grid_data[e.features[0].properties.grid_id].reported
+                                $('#reported').html(reported)
+
+                                let needed = jsObject.grid_data[e.features[0].properties.grid_id].needed
+                                $('#needed').html(needed)
+
+                                // let sc = $('#slider-content')
+                                // sc.html('<span class="loading-spinner active"></span>')
+
+                                // window.get_grid_data(e.features[0].properties.grid_id)
+                                // .done(function(data){
+                                //     sc.empty()
+                                //     $.each(data, function(i,v){
+                                //         sc.append(`<div>${i} : ${v}</div>`)
+                                //     })
+                                // })
+
+                                $('#offCanvasNestedPush').foundation('toggle', e);
+
+                            });
                         })
                     })
+                })
+
+                $('#add-report').on('click', function(e){
+                    $('#church-list').empty().html(`
+                    <div class="grid-x">
+                        <div class="cell small-6">
+                            <input type="text" placeholder="Name of Simple Church" />
+                        </div>
+                        <div class="cell small-1">
+                            <input type="number" placeholder="Members" />
+                        </div>
+                        <div class="cell small-4">
+                            <input type="date" placeholder="Started" />
+                        </div>
+                        <div class="cell small-1">
+                            <button class="button expanded alert" style="border-radius: 0;">X</button>
+                        </div>
+                    </div>
+                    `)
+
+                    jQuery('#report-modal').foundation('open')
+                })
+                $('#add-another').on('click', function(e){
+                    $('#church-list').append(`
+                    <div class="grid-x">
+                        <div class="cell small-7">
+                            <input type="text" placeholder="Name of Simple Church" />
+                        </div>
+                        <div class="cell small-1">
+                            <input type="number" placeholder="Members" />
+                        </div>
+                        <div class="cell small-3">
+                            <input type="date" placeholder="Started" />
+                        </div>
+                        <div class="cell small-1">
+                            <button class="button expanded alert" style="border-radius: 0;">X</button>
+                        </div>
+                    </div>
+                    `)
+                })
+                $('#submit-report').on('click', function(e){
+                    jQuery('#report-modal').foundation('close')
+                })
 
                 // }) /*end grid_id*/
             })
@@ -600,7 +688,7 @@ class DT_Network_Dashboard_Public_Heatmap_Churches
                 'percent' => 0,
                 'reported' => 0,
                 'needed' => 1,
-                'population' => $v['population'],
+                'population' => number_format_i18n( $v['population'] ),
             ];
 
             $population_division = 25000;
@@ -608,13 +696,13 @@ class DT_Network_Dashboard_Public_Heatmap_Churches
                 $population_division = 5000;
             }
 
+            $needed = round( $v['population'] / $population_division );
+            if ( $needed < 1 ){
+                $needed = 1;
+            }
+
             if ( isset( $grid_list[$v['grid_id']] ) && ! empty($grid_list[$v['grid_id']]['count']) ){
                 $count = $grid_list[$v['grid_id']]['count'];
-                $needed = round( $v['population'] / $population_division );
-                if ( $needed < 1 ){
-                    $needed = 1;
-                }
-
                 if ( ! empty($count) && ! empty($needed) ){
                     $percent = round($count / $needed * 100 );
 
@@ -622,10 +710,12 @@ class DT_Network_Dashboard_Public_Heatmap_Churches
                     $data[$v['grid_id']]['reported'] = $grid_list[$v['grid_id']]['count'];
                     $data[$v['grid_id']]['needed'] = $needed;
                 }
-
-
             }
-
+            else {
+                $data[$v['grid_id']]['percent'] = 0;
+                $data[$v['grid_id']]['reported'] = 0;
+                $data[$v['grid_id']]['needed'] = $needed;
+            }
         }
 
         return $data;

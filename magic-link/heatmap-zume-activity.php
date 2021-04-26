@@ -1,30 +1,34 @@
 <?php
+/**
+ * Map of Zume activity by movement log data.
+ */
+
 if ( !defined( 'ABSPATH' ) ) { exit; } // Exit if accessed directly.
 
 if ( strpos( dt_get_url_path(), 'zume_app' ) !== false || dt_is_rest() ){
-    DT_Network_Dashboard_Public_Heatmap_Trainings::instance();
+    DT_Network_Dashboard_Public_Heatmap_Activity::instance();
 }
 
 
 add_filter('dt_network_dashboard_supported_public_links', function( $supported_links ){
     $supported_links[] = [
-        'name' => 'Public Heatmap ( Trainings )',
-        'description' => 'Trainings map for world saturation',
-        'key' => 'zume_app_heatmap_trainings',
-        'url' => 'zume_app/heatmap_trainings'
+        'name' => 'Public Heatmap ( Zume Activity )',
+        'description' => 'Maps church saturation by admin2 (counties)',
+        'key' => 'zume_app_heatmap_activity',
+        'url' => 'zume_app/heatmap_activity'
     ];
     return $supported_links;
 }, 10, 1 );
 
 
-class DT_Network_Dashboard_Public_Heatmap_Trainings
+class DT_Network_Dashboard_Public_Heatmap_Activity
 {
 
     public $magic = false;
     public $parts = false;
     public $root = "zume_app";
-    public $type = 'heatmap_trainings';
-    public $post_type = 'trainings';
+    public $type = 'heatmap_activity';
+    public $post_type = 'groups';
 
     private static $_instance = null;
     public static function instance() {
@@ -95,7 +99,7 @@ class DT_Network_Dashboard_Public_Heatmap_Trainings
             $types[$this->root] = [];
         }
         $types[$this->root][$this->type] = [
-            'name' => 'Trainings Saturation',
+            'name' => 'Zume Activity',
             'root' => $this->root,
             'type' => $this->type,
             'meta_key' => 'public_key',
@@ -206,7 +210,7 @@ class DT_Network_Dashboard_Public_Heatmap_Trainings
         }
     }
     public function _browser_tab_title( $title ){
-        return __( "Zúme Trainings Map", 'disciple_tools' );
+        return __( "Zúme Activity Map", 'disciple_tools' );
     }
 
     public function header_style(){
@@ -238,31 +242,14 @@ class DT_Network_Dashboard_Public_Heatmap_Trainings
                 clearInterval(window.fiveMinuteTimer)
             })
 
-            window.get_grid_data = (grid_id) => {
+            window.get_movement_data = (grid_id) => {
+                let offset = new Date().getTimezoneOffset();
                 return jQuery.ajax({
                     type: "POST",
-                    data: JSON.stringify({ action: 'POST', parts: jsObject.parts, grid_id: grid_id }),
+                    data: JSON.stringify({ action: 'POST', parts: jsObject.parts, grid_id: grid_id, offset: offset }),
                     contentType: "application/json; charset=utf-8",
                     dataType: "json",
-                    url: jsObject.root + jsObject.parts.root + '/v1/' + jsObject.parts.type + '/grid_totals',
-                    beforeSend: function (xhr) {
-                        xhr.setRequestHeader('X-WP-Nonce', jsObject.nonce )
-                    }
-                })
-                    .fail(function(e) {
-                        console.log(e)
-                        jQuery('#error').html(e)
-                    })
-            }
-
-            window.create_report = () => {
-                /* build report elements */
-                return jQuery.ajax({
-                    type: "POST",
-                    data: JSON.stringify({ action: 'POST', parts: jsObject.parts, grid_id: grid_id }),
-                    contentType: "application/json; charset=utf-8",
-                    dataType: "json",
-                    url: jsObject.root + jsObject.parts.root + '/v1/' + jsObject.parts.type + '/grid_totals',
+                    url: jsObject.root + jsObject.parts.root + '/v1/' + jsObject.parts.type + '/movement_data',
                     beforeSend: function (xhr) {
                         xhr.setRequestHeader('X-WP-Nonce', jsObject.nonce )
                     }
@@ -300,67 +287,24 @@ class DT_Network_Dashboard_Public_Heatmap_Trainings
                     <hr>
                 </div>
                 <div class="cell">
-                    <h2>Goal: <span id="saturation-goal">0</span>%</h2>
+                    <h2>Activity by Population: <span id="saturation-goal">0</span>%</h2>
                     <meter id="meter" style="height:3rem;width:100%;" value="30" min="0" low="33" high="66" optimum="100" max="100"></meter>
                 </div>
                 <div class="cell">
                     <h2>Population: <span id="population">0</span></h2>
                 </div>
                 <div class="cell">
-                    <h2>Trainings Needed: <span id="needed">0</span></h2>
-                </div>
-                <div class="cell">
-                    <h2>Trainings Reported: <span id="reported">0</span></h2>
+                    <h2>Events: <span id="reported">0</span></h2>
                 </div>
                 <div class="cell">
                     <hr>
                 </div>
-                <div class="cell center">
-                    <button class="button" id="add-report">Add Report</button>
-                </div>
-                <!--                <div class="cell ">-->
-                <!--                    <div class="callout" style="background-color:whitesmoke;">-->
-                <!--                        <h2>Details:</h2>-->
-                <!--                        <div id="slider-content"></div>-->
-                <!--                    </div>-->
-                <!---->
-                <!--                </div>-->
-            </div>
-            <button class="close-button" data-close aria-label="Close modal" type="button">
-                <span aria-hidden="true">&times;</span>
-            </button>
-        </div>
-        <!-- Report modal -->
-        <div class="reveal" id="report-modal" data-v-offset="10px" data-reveal>
-            <div>
-                <h1 id="title">Report New Training <i class="fi-info primary-color small"></i> </h1>
-                <p id="report-modal-title"></p>
-            </div>
-            <div id="report-modal-content">
-
-                <div class="grid-x">
-                    <div class="cell">
-                        <input type="text" placeholder="Name" />
-                    </div>
-                    <div class="cell">
-                        <input type="text" placeholder="Email" />
-                    </div>
-                    <div class="cell">
-                        <input type="text" placeholder="Phone" />
-                    </div>
-                    <div class="cell callout">
-                        <div id="church-list"></div>
-                        <div class="grid-x">
-                            <div class="cell center">
-                                <button type="button" class="button clear small" id="add-another">add another</button>
-                            </div>
-                        </div>
+                <div class="cell ">
+                    <div class="callout" style="background-color:whitesmoke;">
+                        <h2>Activity:</h2>
+                        <div id="slider-content"></div>
                     </div>
 
-                    <div class="cell center">
-                        <input type="hidden" id="report-grid-id" />
-                        <button class="button" id="submit-report">Add Report</button>
-                    </div>
                 </div>
             </div>
             <button class="close-button" data-close aria-label="Close modal" type="button">
@@ -389,7 +333,6 @@ class DT_Network_Dashboard_Public_Heatmap_Trainings
                         }
                     </style>`)
 
-                // window.get_grid_data().then(function(grid_data){
                 $('#map').empty()
                 mapboxgl.accessToken = jsObject.map_key;
                 var map = new mapboxgl.Map({
@@ -440,7 +383,7 @@ class DT_Network_Dashboard_Public_Heatmap_Trainings
                                     'source': i.toString(),
                                     'paint': {
                                         'line-color': '#323A68',
-                                        'line-width': .5
+                                        'line-width': .2
                                     }
                                 });
 
@@ -477,10 +420,8 @@ class DT_Network_Dashboard_Public_Heatmap_Trainings
                                             ['get', 'value'],
                                             0,
                                             'rgba(0,0,0,0)',
-                                            1,
+                                            10,
                                             'yellow',
-                                            // 10,
-                                            // 'grey',
                                             // 30,
                                             // 'red',
                                             // 70,
@@ -529,16 +470,20 @@ class DT_Network_Dashboard_Public_Heatmap_Trainings
                                     let needed = jsObject.grid_data[e.features[0].properties.grid_id].needed
                                     $('#needed').html(needed)
 
-                                    // let sc = $('#slider-content')
-                                    // sc.html('<span class="loading-spinner active"></span>')
+                                    let sc = $('#slider-content')
+                                    sc.html('<span class="loading-spinner active"></span>')
 
-                                    // window.get_grid_data(e.features[0].properties.grid_id)
-                                    // .done(function(data){
-                                    //     sc.empty()
-                                    //     $.each(data, function(i,v){
-                                    //         sc.append(`<div>${i} : ${v}</div>`)
-                                    //     })
-                                    // })
+                                    window.get_movement_data(e.features[0].properties.grid_id)
+                                    .done(function(data){
+                                        console.log(data)
+                                        sc.empty()
+                                        $.each(data, function(i,v){
+                                            if ( typeof v.message !== 'undefined' ){
+
+                                                sc.append(`<div><div style="float:left;width:180px;"><strong>${v.formatted_time}</strong></div> <span>${v.message}</span></div>`)
+                                            }
+                                        })
+                                    })
 
                                     $('#offCanvasNestedPush').foundation('toggle', e);
 
@@ -547,49 +492,8 @@ class DT_Network_Dashboard_Public_Heatmap_Trainings
                     })
                 })
 
-                $('#add-report').on('click', function(e){
-                    $('#church-list').empty().html(`
-                    <div class="grid-x">
-                        <div class="cell small-6">
-                            <input type="text" placeholder="Name of Simple Church" />
-                        </div>
-                        <div class="cell small-1">
-                            <input type="number" placeholder="Members" />
-                        </div>
-                        <div class="cell small-4">
-                            <input type="date" placeholder="Started" />
-                        </div>
-                        <div class="cell small-1">
-                            <button class="button expanded alert" style="border-radius: 0;">X</button>
-                        </div>
-                    </div>
-                    `)
 
-                    jQuery('#report-modal').foundation('open')
-                })
-                $('#add-another').on('click', function(e){
-                    $('#church-list').append(`
-                    <div class="grid-x">
-                        <div class="cell small-7">
-                            <input type="text" placeholder="Name of Simple Church" />
-                        </div>
-                        <div class="cell small-1">
-                            <input type="number" placeholder="Members" />
-                        </div>
-                        <div class="cell small-3">
-                            <input type="date" placeholder="Started" />
-                        </div>
-                        <div class="cell small-1">
-                            <button class="button expanded alert" style="border-radius: 0;">X</button>
-                        </div>
-                    </div>
-                    `)
-                })
-                $('#submit-report').on('click', function(e){
-                    jQuery('#report-modal').foundation('close')
-                })
 
-                // }) /*end grid_id*/
             })
         </script>
         <?php
@@ -597,8 +501,7 @@ class DT_Network_Dashboard_Public_Heatmap_Trainings
 
     public function grid_list(){
         $list = $this->query_world_saturation_grid();
-        $trainings_list = $this->query_trainings_grid();
-
+        $grid_list = $this->query_activity_grid();
 
         $data = [];
         foreach( $list as $v ){
@@ -610,30 +513,23 @@ class DT_Network_Dashboard_Public_Heatmap_Trainings
                 'population' => number_format_i18n( $v['population'] ),
             ];
 
-            $population_division = 50000;
-            if ( in_array( $v['country_code'], ['US'])) {
-                $population_division = 5000;
-            }
+            $population_division = 1000;
 
             $needed = round( $v['population'] / $population_division );
             if ( $needed < 1 ){
                 $needed = 1;
             }
 
-            // Trainings objects that have location data.
-            if ( isset( $trainings_list[$v['grid_id']] ) && ! empty($trainings_list[$v['grid_id']]['count']) ){
-                $count = $trainings_list[$v['grid_id']]['count'];
+            if ( isset( $grid_list[$v['grid_id']] ) && ! empty($grid_list[$v['grid_id']]['count']) ){
+                $count = $grid_list[$v['grid_id']]['count'];
                 if ( ! empty($count) && ! empty($needed) ){
                     $percent = round($count / $needed * 100 );
 
                     $data[$v['grid_id']]['percent'] = $percent;
-                    $data[$v['grid_id']]['reported'] = $trainings_list[$v['grid_id']]['count'];
+                    $data[$v['grid_id']]['reported'] = $grid_list[$v['grid_id']]['count'];
                     $data[$v['grid_id']]['needed'] = $needed;
                 }
             }
-
-            // @todo Add contacts that are considered trained
-
             else {
                 $data[$v['grid_id']]['percent'] = 0;
                 $data[$v['grid_id']]['reported'] = 0;
@@ -644,32 +540,70 @@ class DT_Network_Dashboard_Public_Heatmap_Trainings
         return $data;
     }
 
-    /**
-     * Register REST Endpoints
-     * @link https://github.com/DiscipleTools/disciple-tools-theme/wiki/Site-to-Site-Link for outside of wordpress authentication
-     */
-    public function add_endpoints() {
-        $namespace = $this->root . '/v1';
-        register_rest_route(
-            $namespace,
-            '/'.$this->type .'/trainings_totals/',
-            array(
-                array(
-                    'methods'  => WP_REST_Server::CREATABLE,
-                    'callback' => array( $this, 'grid_totals' ),
-                ),
-            )
-        );
-    }
+    public function query_activity_grid(){
+        global $wpdb;
+        $list = $wpdb->get_results( "
+            SELECT t0.admin0_grid_id as grid_id, count(t0.admin0_grid_id) as count
+            FROM (
+             SELECT lg.admin0_grid_id, lg.admin1_grid_id, lg.admin2_grid_id, lg.admin3_grid_id, lg.admin4_grid_id, lg.admin5_grid_id
+                FROM $wpdb->dt_movement_log as ml
+                JOIN $wpdb->dt_location_grid as lg ON ml.grid_id=lg.grid_id
+                WHERE ml.grid_id > 0
+            ) as t0
+            GROUP BY t0.admin0_grid_id
+            UNION
+            SELECT t1.admin1_grid_id as grid_id, count(t1.admin1_grid_id) as count
+            FROM (
+             SELECT lg.admin0_grid_id, lg.admin1_grid_id, lg.admin2_grid_id, lg.admin3_grid_id, lg.admin4_grid_id, lg.admin5_grid_id
+                FROM $wpdb->dt_movement_log as ml
+                JOIN $wpdb->dt_location_grid as lg ON ml.grid_id=lg.grid_id
+                WHERE ml.grid_id > 0
+            ) as t1
+            GROUP BY t1.admin1_grid_id
+            UNION
+            SELECT t2.admin2_grid_id as grid_id, count(t2.admin2_grid_id) as count
+            FROM (
+                SELECT lg.admin0_grid_id, lg.admin1_grid_id, lg.admin2_grid_id, lg.admin3_grid_id, lg.admin4_grid_id, lg.admin5_grid_id
+                FROM $wpdb->dt_movement_log as ml
+                JOIN $wpdb->dt_location_grid as lg ON ml.grid_id=lg.grid_id
+                WHERE ml.grid_id > 0
+            ) as t2
+            GROUP BY t2.admin2_grid_id
+            UNION
+            SELECT t3.admin3_grid_id as grid_id, count(t3.admin3_grid_id) as count
+            FROM (
+                SELECT lg.admin0_grid_id, lg.admin1_grid_id, lg.admin2_grid_id, lg.admin3_grid_id, lg.admin4_grid_id, lg.admin5_grid_id
+                FROM $wpdb->dt_movement_log as ml
+                JOIN $wpdb->dt_location_grid as lg ON ml.grid_id=lg.grid_id
+                WHERE ml.grid_id > 0
+            ) as t3
+            GROUP BY t3.admin3_grid_id
+            UNION
+            SELECT t4.admin4_grid_id as grid_id, count(t4.admin4_grid_id) as count
+            FROM (
+                SELECT lg.admin0_grid_id, lg.admin1_grid_id, lg.admin2_grid_id, lg.admin3_grid_id, lg.admin4_grid_id, lg.admin5_grid_id
+                FROM $wpdb->dt_movement_log as ml
+                JOIN $wpdb->dt_location_grid as lg ON ml.grid_id=lg.grid_id
+                WHERE ml.grid_id > 0
+            ) as t4
+            GROUP BY t4.admin4_grid_id
+            UNION
+            SELECT t5.admin5_grid_id as grid_id, count(t5.admin5_grid_id) as count
+            FROM (
+                SELECT lg.admin0_grid_id, lg.admin1_grid_id, lg.admin2_grid_id, lg.admin3_grid_id, lg.admin4_grid_id, lg.admin5_grid_id
+                FROM $wpdb->dt_movement_log as ml
+                JOIN $wpdb->dt_location_grid as lg ON ml.grid_id=lg.grid_id
+                WHERE ml.grid_id > 0
+            ) as t5
+            GROUP BY t5.admin5_grid_id;
+            ", ARRAY_A );
 
-    public function grid_totals( WP_REST_Request $request ){
-        $params = $request->get_json_params() ?? $request->get_body_params();
-
-        if ( ! isset( $params['grid_id'] ) ) {
-            return new WP_Error(__METHOD__, 'no grid id' );
+        $data = [];
+        foreach( $list as $item ){
+            $data[$item['grid_id']] = $item;
         }
-        return Disciple_Tools_Mapping_Queries::get_by_grid_id( $params['grid_id'] );
 
+        return $data;
     }
 
     public function query_world_saturation_grid(){
@@ -739,76 +673,97 @@ class DT_Network_Dashboard_Public_Heatmap_Trainings
         ", ARRAY_A );
     }
 
-    public function query_trainings_grid(){
-        global $wpdb;
-        $list = $wpdb->get_results( "
-            SELECT t0.admin0_grid_id as grid_id, count(t0.admin0_grid_id) as count
-            FROM (
-             SELECT lg.admin0_grid_id, lg.admin1_grid_id, lg.admin2_grid_id, lg.admin3_grid_id, lg.admin4_grid_id, lg.admin5_grid_id
-                FROM $wpdb->postmeta as pm
-                JOIN $wpdb->posts as p ON p.ID=pm.post_id AND p.post_type = 'trainings'
-                LEFT JOIN $wpdb->dt_location_grid as lg ON pm.meta_value=lg.grid_id
-                WHERE pm.meta_key = 'location_grid'
-            ) as t0
-            GROUP BY t0.admin0_grid_id
-            UNION
-            SELECT t1.admin1_grid_id as grid_id, count(t1.admin1_grid_id) as count
-            FROM (
-             SELECT lg.admin0_grid_id, lg.admin1_grid_id, lg.admin2_grid_id, lg.admin3_grid_id, lg.admin4_grid_id, lg.admin5_grid_id
-                FROM $wpdb->postmeta as pm
-                JOIN $wpdb->posts as p ON p.ID=pm.post_id AND p.post_type = 'trainings'
-                LEFT JOIN $wpdb->dt_location_grid as lg ON pm.meta_value=lg.grid_id
-                WHERE pm.meta_key = 'location_grid'
-            ) as t1
-            GROUP BY t1.admin1_grid_id
-            UNION
-            SELECT t2.admin2_grid_id as grid_id, count(t2.admin2_grid_id) as count
-            FROM (
-                SELECT lg.admin0_grid_id, lg.admin1_grid_id, lg.admin2_grid_id, lg.admin3_grid_id, lg.admin4_grid_id, lg.admin5_grid_id
-                FROM $wpdb->postmeta as pm
-                JOIN $wpdb->posts as p ON p.ID=pm.post_id AND p.post_type = 'trainings'
-                LEFT JOIN $wpdb->dt_location_grid as lg ON pm.meta_value=lg.grid_id
-                WHERE pm.meta_key = 'location_grid'
-            ) as t2
-            GROUP BY t2.admin2_grid_id
-            UNION
-            SELECT t3.admin3_grid_id as grid_id, count(t3.admin3_grid_id) as count
-            FROM (
-                SELECT lg.admin0_grid_id, lg.admin1_grid_id, lg.admin2_grid_id, lg.admin3_grid_id, lg.admin4_grid_id, lg.admin5_grid_id
-                FROM $wpdb->postmeta as pm
-                JOIN $wpdb->posts as p ON p.ID=pm.post_id AND p.post_type = 'trainings'
-                LEFT JOIN $wpdb->dt_location_grid as lg ON pm.meta_value=lg.grid_id
-                WHERE pm.meta_key = 'location_grid'
-            ) as t3
-            GROUP BY t3.admin3_grid_id
-            UNION
-            SELECT t4.admin4_grid_id as grid_id, count(t4.admin4_grid_id) as count
-            FROM (
-                SELECT lg.admin0_grid_id, lg.admin1_grid_id, lg.admin2_grid_id, lg.admin3_grid_id, lg.admin4_grid_id, lg.admin5_grid_id
-                FROM $wpdb->postmeta as pm
-                JOIN $wpdb->posts as p ON p.ID=pm.post_id AND p.post_type = 'trainings'
-                LEFT JOIN $wpdb->dt_location_grid as lg ON pm.meta_value=lg.grid_id
-                WHERE pm.meta_key = 'location_grid'
-            ) as t4
-            GROUP BY t4.admin4_grid_id
-            UNION
-            SELECT t5.admin5_grid_id as grid_id, count(t5.admin5_grid_id) as count
-            FROM (
-                SELECT lg.admin0_grid_id, lg.admin1_grid_id, lg.admin2_grid_id, lg.admin3_grid_id, lg.admin4_grid_id, lg.admin5_grid_id
-                FROM $wpdb->postmeta as pm
-                JOIN $wpdb->posts as p ON p.ID=pm.post_id AND p.post_type = 'trainings'
-                LEFT JOIN $wpdb->dt_location_grid as lg ON pm.meta_value=lg.grid_id
-                WHERE pm.meta_key = 'location_grid'
-            ) as t5
-            GROUP BY t5.admin5_grid_id;
-            ", ARRAY_A );
 
-        $data = [];
-        foreach( $list as $item ){
-            $data[$item['grid_id']] = $item;
+
+    /**
+     * Register REST Endpoints
+     * @link https://github.com/DiscipleTools/disciple-tools-theme/wiki/Site-to-Site-Link for outside of wordpress authentication
+     */
+    public function add_endpoints() {
+        $namespace = $this->root . '/v1';
+
+        register_rest_route(
+            $namespace,
+            '/'.$this->type .'/movement_data/',
+            array(
+                array(
+                    'methods'  => WP_REST_Server::CREATABLE,
+                    'callback' => array( $this, 'movement_data' ),
+                ),
+            )
+        );
+    }
+
+    public function movement_data( WP_REST_Request $request ){
+        $params = $request->get_json_params() ?? $request->get_body_params();
+
+        if ( ! isset( $params['grid_id'] ) ) {
+            return new WP_Error(__METHOD__, 'no grid id' );
+        }
+        if ( ! isset( $params['offset'] ) ) {
+            return new WP_Error(__METHOD__, 'no grid id' );
+        }
+        $grid_id = sanitize_text_field( wp_unslash( $params['grid_id']));
+        $offset = sanitize_text_field( wp_unslash( $params['offset']));
+
+        return $this->query_movement_data( $grid_id, $offset );
+
+    }
+
+    public function query_movement_data( $grid_id, $offset ) {
+        global $wpdb;
+        $ids = [];
+        $ids[] = $grid_id;
+        $children = Disciple_Tools_Mapping_Queries::get_children_by_grid_id( $grid_id );
+        if ( ! empty( $children ) ) {
+            foreach( $children as $child ){
+                $ids[] = $child['grid_id'];
+            }
+        }
+        $prepared_list = dt_array_to_sql( $ids );
+        $list = $wpdb->get_results("
+                SELECT
+                       id,
+                       action,
+                       category,
+                       lng,
+                       lat,
+                       label,
+                       grid_id,
+                       payload,
+                       timestamp,
+                       'A Zúme partner' as site_name
+                FROM $wpdb->dt_movement_log
+                WHERE grid_id IN ($prepared_list)
+                ORDER BY timestamp DESC", ARRAY_A);
+        if ( empty( $list ) ){
+            return [];
         }
 
-        return $data;
+        foreach( $list as $index => $item ){
+            $list[$index]['payload'] = maybe_unserialize( $item['payload'] );
+            $list[$index]['formatted_time'] = date( 'M, d Y, g:i a', $item['timestamp'] + $offset );
+        }
+
+        if ( function_exists( 'zume_log_actions' ) ) {
+            $list = zume_log_actions($list);
+        }
+        if ( function_exists( 'dt_network_dashboard_translate_log_generations' ) ) {
+            $list = dt_network_dashboard_translate_log_generations($list);
+        }
+        if ( function_exists( 'dt_network_dashboard_translate_log_new_posts' ) ) {
+            $list = dt_network_dashboard_translate_log_new_posts($list);
+        }
+
+        foreach( $list as $index => $item ){
+            if ( ! isset( $item['message'] ) ) {
+                $list[$index]['message'] = 'Non-public movement event reported.';
+            }
+        }
+
+        return $list;
     }
+
 }
+
 

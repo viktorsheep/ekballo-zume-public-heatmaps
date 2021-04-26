@@ -77,6 +77,8 @@ class Zume_Public_Heatmaps {
     private function __construct() {
 
         require_once('magic-link/heatmap-churches.php');
+        require_once('magic-link/heatmap-zume-activity.php');
+        require_once('magic-link/heatmap-trainings.php');
 
         if ( is_admin() ) {
             require_once( 'admin/admin-menu-and-tabs.php' ); // adds starter admin page and section for plugin
