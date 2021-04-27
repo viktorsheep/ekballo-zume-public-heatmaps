@@ -215,6 +215,12 @@ class DT_Network_Dashboard_Public_Heatmap_Churches
             body {
                 background: white;
             }
+            #email {
+                display:none;
+            }
+            .redborder {
+                border: 1px solid red;
+            }
         </style>
         <?php
     }
@@ -255,38 +261,120 @@ class DT_Network_Dashboard_Public_Heatmap_Churches
                     })
             }
 
-            window.create_report = () => {
-                /* build report elements */
-                return jQuery.ajax({
-                    type: "POST",
-                    data: JSON.stringify({ action: 'POST', parts: jsObject.parts, grid_id: grid_id }),
-                    contentType: "application/json; charset=utf-8",
-                    dataType: "json",
-                    url: jsObject.root + jsObject.parts.root + '/v1/' + jsObject.parts.type + '/grid_totals',
-                    beforeSend: function (xhr) {
-                        xhr.setRequestHeader('X-WP-Nonce', jsObject.nonce )
-                    }
-                })
-                    .fail(function(e) {
-                        console.log(e)
-                        jQuery('#error').html(e)
-                    })
-            }
+            // window.create_report = () => {
+            //     let spinner = jQuery('.loading-spinner')
+            //     spinner.addClass('active')
+            //
+            //     let submit_button = jQuery('#submit-report')
+            //     submit_button.prop('disabled', true)
+            //
+            //     let honey = jQuery('#email').val()
+            //     if ( honey ) {
+            //         submit_button.html('Shame, shame, shame. We know your name ... ROBOT!').prop('disabled', true )
+            //         spinner.removeClass('active')
+            //         return;
+            //     }
+            //
+            //
+            //     let name_input = jQuery('#name')
+            //     let name = name_input.val()
+            //     if ( ! name ) {
+            //         jQuery('#name-error').show()
+            //         submit_button.removeClass('loading')
+            //         name_input.focus(function(){
+            //             jQuery('#name-error').hide()
+            //         })
+            //         submit_button.prop('disabled', false)
+            //         spinner.removeClass('active')
+            //         return;
+            //     }
+            //
+            //     let email_input = jQuery('#e2')
+            //     let email = email_input.val()
+            //     if ( ! email ) {
+            //         jQuery('#email-error').show()
+            //         submit_button.removeClass('loading')
+            //         email_input.focus(function(){
+            //             jQuery('#email-error').hide()
+            //         })
+            //         submit_button.prop('disabled', false)
+            //         spinner.removeClass('active')
+            //         return;
+            //     }
+            //
+            //     let phone_input = jQuery('#phone')
+            //     let phone = phone_input.val()
+            //     if ( ! phone ) {
+            //         jQuery('#phone-error').show()
+            //         submit_button.removeClass('loading')
+            //         email_input.focus(function(){
+            //             jQuery('#phone-error').hide()
+            //         })
+            //         submit_button.prop('disabled', false)
+            //         spinner.removeClass('active')
+            //         return;
+            //     }
+            //
+            //     let churches = []
+            //     jQuery.each( jQuery('.list-row input'), function(i,v){
+            //         let groupid = jQuery(this).data('group-id')
+            //
+            //         if ( typeof churches[groupid] === 'undefined' ){
+            //             churches[groupid] = []
+            //         }
+            //         if ( jQuery(this).data('name') === 'name') {
+            //             churches[groupid].name = jQuery(this).val()
+            //         } else if ( jQuery(this).data('name') === 'members' ) {
+            //             churches[groupid].members = jQuery(this).val()
+            //         } else if ( jQuery(this).data('name') === 'start' ) {
+            //             churches[groupid].start = jQuery(this).val()
+            //         }
+            //     })
+            //
+            //     let grid_id = jQuery('#report-grid-id').val()
+            //
+            //     let form_data = []
+            //     form_data.name = name
+            //     form_data.email = email
+            //     form_data.phone = phone
+            //     form_data.list = churches
+            //     form_data.grid_id = grid_id
+            //
+            //     console.log(form_data)
+            //
+            //     jQuery.ajax({
+            //         type: "POST",
+            //         data: JSON.stringify({ action: 'new_report', parts: jsObject.parts, data: form_data }),
+            //         contentType: "application/json; charset=utf-8",
+            //         dataType: "json",
+            //         url: jsObject.root + jsObject.parts.root + '/v1/' + jsObject.parts.type,
+            //         beforeSend: function (xhr) {
+            //             xhr.setRequestHeader('X-WP-Nonce', jsObject.nonce )
+            //         }
+            //     })
+            //         .done(function(response){
+            //             jQuery('.loading-spinner').removeClass('active')
+            //             console.log(response)
+            //         })
+            //         .fail(function(e) {
+            //             console.log(e)
+            //             jQuery('#error').html(e)
+            //         })
+            // }
 
         </script>
         <?php
         return true;
     }
     public function body(){
+        DT_Mapbox_API::geocoder_scripts();
         ?>
         <div id="custom-style"></div>
         <div id="wrapper">
             <div id="map-wrapper">
-                <div style="position:absolute; top: 10px; left:10px; right:40px; z-index: 10;background-color:white; opacity: .8;padding:5px; margin: 0 10px;">
+                <div class="hide-for-small-only" style="position:absolute; top: 10px; left:10px; z-index: 10;background-color:white; opacity: .9;padding:5px 10px; margin: 0 10px;">
                     <div class="grid-x">
-                        <div class="cell small-4"></div>
-                        <div class="cell small-4" style="text-align:center;" id="name-id">Hover and zoom for locations</div>
-                        <div class="cell small-4"></div>
+                        <div class="cell" id="name-id">Hover and zoom for locations</div>
                     </div>
                 </div>
 
@@ -318,13 +406,7 @@ class DT_Network_Dashboard_Public_Heatmap_Churches
                 <div class="cell center">
                     <button class="button" id="add-report">Add Report</button>
                 </div>
-<!--                <div class="cell ">-->
-<!--                    <div class="callout" style="background-color:whitesmoke;">-->
-<!--                        <h2>Details:</h2>-->
-<!--                        <div id="slider-content"></div>-->
-<!--                    </div>-->
-<!---->
-<!--                </div>-->
+
             </div>
             <button class="close-button" data-close aria-label="Close modal" type="button">
                 <span aria-hidden="true">&times;</span>
@@ -334,22 +416,48 @@ class DT_Network_Dashboard_Public_Heatmap_Churches
         <div class="reveal" id="report-modal" data-v-offset="10px" data-reveal>
             <div>
                 <h1 id="title">Report New Simple Church <i class="fi-info primary-color small"></i> </h1>
-                <p id="report-modal-title"></p>
+                <h3 id="report-modal-title"></h3>
             </div>
             <div id="report-modal-content">
-
                 <div class="grid-x">
                     <div class="cell">
-                        <input type="text" placeholder="Name" />
+                        <label for="name">Name</label>
+                        <input type="text" id="name" class="required" placeholder="Name" />
+                        <span id="name-error" class="form-error">
+                            <?php esc_html_e( "You're name is required.", 'disciple_tools' ); ?>
+                        </span>
                     </div>
                     <div class="cell">
-                        <input type="text" placeholder="Email" />
+                        <label for="email">Email</label>
+                        <input type="email" id="email" name="email" placeholder="Email" />
+                        <input type="email" id="e2" name="email" class="required" placeholder="Email" />
+                        <span id="email-error" class="form-error">
+                            <?php esc_html_e( "You're email is required.", 'disciple_tools' ); ?>
+                        </span>
                     </div>
                     <div class="cell">
-                        <input type="text" placeholder="Phone" />
+                        <label for="tel">Phone</label>
+                        <input type="tel" id="phone" name="phone" class="required" placeholder="Phone" />
+                        <span id="phone-error" class="form-error">
+                            <?php esc_html_e( "You're phone is required.", 'disciple_tools' ); ?>
+                        </span>
                     </div>
                     <div class="cell callout">
-                        <div id="church-list"></div>
+                        <div class="grid-x">
+                            <div class="cell small-6">
+                                Nickname of Simple Church
+                            </div>
+                            <div class="cell small-2">
+                                Member Count
+                            </div>
+                            <div class="cell small-3">
+                                Date Started
+                            </div>
+                            <div class="cell small-1">
+
+                            </div>
+                        </div>
+                        <div id="church-list"><!-- church report rows --></div>
                         <div class="grid-x">
                             <div class="cell center">
                                 <button type="button" class="button clear small" id="add-another">add another</button>
@@ -359,7 +467,7 @@ class DT_Network_Dashboard_Public_Heatmap_Churches
 
                     <div class="cell center">
                         <input type="hidden" id="report-grid-id" />
-                        <button class="button" id="submit-report">Add Report</button>
+                        <button class="button" id="submit-report">Add Report</button> <span class="loading-spinner"></span>
                     </div>
                 </div>
             </div>
@@ -399,8 +507,16 @@ class DT_Network_Dashboard_Public_Heatmap_Churches
                     center: [-98, 38.88],
                     minZoom: 2,
                     maxZoom: 8,
-                    zoom: 2
+                    zoom: 3
                 });
+
+                map.addControl(
+                    new MapboxGeocoder({
+                        accessToken: mapboxgl.accessToken,
+                        mapboxgl: mapboxgl,
+                        marker: false
+                    })
+                );
 
                 map.addControl(new mapboxgl.NavigationControl());
                 map.dragRotate.disable();
@@ -419,7 +535,16 @@ class DT_Network_Dashboard_Public_Heatmap_Churches
 
                     jQuery.each(asset_list, function(i,v){
 
-                        jQuery.get( jsObject.mirror_url + 'tiles/world/saturation/'+v, null, null, 'json')
+                        jQuery.ajax({
+                            url: jsObject.mirror_url + 'tiles/world/saturation/' + v,
+                            dataType: 'json',
+                            data: null,
+                            beforeSend: function (xhr) {
+                                if (xhr.overrideMimeType) {
+                                    xhr.overrideMimeType("application/json");
+                                }
+                            }
+                        })
                         .done(function (geojson) {
 
                             jQuery.each(geojson.features, function (i, v) {
@@ -440,7 +565,7 @@ class DT_Network_Dashboard_Public_Heatmap_Churches
                                 'source': i.toString(),
                                 'paint': {
                                     'line-color': '#323A68',
-                                    'line-width': .2
+                                    'line-width': .5
                                 }
                             });
 
@@ -521,24 +646,13 @@ class DT_Network_Dashboard_Public_Heatmap_Churches
 
                                 //report
                                 $('#report-modal-title').html(e.features[0].properties.full_name)
-                                $('#report-grid-id').html(e.features[0].properties.grid_id)
+                                $('#report-grid-id').val(e.features[0].properties.grid_id)
 
                                 let reported = jsObject.grid_data[e.features[0].properties.grid_id].reported
                                 $('#reported').html(reported)
 
                                 let needed = jsObject.grid_data[e.features[0].properties.grid_id].needed
                                 $('#needed').html(needed)
-
-                                // let sc = $('#slider-content')
-                                // sc.html('<span class="loading-spinner active"></span>')
-
-                                // window.get_grid_data(e.features[0].properties.grid_id)
-                                // .done(function(data){
-                                //     sc.empty()
-                                //     $.each(data, function(i,v){
-                                //         sc.append(`<div>${i} : ${v}</div>`)
-                                //     })
-                                // })
 
                                 $('#offCanvasNestedPush').foundation('toggle', e);
 
@@ -548,138 +662,159 @@ class DT_Network_Dashboard_Public_Heatmap_Churches
                 })
 
                 $('#add-report').on('click', function(e){
-                    $('#church-list').empty().html(`
-                    <div class="grid-x">
-                        <div class="cell small-6">
-                            <input type="text" placeholder="Name of Simple Church" />
-                        </div>
-                        <div class="cell small-1">
-                            <input type="number" placeholder="Members" />
-                        </div>
-                        <div class="cell small-4">
-                            <input type="date" placeholder="Started" />
-                        </div>
-                        <div class="cell small-1">
-                            <button class="button expanded alert" style="border-radius: 0;">X</button>
-                        </div>
-                    </div>
-                    `)
+                    $('#church-list').empty()
+                    append_report_row()
 
                     jQuery('#report-modal').foundation('open')
                 })
                 $('#add-another').on('click', function(e){
+                    append_report_row()
+                })
+                let submit_button = $('#submit-report')
+                function check_inputs(){
+                    submit_button.prop('disabled', false)
+                    $.each($('.required'), function(){
+                        if ( $(this).val() === '' ) {
+                            $(this).addClass('redborder')
+                            submit_button.prop('disabled', true)
+                        }
+                        else {
+                            $(this).removeClass('redborder')
+                        }
+                    })
+
+                }
+                function append_report_row(){
+                    let id = Date.now()
                     $('#church-list').append(`
-                    <div class="grid-x">
-                        <div class="cell small-7">
-                            <input type="text" placeholder="Name of Simple Church" />
+                    <div class="grid-x row-${id} list-row" data-id="${id}">
+                        <div class="cell small-6">
+                            <input type="text" name="${id}[name]" class="${id} name-${id} required" placeholder="Name of Simple Church" data-name="name" data-group-id="${id}" />
                         </div>
-                        <div class="cell small-1">
-                            <input type="number" placeholder="Members" />
+                        <div class="cell small-2">
+                            <input type="number" name="${id}[members]" class="${id} members-${id} required" placeholder="#" data-name="members" data-group-id="${id}" />
                         </div>
                         <div class="cell small-3">
-                            <input type="date" placeholder="Started" />
+                            <input type="date" name="${id}[start]" class="${id} start-${id} required" placeholder="Started" data-name="start" data-group-id="${id}" />
                         </div>
                         <div class="cell small-1">
-                            <button class="button expanded alert" style="border-radius: 0;">X</button>
+                            <button class="button expanded alert" style="border-radius: 0;" onclick="remove_row(${id})">X</button>
                         </div>
                     </div>
                     `)
-                })
-                $('#submit-report').on('click', function(e){
-                    jQuery('#report-modal').foundation('close')
-                })
 
-                // }) /*end grid_id*/
+                    $('.required').focusout(function(){
+                        check_inputs()
+                    })
+                    check_inputs()
+                }
+                submit_button.on('click', function(){
+                    let spinner = jQuery('.loading-spinner')
+                    spinner.addClass('active')
+
+                    let submit_button = jQuery('#submit-report')
+                    submit_button.prop('disabled', true)
+
+                    let honey = jQuery('#email').val()
+                    if ( honey ) {
+                        submit_button.html('Shame, shame, shame. We know your name ... ROBOT!').prop('disabled', true )
+                        spinner.removeClass('active')
+                        return;
+                    }
+
+
+                    let name_input = jQuery('#name')
+                    let name = name_input.val()
+                    if ( ! name ) {
+                        jQuery('#name-error').show()
+                        submit_button.removeClass('loading')
+                        name_input.focus(function(){
+                            jQuery('#name-error').hide()
+                        })
+                        submit_button.prop('disabled', false)
+                        spinner.removeClass('active')
+                        return;
+                    }
+
+                    let email_input = jQuery('#e2')
+                    let email = email_input.val()
+                    if ( ! email ) {
+                        jQuery('#email-error').show()
+                        submit_button.removeClass('loading')
+                        email_input.focus(function(){
+                            jQuery('#email-error').hide()
+                        })
+                        submit_button.prop('disabled', false)
+                        spinner.removeClass('active')
+                        return;
+                    }
+
+                    let phone_input = jQuery('#phone')
+                    let phone = phone_input.val()
+                    if ( ! phone ) {
+                        jQuery('#phone-error').show()
+                        submit_button.removeClass('loading')
+                        email_input.focus(function(){
+                            jQuery('#phone-error').hide()
+                        })
+                        submit_button.prop('disabled', false)
+                        spinner.removeClass('active')
+                        return;
+                    }
+
+                    let list = []
+                    jQuery.each( jQuery('.list-row'), function(i,v){
+                        let row_id = jQuery(this).data('id')
+                        list.push({
+                            name: jQuery('.name-'+row_id).val(),
+                            members: jQuery('.members-'+row_id).val(),
+                            start: jQuery('.start-'+row_id).val()
+                        })
+                    })
+
+
+                    let grid_id = jQuery('#report-grid-id').val()
+
+                    let form_data = {
+                        name: name,
+                        email: email,
+                        phone: phone,
+                        grid_id: grid_id,
+                        list: list
+                    }
+
+                    jQuery.ajax({
+                        type: "POST",
+                        data: JSON.stringify({ action: 'new_report', parts: jsObject.parts, data: form_data }),
+                        contentType: "application/json; charset=utf-8",
+                        dataType: "json",
+                        url: jsObject.root + jsObject.parts.root + '/v1/' + jsObject.parts.type,
+                        beforeSend: function (xhr) {
+                            xhr.setRequestHeader('X-WP-Nonce', jsObject.nonce )
+                        }
+                    })
+                        .done(function(response){
+                            jQuery('.loading-spinner').removeClass('active')
+                            console.log(response)
+                        })
+                        .fail(function(e) {
+                            console.log(e)
+                            jQuery('#error').html(e)
+                        })
+                })
             })
+            function remove_row( id ) {
+                let submit_button = $('#submit-report')
+                jQuery('.row-'+id).remove();
+                submit_button.prop('disabled', true)
+            }
         </script>
         <?php
     }
 
     public function grid_list(){
-        global $wpdb;
-        $list = $wpdb->get_results("
-        SELECT
-        lg0.grid_id, lg0.population, lg0.country_code
-        FROM $wpdb->dt_location_grid lg0
-        LEFT JOIN $wpdb->dt_location_grid as a0 ON lg0.admin0_grid_id=a0.grid_id
-        WHERE lg0.level < 1
-        AND lg0.country_code NOT IN (
-            SELECT lg23.country_code FROM $wpdb->dt_location_grid lg23 WHERE lg23.level_name = 'admin1' GROUP BY lg23.country_code
-        )
-        AND a0.name NOT IN ('China', 'India', 'France', 'Spain', 'Pakistan', 'Bangladesh')
-        AND a0.name NOT IN ('Romania', 'Estonia', 'Bhutan', 'Croatia', 'Solomon Islands', 'Guyana', 'Iceland', 'Vanuatu', 'Cape Verde', 'Samoa', 'Faroe Islands', 'Norway', 'Uruguay', 'Mongolia', 'United Arab Emirates', 'Slovenia', 'Bulgaria', 'Honduras', 'Columbia', 'Namibia', 'Switzerland', 'Western Sahara')
-
-        UNION ALL
-        --
-        # Only admin1
-        --
-        SELECT
-        lg1.grid_id, lg1.population, lg1.country_code
-        FROM $wpdb->dt_location_grid as lg1
-        LEFT JOIN $wpdb->dt_location_grid as a0 ON lg1.admin0_grid_id=a0.grid_id
-        WHERE lg1.country_code NOT IN (
-        SELECT lg22.country_code FROM $wpdb->dt_location_grid lg22 WHERE lg22.level_name = 'admin2' GROUP BY lg22.country_code
-        ) AND lg1.level_name != 'admin0'
-        AND a0.name NOT IN ('China', 'India', 'France', 'Spain', 'Pakistan', 'Bangladesh')
-        AND a0.name NOT IN ('Romania', 'Estonia', 'Bhutan', 'Croatia', 'Solomon Islands', 'Guyana', 'Iceland', 'Vanuatu', 'Cape Verde', 'Samoa', 'Faroe Islands', 'Norway', 'Uruguay', 'Mongolia', 'United Arab Emirates', 'Slovenia', 'Bulgaria', 'Honduras', 'Columbia', 'Namibia', 'Switzerland', 'Western Sahara')
-
-
-        UNION ALL
-        --
-        # Has admin2
-        --
-        SELECT
-        lg2.grid_id, lg2.population, lg2.country_code
-        FROM $wpdb->dt_location_grid lg2
-        LEFT JOIN $wpdb->dt_location_grid as a0 ON lg2.admin0_grid_id=a0.grid_id
-        WHERE lg2.level_name = 'admin2'
-        AND a0.name NOT IN ('China', 'India', 'France', 'Spain', 'Pakistan', 'Bangladesh')
-        AND a0.name NOT IN ('Romania', 'Estonia', 'Bhutan', 'Croatia', 'Solomon Islands', 'Guyana', 'Iceland', 'Vanuatu', 'Cape Verde', 'Samoa', 'Faroe Islands', 'Norway', 'Uruguay', 'Mongolia', 'United Arab Emirates', 'Slovenia', 'Bulgaria', 'Honduras', 'Columbia', 'Namibia', 'Switzerland', 'Western Sahara')
-
-        UNION ALL
-
-        # Exceptions admin3
-
-        SELECT
-        lge.grid_id, lge.population, lge.country_code
-        FROM $wpdb->dt_location_grid lge
-        LEFT JOIN $wpdb->dt_location_grid as a0 ON lge.admin0_grid_id=a0.grid_id
-        WHERE a0.name IN ('China', 'India', 'France', 'Spain', 'Pakistan', 'Bangladesh')
-            AND lge.level_name = 'admin3'
-
-
-        UNION ALL
-
-        # Exceptions admin1
-
-        SELECT
-        lge1.grid_id, lge1.population, lge1.country_code
-        FROM $wpdb->dt_location_grid lge1
-        LEFT JOIN $wpdb->dt_location_grid as a0 ON lge1.admin0_grid_id=a0.grid_id
-        WHERE lge1.level_name = 'admin1'
-        AND a0.name IN ('Romania', 'Estonia', 'Bhutan', 'Croatia', 'Solomon Islands', 'Guyana', 'Iceland', 'Vanuatu', 'Cape Verde', 'Samoa', 'Faroe Islands', 'Norway', 'Uruguay', 'Mongolia', 'United Arab Emirates', 'Slovenia', 'Bulgaria', 'Honduras', 'Columbia', 'Namibia', 'Switzerland', 'Western Sahara')
-
-        ", ARRAY_A );
-
-        $status = 'all';
-        $post_type = 'groups';
-        $sites = get_transient('DT_Network_Dashboard_Metrics_Base::get_sites' ); // @todo depends on the 24 hour transient to be present
-        $grid_list = array();
-        if ( ! empty( $sites ) ) {
-            foreach ( $sites as $key => $site ) {
-                foreach ( $site['locations'][$post_type][$status] as $grid ) {
-                    if ( ! isset( $grid_list[$grid['grid_id']] ) ) {
-                        $grid_list[$grid['grid_id']] = array(
-                            'grid_id' => $grid['grid_id'],
-                            'count' => 0
-                        );
-                    }
-
-                    $grid_list[$grid['grid_id']]['count'] = $grid_list[$grid['grid_id']]['count'] + $grid['count'];
-                }
-            }
-        }
-
+        $list = DT_Zume_Public_Heatmap::query_saturation_list();
+        $grid_list = Disciple_Tools_Mapping_Queries::query_church_location_grid_totals();
 
         $data = [];
         foreach( $list as $v ){
@@ -736,42 +871,6 @@ class DT_Network_Dashboard_Public_Heatmap_Churches
             ]
         );
 
-        register_rest_route(
-            $namespace,
-            '/'.$this->type .'/grid_totals/',
-            array(
-                array(
-                    'methods'  => WP_REST_Server::CREATABLE,
-                    'callback' => array( $this, 'grid_totals' ),
-                ),
-            )
-        );
-    }
-
-    public function grid_totals( WP_REST_Request $request ){
-        $params = $request->get_json_params() ?? $request->get_body_params();
-
-        if ( ! isset( $params['grid_id'] ) ) {
-            return new WP_Error(__METHOD__, 'no grid id' );
-        }
-        return Disciple_Tools_Mapping_Queries::get_by_grid_id( $params['grid_id'] );
-//        $sites = DT_Network_Dashboard_Metrics_Base::get_sites();
-//        $grid_list = array();
-//        if ( ! empty( $sites ) ) {
-//            foreach ( $sites as $key => $site ) {
-//                foreach ( $site['locations'][$post_type][$status] as $grid ) {
-//                    if ( ! isset( $grid_list[$grid['grid_id']] ) ) {
-//                        $grid_list[$grid['grid_id']] = array(
-//                            'grid_id' => $grid['grid_id'],
-//                            'count' => 0
-//                        );
-//                    }
-//
-//                    $grid_list[$grid['grid_id']]['count'] = $grid_list[$grid['grid_id']]['count'] + $grid['count'];
-//                }
-//            }
-//        }
-//        return $grid_list;
     }
 
     public function endpoint( WP_REST_Request $request ) {
@@ -784,25 +883,134 @@ class DT_Network_Dashboard_Public_Heatmap_Churches
         $params = dt_recursive_sanitize_array( $params );
         $action = sanitize_text_field( wp_unslash( $params['action'] ) );
 
-
         switch ( $action ) {
-            case 'get':
-                return $this->endpoint_get();
-//            case 'geojson':
-//                return $this->get_geojson();
-
-            // add other cases
-
+            case 'new_report':
+                return $this->endpoint_get( $params['data'] );
             default:
                 return new WP_Error( __METHOD__, "Missing valid action", [ 'status' => 400 ] );
         }
     }
-    public function endpoint_get() {
+    public function endpoint_get( $form_data ) {
         $data = [];
 
-        $data[] = [ 'name' => 'List item' ]; // @todo remove example
-        $data[] = [ 'name' => 'List item' ]; // @todo remove example
+        if ( ! isset( $form_data['grid_id'], $form_data['name'], $form_data['email'], $form_data['phone'], $form_data['list'] ) ) {
+            return new WP_Error(__METHOD__, 'Missing params.', ['status' => 400 ] );
+        }
+        if ( ! is_array( $form_data['list'] ) || empty( $form_data['list'] ) ) {
+            return new WP_Error(__METHOD__, 'List missing.', ['status' => 400 ] );
+        }
 
+        // create contact
+        $fields = [
+            'title' => $form_data['name'],
+            "overall_status" => "new",
+            "contact_email" => [
+                ["value" => $form_data['email']],
+            ],
+            "contact_phone" => [
+                ["value" => $form_data['phone']],
+            ],
+            'notes' => [
+                'source_note' => 'Submitted from public heatmap.'
+            ]
+
+        ];
+        if ( DT_Mapbox_API::get_key() ) {
+            $fields["location_grid_meta"] = [
+                "values" => [
+                    [ "grid_id" => $form_data['grid_id'] ]
+                ]
+            ];
+        } else {
+            $fields["location_grid"] = [
+                "values" => [
+                    [ "value" => $form_data['grid_id'] ]
+                ]
+            ];
+        }
+
+        $contact = DT_Posts::create_post( 'contacts', $fields, true, false );
+        if ( is_wp_error( $contact ) ){
+            return $contact;
+        }
+        $contact_id = $contact['ID'];
+
+        $group_ids = [];
+        $groups = [];
+        foreach( $form_data['list'] as $group ) {
+            $fields = [
+                'title' => $group['name'],
+                'member_count' => $group['members'],
+                'start_date' => $group['start'],
+                'church_start_date' => $group['start'],
+                'group_status' => 'active',
+                'leader_count' => 1,
+                'group_type' => 'church',
+                'members' => [
+                    "values" => [
+                        [ "value" => $contact_id ],
+                    ],
+                ],
+                'leaders' => [
+                    "values" => [
+                        [ "value" => $contact_id ],
+                    ],
+                ],
+                'notes' => [
+                    'source_note' => 'Submitted from public heatmap.'
+                ]
+            ];
+            if ( DT_Mapbox_API::get_key() ) {
+                $fields["location_grid_meta"] = [
+                    "values" => [
+                        [ "grid_id" => $form_data['grid_id'] ]
+                    ]
+                ];
+            } else {
+                $fields["location_grid"] = [
+                    "values" => [
+                        [ "value" => $form_data['grid_id'] ]
+                    ]
+                ];
+            }
+
+            $g = DT_Posts::create_post( 'groups', $fields, true, false );
+            if ( is_wp_error( $g ) ){
+                $groups[] = $g;
+                continue;
+            }
+            $group_id = $g['ID'];
+            $group_ids[] = $group_id;
+            $groups[$group_id] = $g;
+        }
+
+        // make connections
+        $connection_ids = [];
+        if ( ! empty( $group_ids ) ) {
+            foreach( $group_ids as $gid ) {
+                $fields = [
+                    "peer_groups" => [
+                        "values" => [],
+                    ]
+                ];
+                foreach( $group_ids as $subid ) {
+                    if ( $gid === $subid ) {
+                        continue;
+                    }
+                    $fields['peer_groups']['values'][] = [ "value" => $subid ];
+                }
+
+                $c = DT_Posts::update_post( 'groups', $gid, $fields, true, false );
+                $connection_ids[] = $c;
+            }
+        }
+
+        $data = [
+            'contact' => $contact,
+            'groups' => $groups,
+            'connections' => $connection_ids
+        ];
+        
         return $data;
     }
 }

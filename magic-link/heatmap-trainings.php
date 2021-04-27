@@ -278,15 +278,14 @@ class DT_Network_Dashboard_Public_Heatmap_Trainings
         return true;
     }
     public function body(){
+        DT_Mapbox_API::geocoder_scripts();
         ?>
         <div id="custom-style"></div>
         <div id="wrapper">
             <div id="map-wrapper">
-                <div style="position:absolute; top: 10px; left:10px; right:40px; z-index: 10;background-color:white; opacity: .8;padding:5px; margin: 0 10px;">
+                <div class="hide-for-small-only" style="position:absolute; top: 10px; left:10px; z-index: 10;background-color:white; opacity: .9;padding:5px 10px; margin: 0 10px;">
                     <div class="grid-x">
-                        <div class="cell small-4"></div>
-                        <div class="cell small-4" style="text-align:center;" id="name-id">Hover and zoom for locations</div>
-                        <div class="cell small-4"></div>
+                        <div class="cell" id="name-id">Hover and zoom for locations</div>
                     </div>
                 </div>
 
@@ -402,6 +401,14 @@ class DT_Network_Dashboard_Public_Heatmap_Trainings
                     zoom: 2
                 });
 
+                map.addControl(
+                    new MapboxGeocoder({
+                        accessToken: mapboxgl.accessToken,
+                        mapboxgl: mapboxgl,
+                        marker: false
+                    })
+                );
+
                 map.addControl(new mapboxgl.NavigationControl());
                 map.dragRotate.disable();
                 map.touchZoomRotate.disableRotation();
@@ -419,7 +426,16 @@ class DT_Network_Dashboard_Public_Heatmap_Trainings
 
                     jQuery.each(asset_list, function(i,v){
 
-                        jQuery.get( jsObject.mirror_url + 'tiles/world/saturation/'+v, null, null, 'json')
+                        jQuery.ajax({
+                            url: jsObject.mirror_url + 'tiles/world/saturation/' + v,
+                            dataType: 'json',
+                            data: null,
+                            beforeSend: function (xhr) {
+                                if (xhr.overrideMimeType) {
+                                    xhr.overrideMimeType("application/json");
+                                }
+                            }
+                        })
                             .done(function (geojson) {
 
                                 jQuery.each(geojson.features, function (i, v) {

@@ -265,15 +265,14 @@ class DT_Network_Dashboard_Public_Heatmap_Activity
         return true;
     }
     public function body(){
+        DT_Mapbox_API::geocoder_scripts();
         ?>
         <div id="custom-style"></div>
         <div id="wrapper">
             <div id="map-wrapper">
-                <div style="position:absolute; top: 10px; left:10px; right:40px; z-index: 10;background-color:white; opacity: .8;padding:5px; margin: 0 10px;">
+                <div class="hide-for-small-only" style="position:absolute; top: 10px; left:10px; z-index: 10;background-color:white; opacity: .9;padding:5px 10px; margin: 0 10px;">
                     <div class="grid-x">
-                        <div class="cell small-4"></div>
-                        <div class="cell small-4" style="text-align:center;" id="name-id">Hover and zoom for locations</div>
-                        <div class="cell small-4"></div>
+                        <div class="cell" id="name-id">Hover and zoom for locations</div>
                     </div>
                 </div>
 
@@ -287,7 +286,7 @@ class DT_Network_Dashboard_Public_Heatmap_Activity
                     <hr>
                 </div>
                 <div class="cell">
-                    <h2>Activity by Population: <span id="saturation-goal">0</span>%</h2>
+                    <h2>Engagement <i class="fi-info primary-color"></i>: <span id="saturation-goal">0</span>%</h2>
                     <meter id="meter" style="height:3rem;width:100%;" value="30" min="0" low="33" high="66" optimum="100" max="100"></meter>
                 </div>
                 <div class="cell">
@@ -345,6 +344,14 @@ class DT_Network_Dashboard_Public_Heatmap_Activity
                     zoom: 2
                 });
 
+                map.addControl(
+                    new MapboxGeocoder({
+                        accessToken: mapboxgl.accessToken,
+                        mapboxgl: mapboxgl,
+                        marker: false
+                    })
+                );
+
                 map.addControl(new mapboxgl.NavigationControl());
                 map.dragRotate.disable();
                 map.touchZoomRotate.disableRotation();
@@ -362,138 +369,144 @@ class DT_Network_Dashboard_Public_Heatmap_Activity
 
                     jQuery.each(asset_list, function(i,v){
 
-                        jQuery.get( jsObject.mirror_url + 'tiles/world/saturation/'+v, null, null, 'json')
-                            .done(function (geojson) {
+                        jQuery.ajax({
+                            url: jsObject.mirror_url + 'tiles/world/saturation/' + v,
+                            dataType: 'json',
+                            data: null,
+                            beforeSend: function (xhr) {
+                                if (xhr.overrideMimeType) {
+                                    xhr.overrideMimeType("application/json");
+                                }
+                            }
+                        })
+                        .done(function (geojson) {
 
-                                jQuery.each(geojson.features, function (i, v) {
-                                    if (jsObject.grid_data[v.id]) {
-                                        geojson.features[i].properties.value = parseInt(jsObject.grid_data[v.id].percent)
-                                    } else {
-                                        geojson.features[i].properties.value = 0
-                                    }
-                                })
-
-                                map.addSource(i.toString(), {
-                                    'type': 'geojson',
-                                    'data': geojson
-                                });
-                                map.addLayer({
-                                    'id': i.toString()+'line',
-                                    'type': 'line',
-                                    'source': i.toString(),
-                                    'paint': {
-                                        'line-color': '#323A68',
-                                        'line-width': .2
-                                    }
-                                });
-
-                                /**************/
-                                /* hover map*/
-                                /**************/
-                                map.addLayer({
-                                    'id': i.toString() + 'fills',
-                                    'type': 'fill',
-                                    'source': i.toString(),
-                                    'paint': {
-                                        'fill-color': 'black',
-                                        'fill-opacity': [
-                                            'case',
-                                            ['boolean', ['feature-state', 'hover'], false],
-                                            .8,
-                                            0
-                                        ]
-                                    }
-                                })
-                                /* end hover map*/
-
-                                /**********/
-                                /* heat map brown */
-                                /**********/
-                                map.addLayer({
-                                    'id': i.toString() + 'fills_heat',
-                                    'type': 'fill',
-                                    'source': i.toString(),
-                                    'paint': {
-                                        'fill-color': [
-                                            'interpolate',
-                                            ['linear'],
-                                            ['get', 'value'],
-                                            0,
-                                            'rgba(0,0,0,0)',
-                                            10,
-                                            'yellow',
-                                            // 30,
-                                            // 'red',
-                                            // 70,
-                                            // 'yellow',
-                                            100,
-                                            'darkgreen',
-
-                                        ],
-                                        'fill-opacity': 0.7
-                                    }
-                                })
-                                /**********/
-                                /* end fill map */
-                                /**********/
-
-                                map.on('mousemove', i.toString()+'fills', function (e) {
-                                    if ( window.previous_hover ) {
-                                        map.setFeatureState(
-                                            window.previous_hover,
-                                            { hover: false }
-                                        )
-                                    }
-                                    window.previous_hover = { source: i.toString(), id: e.features[0].id }
-                                    if (e.features.length > 0) {
-                                        jQuery('#name-id').html(e.features[0].properties.full_name)
-                                        map.setFeatureState(
-                                            window.previous_hover,
-                                            {hover: true}
-                                        );
-                                    }
-                                });
-                                map.on('click', i.toString()+'fills', function (e) {
-
-                                    $('#title').html(e.features[0].properties.full_name)
-                                    $('#meter').val(jsObject.grid_data[e.features[0].properties.grid_id].percent)
-                                    $('#saturation-goal').html(jsObject.grid_data[e.features[0].properties.grid_id].percent)
-                                    $('#population').html(jsObject.grid_data[e.features[0].properties.grid_id].population)
-
-                                    //report
-                                    $('#report-modal-title').html(e.features[0].properties.full_name)
-                                    $('#report-grid-id').html(e.features[0].properties.grid_id)
-
-                                    let reported = jsObject.grid_data[e.features[0].properties.grid_id].reported
-                                    $('#reported').html(reported)
-
-                                    let needed = jsObject.grid_data[e.features[0].properties.grid_id].needed
-                                    $('#needed').html(needed)
-
-                                    let sc = $('#slider-content')
-                                    sc.html('<span class="loading-spinner active"></span>')
-
-                                    window.get_movement_data(e.features[0].properties.grid_id)
-                                    .done(function(data){
-                                        console.log(data)
-                                        sc.empty()
-                                        $.each(data, function(i,v){
-                                            if ( typeof v.message !== 'undefined' ){
-
-                                                sc.append(`<div><div style="float:left;width:180px;"><strong>${v.formatted_time}</strong></div> <span>${v.message}</span></div>`)
-                                            }
-                                        })
-                                    })
-
-                                    $('#offCanvasNestedPush').foundation('toggle', e);
-
-                                });
+                            jQuery.each(geojson.features, function (i, v) {
+                                if (jsObject.grid_data[v.id]) {
+                                    geojson.features[i].properties.value = parseInt(jsObject.grid_data[v.id].percent)
+                                } else {
+                                    geojson.features[i].properties.value = 0
+                                }
                             })
+
+                            map.addSource(i.toString(), {
+                                'type': 'geojson',
+                                'data': geojson
+                            });
+                            map.addLayer({
+                                'id': i.toString()+'line',
+                                'type': 'line',
+                                'source': i.toString(),
+                                'paint': {
+                                    'line-color': '#323A68',
+                                    'line-width': .5
+                                }
+                            });
+
+                            /**************/
+                            /* hover map*/
+                            /**************/
+                            map.addLayer({
+                                'id': i.toString() + 'fills',
+                                'type': 'fill',
+                                'source': i.toString(),
+                                'paint': {
+                                    'fill-color': 'black',
+                                    'fill-opacity': [
+                                        'case',
+                                        ['boolean', ['feature-state', 'hover'], false],
+                                        .8,
+                                        0
+                                    ]
+                                }
+                            })
+                            /* end hover map*/
+
+                            /**********/
+                            /* heat map brown */
+                            /**********/
+                            map.addLayer({
+                                'id': i.toString() + 'fills_heat',
+                                'type': 'fill',
+                                'source': i.toString(),
+                                'paint': {
+                                    'fill-color': [
+                                        'interpolate',
+                                        ['linear'],
+                                        ['get', 'value'],
+                                        0,
+                                        'rgba(0,0,0,0)',
+                                        10,
+                                        'yellow',
+                                        // 30,
+                                        // 'red',
+                                        // 70,
+                                        // 'yellow',
+                                        100,
+                                        'darkgreen',
+
+                                    ],
+                                    'fill-opacity': 0.7
+                                }
+                            })
+                            /**********/
+                            /* end fill map */
+                            /**********/
+
+                            map.on('mousemove', i.toString()+'fills', function (e) {
+                                if ( window.previous_hover ) {
+                                    map.setFeatureState(
+                                        window.previous_hover,
+                                        { hover: false }
+                                    )
+                                }
+                                window.previous_hover = { source: i.toString(), id: e.features[0].id }
+                                if (e.features.length > 0) {
+                                    jQuery('#name-id').html(e.features[0].properties.full_name)
+                                    map.setFeatureState(
+                                        window.previous_hover,
+                                        {hover: true}
+                                    );
+                                }
+                            });
+                            map.on('click', i.toString()+'fills', function (e) {
+
+                                $('#title').html(e.features[0].properties.full_name)
+                                $('#meter').val(jsObject.grid_data[e.features[0].properties.grid_id].percent)
+                                $('#saturation-goal').html(jsObject.grid_data[e.features[0].properties.grid_id].percent)
+                                $('#population').html(jsObject.grid_data[e.features[0].properties.grid_id].population)
+
+                                //report
+                                $('#report-modal-title').html(e.features[0].properties.full_name)
+                                $('#report-grid-id').html(e.features[0].properties.grid_id)
+
+                                let reported = jsObject.grid_data[e.features[0].properties.grid_id].reported
+                                $('#reported').html(reported)
+
+                                let needed = jsObject.grid_data[e.features[0].properties.grid_id].needed
+                                $('#needed').html(needed)
+
+                                let sc = $('#slider-content')
+                                sc.html('<span class="loading-spinner active"></span>')
+
+                                window.get_movement_data(e.features[0].properties.grid_id)
+                                .done(function(data){
+                                    console.log(data)
+                                    sc.empty()
+                                    $.each(data, function(i,v){
+                                        if ( typeof v.message !== 'undefined' ){
+
+                                            sc.append(`<div><div style="float:left;width:180px;"><strong>${v.formatted_time}</strong></div> <span>${v.message}</span></div>`)
+                                        }
+                                    })
+                                })
+
+                                $('#offCanvasNestedPush').foundation('toggle', e);
+
+                            });
+                        })
                     })
                 })
-
-
-
             })
         </script>
         <?php

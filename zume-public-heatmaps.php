@@ -76,6 +76,7 @@ class Zume_Public_Heatmaps {
 
     private function __construct() {
 
+        require_once('magic-link/queries.php');
         require_once('magic-link/heatmap-churches.php');
         require_once('magic-link/heatmap-zume-activity.php');
         require_once('magic-link/heatmap-trainings.php');
