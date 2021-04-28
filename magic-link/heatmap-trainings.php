@@ -612,9 +612,8 @@ class DT_Network_Dashboard_Public_Heatmap_Trainings
     }
 
     public function grid_list(){
-        $list = $this->query_world_saturation_grid();
+        $list = DT_Zume_Public_Heatmap::query_saturation_list();
         $trainings_list = $this->query_trainings_grid();
-
 
         $data = [];
         foreach( $list as $v ){

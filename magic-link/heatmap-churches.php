@@ -260,108 +260,6 @@ class DT_Network_Dashboard_Public_Heatmap_Churches
                         jQuery('#error').html(e)
                     })
             }
-
-            // window.create_report = () => {
-            //     let spinner = jQuery('.loading-spinner')
-            //     spinner.addClass('active')
-            //
-            //     let submit_button = jQuery('#submit-report')
-            //     submit_button.prop('disabled', true)
-            //
-            //     let honey = jQuery('#email').val()
-            //     if ( honey ) {
-            //         submit_button.html('Shame, shame, shame. We know your name ... ROBOT!').prop('disabled', true )
-            //         spinner.removeClass('active')
-            //         return;
-            //     }
-            //
-            //
-            //     let name_input = jQuery('#name')
-            //     let name = name_input.val()
-            //     if ( ! name ) {
-            //         jQuery('#name-error').show()
-            //         submit_button.removeClass('loading')
-            //         name_input.focus(function(){
-            //             jQuery('#name-error').hide()
-            //         })
-            //         submit_button.prop('disabled', false)
-            //         spinner.removeClass('active')
-            //         return;
-            //     }
-            //
-            //     let email_input = jQuery('#e2')
-            //     let email = email_input.val()
-            //     if ( ! email ) {
-            //         jQuery('#email-error').show()
-            //         submit_button.removeClass('loading')
-            //         email_input.focus(function(){
-            //             jQuery('#email-error').hide()
-            //         })
-            //         submit_button.prop('disabled', false)
-            //         spinner.removeClass('active')
-            //         return;
-            //     }
-            //
-            //     let phone_input = jQuery('#phone')
-            //     let phone = phone_input.val()
-            //     if ( ! phone ) {
-            //         jQuery('#phone-error').show()
-            //         submit_button.removeClass('loading')
-            //         email_input.focus(function(){
-            //             jQuery('#phone-error').hide()
-            //         })
-            //         submit_button.prop('disabled', false)
-            //         spinner.removeClass('active')
-            //         return;
-            //     }
-            //
-            //     let churches = []
-            //     jQuery.each( jQuery('.list-row input'), function(i,v){
-            //         let groupid = jQuery(this).data('group-id')
-            //
-            //         if ( typeof churches[groupid] === 'undefined' ){
-            //             churches[groupid] = []
-            //         }
-            //         if ( jQuery(this).data('name') === 'name') {
-            //             churches[groupid].name = jQuery(this).val()
-            //         } else if ( jQuery(this).data('name') === 'members' ) {
-            //             churches[groupid].members = jQuery(this).val()
-            //         } else if ( jQuery(this).data('name') === 'start' ) {
-            //             churches[groupid].start = jQuery(this).val()
-            //         }
-            //     })
-            //
-            //     let grid_id = jQuery('#report-grid-id').val()
-            //
-            //     let form_data = []
-            //     form_data.name = name
-            //     form_data.email = email
-            //     form_data.phone = phone
-            //     form_data.list = churches
-            //     form_data.grid_id = grid_id
-            //
-            //     console.log(form_data)
-            //
-            //     jQuery.ajax({
-            //         type: "POST",
-            //         data: JSON.stringify({ action: 'new_report', parts: jsObject.parts, data: form_data }),
-            //         contentType: "application/json; charset=utf-8",
-            //         dataType: "json",
-            //         url: jsObject.root + jsObject.parts.root + '/v1/' + jsObject.parts.type,
-            //         beforeSend: function (xhr) {
-            //             xhr.setRequestHeader('X-WP-Nonce', jsObject.nonce )
-            //         }
-            //     })
-            //         .done(function(response){
-            //             jQuery('.loading-spinner').removeClass('active')
-            //             console.log(response)
-            //         })
-            //         .fail(function(e) {
-            //             console.log(e)
-            //             jQuery('#error').html(e)
-            //         })
-            // }
-
         </script>
         <?php
         return true;
@@ -444,13 +342,13 @@ class DT_Network_Dashboard_Public_Heatmap_Churches
                     </div>
                     <div class="cell callout">
                         <div class="grid-x">
-                            <div class="cell small-6">
+                            <div class="cell small-5">
                                 Nickname of Simple Church
                             </div>
                             <div class="cell small-2">
                                 Member Count
                             </div>
-                            <div class="cell small-3">
+                            <div class="cell small-4">
                                 Date Started
                             </div>
                             <div class="cell small-1">
@@ -466,8 +364,12 @@ class DT_Network_Dashboard_Public_Heatmap_Churches
                     </div>
 
                     <div class="cell center">
+                        <p><input type="checkbox" class="required" id="return-reporter" /> I have submitted a report before.</p>
+                    </div>
+                    <div class="cell center">
                         <input type="hidden" id="report-grid-id" />
-                        <button class="button" id="submit-report">Add Report</button> <span class="loading-spinner"></span>
+<!--                        <button class="button" id="submit-report">Add Report</button> <span class="loading-spinner"></span>-->
+                        <button class="button" onclick="alert('Add Report Disabled on Live Site')">Add Report</button>
                     </div>
                 </div>
             </div>
@@ -603,11 +505,11 @@ class DT_Network_Dashboard_Public_Heatmap_Churches
                                         0,
                                         'rgba(0,0,0,0)',
                                         1,
-                                        'yellow',
+                                        'OrangeRed',
                                         // 10,
                                         // 'grey',
-                                        // 30,
-                                        // 'red',
+                                        // 50,
+                                        // 'lightgreen',
                                         // 70,
                                         // 'yellow',
                                         100,
@@ -688,13 +590,13 @@ class DT_Network_Dashboard_Public_Heatmap_Churches
                     let id = Date.now()
                     $('#church-list').append(`
                     <div class="grid-x row-${id} list-row" data-id="${id}">
-                        <div class="cell small-6">
+                        <div class="cell small-5">
                             <input type="text" name="${id}[name]" class="${id} name-${id} required" placeholder="Name of Simple Church" data-name="name" data-group-id="${id}" />
                         </div>
                         <div class="cell small-2">
                             <input type="number" name="${id}[members]" class="${id} members-${id} required" placeholder="#" data-name="members" data-group-id="${id}" />
                         </div>
-                        <div class="cell small-3">
+                        <div class="cell small-4">
                             <input type="date" name="${id}[start]" class="${id} start-${id} required" placeholder="Started" data-name="start" data-group-id="${id}" />
                         </div>
                         <div class="cell small-1">
@@ -721,7 +623,6 @@ class DT_Network_Dashboard_Public_Heatmap_Churches
                         spinner.removeClass('active')
                         return;
                     }
-
 
                     let name_input = jQuery('#name')
                     let name = name_input.val()
@@ -774,12 +675,24 @@ class DT_Network_Dashboard_Public_Heatmap_Churches
 
 
                     let grid_id = jQuery('#report-grid-id').val()
+                    let return_reporter = jQuery('#return-reporter').is(':checked');
+
+                    // if cookie contact_id
+                    // if window contact_id
+                    let contact_id = ''
+                    if ( typeof window.contact_id !== 'undefined' && typeof window.contact_email !== 'undefined' ) {
+                        if ( email === window.contact_email ) {
+                            contact_id = window.contact_id
+                        }
+                    }
 
                     let form_data = {
                         name: name,
                         email: email,
                         phone: phone,
                         grid_id: grid_id,
+                        contact_id: contact_id,
+                        return_reporter: return_reporter,
                         list: list
                     }
 
@@ -796,6 +709,11 @@ class DT_Network_Dashboard_Public_Heatmap_Churches
                         .done(function(response){
                             jQuery('.loading-spinner').removeClass('active')
                             console.log(response)
+
+                            window.contact_id = response.contact.ID
+                            window.contact_email = email
+
+
                         })
                         .fail(function(e) {
                             console.log(e)
@@ -803,11 +721,17 @@ class DT_Network_Dashboard_Public_Heatmap_Churches
                         })
                 })
             })
+
             function remove_row( id ) {
                 let submit_button = $('#submit-report')
                 jQuery('.row-'+id).remove();
                 submit_button.prop('disabled', true)
             }
+            if (document.readyState === 'complete') {
+                window.contact_id = Cookie.get('contact_id')
+                window.contact_email = Cookie.get('contact_email')
+            }
+
         </script>
         <?php
     }
@@ -873,6 +797,10 @@ class DT_Network_Dashboard_Public_Heatmap_Churches
 
     }
 
+    /**
+     * @param WP_REST_Request $request
+     * @return array|false|int|WP_Error|null
+     */
     public function endpoint( WP_REST_Request $request ) {
         $params = $request->get_params();
 
@@ -885,14 +813,14 @@ class DT_Network_Dashboard_Public_Heatmap_Churches
 
         switch ( $action ) {
             case 'new_report':
-                return $this->endpoint_get( $params['data'] );
+                return $this->endpoint_new_report( $params['data'] );
             default:
                 return new WP_Error( __METHOD__, "Missing valid action", [ 'status' => 400 ] );
         }
     }
-    public function endpoint_get( $form_data ) {
-        $data = [];
 
+    public function endpoint_new_report( $form_data ) {
+        global $wpdb;
         if ( ! isset( $form_data['grid_id'], $form_data['name'], $form_data['email'], $form_data['phone'], $form_data['list'] ) ) {
             return new WP_Error(__METHOD__, 'Missing params.', ['status' => 400 ] );
         }
@@ -900,41 +828,73 @@ class DT_Network_Dashboard_Public_Heatmap_Churches
             return new WP_Error(__METHOD__, 'List missing.', ['status' => 400 ] );
         }
 
-        // create contact
-        $fields = [
-            'title' => $form_data['name'],
-            "overall_status" => "new",
-            "contact_email" => [
-                ["value" => $form_data['email']],
-            ],
-            "contact_phone" => [
-                ["value" => $form_data['phone']],
-            ],
-            'notes' => [
-                'source_note' => 'Submitted from public heatmap.'
-            ]
+        $contact_id = false;
 
-        ];
-        if ( DT_Mapbox_API::get_key() ) {
-            $fields["location_grid_meta"] = [
-                "values" => [
-                    [ "grid_id" => $form_data['grid_id'] ]
-                ]
-            ];
-        } else {
-            $fields["location_grid"] = [
-                "values" => [
-                    [ "value" => $form_data['grid_id'] ]
-                ]
-            ];
+        // try to get contact_id and contact
+        if ( isset( $form_data['contact_id'] ) && ! empty( $form_data['contact_id'] ) ) {
+            $contact_id = (int) $form_data['contact_id'];
+            $contact = DT_Posts::get_post('contacts', $contact_id, false, false );
+            if ( is_wp_error( $contact ) ){
+                return $contact;
+            }
+        }
+        else if ( isset( $form_data['return_reporter'] ) && $form_data['return_reporter'] ) {
+            $email = sanitize_email( wp_unslash( $form_data['email'] ) );
+            $contact_ids = $wpdb->get_results($wpdb->prepare( "
+                SELECT DISTINCT pm.post_id
+                FROM $wpdb->postmeta as pm
+                JOIN $wpdb->postmeta as pm1 ON pm.post_id=pm1.post_id AND pm1.meta_key LIKE 'contact_email%' AND pm1.meta_key NOT LIKE '%details'
+                WHERE pm.meta_key = 'overall_status' AND pm.meta_value = 'active' AND pm1.meta_value = %s
+            ", $email ), ARRAY_A );
+            if ( ! empty( $contact_ids ) ){
+                $contact_id = $contact_ids[0]['post_id'];
+                $contact = DT_Posts::get_post('contacts', $contact_id, false, false );
+                if ( is_wp_error( $contact ) ){
+                    return $contact;
+                }
+            }
         }
 
-        $contact = DT_Posts::create_post( 'contacts', $fields, true, false );
-        if ( is_wp_error( $contact ) ){
-            return $contact;
-        }
-        $contact_id = $contact['ID'];
+        // create contact if not able to be found
+        if ( ! $contact_id ) {
+            // create contact
+            $fields = [
+                'title' => $form_data['name'],
+                "overall_status" => "new",
+                "type" => "access",
+                "contact_email" => [
+                    ["value" => $form_data['email']],
+                ],
+                "contact_phone" => [
+                    ["value" => $form_data['phone']],
+                ],
+                'notes' => [
+                    'source_note' => 'Submitted from public heatmap.'
+                ]
 
+            ];
+            if ( DT_Mapbox_API::get_key() ) {
+                $fields["location_grid_meta"] = [
+                    "values" => [
+                        [ "grid_id" => $form_data['grid_id'] ]
+                    ]
+                ];
+            } else {
+                $fields["location_grid"] = [
+                    "values" => [
+                        [ "value" => $form_data['grid_id'] ]
+                    ]
+                ];
+            }
+
+            $contact = DT_Posts::create_post( 'contacts', $fields, true, false );
+            if ( is_wp_error( $contact ) ){
+                return $contact;
+            }
+            $contact_id = $contact['ID'];
+        }
+
+        // create groups
         $group_ids = [];
         $groups = [];
         foreach( $form_data['list'] as $group ) {
@@ -984,7 +944,7 @@ class DT_Network_Dashboard_Public_Heatmap_Churches
             $groups[$group_id] = $g;
         }
 
-        // make connections
+        // create connections
         $connection_ids = [];
         if ( ! empty( $group_ids ) ) {
             foreach( $group_ids as $gid ) {
@@ -1010,7 +970,7 @@ class DT_Network_Dashboard_Public_Heatmap_Churches
             'groups' => $groups,
             'connections' => $connection_ids
         ];
-        
+
         return $data;
     }
 }
