@@ -2,29 +2,29 @@
 if ( !defined( 'ABSPATH' ) ) { exit; } // Exit if accessed directly.
 
 if ( strpos( dt_get_url_path(), 'zume_app' ) !== false || dt_is_rest() ){
-    DT_Network_Dashboard_Public_Heatmap_Churches::instance();
+    DT_Pray4everywhere::instance();
 }
 
 
 add_filter('dt_network_dashboard_supported_public_links', function( $supported_links ){
     $supported_links[] = [
-        'name' => 'Public Heatmap ( Churches )',
-        'description' => 'Maps church saturation by admin2 (counties)',
-        'key' => 'zume_app_heatmap_churches',
-        'url' => 'zume_app/heatmap_churches'
+        'name' => 'Public Heatmap ( Pray4Everywhere )',
+        'description' => 'Pray4Everywhere template',
+        'key' => 'zume_app_pray4everywhere',
+        'url' => 'zume_app/pray4everywhere'
     ];
     return $supported_links;
 }, 10, 1 );
 
 
-class DT_Network_Dashboard_Public_Heatmap_Churches
+class DT_Pray4everywhere
 {
 
     public $magic = false;
     public $parts = false;
     public $root = "zume_app";
-    public $type = 'heatmap_churches';
-    public $post_type = 'groups';
+    public $type = 'pray4everywhere';
+    public $post_type = 'contacts';
 
     private static $_instance = null;
     public static function instance() {
@@ -368,7 +368,8 @@ class DT_Network_Dashboard_Public_Heatmap_Churches
                     </div>
                     <div class="cell center">
                         <input type="hidden" id="report-grid-id" />
-                        <button class="button" id="submit-report">Add Report</button> <span class="loading-spinner"></span>
+                        <!--                        <button class="button" id="submit-report">Add Report</button> <span class="loading-spinner"></span>-->
+                        <button class="button" onclick="alert('Add Report Disabled on Live Site')">Add Report</button>
                     </div>
                 </div>
             </div>
@@ -398,13 +399,12 @@ class DT_Network_Dashboard_Public_Heatmap_Churches
                         }
                     </style>`)
 
-                 // window.get_grid_data().then(function(grid_data){
+                // window.get_grid_data().then(function(grid_data){
                 $('#map').empty()
                 mapboxgl.accessToken = jsObject.map_key;
                 var map = new mapboxgl.Map({
                     container: 'map',
                     style: 'mapbox://styles/mapbox/light-v10',
-                    // style: 'mapbox://styles/mapbox/dark-v10',
                     // style: 'mapbox://styles/mapbox/streets-v11',
                     center: [-98, 38.88],
                     minZoom: 2,
@@ -425,6 +425,7 @@ class DT_Network_Dashboard_Public_Heatmap_Churches
                 map.touchZoomRotate.disableRotation();
 
                 window.previous_hover = false
+
                 map.on('load', function() {
 
                     let asset_list = []
@@ -446,107 +447,119 @@ class DT_Network_Dashboard_Public_Heatmap_Churches
                                 }
                             }
                         })
-                        .done(function (geojson) {
+                            .done(function (geojson) {
 
-                            jQuery.each(geojson.features, function (i, v) {
-                                if (jsObject.grid_data.data[v.id]) {
-                                    geojson.features[i].properties.value = parseInt(jsObject.grid_data.data[v.id].percent)
-                                } else {
-                                    geojson.features[i].properties.value = 0
-                                }
+                                jQuery.each(geojson.features, function (i, v) {
+                                    if (jsObject.grid_data[v.id]) {
+                                        geojson.features[i].properties.value = parseInt(jsObject.grid_data[v.id].percent)
+                                    } else {
+                                        geojson.features[i].properties.value = 0
+                                    }
+                                })
+
+                                map.addSource(i.toString(), {
+                                    'type': 'geojson',
+                                    'data': geojson
+                                });
+                                map.addLayer({
+                                    'id': i.toString()+'line',
+                                    'type': 'line',
+                                    'source': i.toString(),
+                                    'paint': {
+                                        'line-color': '#323A68',
+                                        'line-width': .5
+                                    }
+                                });
+
+                                /**************/
+                                /* hover map*/
+                                /**************/
+                                map.addLayer({
+                                    'id': i.toString() + 'fills',
+                                    'type': 'fill',
+                                    'source': i.toString(),
+                                    'paint': {
+                                        'fill-color': 'black',
+                                        'fill-opacity': [
+                                            'case',
+                                            ['boolean', ['feature-state', 'hover'], false],
+                                            .8,
+                                            0
+                                        ]
+                                    }
+                                })
+                                /* end hover map*/
+
+                                /**********/
+                                /* heat map brown */
+                                /**********/
+                                map.addLayer({
+                                    'id': i.toString() + 'fills_heat',
+                                    'type': 'fill',
+                                    'source': i.toString(),
+                                    'paint': {
+                                        'fill-color': [
+                                            'interpolate',
+                                            ['linear'],
+                                            ['get', 'value'],
+                                            0,
+                                            'rgba(0,0,0,0)',
+                                            1,
+                                            'OrangeRed',
+                                            // 10,
+                                            // 'grey',
+                                            // 50,
+                                            // 'lightgreen',
+                                            // 70,
+                                            // 'yellow',
+                                            100,
+                                            'darkgreen',
+
+                                        ],
+                                        'fill-opacity': 0.7
+                                    }
+                                })
+                                /**********/
+                                /* end fill map */
+                                /**********/
+
+                                map.on('mousemove', i.toString()+'fills', function (e) {
+                                    if ( window.previous_hover ) {
+                                        map.setFeatureState(
+                                            window.previous_hover,
+                                            { hover: false }
+                                        )
+                                    }
+                                    window.previous_hover = { source: i.toString(), id: e.features[0].id }
+                                    if (e.features.length > 0) {
+                                        jQuery('#name-id').html(e.features[0].properties.full_name)
+                                        map.setFeatureState(
+                                            window.previous_hover,
+                                            {hover: true}
+                                        );
+                                    }
+                                });
+                                map.on('click', i.toString()+'fills', function (e) {
+
+                                    $('#title').html(e.features[0].properties.full_name)
+                                    $('#meter').val(jsObject.grid_data[e.features[0].properties.grid_id].percent)
+                                    $('#saturation-goal').html(jsObject.grid_data[e.features[0].properties.grid_id].percent)
+                                    $('#population').html(jsObject.grid_data[e.features[0].properties.grid_id].population)
+
+                                    //report
+                                    $('#report-modal-title').html(e.features[0].properties.full_name)
+                                    $('#report-grid-id').val(e.features[0].properties.grid_id)
+
+                                    let reported = jsObject.grid_data[e.features[0].properties.grid_id].reported
+                                    $('#reported').html(reported)
+
+                                    let needed = jsObject.grid_data[e.features[0].properties.grid_id].needed
+                                    $('#needed').html(needed)
+
+                                    $('#offCanvasNestedPush').foundation('toggle', e);
+
+                                });
                             })
-
-                            map.addSource(i.toString(), {
-                                'type': 'geojson',
-                                'data': geojson
-                            });
-                            map.addLayer({
-                                'id': i.toString()+'line',
-                                'type': 'line',
-                                'source': i.toString(),
-                                'paint': {
-                                    // 'line-color': '#323A68',
-                                    'line-color': 'grey',
-                                    'line-width': .5
-                                }
-                            });
-
-                            /**************/
-                            /* hover map*/
-                            /**************/
-                            map.addLayer({
-                                'id': i.toString() + 'fills',
-                                'type': 'fill',
-                                'source': i.toString(),
-                                'paint': {
-                                    'fill-color': 'black',
-                                    'fill-opacity': [
-                                        'case',
-                                        ['boolean', ['feature-state', 'hover'], false],
-                                        .8,
-                                        0
-                                    ]
-                                }
-                            })
-                            /* end hover map*/
-
-                            /**********/
-                            /* heat map brown */
-                            /**********/
-                            map.addLayer({
-                                'id': i.toString() + 'fills_heat',
-                                'type': 'fill',
-                                'source': i.toString(),
-                                'paint': {
-                                    'fill-color': {
-                                        property: 'value',
-                                        stops: [[0, 'rgba(0, 0, 0, 0)'], [1, 'rgb(155, 200, 254)'], [jsObject.grid_data.highest_value, 'rgb(37, 82, 154)']]
-                                    },
-                                    'fill-opacity': 0.75,
-                                    'fill-outline-color': '#707070'
-                                }
-                            })
-                            /**********/
-                            /* end fill map */
-                            /**********/
-
-                            map.on('mousemove', i.toString()+'fills', function (e) {
-                                if ( window.previous_hover ) {
-                                    map.setFeatureState(
-                                        window.previous_hover,
-                                        { hover: false }
-                                    )
-                                }
-                                window.previous_hover = { source: i.toString(), id: e.features[0].id }
-                                if (e.features.length > 0) {
-                                    jQuery('#name-id').html(e.features[0].properties.full_name)
-                                    map.setFeatureState(
-                                        window.previous_hover,
-                                        {hover: true}
-                                    );
-                                }
-                            });
-                            map.on('click', i.toString()+'fills', function (e) {
-
-                                $('#title').html(e.features[0].properties.full_name)
-                                $('#meter').val(jsObject.grid_data.data[e.features[0].properties.grid_id].percent)
-                                $('#saturation-goal').html(jsObject.grid_data.data[e.features[0].properties.grid_id].percent)
-                                $('#population').html(jsObject.grid_data.data[e.features[0].properties.grid_id].population)
-
-                                //report
-                                $('#report-modal-title').html(e.features[0].properties.full_name)
-                                $('#report-grid-id').val(e.features[0].properties.grid_id)
-
-                                let reported = jsObject.grid_data.data[e.features[0].properties.grid_id].reported
-                                $('#reported').html(reported)
-
-                                let needed = jsObject.grid_data.data[e.features[0].properties.grid_id].needed
-                                $('#needed').html(needed)
-
-                                $('#offCanvasNestedPush').foundation('toggle', e);
-
-                            });
-                        })
                     })
                 })
 
@@ -728,7 +741,6 @@ class DT_Network_Dashboard_Public_Heatmap_Churches
         $grid_list = Disciple_Tools_Mapping_Queries::query_church_location_grid_totals();
 
         $data = [];
-        $highest_value = 1;
         foreach( $list as $v ){
             $data[$v['grid_id']] = [
                 'grid_id' => $v['grid_id'],
@@ -763,16 +775,9 @@ class DT_Network_Dashboard_Public_Heatmap_Churches
                 $data[$v['grid_id']]['reported'] = 0;
                 $data[$v['grid_id']]['needed'] = $needed;
             }
-
-            if ( $highest_value < $data[$v['grid_id']]['reported'] ){
-                $highest_value = $data[$v['grid_id']]['reported'];
-            }
         }
 
-        return [
-            'highest_value' => (int) $highest_value,
-            'data' => $data
-        ];
+        return $data;
     }
 
     /**

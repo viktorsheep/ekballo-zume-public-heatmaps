@@ -44,7 +44,7 @@ class Zume_Public_Heatmaps_Menu {
      * @since 0.1
      */
     public function register_menu() {
-        add_submenu_page( 'dt_extensions', 'Plugin Starter Template', 'Plugin Starter Template', 'manage_dt', $this->token, [ $this, 'content' ] );
+        add_submenu_page( 'dt_extensions', 'Zume HeatMap', 'Zume Heatmap', 'manage_dt', $this->token, [ $this, 'content' ] );
     }
 
     /**
@@ -72,11 +72,11 @@ class Zume_Public_Heatmaps_Menu {
 
         ?>
         <div class="wrap">
-            <h2>Plugin Starter Template</h2>
+            <h2>Zume Public Heatmap</h2>
             <h2 class="nav-tab-wrapper">
                 <a href="<?php echo esc_attr( $link ) . 'general' ?>"
                    class="nav-tab <?php echo esc_html( ( $tab == 'general' || !isset( $tab ) ) ? 'nav-tab-active' : '' ); ?>">General</a>
-                <a href="<?php echo esc_attr( $link ) . 'second' ?>" class="nav-tab <?php echo esc_html( ( $tab == 'second' || !isset( $tab ) ) ? 'nav-tab-active' : '' ); ?>">Second</a>
+                <a href="<?php echo esc_attr( $link ) . 'update_lgdb' ?>" class="nav-tab <?php echo esc_html( ( $tab == 'update_lgdb' || !isset( $tab ) ) ? 'nav-tab-active' : '' ); ?>">Update LG Database</a>
             </h2>
 
             <?php
@@ -85,7 +85,7 @@ class Zume_Public_Heatmaps_Menu {
                     $object = new Zume_Public_Heatmaps_Tab_General();
                     $object->content();
                     break;
-                case "second":
+                case "update_lgdb":
                     $object = new Zume_Public_Heatmaps_Tab_Second();
                     $object->content();
                     break;
@@ -183,26 +183,18 @@ class Zume_Public_Heatmaps_Tab_General {
  */
 class Zume_Public_Heatmaps_Tab_Second {
     public function content() {
+//        require_once('patch-full-location-grid.php');
         ?>
         <div class="wrap">
             <div id="poststuff">
-                <div id="post-body" class="metabox-holder columns-2">
+                <div id="post-body" class="metabox-holder columns-1">
                     <div id="post-body-content">
                         <!-- Main Column -->
 
-                        <?php $this->main_column() ?>
+<!--                        --><?php //DT_Patch_Location_Grid_Full::instance()->admin_box(); ?>
 
                         <!-- End Main Column -->
                     </div><!-- end post-body-content -->
-                    <div id="postbox-container-1" class="postbox-container">
-                        <!-- Right Column -->
-
-                        <?php $this->right_column() ?>
-
-                        <!-- End Right Column -->
-                    </div><!-- postbox-container 1 -->
-                    <div id="postbox-container-2" class="postbox-container">
-                    </div><!-- postbox-container 2 -->
                 </div><!-- post-body meta box container -->
             </div><!--poststuff end -->
         </div><!-- wrap end -->
