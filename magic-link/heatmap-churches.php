@@ -267,7 +267,19 @@ class DT_Network_Dashboard_Public_Heatmap_Churches
     public function body(){
         DT_Mapbox_API::geocoder_scripts();
         ?>
-        <div id="custom-style"></div>
+        <div id="custom-style">
+            <style>
+                #wrapper {
+                    height: 1000px !important;
+                }
+                #map-wrapper {
+                    height: 1000px !important;
+                }
+                #map {
+                    height: 1000px !important;
+                }
+            </style>
+        </div>
         <div id="wrapper">
             <div id="map-wrapper">
                 <div class="hide-for-small-only" style="position:absolute; top: 10px; left:10px; z-index: 10;background-color:white; opacity: .9;padding:5px 10px; margin: 0 10px;">
@@ -275,10 +287,11 @@ class DT_Network_Dashboard_Public_Heatmap_Churches
                         <div class="cell" id="name-id">Hover and zoom for locations</div>
                     </div>
                 </div>
-
-                <div id='map'><span class="loading-spinner active"></span></div>
+                <span class="loading-spinner active"></span>
+                <div id='map'></div>
             </div>
         </div>
+        <!-- modal -->
         <div class="off-canvas position-left is-closed" id="offCanvasNestedPush" data-transition-time=".3s" data-off-canvas>
             <div class="grid-x grid-padding-x " style="margin-top:1rem;">
                 <div class="cell">
@@ -310,7 +323,7 @@ class DT_Network_Dashboard_Public_Heatmap_Churches
                 <span aria-hidden="true">&times;</span>
             </button>
         </div>
-        <!-- Report modal -->
+        <!-- modal -->
         <div class="reveal" id="report-modal" data-v-offset="10px" data-reveal>
             <div>
                 <h1 id="title">Report New Simple Church <i class="fi-info primary-color small"></i> </h1>
@@ -398,14 +411,12 @@ class DT_Network_Dashboard_Public_Heatmap_Churches
                         }
                     </style>`)
 
-                 // window.get_grid_data().then(function(grid_data){
-                $('#map').empty()
+                $('.loading-spinner').removeClass('active')
+
                 mapboxgl.accessToken = jsObject.map_key;
                 var map = new mapboxgl.Map({
                     container: 'map',
                     style: 'mapbox://styles/mapbox/light-v10',
-                    // style: 'mapbox://styles/mapbox/dark-v10',
-                    // style: 'mapbox://styles/mapbox/streets-v11',
                     center: [-98, 38.88],
                     minZoom: 2,
                     maxZoom: 8,
@@ -425,28 +436,29 @@ class DT_Network_Dashboard_Public_Heatmap_Churches
                 map.touchZoomRotate.disableRotation();
 
                 window.previous_hover = false
-                map.on('load', function() {
 
-                    let asset_list = []
-                    var i = 1;
-                    while( i <= 46 ){
-                        asset_list.push(i+'.geojson')
-                        i++
-                    }
+                let asset_list = []
+                var i = 1;
+                while( i <= 46 ){
+                    asset_list.push(i+'.geojson')
+                    i++
+                }
 
-                    jQuery.each(asset_list, function(i,v){
+                jQuery.each(asset_list, function(i,v){
 
-                        jQuery.ajax({
-                            url: jsObject.mirror_url + 'tiles/world/saturation/' + v,
-                            dataType: 'json',
-                            data: null,
-                            beforeSend: function (xhr) {
-                                if (xhr.overrideMimeType) {
-                                    xhr.overrideMimeType("application/json");
-                                }
+                    jQuery.ajax({
+                        url: jsObject.mirror_url + 'tiles/world/saturation/' + v,
+                        dataType: 'json',
+                        data: null,
+                        beforeSend: function (xhr) {
+                            if (xhr.overrideMimeType) {
+                                xhr.overrideMimeType("application/json");
                             }
-                        })
-                        .done(function (geojson) {
+                        }
+                    })
+                    .done(function (geojson) {
+
+                        map.on('load', function() {
 
                             jQuery.each(geojson.features, function (i, v) {
                                 if (jsObject.grid_data.data[v.id]) {
@@ -546,9 +558,12 @@ class DT_Network_Dashboard_Public_Heatmap_Churches
                                 $('#offCanvasNestedPush').foundation('toggle', e);
 
                             });
+
                         })
-                    })
-                })
+
+                    }) /* ajax call */
+                }) /* for each loop */
+
 
                 $('#add-report').on('click', function(e){
                     $('#church-list').empty()
