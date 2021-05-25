@@ -1,0 +1,129 @@
+<style>
+    body {
+        background: white;
+    }
+    #email {
+        display:none;
+    }
+    .redborder {
+        border: 1px solid red;
+    }
+</style>
+<style id="custom-style">
+    #wrapper {
+        height: 1000px !important;
+    }
+    #map-wrapper {
+        height: 1000px !important;
+    }
+    #map {
+        height: 1000px !important;
+    }
+</style>
+
+<div id="wrapper">
+    <div id="map-wrapper">
+        <div class="hide-for-small-only" style="position:absolute; top: 10px; z-index: 10;background-color:white; opacity: .9;padding:5px 10px; margin: 0 auto;">
+            <div class="grid-x">
+                <div class="cell" id="name-id">Hover and zoom for locations</div>
+            </div>
+        </div>
+        <span class="loading-spinner active"></span>
+        <div id='map'></div>
+    </div>
+</div>
+
+<!-- modal -->
+<div class="off-canvas position-left is-closed" id="offCanvasNestedPush" data-transition-time=".3s" data-off-canvas>
+    <div class="grid-x grid-padding-x " style="margin-top:1rem;">
+        <div class="cell">
+            <h1 id="title">Title</h1>
+            <hr>
+        </div>
+        <div class="cell">
+            <h2>Goal: <span id="saturation-goal">0</span>%</h2>
+            <meter id="meter" style="height:3rem;width:100%;" value="30" min="0" low="33" high="66" optimum="100" max="100"></meter>
+        </div>
+        <div class="cell">
+            <h2>Population: <span id="population">0</span></h2>
+        </div>
+        <div class="cell">
+            <h2>New Churches Needed: <span id="needed">0</span></h2>
+        </div>
+        <div class="cell">
+            <h2>Churches Reported: <span id="reported">0</span></h2>
+        </div>
+        <div class="cell">
+            <hr>
+        </div>
+        <!-- @todo add reports-->
+<!--        <div class="cell center">-->
+<!--            <button class="button" id="add-report">Add Report</button>-->
+<!--        </div>-->
+
+    </div>
+    <button class="close-button" data-close aria-label="Close modal" type="button">
+        <span aria-hidden="true">&times;</span>
+    </button>
+</div>
+
+<!-- modal -->
+<div class="reveal" id="report-modal" data-v-offset="10px" data-reveal>
+    <div>
+        <h1>Report New Simple Church <i class="fi-info primary-color small"></i></h1>
+        <h3 id="report-modal-title"></h3>
+    </div>
+    <div id="report-modal-content">
+        <div class="grid-x">
+            <div class="cell">
+                <label for="name">Name</label>
+                <input type="text" id="name" class="required" placeholder="Name" />
+                <span id="name-error" class="form-error">You're name is required.</span>
+            </div>
+            <div class="cell">
+                <label for="email">Email</label>
+                <input type="email" id="email" name="email" placeholder="Email" />
+                <input type="email" id="e2" name="email" class="required" placeholder="Email" />
+                <span id="email-error" class="form-error">You're email is required.</span>
+            </div>
+            <div class="cell">
+                <label for="phone">Phone</label>
+                <input type="tel" id="phone" name="phone" class="required" placeholder="Phone" />
+                <span id="phone-error" class="form-error">You're phone is required.</span>
+            </div>
+            <div class="cell callout">
+                <div class="grid-x">
+                    <div class="cell small-5">
+                        Nickname of Simple Church
+                    </div>
+                    <div class="cell small-2">
+                        Member Count
+                    </div>
+                    <div class="cell small-4">
+                        Date Started
+                    </div>
+                    <div class="cell small-1">
+
+                    </div>
+                </div>
+                <div id="church-list"><!-- church report rows --></div>
+                <div class="grid-x">
+                    <div class="cell center">
+                        <button type="button" class="button clear small" id="add-another">add another</button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="cell center">
+                <p><input type="checkbox" class="required" id="return-reporter" /> I have submitted a report before.</p>
+            </div>
+            <div class="cell center">
+                <input type="hidden" id="report-grid-id" />
+                <button class="button" id="submit-report">Add Report</button> <span class="loading-spinner"></span>
+            </div>
+        </div>
+    </div>
+    <button class="close-button" data-close aria-label="Close modal" type="button">
+        <span aria-hidden="true">&times;</span>
+    </button>
+</div>

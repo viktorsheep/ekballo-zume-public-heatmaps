@@ -24,6 +24,7 @@ class DT_Network_Dashboard_Public_Heatmap_Churches
     public $parts = false;
     public $root = "zume_app";
     public $type = 'heatmap_churches';
+    public $key = 'zume_app_heatmap_churches';
     public $post_type = 'groups';
 
     private static $_instance = null;
@@ -43,6 +44,7 @@ class DT_Network_Dashboard_Public_Heatmap_Churches
         // register REST and REST access
         add_filter( 'dt_allow_rest_access', [ $this, '_authorize_url' ], 100, 1 );
         add_action( 'rest_api_init', [ $this, 'add_endpoints' ] );
+        add_action( 'wp_enqueue_scripts', [ $this, '_wp_enqueue_scripts' ], 100 );
 
 
         // fail if not valid url
@@ -107,6 +109,30 @@ class DT_Network_Dashboard_Public_Heatmap_Churches
         return $types;
     }
 
+    public function _wp_enqueue_scripts(){
+        $url = dt_get_url_path();
+        if ( strpos( $url, $this->root . '/' . $this->type ) !== false ) {
+            wp_enqueue_script( 'lodash' );
+            wp_enqueue_script( 'moment' );
+            wp_enqueue_script( 'jquery-ui' );
+            wp_enqueue_script( 'jquery-touch-punch' );
+
+            wp_enqueue_script( $this->key, trailingslashit( plugin_dir_url( __FILE__ ) ) . 'heatmap-churches.js', [
+                'jquery',
+                'jquery-touch-punch'
+            ], filemtime( plugin_dir_path( __FILE__ ) .'heatmap-churches.js' ), true );
+
+//            wp_enqueue_script( 'p2r', trailingslashit( plugin_dir_url( __FILE__ ) ) . 'jquery.p2r.min.js', [
+//                'jquery',
+//                'jquery-touch-punch'
+//            ], filemtime( plugin_dir_path( __FILE__ ) .'jquery.p2r.min.js' ), true );
+//            wp_enqueue_script( 'service-worker', trailingslashit( plugin_dir_url( __FILE__ ) ) . 'service-worker.js', [
+//                'jquery',
+//                'jquery-touch-punch'
+//            ], filemtime( plugin_dir_path( __FILE__ ) .'service-worker.js' ), true );
+        }
+    }
+
     public function _register_url( $template_for_url ){
         $parts = $this->parts;
 
@@ -164,8 +190,8 @@ class DT_Network_Dashboard_Public_Heatmap_Churches
         $allowed_js = [
             'jquery',
             'lodash',
-            'moment',
-            'datepicker',
+//            'moment',
+//            'datepicker',
             'site-js',
             'shared-functions',
             'mapbox-gl',
@@ -173,6 +199,7 @@ class DT_Network_Dashboard_Public_Heatmap_Churches
             'mapbox-search-widget',
             'google-search-widget',
             'jquery-cookie',
+            $this->key
         ];
 
         global $wp_scripts;
@@ -192,7 +219,7 @@ class DT_Network_Dashboard_Public_Heatmap_Churches
             'foundation-css',
             'jquery-ui-site-css',
             'site-css',
-            'datepicker-css',
+//            'datepicker-css',
             'mapbox-gl-css'
         ];
 
@@ -206,23 +233,10 @@ class DT_Network_Dashboard_Public_Heatmap_Churches
         }
     }
     public function _browser_tab_title( $title ){
-        return __( "Zúme Trainings Map", 'disciple_tools' );
+        return __( "Zúme Churches Map", 'disciple_tools' );
     }
 
     public function header_style(){
-        ?>
-        <style>
-            body {
-                background: white;
-            }
-            #email {
-                display:none;
-            }
-            .redborder {
-                border: 1px solid red;
-            }
-        </style>
-        <?php
     }
     public function header_javascript(){
         ?>
@@ -239,503 +253,30 @@ class DT_Network_Dashboard_Public_Heatmap_Churches
                 ],
                 'grid_data' => $this->grid_list(),
             ]) ?>][0]
-
-            jQuery(document).ready(function(){
-                clearInterval(window.fiveMinuteTimer)
-            })
-
-            window.get_grid_data = (grid_id) => {
-                return jQuery.ajax({
-                    type: "POST",
-                    data: JSON.stringify({ action: 'POST', parts: jsObject.parts, grid_id: grid_id }),
-                    contentType: "application/json; charset=utf-8",
-                    dataType: "json",
-                    url: jsObject.root + jsObject.parts.root + '/v1/' + jsObject.parts.type + '/grid_totals',
-                    beforeSend: function (xhr) {
-                        xhr.setRequestHeader('X-WP-Nonce', jsObject.nonce )
-                    }
-                })
-                    .fail(function(e) {
-                        console.log(e)
-                        jQuery('#error').html(e)
-                    })
-            }
         </script>
         <?php
         return true;
     }
     public function body(){
         DT_Mapbox_API::geocoder_scripts();
-        ?>
-        <div id="custom-style">
-            <style>
-                #wrapper {
-                    height: 1000px !important;
-                }
-                #map-wrapper {
-                    height: 1000px !important;
-                }
-                #map {
-                    height: 1000px !important;
-                }
-            </style>
-        </div>
-        <div id="wrapper">
-            <div id="map-wrapper">
-                <div class="hide-for-small-only" style="position:absolute; top: 10px; left:10px; z-index: 10;background-color:white; opacity: .9;padding:5px 10px; margin: 0 10px;">
-                    <div class="grid-x">
-                        <div class="cell" id="name-id">Hover and zoom for locations</div>
-                    </div>
-                </div>
-                <span class="loading-spinner active"></span>
-                <div id='map'></div>
-            </div>
-        </div>
-        <!-- modal -->
-        <div class="off-canvas position-left is-closed" id="offCanvasNestedPush" data-transition-time=".3s" data-off-canvas>
-            <div class="grid-x grid-padding-x " style="margin-top:1rem;">
-                <div class="cell">
-                    <h1 id="title">Title</h1>
-                    <hr>
-                </div>
-                <div class="cell">
-                    <h2>Goal: <span id="saturation-goal">0</span>%</h2>
-                    <meter id="meter" style="height:3rem;width:100%;" value="30" min="0" low="33" high="66" optimum="100" max="100"></meter>
-                </div>
-                <div class="cell">
-                    <h2>Population: <span id="population">0</span></h2>
-                </div>
-                <div class="cell">
-                    <h2>New Churches Needed: <span id="needed">0</span></h2>
-                </div>
-                <div class="cell">
-                    <h2>Churches Reported: <span id="reported">0</span></h2>
-                </div>
-                <div class="cell">
-                    <hr>
-                </div>
-                <div class="cell center">
-                    <button class="button" id="add-report">Add Report</button>
-                </div>
+        include('heatmap-churches.html');
+    }
 
-            </div>
-            <button class="close-button" data-close aria-label="Close modal" type="button">
-                <span aria-hidden="true">&times;</span>
-            </button>
-        </div>
-        <!-- modal -->
-        <div class="reveal" id="report-modal" data-v-offset="10px" data-reveal>
-            <div>
-                <h1 id="title">Report New Simple Church <i class="fi-info primary-color small"></i> </h1>
-                <h3 id="report-modal-title"></h3>
-            </div>
-            <div id="report-modal-content">
-                <div class="grid-x">
-                    <div class="cell">
-                        <label for="name">Name</label>
-                        <input type="text" id="name" class="required" placeholder="Name" />
-                        <span id="name-error" class="form-error">
-                            <?php esc_html_e( "You're name is required.", 'disciple_tools' ); ?>
-                        </span>
-                    </div>
-                    <div class="cell">
-                        <label for="email">Email</label>
-                        <input type="email" id="email" name="email" placeholder="Email" />
-                        <input type="email" id="e2" name="email" class="required" placeholder="Email" />
-                        <span id="email-error" class="form-error">
-                            <?php esc_html_e( "You're email is required.", 'disciple_tools' ); ?>
-                        </span>
-                    </div>
-                    <div class="cell">
-                        <label for="tel">Phone</label>
-                        <input type="tel" id="phone" name="phone" class="required" placeholder="Phone" />
-                        <span id="phone-error" class="form-error">
-                            <?php esc_html_e( "You're phone is required.", 'disciple_tools' ); ?>
-                        </span>
-                    </div>
-                    <div class="cell callout">
-                        <div class="grid-x">
-                            <div class="cell small-5">
-                                Nickname of Simple Church
-                            </div>
-                            <div class="cell small-2">
-                                Member Count
-                            </div>
-                            <div class="cell small-4">
-                                Date Started
-                            </div>
-                            <div class="cell small-1">
+    /**
+     * Register REST Endpoints
+     * @link https://github.com/DiscipleTools/disciple-tools-theme/wiki/Site-to-Site-Link for outside of wordpress authentication
+     */
+    public function add_endpoints() {
+        $namespace = $this->root . '/v1';
+        register_rest_route(
+            $namespace, '/'.$this->type, [
+                [
+                    'methods'  => "POST",
+                    'callback' => [ $this, 'endpoint' ],
+                ],
+            ]
+        );
 
-                            </div>
-                        </div>
-                        <div id="church-list"><!-- church report rows --></div>
-                        <div class="grid-x">
-                            <div class="cell center">
-                                <button type="button" class="button clear small" id="add-another">add another</button>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="cell center">
-                        <p><input type="checkbox" class="required" id="return-reporter" /> I have submitted a report before.</p>
-                    </div>
-                    <div class="cell center">
-                        <input type="hidden" id="report-grid-id" />
-                        <button class="button" id="submit-report">Add Report</button> <span class="loading-spinner"></span>
-                    </div>
-                </div>
-            </div>
-            <button class="close-button" data-close aria-label="Close modal" type="button">
-                <span aria-hidden="true">&times;</span>
-            </button>
-        </div>
-
-        <script>
-            jQuery(document).ready(function($){
-
-                /* set vertical size the form column*/
-                $('#custom-style').append(`
-                    <style>
-                        #wrapper {
-                            height: ${window.innerHeight}px !important;
-                        }
-                        #map-wrapper {
-                            height: ${window.innerHeight}px !important;
-                        }
-                        #map {
-                            height: ${window.innerHeight}px !important;
-                        }
-                        .off-canvas {
-                        width:${window.innerWidth * .50}px;
-                        background-color:white;
-                        }
-                    </style>`)
-
-                $('.loading-spinner').removeClass('active')
-
-                mapboxgl.accessToken = jsObject.map_key;
-                var map = new mapboxgl.Map({
-                    container: 'map',
-                    style: 'mapbox://styles/mapbox/light-v10',
-                    center: [-98, 38.88],
-                    minZoom: 2,
-                    maxZoom: 8,
-                    zoom: 3
-                });
-
-                map.addControl(
-                    new MapboxGeocoder({
-                        accessToken: mapboxgl.accessToken,
-                        mapboxgl: mapboxgl,
-                        marker: false
-                    })
-                );
-
-                map.addControl(new mapboxgl.NavigationControl());
-                map.dragRotate.disable();
-                map.touchZoomRotate.disableRotation();
-
-                window.previous_hover = false
-
-                let asset_list = []
-                var i = 1;
-                while( i <= 46 ){
-                    asset_list.push(i+'.geojson')
-                    i++
-                }
-
-                jQuery.each(asset_list, function(i,v){
-
-                    jQuery.ajax({
-                        url: jsObject.mirror_url + 'tiles/world/saturation/' + v,
-                        dataType: 'json',
-                        data: null,
-                        beforeSend: function (xhr) {
-                            if (xhr.overrideMimeType) {
-                                xhr.overrideMimeType("application/json");
-                            }
-                        }
-                    })
-                    .done(function (geojson) {
-
-                        map.on('load', function() {
-
-                            jQuery.each(geojson.features, function (i, v) {
-                                if (jsObject.grid_data.data[v.id]) {
-                                    geojson.features[i].properties.value = parseInt(jsObject.grid_data.data[v.id].percent)
-                                } else {
-                                    geojson.features[i].properties.value = 0
-                                }
-                            })
-
-                            map.addSource(i.toString(), {
-                                'type': 'geojson',
-                                'data': geojson
-                            });
-                            map.addLayer({
-                                'id': i.toString()+'line',
-                                'type': 'line',
-                                'source': i.toString(),
-                                'paint': {
-                                    // 'line-color': '#323A68',
-                                    'line-color': 'grey',
-                                    'line-width': .5
-                                }
-                            });
-
-                            /**************/
-                            /* hover map*/
-                            /**************/
-                            map.addLayer({
-                                'id': i.toString() + 'fills',
-                                'type': 'fill',
-                                'source': i.toString(),
-                                'paint': {
-                                    'fill-color': 'black',
-                                    'fill-opacity': [
-                                        'case',
-                                        ['boolean', ['feature-state', 'hover'], false],
-                                        .8,
-                                        0
-                                    ]
-                                }
-                            })
-                            /* end hover map*/
-
-                            /**********/
-                            /* heat map brown */
-                            /**********/
-                            map.addLayer({
-                                'id': i.toString() + 'fills_heat',
-                                'type': 'fill',
-                                'source': i.toString(),
-                                'paint': {
-                                    'fill-color': {
-                                        property: 'value',
-                                        stops: [[0, 'rgba(0, 0, 0, 0)'], [1, 'rgb(155, 200, 254)'], [jsObject.grid_data.highest_value, 'rgb(37, 82, 154)']]
-                                    },
-                                    'fill-opacity': 0.75,
-                                    'fill-outline-color': '#707070'
-                                }
-                            })
-                            /**********/
-                            /* end fill map */
-                            /**********/
-
-                            map.on('mousemove', i.toString()+'fills', function (e) {
-                                if ( window.previous_hover ) {
-                                    map.setFeatureState(
-                                        window.previous_hover,
-                                        { hover: false }
-                                    )
-                                }
-                                window.previous_hover = { source: i.toString(), id: e.features[0].id }
-                                if (e.features.length > 0) {
-                                    jQuery('#name-id').html(e.features[0].properties.full_name)
-                                    map.setFeatureState(
-                                        window.previous_hover,
-                                        {hover: true}
-                                    );
-                                }
-                            });
-                            map.on('click', i.toString()+'fills', function (e) {
-
-                                $('#title').html(e.features[0].properties.full_name)
-                                $('#meter').val(jsObject.grid_data.data[e.features[0].properties.grid_id].percent)
-                                $('#saturation-goal').html(jsObject.grid_data.data[e.features[0].properties.grid_id].percent)
-                                $('#population').html(jsObject.grid_data.data[e.features[0].properties.grid_id].population)
-
-                                //report
-                                $('#report-modal-title').html(e.features[0].properties.full_name)
-                                $('#report-grid-id').val(e.features[0].properties.grid_id)
-
-                                let reported = jsObject.grid_data.data[e.features[0].properties.grid_id].reported
-                                $('#reported').html(reported)
-
-                                let needed = jsObject.grid_data.data[e.features[0].properties.grid_id].needed
-                                $('#needed').html(needed)
-
-                                $('#offCanvasNestedPush').foundation('toggle', e);
-
-                            });
-
-                        })
-
-                    }) /* ajax call */
-                }) /* for each loop */
-
-
-                $('#add-report').on('click', function(e){
-                    $('#church-list').empty()
-                    append_report_row()
-
-                    jQuery('#report-modal').foundation('open')
-                })
-                $('#add-another').on('click', function(e){
-                    append_report_row()
-                })
-                let submit_button = $('#submit-report')
-                function check_inputs(){
-                    submit_button.prop('disabled', false)
-                    $.each($('.required'), function(){
-                        if ( $(this).val() === '' ) {
-                            $(this).addClass('redborder')
-                            submit_button.prop('disabled', true)
-                        }
-                        else {
-                            $(this).removeClass('redborder')
-                        }
-                    })
-
-                }
-                function append_report_row(){
-                    let id = Date.now()
-                    $('#church-list').append(`
-                    <div class="grid-x row-${id} list-row" data-id="${id}">
-                        <div class="cell small-5">
-                            <input type="text" name="${id}[name]" class="${id} name-${id} required" placeholder="Name of Simple Church" data-name="name" data-group-id="${id}" />
-                        </div>
-                        <div class="cell small-2">
-                            <input type="number" name="${id}[members]" class="${id} members-${id} required" placeholder="#" data-name="members" data-group-id="${id}" />
-                        </div>
-                        <div class="cell small-4">
-                            <input type="date" name="${id}[start]" class="${id} start-${id} required" placeholder="Started" data-name="start" data-group-id="${id}" />
-                        </div>
-                        <div class="cell small-1">
-                            <button class="button expanded alert" style="border-radius: 0;" onclick="remove_row(${id})">X</button>
-                        </div>
-                    </div>
-                    `)
-
-                    $('.required').focusout(function(){
-                        check_inputs()
-                    })
-                    check_inputs()
-                }
-                submit_button.on('click', function(){
-                    let spinner = jQuery('.loading-spinner')
-                    spinner.addClass('active')
-
-                    let submit_button = jQuery('#submit-report')
-                    submit_button.prop('disabled', true)
-
-                    let honey = jQuery('#email').val()
-                    if ( honey ) {
-                        submit_button.html('Shame, shame, shame. We know your name ... ROBOT!').prop('disabled', true )
-                        spinner.removeClass('active')
-                        return;
-                    }
-
-                    let name_input = jQuery('#name')
-                    let name = name_input.val()
-                    if ( ! name ) {
-                        jQuery('#name-error').show()
-                        submit_button.removeClass('loading')
-                        name_input.focus(function(){
-                            jQuery('#name-error').hide()
-                        })
-                        submit_button.prop('disabled', false)
-                        spinner.removeClass('active')
-                        return;
-                    }
-
-                    let email_input = jQuery('#e2')
-                    let email = email_input.val()
-                    if ( ! email ) {
-                        jQuery('#email-error').show()
-                        submit_button.removeClass('loading')
-                        email_input.focus(function(){
-                            jQuery('#email-error').hide()
-                        })
-                        submit_button.prop('disabled', false)
-                        spinner.removeClass('active')
-                        return;
-                    }
-
-                    let phone_input = jQuery('#phone')
-                    let phone = phone_input.val()
-                    if ( ! phone ) {
-                        jQuery('#phone-error').show()
-                        submit_button.removeClass('loading')
-                        email_input.focus(function(){
-                            jQuery('#phone-error').hide()
-                        })
-                        submit_button.prop('disabled', false)
-                        spinner.removeClass('active')
-                        return;
-                    }
-
-                    let list = []
-                    jQuery.each( jQuery('.list-row'), function(i,v){
-                        let row_id = jQuery(this).data('id')
-                        list.push({
-                            name: jQuery('.name-'+row_id).val(),
-                            members: jQuery('.members-'+row_id).val(),
-                            start: jQuery('.start-'+row_id).val()
-                        })
-                    })
-
-
-                    let grid_id = jQuery('#report-grid-id').val()
-                    let return_reporter = jQuery('#return-reporter').is(':checked');
-
-                    // if cookie contact_id
-                    // if window contact_id
-                    let contact_id = ''
-                    if ( typeof window.contact_id !== 'undefined' && typeof window.contact_email !== 'undefined' ) {
-                        if ( email === window.contact_email ) {
-                            contact_id = window.contact_id
-                        }
-                    }
-
-                    let form_data = {
-                        name: name,
-                        email: email,
-                        phone: phone,
-                        grid_id: grid_id,
-                        contact_id: contact_id,
-                        return_reporter: return_reporter,
-                        list: list
-                    }
-
-                    jQuery.ajax({
-                        type: "POST",
-                        data: JSON.stringify({ action: 'new_report', parts: jsObject.parts, data: form_data }),
-                        contentType: "application/json; charset=utf-8",
-                        dataType: "json",
-                        url: jsObject.root + jsObject.parts.root + '/v1/' + jsObject.parts.type,
-                        beforeSend: function (xhr) {
-                            xhr.setRequestHeader('X-WP-Nonce', jsObject.nonce )
-                        }
-                    })
-                        .done(function(response){
-                            jQuery('.loading-spinner').removeClass('active')
-                            console.log(response)
-
-                            window.contact_id = response.contact.ID
-                            window.contact_email = email
-
-
-                        })
-                        .fail(function(e) {
-                            console.log(e)
-                            jQuery('#error').html(e)
-                        })
-                })
-            })
-
-            function remove_row( id ) {
-                let submit_button = $('#submit-report')
-                jQuery('.row-'+id).remove();
-                submit_button.prop('disabled', true)
-            }
-            if (document.readyState === 'complete') {
-                window.contact_id = Cookie.get('contact_id')
-                window.contact_email = Cookie.get('contact_email')
-            }
-
-        </script>
-        <?php
     }
 
     public function grid_list(){
@@ -788,23 +329,6 @@ class DT_Network_Dashboard_Public_Heatmap_Churches
             'highest_value' => (int) $highest_value,
             'data' => $data
         ];
-    }
-
-    /**
-     * Register REST Endpoints
-     * @link https://github.com/DiscipleTools/disciple-tools-theme/wiki/Site-to-Site-Link for outside of wordpress authentication
-     */
-    public function add_endpoints() {
-        $namespace = $this->root . '/v1';
-        register_rest_route(
-            $namespace, '/'.$this->type, [
-                [
-                    'methods'  => "POST",
-                    'callback' => [ $this, 'endpoint' ],
-                ],
-            ]
-        );
-
     }
 
     /**
