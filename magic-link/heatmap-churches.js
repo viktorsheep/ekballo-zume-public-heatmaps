@@ -8,10 +8,10 @@ if(/(android|bb\d+|meego).+mobile|avantgo|bada\/|blackberry|blazer|compal|elaine
 window.get_grid_data = (grid_id) => {
   return jQuery.ajax({
     type: "POST",
-    data: JSON.stringify({ action: 'POST', parts: jsObject.parts, grid_id: grid_id }),
+    data: JSON.stringify({ action: 'grid_id', parts: jsObject.parts, grid_id: grid_id }),
     contentType: "application/json; charset=utf-8",
     dataType: "json",
-    url: jsObject.root + jsObject.parts.root + '/v1/' + jsObject.parts.type + '/grid_totals',
+    url: jsObject.root + jsObject.parts.root + '/v1/' + jsObject.parts.type,
     beforeSend: function (xhr) {
       xhr.setRequestHeader('X-WP-Nonce', jsObject.nonce )
     }
@@ -25,6 +25,11 @@ window.get_grid_data = (grid_id) => {
 jQuery(document).ready(function($){
   clearInterval(window.fiveMinuteTimer)
 
+  let slider_width = window.innerWidth * .70
+  if ( isMobile ) {
+    slider_width = window.innerWidth * .95
+  }
+
   /* set vertical size the form column*/
   $('#custom-style').empty().append(`
       #wrapper {
@@ -37,7 +42,7 @@ jQuery(document).ready(function($){
           height: ${window.innerHeight}px !important;
       }
       .off-canvas {
-          width:${window.innerWidth * .50}px;
+          width:${slider_width}px;
           background-color:white;
       }
   `)
@@ -179,7 +184,6 @@ jQuery(document).ready(function($){
             window.previous_hover = { source: i.toString(), id: e.features[0].id }
             if (e.features.length > 0) {
               show_details_panel()
-              // jQuery('#name-id').html(e.features[0].properties.full_name)
               map.setFeatureState(
                 window.previous_hover,
                 {hover: true}
@@ -201,22 +205,18 @@ jQuery(document).ready(function($){
             }
           });
           map.on('click', i.toString()+'fills', function (e) {
-          //
-          //   $('#title').html(e.features[0].properties.full_name)
-          //   $('#meter').val(jsObject.grid_data.data[e.features[0].properties.grid_id].percent)
-          //   $('#saturation-goal').html(jsObject.grid_data.data[e.features[0].properties.grid_id].percent)
-          //   $('#population').html(jsObject.grid_data.data[e.features[0].properties.grid_id].population)
-          //
-          //   //report
-          //   $('#report-modal-title').html(e.features[0].properties.full_name)
-          //   $('#report-grid-id').val(e.features[0].properties.grid_id)
-          //
-          //   let reported = jsObject.grid_data.data[e.features[0].properties.grid_id].reported
-          //   $('#reported').html(reported)
-          //
-          //   let needed = jsObject.grid_data.data[e.features[0].properties.grid_id].needed
-          //   $('#needed').html(needed)
-          //
+            $('#title_report').html(e.features[0].properties.full_name)
+            $('#population_report').html(jsObject.grid_data.data[e.features[0].properties.grid_id].population)
+
+            let sc = $('#slider-content')
+            sc.html('<span class="loading-spinner active"></span>')
+
+            window.get_grid_data(e.features[0].properties.grid_id)
+              .done(function(data){
+                console.log(data)
+                load_slider_content( data )
+              })
+
             $('#offCanvasNestedPush').foundation('toggle', e);
           });
 
@@ -389,6 +389,56 @@ function show_details_panel(){
 }
 function hide_details_panel(){
   $('#details-panel').hide()
+
+}
+
+function load_slider_content( data ) {
+  let content = $('#slider-content')
+  content.empty()
+
+  content.append(`
+    <div class="grid-x">
+        <div class="cell small-4">
+            <div class="grid-x">
+                <div class="cell">
+                    THIS LOCATION
+                </div>
+                <div class="cell">
+                    Churches Needed
+                </div>
+                <div class="cell">
+                    Churches Reported
+                </div>
+            </div>
+        </div>
+        <div class="cell small-4">
+            <div class="grid-x">
+                <div class="cell">
+                    PROGRESS
+                </div>
+                <div class="cell">
+                    Country Progress
+                </div>
+                <div class="cell">
+                    Location Progress
+                </div>
+            </div>
+        </div>
+        <div class="cell small-4">
+            <div class="grid-x">
+                <div class="cell">
+                    ACTIVITY
+                </div>
+                <div class="cell">
+
+                </div>
+                <div class="cell">
+
+                </div>
+            </div>
+        </div>
+    </div>
+  `)
 
 }
 

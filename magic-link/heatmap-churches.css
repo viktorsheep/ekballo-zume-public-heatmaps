@@ -11,11 +11,18 @@ body {
     margin-top:1rem;
     display:none;
 }
+.meter {
+    height:3rem;
+    width:100%;
+}
+#canvas_panel {
+    padding:1rem;
+}
 
 @media (min-width:0px)  {
     /* foundations small */
     /* smartphones, portrait iPhone, portrait 480x320 phones (Android) */
-    
+
 }
 
 @media (min-width:640px)  {

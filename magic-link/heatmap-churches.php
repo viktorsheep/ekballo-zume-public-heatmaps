@@ -272,7 +272,6 @@ class DT_Network_Dashboard_Public_Heatmap_Churches
                 ],
             ]
         );
-
     }
 
     public function grid_list(){
@@ -342,11 +341,20 @@ class DT_Network_Dashboard_Public_Heatmap_Churches
         $action = sanitize_text_field( wp_unslash( $params['action'] ) );
 
         switch ( $action ) {
+            case 'grid_id':
+                return $this->endpoint_get_grid_id( $params['grid_id'] );
             case 'new_report':
                 return $this->endpoint_new_report( $params['data'] );
             default:
                 return new WP_Error( __METHOD__, "Missing valid action", [ 'status' => 400 ] );
         }
+    }
+
+    public function endpoint_get_grid_id( $grid_id ) {
+        $data = [
+            'grid_id' => $grid_id
+        ];
+        return $data;
     }
 
     public function endpoint_new_report( $form_data ) {
@@ -503,5 +511,7 @@ class DT_Network_Dashboard_Public_Heatmap_Churches
 
         return $data;
     }
+
+
 }
 

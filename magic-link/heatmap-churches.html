@@ -39,12 +39,32 @@
                 </div>
                 <div class="cell">
                     <h2>Goal: <span id="saturation-goal">0</span>%</h2>
-                    <meter id="meter" style="height:3rem;width:100%;" value="30" min="0" low="33" high="66" optimum="100" max="100"></meter>
+                    <meter id="meter" class="meter" value="30" min="0" low="33" high="66" optimum="100" max="100"></meter>
+                </div>
+                <div class="cell">
+                    Our vision is to see 1 training and 2 new churches for every 5000 people in the United States and 50,000 people globally.
                 </div>
             </div>
         </div>
     </div>
 </div>
+
+
+<!-- modal -->
+<div class="off-canvas position-right is-closed" id="offCanvasNestedPush" data-transition-time=".3s" data-off-canvas>
+    <div class="grid-x" id="canvas_panel">
+        <div class="cell">
+            <h1 id="title_report"></h1>
+            <h3>Population: <span id="population_report">0</span></h3>
+            <hr>
+        </div>
+        <div class="cell" id="slider-content"></div>
+    </div>
+    <button class="close-button" data-close aria-label="Close modal" type="button">
+        <span aria-hidden="true">&times;</span>
+    </button>
+</div>
+
 
 <!-- report modal -->
 <div class="reveal" id="report-modal" data-v-offset="10px" data-reveal>
