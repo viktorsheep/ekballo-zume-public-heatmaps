@@ -122,10 +122,8 @@ class DT_Network_Dashboard_Public_Heatmap_Churches
                 'jquery-touch-punch'
             ], filemtime( plugin_dir_path( __FILE__ ) .'heatmap-churches.js' ), true );
 
-//            wp_enqueue_script( 'p2r', trailingslashit( plugin_dir_url( __FILE__ ) ) . 'jquery.p2r.min.js', [
-//                'jquery',
-//                'jquery-touch-punch'
-//            ], filemtime( plugin_dir_path( __FILE__ ) .'jquery.p2r.min.js' ), true );
+            wp_enqueue_style( $this->key, trailingslashit( plugin_dir_url( __FILE__ ) ) . 'heatmap-churches.css', ['site-css'], filemtime( plugin_dir_path( __FILE__ ) .'heatmap-churches.css' ));
+
 //            wp_enqueue_script( 'service-worker', trailingslashit( plugin_dir_url( __FILE__ ) ) . 'service-worker.js', [
 //                'jquery',
 //                'jquery-touch-punch'
@@ -190,8 +188,6 @@ class DT_Network_Dashboard_Public_Heatmap_Churches
         $allowed_js = [
             'jquery',
             'lodash',
-//            'moment',
-//            'datepicker',
             'site-js',
             'shared-functions',
             'mapbox-gl',
@@ -219,8 +215,8 @@ class DT_Network_Dashboard_Public_Heatmap_Churches
             'foundation-css',
             'jquery-ui-site-css',
             'site-css',
-//            'datepicker-css',
-            'mapbox-gl-css'
+            'mapbox-gl-css',
+            $this->key
         ];
 
         global $wp_styles;
