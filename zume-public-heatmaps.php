@@ -22,6 +22,14 @@ if ( ! defined( 'ABSPATH' ) ) {
     exit; // Exit if accessed directly
 }
 
+if ( ! defined( 'GLOBAL_POPULATION_BLOCKS' ) ) {
+    define( 'GLOBAL_POPULATION_BLOCKS', 50000 );
+}
+
+if ( ! defined( 'US_POPULATION_BLOCKS' ) ) {
+    define( 'US_POPULATION_BLOCKS', 5000 );
+}
+
 /**
  * Gets the instance of the `Zume_Public_Heatmaps` class.
  *

@@ -230,7 +230,8 @@ jQuery(document).ready(function($){
             $('#modal_tile').html(e.features[0].properties.full_name)
             $('#modal_population').html(jsObject.grid_data.data[e.features[0].properties.grid_id].population)
 
-            jQuery('.temp-spinner').empty().html(`<span class="loading-spinner active"></span>`)
+            jQuery('#custom-paragraph span').empty()
+            jQuery('.temp-spinner').html(`<span class="loading-spinner active"></span>`)
 
             window.get_grid_data(e.features[0].properties.grid_id)
               .done(function(data){
