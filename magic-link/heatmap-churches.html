@@ -42,7 +42,7 @@
                     <meter id="meter" class="meter" value="30" min="0" low="33" high="66" optimum="100" max="100"></meter>
                 </div>
                 <div class="cell">
-                    Our vision is to see 1 training and 2 new churches for every 5000 people in the United States and 50,000 people globally.
+                    Our community vision is to see 1 training and 2 new churches for every 5000 people in the United States and 50,000 people globally.
                 </div>
             </div>
         </div>
@@ -54,11 +54,49 @@
 <div class="off-canvas position-right is-closed" id="offCanvasNestedPush" data-transition-time=".3s" data-off-canvas>
     <div class="grid-x" id="canvas_panel">
         <div class="cell">
-            <h1 id="title_report"></h1>
-            <h3>Population: <span id="population_report">0</span></h3>
+            <h1 id="modal_tile"></h1>
+            <h3>Population: <span id="modal_population">0</span></h3>
             <hr>
         </div>
-        <div class="cell" id="slider-content"></div>
+        <div class="cell" id="slider-content">
+            <div class="grid-x grid-padding-x">
+                <div class="cell small-6">
+                    <div class="grid-x">
+                        <div class="cell">
+                            <h3>PROGRESS</h3>
+                        </div>
+                        <div class="cell" id="progress-content">
+                            <div class="grid-x">
+                                <div class="cell">
+                                    <p>
+                                        Our community vision is to see 1 training and 2 new churches for every 5000 people
+                                        in the United States and 50,000 people globally.
+                                    </p>
+                                    <p>
+                                        <span class="self_name ucwords temp-spinner bold"></span> is one of <span class="self_peers temp-spinner bold"></span>
+                                        administrative divisions in <span class="parent_name ucwords temp-spinner bold"></span>.
+                                        <span class="self_name ucwords temp-spinner bold"></span> has an approximate population of <span class="self_population temp-spinner bold"></span>.
+                                        So to reach the community goal of 2 churches for every <span class="population_division temp-spinner bold"></span> people,
+                                        <span class="self_name ucwords temp-spinner bold"></span> needs
+                                        <span class="self_needed temp-spinner bold"></span> new churches and is <span class="self_percent temp-spinner bold"></span>% to its goal.
+                                    </p>
+                                </div>
+                                <div class="cell"><hr></div>
+                                <div class="cell temp-spinner" id="goals-list"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="cell small-6">
+                    <div class="grid-x">
+                        <div class="cell">
+                            <h3>ACTIVITY</h3>
+                        </div>
+                        <div class="cell temp-spinner" id="activity-content"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
     </div>
     <button class="close-button" data-close aria-label="Close modal" type="button">
         <span aria-hidden="true">&times;</span>

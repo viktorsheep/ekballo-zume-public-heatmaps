@@ -81,9 +81,9 @@ class Zume_Public_Heatmaps {
         require_once('magic-link/heatmap-zume-activity.php');
         require_once('magic-link/heatmap-trainings.php');
 
-//        if ( is_admin() ) {
-//            require_once( 'admin/admin-menu-and-tabs.php' ); // adds starter admin page and section for plugin
-//        }
+        if ( is_admin() ) {
+            require_once( 'admin/admin-menu-and-tabs.php' ); // adds starter admin page and section for plugin
+        }
 
         $this->i18n();
 

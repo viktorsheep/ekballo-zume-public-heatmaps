@@ -21,6 +21,23 @@ window.get_grid_data = (grid_id) => {
       jQuery('#error').html(e)
     })
 }
+window.get_movement_data = (grid_id) => {
+  let offset = new Date().getTimezoneOffset();
+  return jQuery.ajax({
+    type: "POST",
+    data: JSON.stringify({ action: 'POST', parts: jsObject.parts, grid_id: grid_id, offset: offset }),
+    contentType: "application/json; charset=utf-8",
+    dataType: "json",
+    url: jsObject.root + jsObject.parts.root + '/v1/' + jsObject.parts.type + '/movement_data',
+    beforeSend: function (xhr) {
+      xhr.setRequestHeader('X-WP-Nonce', jsObject.nonce )
+    }
+  })
+    .fail(function(e) {
+      console.log(e)
+      jQuery('#error').html(e)
+    })
+}
 
 jQuery(document).ready(function($){
   clearInterval(window.fiveMinuteTimer)
@@ -49,11 +66,16 @@ jQuery(document).ready(function($){
 
   $('.loading-spinner').removeClass('active')
 
+  let center = [-98, 38.88]
+  if ( typeof jsObject.ipstack.latitude !== 'undefined' ) {
+    center = [jsObject.ipstack.longitude, jsObject.ipstack.latitude]
+  }
+
   mapboxgl.accessToken = jsObject.map_key;
   var map = new mapboxgl.Map({
     container: 'map',
     style: 'mapbox://styles/mapbox/light-v10',
-    center: [-98, 38.88],
+    center: center,
     minZoom: 2,
     maxZoom: 8,
     zoom: 3
@@ -205,16 +227,31 @@ jQuery(document).ready(function($){
             }
           });
           map.on('click', i.toString()+'fills', function (e) {
-            $('#title_report').html(e.features[0].properties.full_name)
-            $('#population_report').html(jsObject.grid_data.data[e.features[0].properties.grid_id].population)
+            $('#modal_tile').html(e.features[0].properties.full_name)
+            $('#modal_population').html(jsObject.grid_data.data[e.features[0].properties.grid_id].population)
 
-            let sc = $('#slider-content')
-            sc.html('<span class="loading-spinner active"></span>')
+            jQuery('.temp-spinner').empty().html(`<span class="loading-spinner active"></span>`)
 
             window.get_grid_data(e.features[0].properties.grid_id)
               .done(function(data){
-                console.log(data)
                 load_slider_content( data )
+              })
+
+            let ac = $('#activity-content')
+            ac.html('<span class="loading-spinner active"></span>')
+            window.get_movement_data(e.features[0].properties.grid_id)
+              .done(function(data){
+                console.log(data)
+                ac.empty()
+                if ( data.length < 1 ) {
+                  ac.append(`<div>No Movement Activity</div>`)
+                } else {
+                  $.each(data, function(i,v){
+                    if ( typeof v.message !== 'undefined' ){
+                      ac.append(`<div><div style="float:left;width:180px;"><strong>${v.formatted_time}</strong></div> <span>${v.message}</span></div>`)
+                    }
+                  })
+                }
               })
 
             $('#offCanvasNestedPush').foundation('toggle', e);
@@ -393,52 +430,30 @@ function hide_details_panel(){
 }
 
 function load_slider_content( data ) {
-  let content = $('#slider-content')
-  content.empty()
+  console.log(data)
 
-  content.append(`
-    <div class="grid-x">
-        <div class="cell small-4">
-            <div class="grid-x">
-                <div class="cell">
-                    THIS LOCATION
-                </div>
-                <div class="cell">
-                    Churches Needed
-                </div>
-                <div class="cell">
-                    Churches Reported
-                </div>
-            </div>
-        </div>
-        <div class="cell small-4">
-            <div class="grid-x">
-                <div class="cell">
-                    PROGRESS
-                </div>
-                <div class="cell">
-                    Country Progress
-                </div>
-                <div class="cell">
-                    Location Progress
-                </div>
-            </div>
-        </div>
-        <div class="cell small-4">
-            <div class="grid-x">
-                <div class="cell">
-                    ACTIVITY
-                </div>
-                <div class="cell">
+  jQuery('.self_name').html(data.self.name)
+  jQuery('.self_peers').html(data.self.peers)
+  jQuery('.parent_name').html(data.self.parent_name)
+  jQuery('.population_division').html(data.population_division)
+  jQuery('.self_needed').html(data.self.needed)
+  jQuery('.self_percent').html(data.self.percent)
+  jQuery('.self_population').html(data.self.population)
 
-                </div>
-                <div class="cell">
-
-                </div>
-            </div>
-        </div>
+  let gl = jQuery('#goals-list')
+  gl.empty()
+  jQuery.each(data.levels, function(i,v){
+    gl.append(`
+    <div class="cell">
+        <strong>${v.name}</strong><br>
+        Population: <span>${v.population}</span><br>
+        Churches Needed: <span>${v.needed}</span><br>
+        Churches Reported: <span>${v.reported}</span><br>
+        Goal Reached: <span>${v.percent}</span>%
+        <meter class="meter" value="${v.percent}" min="0" low="33" high="66" optimum="100" max="100"></meter>
     </div>
-  `)
+    `)
+  })
 
 }
 

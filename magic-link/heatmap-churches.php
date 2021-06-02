@@ -235,6 +235,7 @@ class DT_Network_Dashboard_Public_Heatmap_Churches
     public function header_style(){
     }
     public function header_javascript(){
+
         ?>
         <script>
             let jsObject = [<?php echo json_encode([
@@ -244,6 +245,7 @@ class DT_Network_Dashboard_Public_Heatmap_Churches
                 'root' => esc_url_raw( rest_url() ),
                 'nonce' => wp_create_nonce( 'wp_rest' ),
                 'parts' => $this->parts,
+                'ipstack' => DT_Ipstack_API::geocode_current_visitor(),
                 'trans' => [
                     'add' => __( 'Add Magic', 'disciple_tools' ),
                 ],
@@ -271,6 +273,16 @@ class DT_Network_Dashboard_Public_Heatmap_Churches
                     'callback' => [ $this, 'endpoint' ],
                 ],
             ]
+        );
+        register_rest_route(
+            $namespace,
+            '/'.$this->type .'/movement_data/',
+            array(
+                array(
+                    'methods'  => WP_REST_Server::CREATABLE,
+                    'callback' => array( $this, 'movement_data' ),
+                ),
+            )
         );
     }
 
@@ -351,9 +363,168 @@ class DT_Network_Dashboard_Public_Heatmap_Churches
     }
 
     public function endpoint_get_grid_id( $grid_id ) {
+        dt_write_log('Start');
+        global $wpdb;
+
+        $world_population = 7860000000;
+
+        $grid_counts = Disciple_Tools_Mapping_Queries::query_church_location_grid_totals();
+
+        $grid = $wpdb->get_row( $wpdb->prepare( "
+            SELECT
+              g.grid_id,
+              g.level,
+              g.alt_name as name,
+              g.alt_population as population,
+              g.latitude,
+              g.longitude,
+              g.country_code,
+              g.admin0_code,
+              g.parent_id,
+              g.admin0_grid_id,
+              gc.alt_name as admin0_name,
+              gc.alt_population as admin0_population,
+              (SELECT COUNT(a0p.grid_id) FROM $wpdb->dt_location_grid as a0p WHERE a0p.parent_id = g.admin0_grid_id ) as admin0_peers,
+              g.admin1_grid_id,
+              ga1.alt_name as admin1_name,
+              ga1.alt_population as admin1_population,
+                   (SELECT COUNT(a1p.grid_id) FROM $wpdb->dt_location_grid as a1p WHERE a1p.parent_id = g.admin1_grid_id ) as admin1_peers,
+              g.admin2_grid_id,
+              ga2.alt_name as admin2_name,
+              ga2.alt_population as admin2_population,
+                   (SELECT COUNT(a2p.grid_id) FROM $wpdb->dt_location_grid as a2p WHERE a2p.parent_id = g.admin2_grid_id ) as admin2_peers,
+              g.admin3_grid_id,
+              ga3.alt_name as admin3_name,
+              ga3.alt_population as admin3_population,
+            (SELECT COUNT(a3p.grid_id) FROM $wpdb->dt_location_grid as a3p WHERE a3p.parent_id = g.admin3_grid_id ) as admin3_peers
+            FROM $wpdb->dt_location_grid as g
+            LEFT JOIN $wpdb->dt_location_grid as gc ON g.admin0_grid_id=gc.grid_id
+            LEFT JOIN $wpdb->dt_location_grid as ga1 ON g.admin1_grid_id=ga1.grid_id
+            LEFT JOIN $wpdb->dt_location_grid as ga2 ON g.admin2_grid_id=ga2.grid_id
+            LEFT JOIN $wpdb->dt_location_grid as ga3 ON g.admin3_grid_id=ga3.grid_id
+            WHERE g.grid_id = %s
+        ", $grid_id ), ARRAY_A );
+
+        $parent = $wpdb->get_var( $wpdb->prepare( "
+            SELECT
+              COUNT(g.grid_id)
+            FROM $wpdb->dt_location_grid as g
+            WHERE g.parent_id = %s
+        ", $grid['parent_id'] ) );
+
+        $population_division = 50000 / 2;
+        if ( $grid['country_code'] === 'US' ){
+            $population_division = 5000 / 2;
+        }
+
+        $a3_needed = round($grid['admin3_population'] / $population_division );
+        if ( $a3_needed < 1 ) {
+            $a3_needed = 1;
+        }
+        $a2_needed = round($grid['admin2_population'] / $population_division );
+        if ( $a2_needed < 1 ) {
+            $a2_needed = 1;
+        }
+        $a1_needed = round($grid['admin1_population'] / $population_division );
+        if ( $a1_needed < 1 ) {
+            $a1_needed = 1;
+        }
+        $a0_needed = round($grid['admin0_population'] / $population_division );
+        if ( $a0_needed < 1 ) {
+            $a0_needed = 1;
+        }
+
+        $parent_level = $grid['level'] - 1;
+
         $data = [
-            'grid_id' => $grid_id
+            'level' => $grid['level'],
+            'parent_level' => $parent_level,
+            'population_division' => number_format_i18n( $population_division * 2 ), // label for content not calculation
+            'self' => [],
+            'levels' => [
+                [
+                    'name' => $grid['admin3_name'],
+                    'parent_name' => $grid['admin2_name'],
+                    'grid_id' => $grid['admin3_grid_id'],
+                    'population' => number_format_i18n( $grid['admin3_population'] ),
+                    'peers' => number_format_i18n( $grid['admin3_peers'] ),
+                    'needed' => number_format_i18n( $a3_needed ),
+                    'reported' => 0,
+                    'percent' => 0,
+                ],
+                [
+                    'name' => $grid['admin2_name'],
+                    'parent_name' => $grid['admin1_name'],
+                    'grid_id' => $grid['admin2_grid_id'],
+                    'population' => number_format_i18n( $grid['admin2_population'] ),
+                    'peers' => number_format_i18n( $grid['admin2_peers'] ),
+                    'needed' => number_format_i18n( $a2_needed ),
+                    'reported' => 0,
+                    'percent' => 0,
+                ],
+                [
+                    'name' => $grid['admin1_name'],
+                    'parent_name' => $grid['admin0_name'],
+                    'grid_id' => $grid['admin1_grid_id'],
+                    'population' => number_format_i18n( $grid['admin1_population'] ),
+                    'peers' => number_format_i18n( $grid['admin1_peers'] ),
+                    'needed' => number_format_i18n( $a1_needed ),
+                    'reported' => 0,
+                    'percent' => 0,
+                ],
+                [
+                    'name' => $grid['admin0_name'],
+                    'parent_name' => 'World',
+                    'grid_id' => $grid['admin0_grid_id'],
+                    'population' => number_format_i18n( $grid['admin0_population'] ),
+                    'peers' => $grid['admin0_peers'],
+                    'needed' => number_format_i18n( $a0_needed ),
+                    'reported' => 0,
+                    'percent' => 0,
+                ],
+                [
+                    'name' => 'World',
+                    'grid_id' => 1,
+                    'population' => number_format_i18n( $world_population ),
+                    'peers' => 255,
+                    'needed' => number_format_i18n( round($world_population / $population_division ) ),
+                    'reported' => 0,
+                    'percent' => 0,
+                ],
+            ],
+
         ];
+
+        if ( empty( $data['levels'][0]['grid_id'] ) ) {
+            unset( $data['levels'][0] );
+        }
+        if ( empty( $data['levels'][1]['grid_id'] ) ) {
+            unset( $data['levels'][1] );
+        }
+        if ( empty( $data['levels'][2]['grid_id'] ) ) {
+            unset( $data['levels'][2] );
+        }
+        if ( empty( $data['levels'][3]['grid_id'] ) ) {
+            unset( $data['levels'][3] );
+        }
+
+        foreach( $data['levels'] as $i => $v ) {
+            $data['self'] = [
+                'name' => $v['name'],
+                'parent_name' => $v['parent_name'],
+                'grid_id' => $v['grid_id'],
+                'population' => $v['population'],
+                'peers' => $v['peers'],
+                'needed' => $v['needed'],
+                'reported' => $v['reported'],
+                'percent' => $v['percent'],
+            ];
+            break;
+        }
+
+
+        dt_write_log($data);
+        dt_write_log('End');
         return $data;
     }
 
@@ -510,6 +681,76 @@ class DT_Network_Dashboard_Public_Heatmap_Churches
         ];
 
         return $data;
+    }
+
+    public function movement_data( WP_REST_Request $request ){
+        $params = $request->get_json_params() ?? $request->get_body_params();
+
+        if ( ! isset( $params['grid_id'] ) ) {
+            return new WP_Error(__METHOD__, 'no grid id' );
+        }
+        if ( ! isset( $params['offset'] ) ) {
+            return new WP_Error(__METHOD__, 'no grid id' );
+        }
+        $grid_id = sanitize_text_field( wp_unslash( $params['grid_id']));
+        $offset = sanitize_text_field( wp_unslash( $params['offset']));
+
+        return $this->query_movement_data( $grid_id, $offset );
+
+    }
+
+    public function query_movement_data( $grid_id, $offset ) {
+        global $wpdb;
+        $ids = [];
+        $ids[] = $grid_id;
+        $children = Disciple_Tools_Mapping_Queries::get_children_by_grid_id( $grid_id );
+        if ( ! empty( $children ) ) {
+            foreach( $children as $child ){
+                $ids[] = $child['grid_id'];
+            }
+        }
+        $prepared_list = dt_array_to_sql( $ids );
+        $list = $wpdb->get_results("
+                SELECT
+                       id,
+                       action,
+                       category,
+                       lng,
+                       lat,
+                       label,
+                       grid_id,
+                       payload,
+                       timestamp,
+                       'A Zúme partner' as site_name
+                FROM $wpdb->dt_movement_log
+                WHERE grid_id IN ($prepared_list)
+                ORDER BY timestamp DESC", ARRAY_A);
+        if ( empty( $list ) ){
+            return [];
+        }
+
+        foreach( $list as $index => $item ){
+            $list[$index]['payload'] = maybe_unserialize( $item['payload'] );
+            $list[$index]['formatted_time'] = date( 'M, d Y, g:i a', $item['timestamp'] + $offset );
+        }
+
+        if ( function_exists( 'zume_log_actions' ) ) {
+            $list = zume_log_actions($list);
+        }
+        if ( function_exists( 'dt_network_dashboard_translate_log_generations' ) ) {
+            $list = dt_network_dashboard_translate_log_generations($list);
+        }
+        if ( function_exists( 'dt_network_dashboard_translate_log_new_posts' ) ) {
+            $list = dt_network_dashboard_translate_log_new_posts($list);
+        }
+
+        foreach( $list as $index => $item ){
+            if ( ! isset( $item['message'] ) ) {
+                $list[$index]['message'] = 'Non-public movement event reported.';
+            }
+        }
+
+        return $list;
     }
 
 

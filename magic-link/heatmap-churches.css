@@ -18,6 +18,12 @@ body {
 #canvas_panel {
     padding:1rem;
 }
+.ucwords {
+    text-transform: capitalize;
+}
+.bold {
+    font-weight:bold;
+}
 
 @media (min-width:0px)  {
     /* foundations small */
