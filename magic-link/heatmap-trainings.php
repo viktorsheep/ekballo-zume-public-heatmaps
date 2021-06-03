@@ -134,5 +134,31 @@ class DT_Network_Dashboard_Public_Heatmap_Trainings extends DT_Network_Dashboard
     public function _browser_tab_title( $title ){
         return __( "Zúme Trainings Map", 'disciple_tools' );
     }
+
+    public function customized_welcome_script(){
+        ?>
+        <script>
+            jQuery(document).ready(function($){
+                $('#welcome-modal').foundation('open');
+                $('#welcome-content').html(`
+                    <div class="grid-x">
+                        <div class="cell">
+
+                        </div>
+                        <div class="cell">
+
+                        </div>
+                        <div class="cell">
+
+                        </div>
+                        <div class="cell">
+
+                        </div>
+                    </div>
+                  `)
+            })
+        </script>
+        <?php
+    }
 }
 

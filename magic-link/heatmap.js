@@ -42,7 +42,6 @@ window.get_movement_data = (grid_id) => {
 
 jQuery(document).ready(function($){
   clearInterval(window.fiveMinuteTimer)
-  // @todo clear waiting screen.
 
   let slider_width = window.innerWidth * .70
   if ( isMobile ) {
@@ -66,6 +65,9 @@ jQuery(document).ready(function($){
         }
         #initialize-screen {
             height: ${window.innerHeight}px !important;
+        }
+        #welcome-modal {
+            height: ${window.innerHeight - 30}px !important;
         }
 
     `)
@@ -494,13 +496,15 @@ function load_map() {
         jQuery('#error').html(e)
       })
   })
-}; /* .preCache */
+} /* .preCache */
 
 function show_details_panel(){
   $('#details-panel').show()
+  $('#training-start-screen').hide()
 }
 function hide_details_panel(){
   $('#details-panel').hide()
+  $('#training-start-screen').show()
 }
 
 function load_slider_content( data ) {

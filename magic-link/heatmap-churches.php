@@ -293,7 +293,6 @@ class DT_Network_Dashboard_Public_Heatmap_Churches
     }
     public function header_javascript(){
         ?>
-
         <script>
             let jsObject = [<?php echo json_encode([
                 'map_key' => DT_Mapbox_API::get_key(),
@@ -312,7 +311,59 @@ class DT_Network_Dashboard_Public_Heatmap_Churches
             ]) ?>][0]
         </script>
         <?php
+        $this->customized_welcome_script();
         return true;
+    }
+    public function customized_welcome_script(){
+        ?>
+        <script>
+            jQuery(document).ready(function($){
+                let asset_url = '<?php echo plugin_dir_url(__FILE__) ?>'
+                // $('#welcome-modal').foundation('open');
+                // $('#welcome-content').html(`
+                //     <div class="grid-x">
+                //         <div class="cell">
+                //
+                //         </div>
+                //         <div class="cell">
+                //
+                //         </div>
+                //         <div class="cell">
+                //
+                //         </div>
+                //         <div class="cell">
+                //
+                //         </div>
+                //     </div>
+                //   `)
+
+                $('#training-start-screen').html(`
+                <div class="grid-x grid-padding-x" >
+                    <div class="cell center">
+                        <img class="training-screen-image" src="${asset_url + 'search.svg'}" alt="search icon" />
+                        <h1>Search</h1>
+                        <p>Search for any city or place with the search input.</p>
+                    </div>
+                    <div class="cell center">
+                        <img class="training-screen-image" src="${asset_url + 'zoom.svg'}" alt="zoom icon"  />
+                        <h1>Zoom</h1>
+                        <p>Scroll zoom with your mouse or pinch zoom with track pads and phones to focus on sections of the map.</p>
+                    </div>
+                    <div class="cell center">
+                        <img class="training-screen-image" src="${asset_url + 'drag.svg'}" alt="drag icon"  />
+                        <h1>Drag</h1>
+                        <p>Click and drag the map any direction to look at a different part of the map.</p>
+                    </div>
+                    <div class="cell center">
+                        <img class="training-screen-image" src="${asset_url + 'click.svg'}" alt="click icon" />
+                        <h1>Click</h1>
+                        <p>Click a single section and reveal a details panel with more information about the location.</p>
+                    </div>
+                </div>
+                `)
+            })
+        </script>
+        <?php
     }
     public function body(){
         DT_Mapbox_API::geocoder_scripts();
