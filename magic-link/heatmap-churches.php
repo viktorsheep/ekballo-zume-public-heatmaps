@@ -431,6 +431,11 @@ class DT_Network_Dashboard_Public_Heatmap_Churches
             $a0_needed = 1;
         }
 
+        $a3_reported = $this->get_reported( $grid['admin3_grid_id'], $grid_totals );
+        $a2_reported = $this->get_reported( $grid['admin2_grid_id'], $grid_totals );
+        $a1_reported = $this->get_reported( $grid['admin1_grid_id'], $grid_totals );
+        $a0_reported = $this->get_reported( $grid['admin0_grid_id'], $grid_totals );
+
         // build levels
         $data = [
             'level' => $grid['level'],
@@ -445,8 +450,8 @@ class DT_Network_Dashboard_Public_Heatmap_Churches
                     'population' => number_format_i18n( $grid['admin3_population'] ),
                     'peers' => number_format_i18n( $grid['admin3_peers'] ),
                     'needed' => number_format_i18n( $a3_needed ),
-                    'reported' =>  number_format_i18n( $this->get_reported( $grid['admin3_grid_id'], $grid_totals ) ),
-                    'percent' => 0,
+                    'reported' =>  number_format_i18n( $a3_reported ),
+                    'percent' => number_format_i18n( $a3_reported / $a3_needed * 100, 3 ),
                 ],
                 [
                     'name' => $grid['admin2_name'],
@@ -455,8 +460,8 @@ class DT_Network_Dashboard_Public_Heatmap_Churches
                     'population' => number_format_i18n( $grid['admin2_population'] ),
                     'peers' => number_format_i18n( $grid['admin2_peers'] ),
                     'needed' => number_format_i18n( $a2_needed ),
-                    'reported' => number_format_i18n( $this->get_reported( $grid['admin2_grid_id'], $grid_totals ) ),
-                    'percent' => 0,
+                    'reported' => number_format_i18n( $a2_reported ),
+                    'percent' => number_format_i18n( $a2_reported / $a2_needed * 100, 3 ),
                 ],
                 [
                     'name' => $grid['admin1_name'],
@@ -465,8 +470,8 @@ class DT_Network_Dashboard_Public_Heatmap_Churches
                     'population' => number_format_i18n( $grid['admin1_population'] ),
                     'peers' => number_format_i18n( $grid['admin1_peers'] ),
                     'needed' => number_format_i18n( $a1_needed ),
-                    'reported' =>  number_format_i18n( $this->get_reported( $grid['admin1_grid_id'], $grid_totals ) ),
-                    'percent' => 0,
+                    'reported' =>  number_format_i18n( $a1_reported ),
+                    'percent' => number_format_i18n( $a1_reported / $a1_needed * 100, 3 ),
                 ],
                 // country level
                 [
@@ -476,8 +481,8 @@ class DT_Network_Dashboard_Public_Heatmap_Churches
                     'population' => number_format_i18n( $grid['admin0_population'] ),
                     'peers' => $grid['admin0_peers'],
                     'needed' => number_format_i18n( $a0_needed ),
-                    'reported' =>  number_format_i18n( $this->get_reported( $grid['admin0_grid_id'], $grid_totals ) ),
-                    'percent' => 0,
+                    'reported' =>  number_format_i18n( $a0_reported ),
+                    'percent' => number_format_i18n( $a0_reported / $a0_needed * 100, 3 ),
                 ],
                 // world level
                 [
@@ -528,11 +533,6 @@ class DT_Network_Dashboard_Public_Heatmap_Churches
         return $data;
     }
 
-    public function query_saturation_list() : array {
-        global $wpdb;
-        $list = Zume_Public_Heatmap_Queries::query_saturation_list();
-        $grid_list = Disciple_Tools_Mapping_Queries::query_church_location_grid_totals();
-    }
 
     public function get_reported( $grid_id, $grid_totals = [] ) : int {
         if ( is_null($grid_totals)) {
@@ -568,14 +568,22 @@ class DT_Network_Dashboard_Public_Heatmap_Churches
 
         // reported
         global $wpdb;
-
-
-//        $list = Zume_Public_Heatmap_Queries::query_saturation_list();
-
-
+        $reported = $wpdb->get_var("
+            SELECT COUNT(lg.admin0_grid_id) as count
+            FROM $wpdb->postmeta as pm
+            JOIN $wpdb->posts as p ON p.ID=pm.post_id AND p.post_type = 'groups'
+            JOIN $wpdb->postmeta as pm2 ON pm2.post_id=pm.post_id AND pm2.meta_key = 'group_type' AND pm2.meta_value = 'church'
+            JOIN $wpdb->postmeta as pm3 ON pm3.post_id=pm.post_id AND pm3.meta_key = 'group_status' AND (pm3.meta_value = 'active' OR pm3.meta_value = 'inactive')
+            LEFT JOIN $wpdb->dt_location_grid as lg ON pm.meta_value=lg.grid_id
+            WHERE pm.meta_key = 'location_grid'
+        ");
+        $data['reported'] = ( ! empty( $reported ) ) ? (int) $reported : 0;
+        $data['percent'] =  $data['reported'] / $data['needed'] * 100;
 
         $data['population'] = number_format_i18n( $data['population'] );
         $data['needed'] = number_format_i18n( $data['needed'] );
+        $data['reported'] = number_format_i18n( $data['reported'] );
+        $data['percent'] = number_format_i18n( $data['percent'], 3);
 
         return $data;
     }
