@@ -230,7 +230,7 @@ jQuery(document).ready(function($){
             $('#modal_tile').html(e.features[0].properties.full_name)
             $('#modal_population').html(jsObject.grid_data.data[e.features[0].properties.grid_id].population)
 
-            jQuery('#custom-paragraph span').empty()
+            // jQuery('#custom-paragraph').empty().html(`<span class="loading-spinner active"></span>`)
             jQuery('.temp-spinner').html(`<span class="loading-spinner active"></span>`)
 
             window.get_grid_data(e.features[0].properties.grid_id)
@@ -433,13 +433,22 @@ function hide_details_panel(){
 function load_slider_content( data ) {
   console.log(data)
 
-  jQuery('.self_name').html(data.self.name)
-  jQuery('.self_peers').html(data.self.peers)
-  jQuery('.parent_name').html(data.self.parent_name)
-  jQuery('.population_division').html(data.population_division)
-  jQuery('.self_needed').html(data.self.needed)
-  jQuery('.self_percent').html(data.self.percent)
-  jQuery('.self_population').html(data.self.population)
+  jQuery('#custom-paragraph').html(`
+    <span class="self_name ucwords temp-spinner bold">${data.self.name}</span> is one of <span class="self_peers  bold">${data.self.peers}</span>
+    administrative divisions in <span class="parent_name ucwords bold">${data.self.parent_name}</span> and it has a population of
+    <span class="self_population  bold">${data.population_division}</span>.
+    In order to reach the community goal of 2 churches for every <span class="population_division  bold"></span> people,
+    <span class="self_name ucwords  bold">${data.self.needed}</span> needs
+    <span class="self_needed bold">${data.self.needed}</span> new churches. So far, it is <span class="self_percent  bold">${data.self.percent}</span>% to its goal.
+  `)
+
+  // jQuery('.self_name').html(data.self.name)
+  // jQuery('.self_peers').html(data.self.peers)
+  // jQuery('.parent_name').html(data.self.parent_name)
+  // jQuery('.population_division').html(data.population_division)
+  // jQuery('.self_needed').html(data.self.needed)
+  // jQuery('.self_percent').html(data.self.percent)
+  // jQuery('.self_population').html(data.self.population)
 
   let gl = jQuery('#goals-list')
   gl.empty()

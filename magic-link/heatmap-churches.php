@@ -122,7 +122,7 @@ class DT_Network_Dashboard_Public_Heatmap_Churches
                 'jquery-touch-punch'
             ], filemtime( plugin_dir_path( __FILE__ ) .'heatmap-churches.js' ), true );
 
-            wp_enqueue_style( $this->key, trailingslashit( plugin_dir_url( __FILE__ ) ) . 'heatmap-churches.css', ['site-css'], filemtime( plugin_dir_path( __FILE__ ) .'heatmap-churches.css' ));
+            wp_enqueue_style( $this->key, trailingslashit( plugin_dir_url( __FILE__ ) ) . 'heatmap.css', ['site-css'], filemtime( plugin_dir_path( __FILE__ ) .'heatmap.css' ));
 
 //            wp_enqueue_script( 'service-worker', trailingslashit( plugin_dir_url( __FILE__ ) ) . 'service-worker.js', [
 //                'jquery',
@@ -302,9 +302,9 @@ class DT_Network_Dashboard_Public_Heatmap_Churches
                 'population' => number_format_i18n( $v['population'] ),
             ];
 
-            $population_division = 25000;
-            if ( in_array( $v['country_code'], ['US'])) {
-                $population_division = 5000;
+            $population_division = 50000 / 2;
+            if ( $v['country_code'] === 'US' ){
+                $population_division = 5000 / 2;
             }
 
             $needed = round( $v['population'] / $population_division );
@@ -368,7 +368,6 @@ class DT_Network_Dashboard_Public_Heatmap_Churches
         global $wpdb;
 
         $world = $this->get_world_goals();
-
         $grid_totals = Zume_Public_Heatmap_Queries::query_church_location_grid_totals();
 
         $grid = $wpdb->get_row( $wpdb->prepare( "
@@ -536,10 +535,10 @@ class DT_Network_Dashboard_Public_Heatmap_Churches
 
     public function get_reported( $grid_id, $grid_totals = [] ) : int {
         if ( is_null($grid_totals)) {
-            $grid_totals = Disciple_Tools_Mapping_Queries::query_church_location_grid_totals();
+            $grid_totals = Zume_Public_Heatmap_Queries::query_church_location_grid_totals();
         }
         if ( isset( $grid_totals[$grid_id])){
-            return (int) $grid_totals[$grid_id];
+            return (int) $grid_totals[$grid_id]['count'];
         }
         else {
             return 0;
