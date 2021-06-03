@@ -437,8 +437,8 @@ function load_slider_content( data ) {
     <span class="self_name ucwords temp-spinner bold">${data.self.name}</span> is one of <span class="self_peers  bold">${data.self.peers}</span>
     administrative divisions in <span class="parent_name ucwords bold">${data.self.parent_name}</span> and it has a population of
     <span class="self_population  bold">${data.population_division}</span>.
-    In order to reach the community goal of 2 churches for every <span class="population_division  bold"></span> people,
-    <span class="self_name ucwords  bold">${data.self.needed}</span> needs
+    In order to reach the community goal of 2 churches for every <span class="population_division  bold">${data.population_division}</span> people,
+    <span class="self_name ucwords  bold">${data.self.name}</span> needs
     <span class="self_needed bold">${data.self.needed}</span> new churches. So far, it is <span class="self_percent  bold">${data.self.percent}</span>% to its goal.
   `)
 
