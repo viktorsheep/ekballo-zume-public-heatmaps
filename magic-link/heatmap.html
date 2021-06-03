@@ -1,14 +1,26 @@
 <style id="custom-style">
     #wrapper {
-        height: 1000px !important;
+        height: 2000px !important;
     }
     #map-wrapper {
-        height: 1000px !important;
+        height: 2000px !important;
     }
     #map {
-        height: 1000px !important;
+        height: 2000px !important;
     }
 </style>
+
+<div id="initialize-screen">
+    <div id="initialize-spinner-wrapper" class="center">
+        <progress class="success initialize-progress" max="46" value="0"></progress><br>
+        Loading the planet ...<br>
+        <span id="initialize-people" style="display:none;">Locating world population...</span><br>
+        <span id="initialize-activity" style="display:none;">Calculating movement activity...</span><br>
+        <span id="initialize-coffee" style="display:none;">Shamelessly brewing coffee...</span><br>
+        <span id="initialize-dothis" style="display:none;">Let's do this...</span><br>
+    </div>
+</div>
+
 
 <div id="wrapper">
     <div class="grid-x">

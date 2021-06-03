@@ -39,8 +39,10 @@ window.get_movement_data = (grid_id) => {
     })
 }
 
+
 jQuery(document).ready(function($){
   clearInterval(window.fiveMinuteTimer)
+  // @todo clear waiting screen.
 
   let slider_width = window.innerWidth * .70
   if ( isMobile ) {
@@ -49,20 +51,83 @@ jQuery(document).ready(function($){
 
   /* set vertical size the form column*/
   $('#custom-style').empty().append(`
-      #wrapper {
-          height: ${window.innerHeight}px !important;
+        #wrapper {
+            height: ${window.innerHeight}px !important;
+        }
+        #map-wrapper {
+            height: ${window.innerHeight}px !important;
+        }
+        #map {
+            height: ${window.innerHeight}px !important;
+        }
+        .off-canvas {
+            width:${slider_width}px;
+            background-color:white;
+        }
+        #initialize-screen {
+            height: ${window.innerHeight}px !important;
+        }
+
+    `)
+
+  // preload all geojson
+  let asset_list = []
+  var i = 1;
+  while( i <= 46 ){
+    asset_list.push(i+'.geojson')
+    i++
+  }
+
+  let loop = 0
+  let initialize_screen = jQuery('.initialize-progress')
+
+  jQuery.each(asset_list, function(i,v) {
+    console.log(v)
+    jQuery.ajax({
+      url: jsObject.mirror_url + 'tiles/world/saturation/' + v,
+      dataType: 'json',
+      data: null,
+      cache: true,
+      beforeSend: function (xhr) {
+        if (xhr.overrideMimeType) {
+          xhr.overrideMimeType("application/json");
+        }
       }
-      #map-wrapper {
-          height: ${window.innerHeight}px !important;
-      }
-      #map {
-          height: ${window.innerHeight}px !important;
-      }
-      .off-canvas {
-          width:${slider_width}px;
-          background-color:white;
-      }
-  `)
+    })
+      .done(function(x){
+        console.log(v + ' returned')
+        loop++
+        initialize_screen.val(loop)
+
+        if ( 5 === loop ) {
+          jQuery('#initialize-people').show()
+        }
+
+        if ( 20 === loop ) {
+          jQuery('#initialize-activity').show()
+        }
+
+        if ( 30 === loop ) {
+          jQuery('#initialize-coffee').show()
+        }
+
+        if ( 43 === loop ) {
+          jQuery('#initialize-dothis').show()
+        }
+
+        if ( loop > 45 ){
+          load_map()
+        }
+      })
+      .fail(function(){
+        loop++
+      })
+  })
+
+}) /* .ready() */
+
+function load_map() {
+  jQuery('#initialize-screen').hide()
 
   // set title
   let ptt = ''
@@ -132,6 +197,7 @@ jQuery(document).ready(function($){
       url: jsObject.mirror_url + 'tiles/world/saturation/' + v,
       dataType: 'json',
       data: null,
+      cache: true,
       beforeSend: function (xhr) {
         if (xhr.overrideMimeType) {
           xhr.overrideMimeType("application/json");
@@ -299,21 +365,21 @@ jQuery(document).ready(function($){
   function append_report_row(){
     let id = Date.now()
     $('#church-list').append(`
-      <div class="grid-x row-${id} list-row" data-id="${id}">
-          <div class="cell small-5">
-              <input type="text" name="${id}[name]" class="${id} name-${id} required" placeholder="Name of Simple Church" data-name="name" data-group-id="${id}" />
+          <div class="grid-x row-${id} list-row" data-id="${id}">
+              <div class="cell small-5">
+                  <input type="text" name="${id}[name]" class="${id} name-${id} required" placeholder="Name of Simple Church" data-name="name" data-group-id="${id}" />
+              </div>
+              <div class="cell small-2">
+                  <input type="number" name="${id}[members]" class="${id} members-${id} required" placeholder="#" data-name="members" data-group-id="${id}" />
+              </div>
+              <div class="cell small-4">
+                  <input type="date" name="${id}[start]" class="${id} start-${id} required" placeholder="Started" data-name="start" data-group-id="${id}" />
+              </div>
+              <div class="cell small-1">
+                  <button class="button expanded alert" style="border-radius: 0;" onclick="remove_row(${id})">X</button>
+              </div>
           </div>
-          <div class="cell small-2">
-              <input type="number" name="${id}[members]" class="${id} members-${id} required" placeholder="#" data-name="members" data-group-id="${id}" />
-          </div>
-          <div class="cell small-4">
-              <input type="date" name="${id}[start]" class="${id} start-${id} required" placeholder="Started" data-name="start" data-group-id="${id}" />
-          </div>
-          <div class="cell small-1">
-              <button class="button expanded alert" style="border-radius: 0;" onclick="remove_row(${id})">X</button>
-          </div>
-      </div>
-    `)
+        `)
 
     $('.required').focusout(function(){
       check_inputs()
@@ -428,7 +494,7 @@ jQuery(document).ready(function($){
         jQuery('#error').html(e)
       })
   })
-})
+}; /* .preCache */
 
 function show_details_panel(){
   $('#details-panel').show()

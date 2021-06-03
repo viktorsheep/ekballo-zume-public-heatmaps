@@ -130,5 +130,9 @@ class DT_Network_Dashboard_Public_Heatmap_Trainings extends DT_Network_Dashboard
         }
         return $population_division;
     }
+
+    public function _browser_tab_title( $title ){
+        return __( "Zúme Trainings Map", 'disciple_tools' );
+    }
 }
 
