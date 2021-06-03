@@ -282,7 +282,14 @@ class DT_Network_Dashboard_Public_Heatmap_Churches
     }
 
     public function header_style(){
-
+        ?>
+        <style>
+            #initialize-screen {
+                background-image: url("<?php echo plugin_dir_url(__FILE__) ?>initialize-background.jpg");
+                background-size:cover;
+            }
+        </style>
+        <?php
     }
     public function header_javascript(){
         ?>
