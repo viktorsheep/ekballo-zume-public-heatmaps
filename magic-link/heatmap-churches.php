@@ -117,10 +117,10 @@ class DT_Network_Dashboard_Public_Heatmap_Churches
             wp_enqueue_script( 'jquery-ui' );
             wp_enqueue_script( 'jquery-touch-punch' );
 
-            wp_enqueue_script( $this->key, trailingslashit( plugin_dir_url( __FILE__ ) ) . 'heatmap-churches.js', [
+            wp_enqueue_script( $this->key, trailingslashit( plugin_dir_url( __FILE__ ) ) . 'heatmap.js', [
                 'jquery',
                 'jquery-touch-punch'
-            ], filemtime( plugin_dir_path( __FILE__ ) .'heatmap-churches.js' ), true );
+            ], filemtime( plugin_dir_path( __FILE__ ) .'heatmap.js' ), true );
 
             wp_enqueue_style( $this->key, trailingslashit( plugin_dir_url( __FILE__ ) ) . 'heatmap.css', ['site-css'], filemtime( plugin_dir_path( __FILE__ ) .'heatmap.css' ));
 
@@ -245,6 +245,7 @@ class DT_Network_Dashboard_Public_Heatmap_Churches
                 'root' => esc_url_raw( rest_url() ),
                 'nonce' => wp_create_nonce( 'wp_rest' ),
                 'parts' => $this->parts,
+                'post_type' => $this->post_type,
                 'ipstack' => DT_Ipstack_API::geocode_current_visitor(),
                 'trans' => [
                     'add' => __( 'Add Magic', 'disciple_tools' ),
@@ -258,7 +259,7 @@ class DT_Network_Dashboard_Public_Heatmap_Churches
     }
     public function body(){
         DT_Mapbox_API::geocoder_scripts();
-        include('heatmap-churches.html');
+        include('heatmap.html');
     }
 
     /**
@@ -287,9 +288,21 @@ class DT_Network_Dashboard_Public_Heatmap_Churches
         );
     }
 
+    public function get_grid_totals(){
+        return Zume_Public_Heatmap_Queries::query_church_location_grid_totals();
+    }
+
+    public function get_population_division( $country_code ){
+        $population_division = 50000 / 2;
+        if ( $country_code === 'US' ){
+            $population_division = 5000 / 2;
+        }
+        return $population_division;
+    }
+
     public function grid_list(){
         $list = Zume_Public_Heatmap_Queries::query_saturation_list();
-        $grid_list = Zume_Public_Heatmap_Queries::query_church_location_grid_totals();
+        $grid_list = $this->get_grid_totals();
 
         $data = [];
         $highest_value = 1;
@@ -302,10 +315,7 @@ class DT_Network_Dashboard_Public_Heatmap_Churches
                 'population' => number_format_i18n( $v['population'] ),
             ];
 
-            $population_division = 50000 / 2;
-            if ( $v['country_code'] === 'US' ){
-                $population_division = 5000 / 2;
-            }
+            $population_division = $this->get_population_division( $v['country_code'] );
 
             $needed = round( $v['population'] / $population_division );
             if ( $needed < 1 ){
@@ -368,7 +378,7 @@ class DT_Network_Dashboard_Public_Heatmap_Churches
         global $wpdb;
 
         $world = $this->get_world_goals();
-        $grid_totals = Zume_Public_Heatmap_Queries::query_church_location_grid_totals();
+        $grid_totals = $this->get_grid_totals();
 
         $grid = $wpdb->get_row( $wpdb->prepare( "
             SELECT
@@ -407,10 +417,7 @@ class DT_Network_Dashboard_Public_Heatmap_Churches
 
 
         // define population
-        $population_division = 50000 / 2;
-        if ( $grid['country_code'] === 'US' ){
-            $population_division = 5000 / 2;
-        }
+        $population_division = $this->get_population_division( $grid['country_code'] );
 
         // build needed var
         $a3_needed = round($grid['admin3_population'] / $population_division );
@@ -525,7 +532,6 @@ class DT_Network_Dashboard_Public_Heatmap_Churches
             ];
             break;
         }
-
 
         dt_write_log($data);
         dt_write_log('End');

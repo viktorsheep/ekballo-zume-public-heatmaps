@@ -64,6 +64,15 @@ jQuery(document).ready(function($){
       }
   `)
 
+  // set title
+  let ptt = ''
+  if ( 'groups' === jsObject.post_type ){
+    ptt = 'Churches'
+  } else {
+    ptt = 'Trainings'
+  }
+  $('#panel-type-title').html(ptt)
+
   $('.loading-spinner').removeClass('active')
 
   let center = [-98, 38.88]
@@ -423,17 +432,17 @@ jQuery(document).ready(function($){
 
 function show_details_panel(){
   $('#details-panel').show()
-
 }
 function hide_details_panel(){
   $('#details-panel').hide()
-
 }
 
 function load_slider_content( data ) {
   console.log(data)
+  console.log(jsObject.parts.post_type)
 
-  jQuery('#custom-paragraph').html(`
+  if ( 'groups' === jsObject.post_type ) {
+    jQuery('#custom-paragraph').html(`
     <span class="self_name ucwords temp-spinner bold">${data.self.name}</span> is one of <span class="self_peers  bold">${data.self.peers}</span>
     administrative divisions in <span class="parent_name ucwords bold">${data.self.parent_name}</span> and it has a population of
     <span class="self_population  bold">${data.population_division}</span>.
@@ -442,18 +451,10 @@ function load_slider_content( data ) {
     <span class="self_needed bold">${data.self.needed}</span> new churches. So far, it is <span class="self_percent  bold">${data.self.percent}</span>% to its goal.
   `)
 
-  // jQuery('.self_name').html(data.self.name)
-  // jQuery('.self_peers').html(data.self.peers)
-  // jQuery('.parent_name').html(data.self.parent_name)
-  // jQuery('.population_division').html(data.population_division)
-  // jQuery('.self_needed').html(data.self.needed)
-  // jQuery('.self_percent').html(data.self.percent)
-  // jQuery('.self_population').html(data.self.population)
-
-  let gl = jQuery('#goals-list')
-  gl.empty()
-  jQuery.each(data.levels, function(i,v){
-    gl.append(`
+    let gl = jQuery('#goals-list')
+    gl.empty()
+    jQuery.each(data.levels, function(i,v){
+      gl.append(`
     <div class="cell">
         <strong>${v.name}</strong><br>
         Population: <span>${v.population}</span><br>
@@ -463,7 +464,33 @@ function load_slider_content( data ) {
         <meter class="meter" value="${v.percent}" min="0" low="33" high="66" optimum="100" max="100"></meter>
     </div>
     `)
-  })
+    })
+  }
+  else if ( 'trainings' === jsObject.post_type ) {
+    jQuery('#custom-paragraph').html(`
+    <span class="self_name ucwords temp-spinner bold">${data.self.name}</span> is one of <span class="self_peers  bold">${data.self.peers}</span>
+    administrative divisions in <span class="parent_name ucwords bold">${data.self.parent_name}</span> and it has a population of
+    <span class="self_population  bold">${data.population_division}</span>.
+    In order to reach the community goal of 1 training for every <span class="population_division  bold">${data.population_division}</span> people,
+    <span class="self_name ucwords  bold">${data.self.name}</span> needs
+    <span class="self_needed bold">${data.self.needed}</span> new trainings. So far, it is <span class="self_percent  bold">${data.self.percent}</span>% to its goal.
+  `)
+
+    let gl = jQuery('#goals-list')
+    gl.empty()
+    jQuery.each(data.levels, function(i,v){
+      gl.append(`
+    <div class="cell">
+        <strong>${v.name}</strong><br>
+        Population: <span>${v.population}</span><br>
+        Trainings Needed: <span>${v.needed}</span><br>
+        Trainings Reported: <span>${v.reported}</span><br>
+        Goal Reached: <span>${v.percent}</span>%
+        <meter class="meter" value="${v.percent}" min="0" low="33" high="66" optimum="100" max="100"></meter>
+    </div>
+    `)
+    })
+  }
 
 }
 
