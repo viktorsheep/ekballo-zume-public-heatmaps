@@ -565,7 +565,8 @@ class DT_Network_Dashboard_Public_Heatmap_Churches
                     'peers' => number_format_i18n( $grid['admin3_peers'] ),
                     'needed' => number_format_i18n( $a3_needed ),
                     'reported' =>  number_format_i18n( $a3_reported ),
-                    'percent' => number_format_i18n( $a3_reported / $a3_needed * 100, 3 ),
+                    'percent' => ceil( $a3_reported / $a3_needed * 100 ),
+                    'percent_formatted' => number_format_i18n( $a3_reported / $a3_needed * 100, 3 ),
                 ],
                 [
                     'name' => $grid['admin2_name'],
@@ -575,7 +576,8 @@ class DT_Network_Dashboard_Public_Heatmap_Churches
                     'peers' => number_format_i18n( $grid['admin2_peers'] ),
                     'needed' => number_format_i18n( $a2_needed ),
                     'reported' => number_format_i18n( $a2_reported ),
-                    'percent' => number_format_i18n( $a2_reported / $a2_needed * 100, 3 ),
+                    'percent' => ceil( $a2_reported / $a2_needed * 100 ),
+                    'percent_formatted' => number_format_i18n( $a2_reported / $a2_needed * 100, 3 ),
                 ],
                 [
                     'name' => $grid['admin1_name'],
@@ -585,7 +587,8 @@ class DT_Network_Dashboard_Public_Heatmap_Churches
                     'peers' => number_format_i18n( $grid['admin1_peers'] ),
                     'needed' => number_format_i18n( $a1_needed ),
                     'reported' =>  number_format_i18n( $a1_reported ),
-                    'percent' => number_format_i18n( $a1_reported / $a1_needed * 100, 3 ),
+                    'percent' => ceil( $a1_reported / $a1_needed * 100 ),
+                    'percent_formatted' => number_format_i18n( $a1_reported / $a1_needed * 100, 3 ),
                 ],
                 // country level
                 [
@@ -596,7 +599,8 @@ class DT_Network_Dashboard_Public_Heatmap_Churches
                     'peers' => $grid['admin0_peers'],
                     'needed' => number_format_i18n( $a0_needed ),
                     'reported' =>  number_format_i18n( $a0_reported ),
-                    'percent' => number_format_i18n( $a0_reported / $a0_needed * 100, 3 ),
+                    'percent' => ceil( $a0_reported / $a0_needed * 100 ),
+                    'percent_formatted' => number_format_i18n( $a0_reported / $a0_needed * 100, 3 ),
                 ],
                 // world level
                 [
@@ -607,6 +611,7 @@ class DT_Network_Dashboard_Public_Heatmap_Churches
                     'needed' => $world['needed'],
                     'reported' => $world['reported'],
                     'percent' => $world['percent'],
+                    'percent_formatted' => $world['percent'],
                 ],
             ],
 
@@ -637,6 +642,7 @@ class DT_Network_Dashboard_Public_Heatmap_Churches
                 'needed' => $v['needed'],
                 'reported' => $v['reported'],
                 'percent' => $v['percent'],
+                'percent_formatted' => $v['percent_formatted'],
             ];
             break;
         }
@@ -680,6 +686,7 @@ class DT_Network_Dashboard_Public_Heatmap_Churches
             'needed' => 0,
             'reported' => 0,
             'percent' => 0,
+            'percent_formatted' => 0,
         ];
 
         // needed
@@ -699,7 +706,8 @@ class DT_Network_Dashboard_Public_Heatmap_Churches
         $data['population'] = number_format_i18n( $data['population'] );
         $data['needed'] = number_format_i18n( $data['needed'] );
         $data['reported'] = number_format_i18n( $data['reported'] );
-        $data['percent'] = number_format_i18n( $data['percent'], 3);
+        $data['percent'] = ceil( $data['percent'] );
+        $data['percent_formatted'] = number_format_i18n( $data['percent'], 3);
 
         return $data;
     }

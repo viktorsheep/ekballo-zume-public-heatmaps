@@ -558,7 +558,7 @@ function load_slider_content( data ) {
         Population: <span>${v.population}</span><br>
         Trainings Needed: <span>${v.needed}</span><br>
         Trainings Reported: <span>${v.reported}</span><br>
-        Goal Reached: <span>${v.percent}</span>%
+        Goal Reached: <span>${v.percent_formatted}</span>%
         <meter class="meter" value="${v.percent}" min="0" low="33" high="66" optimum="100" max="100"></meter>
     </div>
     `)
