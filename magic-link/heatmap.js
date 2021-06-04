@@ -79,7 +79,7 @@ jQuery(document).ready(function($){
   // preload all geojson
   let asset_list = []
   var i = 1;
-  while( i <= 46 ){
+  while( i <= 45 ){
     asset_list.push(i+'.geojson')
     i++
   }
@@ -109,19 +109,19 @@ jQuery(document).ready(function($){
           jQuery('#initialize-people').show()
         }
 
-        if ( 20 === loop ) {
+        if ( 15 === loop ) {
           jQuery('#initialize-activity').show()
         }
 
-        if ( 30 === loop ) {
+        if ( 22 === loop ) {
           jQuery('#initialize-coffee').show()
         }
 
-        if ( 43 === loop ) {
+        if ( 40 === loop ) {
           jQuery('#initialize-dothis').show()
         }
 
-        if ( loop > 45 ){
+        if ( loop > 44 ){
           load_map()
         }
       })
@@ -192,7 +192,7 @@ function load_map() {
 
   let asset_list = []
   var i = 1;
-  while( i <= 46 ){
+  while( i <= 45 ){
     asset_list.push(i+'.geojson')
     i++
   }

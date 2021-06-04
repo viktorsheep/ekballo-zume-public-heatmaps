@@ -642,7 +642,7 @@ class DT_Network_Dashboard_Public_Heatmap_Churches
             break;
         }
 
-        dt_write_log($data);
+//        dt_write_log($data);
         dt_write_log('End');
         return $data;
     }
