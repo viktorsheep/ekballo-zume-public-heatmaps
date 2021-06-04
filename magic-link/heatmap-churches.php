@@ -506,11 +506,11 @@ class DT_Network_Dashboard_Public_Heatmap_Churches
               g.admin1_grid_id,
               ga1.alt_name as admin1_name,
               ga1.alt_population as admin1_population,
-                   (SELECT COUNT(a1p.grid_id) FROM $wpdb->dt_location_grid as a1p WHERE a1p.parent_id = g.admin0_grid_id ) as admin1_peers,
+              (SELECT COUNT(a1p.grid_id) FROM $wpdb->dt_location_grid as a1p WHERE a1p.parent_id = g.admin0_grid_id ) as admin1_peers,
               g.admin2_grid_id,
               ga2.alt_name as admin2_name,
               ga2.alt_population as admin2_population,
-                   (SELECT COUNT(a2p.grid_id) FROM $wpdb->dt_location_grid as a2p WHERE a2p.parent_id = g.admin1_grid_id ) as admin2_peers,
+              (SELECT COUNT(a2p.grid_id) FROM $wpdb->dt_location_grid as a2p WHERE a2p.parent_id = g.admin1_grid_id ) as admin2_peers,
               g.admin3_grid_id,
               ga3.alt_name as admin3_name,
               ga3.alt_population as admin3_population,
@@ -647,8 +647,33 @@ class DT_Network_Dashboard_Public_Heatmap_Churches
             break;
         }
 
+        $this->get_full_training( $grid_id );
 //        dt_write_log($data);
         return $data;
+    }
+
+    public function get_full_training( $grid_id ) {
+        dt_write_log(__METHOD__);
+        $list = Zume_Public_Heatmap_Queries::query_trainings_full();
+        $grid = Zume_Public_Heatmap_Queries::query_grid_elements($grid_id);
+        if ( empty( $grid ) ) {
+            return [];
+        }
+
+        foreach( $grid as $key => $id ) {
+            if ( empty( $id ) ) {
+                continue;
+            }
+            if ( isset( $list[$id]) ) {
+                dt_write_log( $list[$id] );
+            }
+        }
+
+        // @todo calculate parent
+
+        // @todo calculate grandparent
+
+        dt_write_log($grid);
     }
 
 

@@ -465,4 +465,78 @@ class Zume_Public_Heatmap_Queries {
 
         return $data;
     }
+
+    public static function query_trainings_full(){
+        global $wpdb;
+
+        $results = $wpdb->get_results("
+        SELECT tb.grid_id, ROUND( lgo.population / IF( tb.country_code = 'US', 5000, 50000) ) as need, tb.count, lgo.level, lgo.admin0_grid_id as '0', lgo.admin1_grid_id as '1', lgo.admin2_grid_id as '2', lgo.admin3_grid_id as '3'
+            FROM (
+            SELECT t0.admin0_grid_id as grid_id, t0.country_code, count(t0.admin0_grid_id) as count
+                        FROM (
+                         SELECT lg.admin0_grid_id, lg.admin1_grid_id, lg.admin2_grid_id, lg.admin3_grid_id, lg.admin4_grid_id, lg.admin5_grid_id, lg.country_code
+                            FROM $wpdb->postmeta as pm
+                            JOIN $wpdb->posts as p ON p.ID=pm.post_id AND p.post_type = 'trainings'
+                            LEFT JOIN $wpdb->dt_location_grid as lg ON pm.meta_value=lg.grid_id
+                            WHERE pm.meta_key = 'location_grid'
+                        ) as t0
+                        GROUP BY t0.admin0_grid_id, t0.country_code
+                        UNION
+                        SELECT t1.admin1_grid_id as grid_id, t1.country_code, count(t1.admin1_grid_id) as count
+                        FROM (
+                            SELECT lg.admin0_grid_id, lg.admin1_grid_id, lg.admin2_grid_id, lg.admin3_grid_id, lg.admin4_grid_id, lg.admin5_grid_id, lg.country_code
+                            FROM $wpdb->postmeta as pm
+                            JOIN $wpdb->posts as p ON p.ID=pm.post_id AND p.post_type = 'trainings'
+                            LEFT JOIN $wpdb->dt_location_grid as lg ON pm.meta_value=lg.grid_id
+                            WHERE pm.meta_key = 'location_grid'
+                        ) as t1
+                        GROUP BY t1.admin1_grid_id, t1.country_code
+                        UNION
+                        SELECT t2.admin2_grid_id as grid_id, t2.country_code, count(t2.admin2_grid_id) as count
+                        FROM (
+                            SELECT lg.admin0_grid_id, lg.admin1_grid_id, lg.admin2_grid_id, lg.admin3_grid_id, lg.admin4_grid_id, lg.admin5_grid_id, lg.country_code
+                            FROM $wpdb->postmeta as pm
+                            JOIN $wpdb->posts as p ON p.ID=pm.post_id AND p.post_type = 'trainings'
+                            LEFT JOIN $wpdb->dt_location_grid as lg ON pm.meta_value=lg.grid_id
+                            WHERE pm.meta_key = 'location_grid'
+                        ) as t2
+                        GROUP BY t2.admin2_grid_id, t2.country_code
+                        UNION
+                        SELECT t3.admin3_grid_id as grid_id, t3.country_code, count(t3.admin3_grid_id) as count
+                        FROM (
+                            SELECT lg.admin0_grid_id, lg.admin1_grid_id, lg.admin2_grid_id, lg.admin3_grid_id, lg.admin4_grid_id, lg.admin5_grid_id, lg.country_code
+                            FROM $wpdb->postmeta as pm
+                            JOIN $wpdb->posts as p ON p.ID=pm.post_id AND p.post_type = 'trainings'
+                            LEFT JOIN $wpdb->dt_location_grid as lg ON pm.meta_value=lg.grid_id
+                            WHERE pm.meta_key = 'location_grid'
+                        ) as t3
+                        GROUP BY t3.admin3_grid_id, t3.country_code
+            ) as tb
+            LEFT JOIN $wpdb->dt_location_grid lgo ON tb.grid_id=lgo.grid_id
+            WHERE tb.grid_id IS NOT NULL;
+        ", ARRAY_A );
+
+        $list = [];
+        if ( is_array( $results ) ) {
+            foreach ( $results as $result ) {
+                $list[$result['grid_id']] = $result;
+            }
+        }
+
+        return $list;
+    }
+
+    public static function query_grid_elements( $grid_id ) {
+        global $wpdb;
+
+        $result = $wpdb->get_row($wpdb->prepare( "
+            SELECT admin3_grid_id, admin2_grid_id, admin1_grid_id, admin0_grid_id
+            FROM $wpdb->dt_location_grid
+            WHERE grid_id = %s
+        ", $grid_id ), ARRAY_A );
+
+        return $result;
+    }
+
+
 }
