@@ -483,7 +483,6 @@ class DT_Network_Dashboard_Public_Heatmap_Churches
     }
 
     public function endpoint_get_grid_id( $grid_id ) {
-        dt_write_log('Start');
         global $wpdb;
 
         $world = $this->get_world_goals();
@@ -643,7 +642,6 @@ class DT_Network_Dashboard_Public_Heatmap_Churches
         }
 
 //        dt_write_log($data);
-        dt_write_log('End');
         return $data;
     }
 
