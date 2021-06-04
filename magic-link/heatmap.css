@@ -25,6 +25,10 @@ body {
 .bold {
     font-weight:bold;
 }
+#map-sidebar-wrapper {
+    padding-left:1em;
+    overflow-y: scroll;
+}
 
 /*initialize screen*/
 #initialize-screen {
@@ -49,12 +53,14 @@ progress {
 #training-start-screen {
     padding-top:2em;
 }
-.training-screen-image {
-    height: 100px;
-}
-#training-start-screen p {
-    max-width: 50%;
-    margin: 1em auto;
+
+
+
+#help-toggle-icon {
+    cursor: pointer;
+    color: #0c7cd5;
+    font-size:2.5em;
+    margin-top:1em;
 }
 
 @media (min-width:0px)  {
@@ -63,6 +69,14 @@ progress {
     #welcome-close-button {
         font-size:1.5em;
         padding:1em;
+    }
+    .training-screen-image {
+        height: 20px;
+    }
+    #training-start-screen p {
+        max-width: 90%;
+        margin: 1em auto;
+        font-size: .5em;
     }
 }
 
@@ -82,12 +96,31 @@ progress {
         font-size:2.5em;
         padding:1.5em;
     }
+    .training-screen-image {
+        height: 35px;
+    }
+    #training-start-screen p {
+        max-width: 80%;
+        margin: 1em auto;
+        font-size: .8em;
+    }
 }
 @media (min-width:1200px) {
     /* foundations x-large
     /* hi-res laptops and desktops */
+    .training-screen-image {
+        height: 60px;
+    }
 }
 @media (min-width:1440px) {
     /* foundations xx-large
     /* hi-res laptops and desktops */
+    .training-screen-image {
+        height: 75px;
+    }
+    #training-start-screen p {
+        max-width: 70%;
+        margin: 1em auto;
+        font-size: 1.2em;
+    }
 }

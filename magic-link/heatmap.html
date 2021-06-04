@@ -35,37 +35,41 @@
                 <div id='map'></div>
             </div>
         </div>
-        <div class="cell medium-3" style="padding-left:1em;">
+        <div class="cell medium-3" id="map-sidebar-wrapper">
             <!-- details panel -->
-            <div class="grid-x grid-padding-x" id="details-panel">
-                <div class="cell">
-                    <h1 id="title"></h1>
-                    <h3>Population: <span id="population">0</span></h3>
-                    <hr>
-                </div>
-                <div class="cell">
-                    <h2 id="panel-type-title">Churches</h2>
-                </div>
-                <div class="cell">
-                    <h3>Needed: <span id="needed">0</span></h3>
-                </div>
-                <div class="cell">
-                    <h3>Reported: <span id="reported">0</span></h3>
-                </div>
-                <div class="cell">
-                    <hr>
-                </div>
-                <div class="cell">
-                    <h2>Goal: <span id="saturation-goal">0</span>%</h2>
-                    <meter id="meter" class="meter" value="30" min="0" low="33" high="66" optimum="100" max="100"></meter>
-                </div>
-                <div class="cell">
-                    Our community vision is to see 1 training and 2 new churches for every 5000 people in the United States and 50,000 people globally.
+            <div id="details-panel">
+                <div class="grid-x grid-padding-x" >
+                    <div class="cell">
+                        <h1 id="title"></h1>
+                        <h3>Population: <span id="population">0</span></h3>
+                        <hr>
+                    </div>
+                    <div class="cell">
+                        <h2 id="panel-type-title">Churches</h2>
+                    </div>
+                    <div class="cell">
+                        <h3>Needed: <span id="needed">0</span></h3>
+                    </div>
+                    <div class="cell">
+                        <h3>Reported: <span id="reported">0</span></h3>
+                    </div>
+                    <div class="cell">
+                        <hr>
+                    </div>
+                    <div class="cell">
+                        <h2>Goal: <span id="saturation-goal">0</span>%</h2>
+                        <meter id="meter" class="meter" value="30" min="0" low="33" high="66" optimum="100" max="100"></meter>
+                    </div>
+                    <div class="cell">
+                        Our community vision is to see 1 training and 2 new churches for every 5000 people in the United States and 50,000 people globally.
+                    </div>
                 </div>
             </div>
 
             <!-- start screen training-->
-            <div id="training-start-screen"></div>
+            <div id="training-start-screen" class="training-content"></div>
+            <div id="training-help-screen" class="training-content" style="display:none;"><hr></div>
+            <div class="center"><i class="fi-info" id="help-toggle-icon" onclick="jQuery('#training-help-screen').toggle()"></i></div>
         </div>
     </div>
 </div>

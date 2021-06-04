@@ -337,30 +337,31 @@ class DT_Network_Dashboard_Public_Heatmap_Churches
                 //     </div>
                 //   `)
 
-                $('#training-start-screen').html(`
+                $('.training-content').append(`
                 <div class="grid-x grid-padding-x" >
                     <div class="cell center">
                         <img class="training-screen-image" src="${asset_url + 'search.svg'}" alt="search icon" />
-                        <h1>Search</h1>
+                        <h2>Search</h2>
                         <p>Search for any city or place with the search input.</p>
                     </div>
                     <div class="cell center">
                         <img class="training-screen-image" src="${asset_url + 'zoom.svg'}" alt="zoom icon"  />
-                        <h1>Zoom</h1>
+                        <h2>Zoom</h2>
                         <p>Scroll zoom with your mouse or pinch zoom with track pads and phones to focus on sections of the map.</p>
                     </div>
                     <div class="cell center">
                         <img class="training-screen-image" src="${asset_url + 'drag.svg'}" alt="drag icon"  />
-                        <h1>Drag</h1>
+                        <h2>Drag</h2>
                         <p>Click and drag the map any direction to look at a different part of the map.</p>
                     </div>
                     <div class="cell center">
                         <img class="training-screen-image" src="${asset_url + 'click.svg'}" alt="click icon" />
-                        <h1>Click</h1>
+                        <h2>Click</h2>
                         <p>Click a single section and reveal a details panel with more information about the location.</p>
                     </div>
                 </div>
                 `)
+
             })
         </script>
         <?php

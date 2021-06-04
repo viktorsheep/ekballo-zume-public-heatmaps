@@ -48,6 +48,7 @@ jQuery(document).ready(function($){
     slider_width = window.innerWidth * .95
   }
 
+
   /* set vertical size the form column*/
   $('#custom-style').empty().append(`
         #wrapper {
@@ -68,6 +69,9 @@ jQuery(document).ready(function($){
         }
         #welcome-modal {
             height: ${window.innerHeight - 30}px !important;
+        }
+        #map-sidebar-wrapper {
+            height: ${window.innerHeight}px !important;
         }
 
     `)
@@ -504,7 +508,6 @@ function show_details_panel(){
 }
 function hide_details_panel(){
   $('#details-panel').hide()
-  $('#training-start-screen').show()
 }
 
 function load_slider_content( data ) {
