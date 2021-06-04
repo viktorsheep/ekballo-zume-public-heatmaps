@@ -137,27 +137,58 @@ class DT_Network_Dashboard_Public_Heatmap_Trainings extends DT_Network_Dashboard
 
     public function customized_welcome_script(){
         ?>
+        public function customized_welcome_script(){
+        ?>
         <script>
             jQuery(document).ready(function($){
-                $('#welcome-modal').foundation('open');
-                $('#welcome-content').html(`
-                    <div class="grid-x">
-                        <div class="cell">
+                let asset_url = '<?php echo plugin_dir_url(__FILE__) ?>'
+                // $('#welcome-modal').foundation('open');
+                // $('#welcome-content').html(`
+                //     <div class="grid-x">
+                //         <div class="cell">
+                //
+                //         </div>
+                //         <div class="cell">
+                //
+                //         </div>
+                //         <div class="cell">
+                //
+                //         </div>
+                //         <div class="cell">
+                //
+                //         </div>
+                //     </div>
+                //   `)
 
-                        </div>
-                        <div class="cell">
-
-                        </div>
-                        <div class="cell">
-
-                        </div>
-                        <div class="cell">
-
-                        </div>
+                $('.training-content').append(`
+                <div class="grid-x grid-padding-x" >
+                    <div class="cell center">
+                        <img class="training-screen-image" src="${asset_url + 'search.svg'}" alt="search icon" />
+                        <h2>Search</h2>
+                        <p>Search for any city or place with the search input.</p>
                     </div>
-                  `)
+                    <div class="cell center">
+                        <img class="training-screen-image" src="${asset_url + 'zoom.svg'}" alt="zoom icon"  />
+                        <h2>Zoom</h2>
+                        <p>Scroll zoom with your mouse or pinch zoom with track pads and phones to focus on sections of the map.</p>
+                    </div>
+                    <div class="cell center">
+                        <img class="training-screen-image" src="${asset_url + 'drag.svg'}" alt="drag icon"  />
+                        <h2>Drag</h2>
+                        <p>Click and drag the map any direction to look at a different part of the map.</p>
+                    </div>
+                    <div class="cell center">
+                        <img class="training-screen-image" src="${asset_url + 'click.svg'}" alt="click icon" />
+                        <h2>Click</h2>
+                        <p>Click a single section and reveal a details panel with more information about the location.</p>
+                    </div>
+                </div>
+                `)
+
             })
         </script>
+        <?php
+    }
         <?php
     }
 }
