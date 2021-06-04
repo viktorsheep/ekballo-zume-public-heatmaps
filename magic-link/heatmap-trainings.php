@@ -124,9 +124,9 @@ class DT_Network_Dashboard_Public_Heatmap_Trainings extends DT_Network_Dashboard
     }
 
     public function get_population_division( $country_code ){
-        $population_division = 50000;
+        $population_division = 25000;
         if ( $country_code === 'US' ){
-            $population_division = 5000;
+            $population_division = 2500;
         }
         return $population_division;
     }
