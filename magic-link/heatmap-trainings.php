@@ -137,8 +137,6 @@ class DT_Network_Dashboard_Public_Heatmap_Trainings extends DT_Network_Dashboard
 
     public function customized_welcome_script(){
         ?>
-        public function customized_welcome_script(){
-        ?>
         <script>
             jQuery(document).ready(function($){
                 let asset_url = '<?php echo plugin_dir_url(__FILE__) ?>'
@@ -187,8 +185,6 @@ class DT_Network_Dashboard_Public_Heatmap_Trainings extends DT_Network_Dashboard
 
             })
         </script>
-        <?php
-    }
         <?php
     }
 }
