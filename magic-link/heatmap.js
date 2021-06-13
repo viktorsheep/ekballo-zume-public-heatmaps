@@ -516,11 +516,11 @@ function load_slider_content( data ) {
 
   if ( 'groups' === jsObject.post_type ) {
     jQuery('#custom-paragraph').html(`
-    <span class="self_name ucwords temp-spinner bold">${data.self.name}</span> is one of <span class="self_peers  bold">${data.self.peers}</span>
-    administrative divisions in <span class="parent_name ucwords bold">${data.self.parent_name}</span> and it has a population of
+    <span class="self_name ucwords temp-spinner bold">${data.name}</span> is one of <span class="self_peers  bold">${data.peers}</span>
+    administrative divisions in <span class="parent_name ucwords bold">${data.parent_name}</span> and it has a population of
     <span class="self_population  bold">${data.self.population}</span>.
     In order to reach the community goal of 2 churches for every <span class="population_division  bold">${data.population_division}</span> people,
-    <span class="self_name ucwords  bold">${data.self.name}</span> needs
+    <span class="self_name ucwords  bold">${data.name}</span> needs
     <span class="self_needed bold">${data.self.needed}</span> new churches. So far, it is <span class="self_percent  bold">${data.self.percent}</span>% to its goal.
   `)
 
@@ -541,11 +541,11 @@ function load_slider_content( data ) {
   }
   else if ( 'trainings' === jsObject.post_type ) {
     jQuery('#custom-paragraph').html(`
-    <span class="self_name ucwords temp-spinner bold">${data.self.name}</span> is one of <span class="self_peers  bold">${data.self.peers}</span>
-    administrative divisions in <span class="parent_name ucwords bold">${data.self.parent_name}</span> and it has a population of
+    <span class="self_name ucwords temp-spinner bold">${data.name}</span> is one of <span class="self_peers  bold">${data.peers}</span>
+    administrative divisions in <span class="parent_name ucwords bold">${data.parent_name}</span> and it has a population of
     <span class="self_population  bold">${data.self.population}</span>.
     In order to reach the community goal of 1 training for every <span class="population_division  bold">${data.population_division}</span> people,
-    <span class="self_name ucwords  bold">${data.self.name}</span> needs
+    <span class="self_name ucwords  bold">${data.name}</span> needs
     <span class="self_needed bold">${data.self.needed}</span> new trainings. So far, it is <span class="self_percent  bold">${data.self.percent}</span>% to its goal.
   `)
 
@@ -558,7 +558,7 @@ function load_slider_content( data ) {
         Population: <span>${v.population}</span><br>
         Trainings Needed: <span>${v.needed}</span><br>
         Trainings Reported: <span>${v.reported}</span><br>
-        Goal Reached: <span>${v.percent_formatted}</span>%
+        Goal Reached: <span>${v.percent}</span>%
         <meter class="meter" value="${v.percent}" min="0" low="33" high="66" optimum="100" max="100"></meter>
     </div>
     `)

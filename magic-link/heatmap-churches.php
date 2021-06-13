@@ -401,7 +401,7 @@ class DT_Network_Dashboard_Public_Heatmap_Churches
         return Zume_Public_Heatmap_Queries::query_church_location_grid_totals();
     }
 
-    public function get_population_division( $country_code ){
+    public function _get_population_division( $country_code ){
         $population_division = 50000 / 2;
         if ( $country_code === 'US' ){
             $population_division = 5000 / 2;
@@ -424,7 +424,7 @@ class DT_Network_Dashboard_Public_Heatmap_Churches
                 'population' => number_format_i18n( $v['population'] ),
             ];
 
-            $population_division = $this->get_population_division( $v['country_code'] );
+            $population_division = $this->_get_population_division( $v['country_code'] );
 
             $needed = round( $v['population'] / $population_division );
             if ( $needed < 1 ){
@@ -485,195 +485,57 @@ class DT_Network_Dashboard_Public_Heatmap_Churches
     public function endpoint_get_grid_id( $grid_id ) {
         global $wpdb;
 
-        $world = $this->get_world_goals();
-        $grid_totals = $this->get_grid_totals();
-
+        // get grid elements for design
         $grid = $wpdb->get_row( $wpdb->prepare( "
             SELECT
               g.grid_id,
               g.level,
               g.alt_name as name,
-              g.alt_population as population,
-              g.latitude,
-              g.longitude,
+              gn.alt_name as parent_name,
               g.country_code,
-              g.admin0_code,
-              g.parent_id,
-              g.admin0_grid_id,
-              gc.alt_name as admin0_name,
-              gc.alt_population as admin0_population,
-              (SELECT COUNT(a0p.grid_id) FROM $wpdb->dt_location_grid as a0p WHERE a0p.parent_id = 1 ) as admin0_peers,
-              g.admin1_grid_id,
-              ga1.alt_name as admin1_name,
-              ga1.alt_population as admin1_population,
-              (SELECT COUNT(a1p.grid_id) FROM $wpdb->dt_location_grid as a1p WHERE a1p.parent_id = g.admin0_grid_id ) as admin1_peers,
-              g.admin2_grid_id,
-              ga2.alt_name as admin2_name,
-              ga2.alt_population as admin2_population,
-              (SELECT COUNT(a2p.grid_id) FROM $wpdb->dt_location_grid as a2p WHERE a2p.parent_id = g.admin1_grid_id ) as admin2_peers,
-              g.admin3_grid_id,
-              ga3.alt_name as admin3_name,
-              ga3.alt_population as admin3_population,
-            (SELECT COUNT(a3p.grid_id) FROM $wpdb->dt_location_grid as a3p WHERE a3p.parent_id = g.admin2_grid_id ) as admin3_peers
+              (SELECT COUNT(prs.grid_id) FROM $wpdb->dt_location_grid as prs WHERE prs.parent_id = g.parent_id ) as peers
             FROM $wpdb->dt_location_grid as g
-            LEFT JOIN $wpdb->dt_location_grid as gc ON g.admin0_grid_id=gc.grid_id
-            LEFT JOIN $wpdb->dt_location_grid as ga1 ON g.admin1_grid_id=ga1.grid_id
-            LEFT JOIN $wpdb->dt_location_grid as ga2 ON g.admin2_grid_id=ga2.grid_id
-            LEFT JOIN $wpdb->dt_location_grid as ga3 ON g.admin3_grid_id=ga3.grid_id
+            LEFT JOIN $wpdb->dt_location_grid as gn ON g.parent_id=gn.grid_id
             WHERE g.grid_id = %s
         ", $grid_id ), ARRAY_A );
 
-
-        // define population
-        $population_division = $this->get_population_division( $grid['country_code'] );
-
-        // build needed var
-        $a3_needed = round($grid['admin3_population'] / $population_division );
-        if ( $a3_needed < 1 ) {
-            $a3_needed = 1;
-        }
-        $a2_needed = round($grid['admin2_population'] / $population_division );
-        if ( $a2_needed < 1 ) {
-            $a2_needed = 1;
-        }
-        $a1_needed = round($grid['admin1_population'] / $population_division );
-        if ( $a1_needed < 1 ) {
-            $a1_needed = 1;
-        }
-        $a0_needed = round($grid['admin0_population'] / $population_division );
-        if ( $a0_needed < 1 ) {
-            $a0_needed = 1;
-        }
-
-        $a3_reported = $this->get_reported( $grid['admin3_grid_id'], $grid_totals );
-        $a2_reported = $this->get_reported( $grid['admin2_grid_id'], $grid_totals );
-        $a1_reported = $this->get_reported( $grid['admin1_grid_id'], $grid_totals );
-        $a0_reported = $this->get_reported( $grid['admin0_grid_id'], $grid_totals );
-
-        // build levels
+        // set array
+        $population_division = $this->_get_population_division( $grid['country_code'] );
         $data = [
             'level' => $grid['level'],
             'parent_level' => $grid['level'] - 1, // one level higher than current
             'population_division' => number_format_i18n( $population_division * 2 ), // label for content not calculation
+            'name' => $grid['name'],
+            'parent_name' => $grid['parent_name'],
+            'peers' => $grid['peers'],
+            'levels' => [],
             'self' => [],
-            'levels' => [
-                [
-                    'name' => $grid['admin3_name'],
-                    'parent_name' => $grid['admin2_name'],
-                    'grid_id' => $grid['admin3_grid_id'],
-                    'population' => number_format_i18n( $grid['admin3_population'] ),
-                    'peers' => number_format_i18n( $grid['admin3_peers'] ),
-                    'needed' => number_format_i18n( $a3_needed ),
-                    'reported' =>  number_format_i18n( $a3_reported ),
-                    'percent' => ceil( $a3_reported / $a3_needed * 100 ),
-                    'percent_formatted' => number_format_i18n( $a3_reported / $a3_needed * 100, 3 ),
-                ],
-                [
-                    'name' => $grid['admin2_name'],
-                    'parent_name' => $grid['admin1_name'],
-                    'grid_id' => $grid['admin2_grid_id'],
-                    'population' => number_format_i18n( $grid['admin2_population'] ),
-                    'peers' => number_format_i18n( $grid['admin2_peers'] ),
-                    'needed' => number_format_i18n( $a2_needed ),
-                    'reported' => number_format_i18n( $a2_reported ),
-                    'percent' => ceil( $a2_reported / $a2_needed * 100 ),
-                    'percent_formatted' => number_format_i18n( $a2_reported / $a2_needed * 100, 3 ),
-                ],
-                [
-                    'name' => $grid['admin1_name'],
-                    'parent_name' => $grid['admin0_name'],
-                    'grid_id' => $grid['admin1_grid_id'],
-                    'population' => number_format_i18n( $grid['admin1_population'] ),
-                    'peers' => number_format_i18n( $grid['admin1_peers'] ),
-                    'needed' => number_format_i18n( $a1_needed ),
-                    'reported' =>  number_format_i18n( $a1_reported ),
-                    'percent' => ceil( $a1_reported / $a1_needed * 100 ),
-                    'percent_formatted' => number_format_i18n( $a1_reported / $a1_needed * 100, 3 ),
-                ],
-                // country level
-                [
-                    'name' => $grid['admin0_name'],
-                    'parent_name' => 'World',
-                    'grid_id' => $grid['admin0_grid_id'],
-                    'population' => number_format_i18n( $grid['admin0_population'] ),
-                    'peers' => $grid['admin0_peers'],
-                    'needed' => number_format_i18n( $a0_needed ),
-                    'reported' =>  number_format_i18n( $a0_reported ),
-                    'percent' => ceil( $a0_reported / $a0_needed * 100 ),
-                    'percent_formatted' => number_format_i18n( $a0_reported / $a0_needed * 100, 3 ),
-                ],
-                // world level
-                [
-                    'name' => $world['name'],
-                    'grid_id' => $world['grid_id'],
-                    'population' => $world['population'],
-                    'peers' => $world['peers'],
-                    'needed' => $world['needed'],
-                    'reported' => $world['reported'],
-                    'percent' => $world['percent'],
-                    'percent_formatted' => $world['percent'],
-                ],
-            ],
-
         ];
 
-        // remove empty levels
-        if ( empty( $data['levels'][0]['grid_id'] ) ) {
-            unset( $data['levels'][0] );
-        }
-        if ( empty( $data['levels'][1]['grid_id'] ) ) {
-            unset( $data['levels'][1] );
-        }
-        if ( empty( $data['levels'][2]['grid_id'] ) ) {
-            unset( $data['levels'][2] );
-        }
-        if ( empty( $data['levels'][3]['grid_id'] ) ) {
-            unset( $data['levels'][3] );
+        // add levels
+        $levels = $this->_get_flat_levels( $grid_id );
+        foreach( $levels as $index => $level ) {
+            $percent = ceil( $level['reported'] / $level['needed'] * 100 );
+            if ( 100 < $percent ) {
+                $percent = 100;
+            }
+            $data['levels'][] = [
+                'name' => $level['name'],
+                'grid_id' => (int) $level['grid_id'],
+                'population' => number_format_i18n( $level['population'] ),
+                'needed' => number_format_i18n( $level['needed'] ),
+                'reported' => number_format_i18n( $level['reported'] ),
+                'percent' => $percent,
+            ];
         }
 
         // build self section
         foreach( $data['levels'] as $i => $v ) {
-            $data['self'] = [
-                'name' => $v['name'],
-                'parent_name' => $v['parent_name'],
-                'grid_id' => $v['grid_id'],
-                'population' => $v['population'],
-                'peers' => $v['peers'],
-                'needed' => $v['needed'],
-                'reported' => $v['reported'],
-                'percent' => $v['percent'],
-                'percent_formatted' => $v['percent_formatted'],
-            ];
+            $data['self'] = $v;
             break;
         }
 
-        $this->get_full_training( $grid_id );
-//        dt_write_log($data);
         return $data;
-    }
-
-    public function get_full_training( $grid_id ) {
-        dt_write_log(__METHOD__);
-        $list = Zume_Public_Heatmap_Queries::query_trainings_full();
-        $grid = Zume_Public_Heatmap_Queries::query_grid_elements($grid_id);
-        if ( empty( $grid ) ) {
-            return [];
-        }
-
-        foreach( $grid as $key => $id ) {
-            if ( empty( $id ) ) {
-                continue;
-            }
-            if ( isset( $list[$id]) ) {
-                dt_write_log( $list[$id] );
-            }
-        }
-
-        // @todo calculate parent
-
-        // @todo calculate grandparent
-
-        dt_write_log($grid);
     }
 
 
@@ -962,6 +824,53 @@ class DT_Network_Dashboard_Public_Heatmap_Churches
         return $list;
     }
 
+    public function _get_flat_levels( $grid_id ) {
+        $list = $this->get_list(); // get list of training counts
+        $flat_grid = Zume_Public_Heatmap_Queries::query_flat_grid(); // get flat grid
+        $flat_grid_limited = $this->_limit_counts( $flat_grid, $list ); // limit counts to no larger than needed per location.
 
+        $data = [];
+        $grid = Zume_Public_Heatmap_Queries::query_grid_elements( $grid_id ); // get level ids for grid_id
+        foreach( $grid as $id ) {
+            if ( empty( $id ) ) {
+                continue;
+            }
+            if ( isset( $flat_grid_limited[$id] ) ){
+                $data[$id] = $flat_grid_limited[$id];
+            }
+        }
+
+        $data[1] = $flat_grid_limited[1];
+
+        return $data;
+    }
+
+    public function get_list() {
+        return Zume_Public_Heatmap_Queries::query_church_location_grid_totals( null, true );
+    }
+
+    /**
+     * Function limits counts to no higher than the location need. This keeps from inflating the counts up the levels.
+     * @param $flat_grid
+     * @param $list
+     * @return array
+     */
+    public function _limit_counts( $flat_grid, $list ) {
+        $flat_grid_limited = [];
+        foreach( $flat_grid as $value ) {
+            $flat_grid_limited[$value['grid_id']] = $value;
+
+            if( isset( $list[$value['grid_id']] ) && ! empty( $list[$value['grid_id']] ) ) {
+                if( $list[$value['grid_id']] <= $value['needed'] ) {
+                    $flat_grid_limited[$value['grid_id']]['reported'] = $list[$value['grid_id']];
+                } else {
+                    $flat_grid_limited[$value['grid_id']]['reported'] = $value['needed'];
+                }
+            }
+
+
+        }
+        return $flat_grid_limited;
+    }
 }
 
