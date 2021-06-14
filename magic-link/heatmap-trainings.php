@@ -113,16 +113,11 @@ class DT_Network_Dashboard_Public_Heatmap_Trainings extends DT_Network_Dashboard
     }
 
     public function get_world_total() {
-        global $wpdb;
-        return $wpdb->get_var("
-            SELECT COUNT(lg.admin0_grid_id) as count
-                FROM $wpdb->postmeta as pm
-                JOIN $wpdb->posts as p ON p.ID=pm.post_id AND p.post_type = 'trainings'
-                LEFT JOIN $wpdb->dt_location_grid as lg ON pm.meta_value=lg.grid_id
-                WHERE pm.meta_key = 'location_grid'
-        ");
+        return Zume_Public_Heatmap_Queries::query_world_trainings_total();
     }
-
+    public function get_list() {
+        return Zume_Public_Heatmap_Queries::query_training_location_grid_totals( null, true );
+    }
     public function get_population_division( $country_code ){
         $population_division = 25000;
         if ( $country_code === 'US' ){
@@ -140,23 +135,6 @@ class DT_Network_Dashboard_Public_Heatmap_Trainings extends DT_Network_Dashboard
         <script>
             jQuery(document).ready(function($){
                 let asset_url = '<?php echo plugin_dir_url(__FILE__) ?>'
-                // $('#welcome-modal').foundation('open');
-                // $('#welcome-content').html(`
-                //     <div class="grid-x">
-                //         <div class="cell">
-                //
-                //         </div>
-                //         <div class="cell">
-                //
-                //         </div>
-                //         <div class="cell">
-                //
-                //         </div>
-                //         <div class="cell">
-                //
-                //         </div>
-                //     </div>
-                //   `)
 
                 $('.training-content').append(`
                 <div class="grid-x grid-padding-x" >
@@ -187,5 +165,6 @@ class DT_Network_Dashboard_Public_Heatmap_Trainings extends DT_Network_Dashboard
         </script>
         <?php
     }
+
 }
 

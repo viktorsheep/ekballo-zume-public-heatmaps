@@ -12,7 +12,7 @@ class Zume_Public_Heatmap_Queries {
     public static function query_saturation_list () : array {
 
         if ( false !== ( $value = get_transient( __METHOD__) ) ) {
-//            return $value;
+            return $value;
         }
 
         // 44141 records
@@ -97,7 +97,7 @@ class Zume_Public_Heatmap_Queries {
             }
         }
 
-//        set_transient( __METHOD__, $list, MONTH_IN_SECONDS );
+        set_transient( __METHOD__, $list, MONTH_IN_SECONDS );
 
         return $list;
     }
@@ -421,96 +421,6 @@ class Zume_Public_Heatmap_Queries {
         }
 
         return $list;
-    }
-
-    /**
-     * This query returns the total amount of reported churches in the system.
-     * @todo remove this was a performance fail
-     * @return array
-     */
-    public static function query_totals() : array {
-
-        if ( false !== ( $value = get_transient( 'query_totals' ) ) ) {
-            return $value;
-        }
-
-        $saturation_list = self::query_saturation_list();
-        $churches = self::query_church_location_grid_totals();
-//        $trainings = self::query_training_location_grid_totals();
-//        $activity = self::query_activity_location_grid_totals();
-        $trainings = [];
-        $activity = [];
-
-        $data = [];
-
-        foreach( $saturation_list as $location ) {
-            $grid_id = $location['grid_id'];
-
-            // set neededed by location
-            if ( 'US' === $location['country_code'] ) {
-                $neededed = round( (int) $location['population'] / US_POPULATION_BLOCKS );
-                if ( $neededed < 1 ) {
-                    $neededed = 1;
-                }
-            } else {
-                $neededed = round( (int) $location['population'] / GLOBAL_POPULATION_BLOCKS );
-                if ( $neededed < 1 ) {
-                    $neededed = 1;
-                }
-            }
-            $trainings_neededed = (int) $neededed;
-            $churches_neededed = (int) $neededed * 2;
-
-            $activity_report = ( isset( $activity[$grid_id]['count'] ) ) ? (int) $activity[$grid_id]['count'] : 0;
-            $trainings_report = ( isset( $trainings[$grid_id]['count'] ) ) ? (int) $trainings[$grid_id]['count'] : 0;
-            $churches_report = ( isset( $churches[$grid_id]['count'] ) ) ? (int) $churches[$grid_id]['count'] : 0;
-
-            $data[$grid_id] = [
-                'grid_id' => (int) $grid_id,
-                'country_code' => $location['country_code'],
-                'population' => (int) $location['population'],
-                'population_formatted' => number_format_i18n( $location['population'] ),
-                'activity' => [
-                    'reported' => $activity_report,
-                    'reported_formatted' => number_format_i18n( $activity_report ),
-                ],
-                'trainings' => [
-                    'reported' => $trainings_report,
-                    'reported_actual' => $trainings_report,
-                    'reported_formatted' => number_format_i18n( $trainings_report ),
-                    'neededed' => $trainings_neededed,
-                    'neededed_formatted' => number_format_i18n( $trainings_neededed ),
-                    'percent' => round($trainings_report / $trainings_neededed * 100 ),
-                ],
-                'churches' => [
-                    'reported' => $churches_report,
-                    'reported_actual' => $churches_report,
-                    'reported_formatted' => number_format_i18n($churches_report ),
-                    'neededed' => $churches_neededed,
-                    'neededed_formatted' => number_format_i18n( $churches_neededed ),
-                    'percent' => round($churches_report / $churches_neededed * 100 ),
-                ],
-            ];
-
-
-            // evaluate if over
-            if ( $data[$grid_id]['trainings']['reported'] > 0 && $data[$grid_id]['trainings']['reported'] > $data[$grid_id]['trainings']['neededed'] ) {
-                $data[$grid_id]['trainings']['reported'] = $data[$grid_id]['trainings']['neededed'];
-                $data[$grid_id]['trainings']['reported_formatted'] = number_format_i18n( $data[$grid_id]['trainings']['neededed'] );
-                $data[$grid_id]['trainings']['percent'] = 100;
-            }
-            // evaluate if over
-            if ( $data[$grid_id]['churches']['reported'] > 0 && $data[$grid_id]['churches']['reported'] > $data[$grid_id]['churches']['neededed'] ) {
-                $data[$grid_id]['churches']['reported'] = $data[$grid_id]['churches']['neededed'];
-                $data[$grid_id]['churches']['reported_formatted'] = number_format_i18n( $data[$grid_id]['churches']['neededed'] );
-                $data[$grid_id]['churches']['percent'] = 100;
-            }
-
-        }
-
-//        set_transient( 'query_totals', $data, DAY_IN_SECONDS );
-
-        return $data;
     }
 
     public static function query_training_list(){
@@ -978,15 +888,27 @@ class Zume_Public_Heatmap_Queries {
             ) as tb0
             LEFT JOIN $wpdb->dt_location_grid loc ON tb0.admin0_grid_id=loc.grid_id
             GROUP BY tb0.admin0_grid_id
+        ", ARRAY_A );
 
-            UNION ALL
 
+//        set_transient( __METHOD__, $flat_grid_raw, HOUR_IN_SECONDS );
+
+        return $flat_grid_raw;
+    }
+
+    public static function query_flat_world() {
+//        if ( false !== ( $value = get_transient( 'flat_grid' ) ) ) {
+//            return $value;
+//        }
+
+        global $wpdb;
+        $flat_world= $wpdb->get_row("
             # World
             SELECT 1 as grid_id, 'World','' as country_code, SUM(tbw.population) as population, SUM(tbw.needed) as needed, (0) as reported, (0) as percent
             FROM (
                      # 44395 Records
                      SELECT
-                            'World',
+                         'World',
                          lg1.admin0_grid_id,
                          lg1.admin1_grid_id,
                          lg1.admin2_grid_id,
@@ -1083,10 +1005,33 @@ class Zume_Public_Heatmap_Queries {
 
         ", ARRAY_A );
 
-
 //        set_transient( __METHOD__, $flat_grid_raw, HOUR_IN_SECONDS );
 
-        return $flat_grid_raw;
+        return $flat_world;
+    }
+
+    public static function query_world_churches_total(){
+        global $wpdb;
+        return $wpdb->get_var("
+            SELECT COUNT(p.ID) as count
+            FROM $wpdb->postmeta as pm
+            JOIN $wpdb->posts as p ON p.ID=pm.post_id AND p.post_type = 'groups'
+            JOIN $wpdb->postmeta as pm2 ON pm2.post_id=pm.post_id AND pm2.meta_key = 'group_type' AND pm2.meta_value = 'church'
+            JOIN $wpdb->postmeta as pm3 ON pm3.post_id=pm.post_id AND pm3.meta_key = 'group_status' AND (pm3.meta_value = 'active' OR pm3.meta_value = 'inactive')
+            LEFT JOIN $wpdb->dt_location_grid as lg ON pm.meta_value=lg.grid_id
+            WHERE pm.meta_key = 'location_grid'
+        ");
+    }
+
+    public static function query_world_trainings_total(){
+        global $wpdb;
+        return $wpdb->get_var("
+            SELECT COUNT(p.ID) as count
+                FROM $wpdb->postmeta as pm
+                JOIN $wpdb->posts as p ON p.ID=pm.post_id AND p.post_type = 'trainings'
+                LEFT JOIN $wpdb->dt_location_grid as lg ON pm.meta_value=lg.grid_id
+                WHERE pm.meta_key = 'location_grid'
+        ");
     }
 
 

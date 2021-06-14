@@ -5,10 +5,10 @@ if(/(android|bb\d+|meego).+mobile|avantgo|bada\/|blackberry|blazer|compal|elaine
   isMobile = true;
 }
 
-window.get_grid_data = (grid_id) => {
+window.get_grid_data = ( action, grid_id) => {
   return jQuery.ajax({
     type: "POST",
-    data: JSON.stringify({ action: 'grid_id', parts: jsObject.parts, grid_id: grid_id }),
+    data: JSON.stringify({ action: action, parts: jsObject.parts, grid_id: grid_id }),
     contentType: "application/json; charset=utf-8",
     dataType: "json",
     url: jsObject.root + jsObject.parts.root + '/v1/' + jsObject.parts.type,
@@ -311,12 +311,19 @@ function load_map() {
             $('#modal_tile').html(e.features[0].properties.full_name)
             $('#modal_population').html(jsObject.grid_data.data[e.features[0].properties.grid_id].population)
 
-            // jQuery('#custom-paragraph').empty().html(`<span class="loading-spinner active"></span>`)
             jQuery('.temp-spinner').html(`<span class="loading-spinner active"></span>`)
 
-            window.get_grid_data(e.features[0].properties.grid_id)
+            window.get_grid_data( 'self', e.features[0].properties.grid_id)
               .done(function(data){
-                load_slider_content( data )
+                load_self_content( data )
+              })
+            window.get_grid_data( 'levels', e.features[0].properties.grid_id)
+              .done(function(data){
+                load_levels_content( data )
+              })
+            window.get_grid_data( 'world', e.features[0].properties.grid_id)
+              .done(function(data){
+                load_world_content( data )
               })
 
             let ac = $('#activity-content')
@@ -510,19 +517,30 @@ function hide_details_panel(){
   $('#details-panel').hide()
 }
 
-function load_slider_content( data ) {
-  console.log(data)
-  console.log(jsObject.parts.post_type)
-
-  if ( 'groups' === jsObject.post_type ) {
+function load_self_content( data ) {
+  if ('groups' === jsObject.post_type) {
     jQuery('#custom-paragraph').html(`
-    <span class="self_name ucwords temp-spinner bold">${data.name}</span> is one of <span class="self_peers  bold">${data.peers}</span>
-    administrative divisions in <span class="parent_name ucwords bold">${data.parent_name}</span> and it has a population of
-    <span class="self_population  bold">${data.self.population}</span>.
-    In order to reach the community goal of 2 churches for every <span class="population_division  bold">${data.population_division}</span> people,
-    <span class="self_name ucwords  bold">${data.name}</span> needs
-    <span class="self_needed bold">${data.self.needed}</span> new churches. So far, it is <span class="self_percent  bold">${data.self.percent}</span>% to its goal.
-  `)
+      <span class="self_name ucwords temp-spinner bold">${data.name}</span> is one of <span class="self_peers  bold">${data.peers}</span>
+      administrative divisions in <span class="parent_name ucwords bold">${data.parent_name}</span> and it has a population of
+      <span class="self_population  bold">${data.population}</span>.
+      In order to reach the community goal of 2 churches for every <span class="population_division  bold">${data.population_division}</span> people,
+      <span class="self_name ucwords  bold">${data.name}</span> needs
+      <span class="self_needed bold">${data.needed}</span> new churches.
+    `)
+  } else if ('trainings' === jsObject.post_type) {
+    jQuery('#custom-paragraph').html(`
+      <span class="self_name ucwords temp-spinner bold">${data.name}</span> is one of <span class="self_peers  bold">${data.peers}</span>
+      administrative divisions in <span class="parent_name ucwords bold">${data.parent_name}</span> and it has a population of
+      <span class="self_population  bold">${data.population}</span>.
+      In order to reach the community goal of 1 training for every <span class="population_division  bold">${data.population_division}</span> people,
+      <span class="self_name ucwords  bold">${data.name}</span> needs
+      <span class="self_needed bold">${data.needed}</span> new trainings.
+    `)
+  }
+}
+
+function load_levels_content( data ) {
+  if ( 'groups' === jsObject.post_type ) {
 
     let gl = jQuery('#goals-list')
     gl.empty()
@@ -540,14 +558,6 @@ function load_slider_content( data ) {
     })
   }
   else if ( 'trainings' === jsObject.post_type ) {
-    jQuery('#custom-paragraph').html(`
-    <span class="self_name ucwords temp-spinner bold">${data.name}</span> is one of <span class="self_peers  bold">${data.peers}</span>
-    administrative divisions in <span class="parent_name ucwords bold">${data.parent_name}</span> and it has a population of
-    <span class="self_population  bold">${data.self.population}</span>.
-    In order to reach the community goal of 1 training for every <span class="population_division  bold">${data.population_division}</span> people,
-    <span class="self_name ucwords  bold">${data.name}</span> needs
-    <span class="self_needed bold">${data.self.needed}</span> new trainings. So far, it is <span class="self_percent  bold">${data.self.percent}</span>% to its goal.
-  `)
 
     let gl = jQuery('#goals-list')
     gl.empty()
@@ -561,6 +571,42 @@ function load_slider_content( data ) {
         Goal Reached: <span>${v.percent}</span>%
         <meter class="meter" value="${v.percent}" min="0" low="33" high="66" optimum="100" max="100"></meter>
     </div>
+    `)
+    })
+  }
+
+}
+
+function load_world_content( data ) {
+  if ( 'groups' === jsObject.post_type ) {
+    let wl = jQuery('#world-list')
+    wl.empty()
+    jQuery.each(data, function(i,v){
+      wl.append(`
+        <div class="cell">
+            <strong>${v.name}</strong><br>
+            Population: <span>${v.population}</span><br>
+            Churches Needed: <span>${v.needed}</span><br>
+            Churches Reported: <span>${v.reported}</span><br>
+            Goal Reached: <span>${v.percent}</span>%
+            <meter class="meter" value="${v.percent}" min="0" low="33" high="66" optimum="100" max="100"></meter>
+        </div>
+    `)
+    })
+  }
+  else if ( 'trainings' === jsObject.post_type ) {
+    let wl = jQuery('#world-list')
+    wl.empty()
+    jQuery.each(data, function(i,v){
+      wl.append(`
+        <div class="cell">
+            <strong>${v.name}</strong><br>
+            Population: <span>${v.population}</span><br>
+            Trainings Needed: <span>${v.needed}</span><br>
+            Trainings Reported: <span>${v.reported}</span><br>
+            Goal Reached: <span>${v.percent}</span>%
+            <meter class="meter" value="${v.percent}" min="0" low="33" high="66" optimum="100" max="100"></meter>
+        </div>
     `)
     })
   }

@@ -217,7 +217,6 @@ class DT_Network_Dashboard_Public_Heatmap_Churches
         <link rel="prefetch" href="https://storage.googleapis.com/location-grid-mirror-v2/tiles/world/saturation/43.geojson">
         <link rel="prefetch" href="https://storage.googleapis.com/location-grid-mirror-v2/tiles/world/saturation/44.geojson">
         <link rel="prefetch" href="https://storage.googleapis.com/location-grid-mirror-v2/tiles/world/saturation/45.geojson">
-        <link rel="prefetch" href="https://storage.googleapis.com/location-grid-mirror-v2/tiles/world/saturation/46.geojson">
         <?php
         wp_head();
         $this->header_style();
@@ -307,7 +306,6 @@ class DT_Network_Dashboard_Public_Heatmap_Churches
                     'add' => __( 'Add Magic', 'disciple_tools' ),
                 ],
                 'grid_data' => $this->grid_list(),
-//                'query_totals' => Zume_Public_Heatmap_Queries::query_totals(),
             ]) ?>][0]
         </script>
         <?php
@@ -319,24 +317,6 @@ class DT_Network_Dashboard_Public_Heatmap_Churches
         <script>
             jQuery(document).ready(function($){
                 let asset_url = '<?php echo plugin_dir_url(__FILE__) ?>'
-                // $('#welcome-modal').foundation('open');
-                // $('#welcome-content').html(`
-                //     <div class="grid-x">
-                //         <div class="cell">
-                //
-                //         </div>
-                //         <div class="cell">
-                //
-                //         </div>
-                //         <div class="cell">
-                //
-                //         </div>
-                //         <div class="cell">
-                //
-                //         </div>
-                //     </div>
-                //   `)
-
                 $('.training-content').append(`
                 <div class="grid-x grid-padding-x" >
                     <div class="cell center">
@@ -380,7 +360,7 @@ class DT_Network_Dashboard_Public_Heatmap_Churches
         register_rest_route(
             $namespace, '/'.$this->type, [
                 [
-                    'methods'  => "POST",
+                    'methods'  => WP_REST_Server::CREATABLE,
                     'callback' => [ $this, 'endpoint' ],
                 ],
             ]
@@ -395,18 +375,6 @@ class DT_Network_Dashboard_Public_Heatmap_Churches
                 ),
             )
         );
-    }
-
-    public function get_grid_totals(){
-        return Zume_Public_Heatmap_Queries::query_church_location_grid_totals();
-    }
-
-    public function _get_population_division( $country_code ){
-        $population_division = 50000 / 2;
-        if ( $country_code === 'US' ){
-            $population_division = 5000 / 2;
-        }
-        return $population_division;
     }
 
     public function grid_list(){
@@ -432,13 +400,20 @@ class DT_Network_Dashboard_Public_Heatmap_Churches
             }
 
             if ( isset( $grid_list[$v['grid_id']] ) && ! empty($grid_list[$v['grid_id']]['count']) ){
-                $count = $grid_list[$v['grid_id']]['count'];
-                if ( ! empty($count) && ! empty($needed) ){
-                    $percent = round($count / $needed * 100 );
-
-                    $data[$v['grid_id']]['percent'] = $percent;
-                    $data[$v['grid_id']]['reported'] = $grid_list[$v['grid_id']]['count'];
+                $reported = $grid_list[$v['grid_id']]['count'];
+                if ( ! empty($reported) && ! empty($needed) ){
                     $data[$v['grid_id']]['needed'] = $needed;
+
+                    if ( $reported > $needed ) {
+                        $reported = $needed;
+                    }
+                    $data[$v['grid_id']]['reported'] = $reported;
+
+                    $percent = round($reported / $needed * 100 );
+                    if ( 100 < $percent ) {
+                        $percent = 100;
+                    }
+                    $data[$v['grid_id']]['percent'] = $percent;
                 }
             }
             else {
@@ -458,6 +433,18 @@ class DT_Network_Dashboard_Public_Heatmap_Churches
         ];
     }
 
+    public function get_grid_totals(){
+        return Zume_Public_Heatmap_Queries::query_church_location_grid_totals();
+    }
+
+    public function _get_population_division( $country_code ){
+        $population_division = 50000 / 2;
+        if ( $country_code === 'US' ){
+            $population_division = 5000 / 2;
+        }
+        return $population_division;
+    }
+
     /**
      * @param WP_REST_Request $request
      * @return array|false|int|WP_Error|null
@@ -473,13 +460,108 @@ class DT_Network_Dashboard_Public_Heatmap_Churches
         $action = sanitize_text_field( wp_unslash( $params['action'] ) );
 
         switch ( $action ) {
-            case 'grid_id':
+            case 'self':
+                return $this->endpoint_get_self( $params['grid_id'] );
+            case 'levels':
                 return $this->endpoint_get_grid_id( $params['grid_id'] );
+            case 'world':
+                return $this->endpoint_get_world();
             case 'new_report':
                 return $this->endpoint_new_report( $params['data'] );
             default:
                 return new WP_Error( __METHOD__, "Missing valid action", [ 'status' => 400 ] );
         }
+    }
+
+    public function endpoint_get_self( $grid_id ) {
+        global $wpdb;
+
+        // get grid elements for design
+        $grid = $wpdb->get_row( $wpdb->prepare( "
+            SELECT
+              g.grid_id,
+              g.level,
+              g.alt_name as name,
+              gn.alt_name as parent_name,
+              g.country_code,
+              g.population,
+              IF(ROUND(g.population / IF(g.country_code = 'US', 5000, 50000)) < 1, 1,
+                 ROUND(g.population / IF(g.country_code = 'US', 5000, 50000))) as needed,
+              (SELECT COUNT(prs.grid_id) FROM $wpdb->dt_location_grid as prs WHERE prs.parent_id = g.parent_id ) as peers
+            FROM $wpdb->dt_location_grid as g
+            LEFT JOIN $wpdb->dt_location_grid as gn ON g.parent_id=gn.grid_id
+            WHERE g.grid_id = %s
+        ", $grid_id ), ARRAY_A );
+
+        // set array
+        $population_division = $this->_get_population_division( $grid['country_code'] );
+        $data = [
+            'level' => $grid['level'],
+            'parent_level' => $grid['level'] - 1, // one level higher than current
+            'population_division' => number_format_i18n( $population_division ), // label for content not calculation
+            'name' => $grid['name'],
+            'parent_name' => $grid['parent_name'],
+            'peers' => number_format_i18n( $grid['peers'] ),
+            'population' => number_format_i18n( $grid['population'] ),
+            'needed' => number_format_i18n( $grid['needed'] ),
+        ];
+
+        return $data;
+    }
+
+    public function endpoint_get_levels( $grid_id ) {
+        $data = [
+            'levels' => [],
+            'self' => [],
+        ];
+        // add levels
+        $levels = $this->_get_flat_levels( $grid_id );
+        foreach( $levels as $index => $level ) {
+            $percent = ceil( $level['reported'] / $level['needed'] * 100 );
+            if ( 100 < $percent ) {
+                $percent = 100;
+            }
+            $data['levels'][] = [
+                'name' => $level['name'],
+                'grid_id' => (int) $level['grid_id'],
+                'population' => number_format_i18n( $level['population'] ),
+                'needed' => number_format_i18n( $level['needed'] ),
+                'reported' => number_format_i18n( $level['reported'] ),
+                'percent' => $percent,
+            ];
+        }
+
+        // build self section
+        foreach( $data['levels'] as $i => $v ) {
+            $data['self'] = $v;
+            break;
+        }
+
+        return $data;
+    }
+
+    public function endpoint_get_world( ) {
+        $data = [];
+
+        $data[1] = Zume_Public_Heatmap_Queries::query_flat_world(); // get flat grid
+
+        $reported = $this->get_world_total(); // get list of training counts
+        $data[1]['reported'] = number_format_i18n( $reported );
+
+        $percent = ceil( $reported / $data[1]['needed'] * 100 );
+        if ( 100 < $percent ) {
+            $percent = 100;
+        }
+        $data[1]['percent'] = number_format_i18n( $percent, 3);
+        $data[1]['name'] = 'World';
+        $data[1]['population'] = number_format_i18n( $data[1]['population'] );
+        $data[1]['needed'] = number_format_i18n( $data[1]['needed'] );
+
+        return $data;
+    }
+
+    public function get_world_total() {
+        return Zume_Public_Heatmap_Queries::query_world_churches_total();
     }
 
     public function endpoint_get_grid_id( $grid_id ) {
@@ -539,64 +621,121 @@ class DT_Network_Dashboard_Public_Heatmap_Churches
     }
 
 
-    public function get_reported( $grid_id, $grid_totals = [] ) : int {
-        if ( is_null($grid_totals)) {
-            $grid_totals = Zume_Public_Heatmap_Queries::query_church_location_grid_totals();
+
+    public function _get_flat_levels( $grid_id ) {
+        $list = $this->get_list(); // get list of training counts
+        $flat_grid = Zume_Public_Heatmap_Queries::query_flat_grid(); // get flat grid
+        $flat_grid_limited = $this->_limit_counts( $flat_grid, $list ); // limit counts to no larger than needed per location.
+
+        $data = [];
+        $grid = Zume_Public_Heatmap_Queries::query_grid_elements( $grid_id ); // get level ids for grid_id
+        foreach( $grid as $id ) {
+            if ( empty( $id ) ) {
+                continue;
+            }
+            if ( isset( $flat_grid_limited[$id] ) ){
+                $data[$id] = $flat_grid_limited[$id];
+            }
         }
-        if ( isset( $grid_totals[$grid_id])){
-            return (int) $grid_totals[$grid_id]['count'];
-        }
-        else {
-            return 0;
-        }
-    }
-
-    public function get_world_total() {
-        global $wpdb;
-        return $wpdb->get_var("
-            SELECT COUNT(lg.admin0_grid_id) as count
-            FROM $wpdb->postmeta as pm
-            JOIN $wpdb->posts as p ON p.ID=pm.post_id AND p.post_type = 'groups'
-            JOIN $wpdb->postmeta as pm2 ON pm2.post_id=pm.post_id AND pm2.meta_key = 'group_type' AND pm2.meta_value = 'church'
-            JOIN $wpdb->postmeta as pm3 ON pm3.post_id=pm.post_id AND pm3.meta_key = 'group_status' AND (pm3.meta_value = 'active' OR pm3.meta_value = 'inactive')
-            LEFT JOIN $wpdb->dt_location_grid as lg ON pm.meta_value=lg.grid_id
-            WHERE pm.meta_key = 'location_grid'
-        ");
-    }
-
-    public function get_world_goals() : array {
-        $data = [
-            'name' => 'World',
-            'grid_id' => 1,
-            'population' => 7860000000,
-            'peers' => 255,
-            'needed' => 0,
-            'reported' => 0,
-            'percent' => 0,
-            'percent_formatted' => 0,
-        ];
-
-        // needed
-        $us_population = 331000000;
-        $global_pop_block = GLOBAL_POPULATION_BLOCKS;
-        $us_pop_block = US_POPULATION_BLOCKS;
-        $world_population_without_us = $data['population'] - $us_population;
-        $needed_without_us = $world_population_without_us / $global_pop_block;
-        $needed_in_the_us = $us_population / $us_pop_block;
-        $data['needed'] = $needed_without_us + $needed_in_the_us;
-
-        // reported
-        $reported = $this->get_world_total();
-        $data['reported'] = ( ! empty( $reported ) ) ? (int) $reported : 0;
-        $data['percent'] =  $data['reported'] / $data['needed'] * 100;
-
-        $data['population'] = number_format_i18n( $data['population'] );
-        $data['needed'] = number_format_i18n( $data['needed'] );
-        $data['reported'] = number_format_i18n( $data['reported'] );
-        $data['percent'] = ceil( $data['percent'] );
-        $data['percent_formatted'] = number_format_i18n( $data['percent'], 3);
 
         return $data;
+    }
+
+    public function get_list() {
+        return Zume_Public_Heatmap_Queries::query_church_location_grid_totals( null, true );
+    }
+
+    /**
+     * Function limits counts to no higher than the location need. This keeps from inflating the counts up the levels.
+     * @param $flat_grid
+     * @param $list
+     * @return array
+     */
+    public function _limit_counts( $flat_grid, $list ) {
+        $flat_grid_limited = [];
+        foreach( $flat_grid as $value ) {
+            $flat_grid_limited[$value['grid_id']] = $value;
+
+            if( isset( $list[$value['grid_id']] ) && ! empty( $list[$value['grid_id']] ) ) {
+                if( $list[$value['grid_id']] <= $value['needed'] ) {
+                    $flat_grid_limited[$value['grid_id']]['reported'] = $list[$value['grid_id']];
+                } else {
+                    $flat_grid_limited[$value['grid_id']]['reported'] = $value['needed'];
+                }
+            }
+
+
+        }
+        return $flat_grid_limited;
+    }
+
+    public function movement_data( WP_REST_Request $request ){
+        $params = $request->get_json_params() ?? $request->get_body_params();
+
+        if ( ! isset( $params['grid_id'] ) ) {
+            return new WP_Error(__METHOD__, 'no grid id' );
+        }
+        if ( ! isset( $params['offset'] ) ) {
+            return new WP_Error(__METHOD__, 'no grid id' );
+        }
+        $grid_id = sanitize_text_field( wp_unslash( $params['grid_id']));
+        $offset = sanitize_text_field( wp_unslash( $params['offset']));
+
+        return $this->query_movement_data( $grid_id, $offset );
+    }
+
+    public function query_movement_data( $grid_id, $offset ) {
+        global $wpdb;
+        $ids = [];
+        $ids[] = $grid_id;
+        $children = Disciple_Tools_Mapping_Queries::get_children_by_grid_id( $grid_id );
+        if ( ! empty( $children ) ) {
+            foreach( $children as $child ){
+                $ids[] = $child['grid_id'];
+            }
+        }
+        $prepared_list = dt_array_to_sql( $ids );
+        $list = $wpdb->get_results("
+                SELECT
+                       id,
+                       action,
+                       category,
+                       lng,
+                       lat,
+                       label,
+                       grid_id,
+                       payload,
+                       timestamp,
+                       'A Zúme partner' as site_name
+                FROM $wpdb->dt_movement_log
+                WHERE grid_id IN ($prepared_list)
+                ORDER BY timestamp DESC", ARRAY_A);
+        if ( empty( $list ) ){
+            return [];
+        }
+
+        foreach( $list as $index => $item ){
+            $list[$index]['payload'] = maybe_unserialize( $item['payload'] );
+            $list[$index]['formatted_time'] = date( 'M, d Y, g:i a', $item['timestamp'] + $offset );
+        }
+
+        if ( function_exists( 'zume_log_actions' ) ) {
+            $list = zume_log_actions($list);
+        }
+        if ( function_exists( 'dt_network_dashboard_translate_log_generations' ) ) {
+            $list = dt_network_dashboard_translate_log_generations($list);
+        }
+        if ( function_exists( 'dt_network_dashboard_translate_log_new_posts' ) ) {
+            $list = dt_network_dashboard_translate_log_new_posts($list);
+        }
+
+        foreach( $list as $index => $item ){
+            if ( ! isset( $item['message'] ) ) {
+                $list[$index]['message'] = 'Non-public movement event reported.';
+            }
+        }
+
+        return $list;
     }
 
     public function endpoint_new_report( $form_data ) {
@@ -754,123 +893,16 @@ class DT_Network_Dashboard_Public_Heatmap_Churches
         return $data;
     }
 
-    public function movement_data( WP_REST_Request $request ){
-        $params = $request->get_json_params() ?? $request->get_body_params();
-
-        if ( ! isset( $params['grid_id'] ) ) {
-            return new WP_Error(__METHOD__, 'no grid id' );
+    public function get_reported( $grid_id, $grid_totals = [] ) : int {
+        if ( is_null($grid_totals)) {
+            $grid_totals = Zume_Public_Heatmap_Queries::query_church_location_grid_totals();
         }
-        if ( ! isset( $params['offset'] ) ) {
-            return new WP_Error(__METHOD__, 'no grid id' );
+        if ( isset( $grid_totals[$grid_id])){
+            return (int) $grid_totals[$grid_id]['count'];
         }
-        $grid_id = sanitize_text_field( wp_unslash( $params['grid_id']));
-        $offset = sanitize_text_field( wp_unslash( $params['offset']));
-
-        return $this->query_movement_data( $grid_id, $offset );
-
-    }
-
-    public function query_movement_data( $grid_id, $offset ) {
-        global $wpdb;
-        $ids = [];
-        $ids[] = $grid_id;
-        $children = Disciple_Tools_Mapping_Queries::get_children_by_grid_id( $grid_id );
-        if ( ! empty( $children ) ) {
-            foreach( $children as $child ){
-                $ids[] = $child['grid_id'];
-            }
+        else {
+            return 0;
         }
-        $prepared_list = dt_array_to_sql( $ids );
-        $list = $wpdb->get_results("
-                SELECT
-                       id,
-                       action,
-                       category,
-                       lng,
-                       lat,
-                       label,
-                       grid_id,
-                       payload,
-                       timestamp,
-                       'A Zúme partner' as site_name
-                FROM $wpdb->dt_movement_log
-                WHERE grid_id IN ($prepared_list)
-                ORDER BY timestamp DESC", ARRAY_A);
-        if ( empty( $list ) ){
-            return [];
-        }
-
-        foreach( $list as $index => $item ){
-            $list[$index]['payload'] = maybe_unserialize( $item['payload'] );
-            $list[$index]['formatted_time'] = date( 'M, d Y, g:i a', $item['timestamp'] + $offset );
-        }
-
-        if ( function_exists( 'zume_log_actions' ) ) {
-            $list = zume_log_actions($list);
-        }
-        if ( function_exists( 'dt_network_dashboard_translate_log_generations' ) ) {
-            $list = dt_network_dashboard_translate_log_generations($list);
-        }
-        if ( function_exists( 'dt_network_dashboard_translate_log_new_posts' ) ) {
-            $list = dt_network_dashboard_translate_log_new_posts($list);
-        }
-
-        foreach( $list as $index => $item ){
-            if ( ! isset( $item['message'] ) ) {
-                $list[$index]['message'] = 'Non-public movement event reported.';
-            }
-        }
-
-        return $list;
-    }
-
-    public function _get_flat_levels( $grid_id ) {
-        $list = $this->get_list(); // get list of training counts
-        $flat_grid = Zume_Public_Heatmap_Queries::query_flat_grid(); // get flat grid
-        $flat_grid_limited = $this->_limit_counts( $flat_grid, $list ); // limit counts to no larger than needed per location.
-
-        $data = [];
-        $grid = Zume_Public_Heatmap_Queries::query_grid_elements( $grid_id ); // get level ids for grid_id
-        foreach( $grid as $id ) {
-            if ( empty( $id ) ) {
-                continue;
-            }
-            if ( isset( $flat_grid_limited[$id] ) ){
-                $data[$id] = $flat_grid_limited[$id];
-            }
-        }
-
-        $data[1] = $flat_grid_limited[1];
-
-        return $data;
-    }
-
-    public function get_list() {
-        return Zume_Public_Heatmap_Queries::query_church_location_grid_totals( null, true );
-    }
-
-    /**
-     * Function limits counts to no higher than the location need. This keeps from inflating the counts up the levels.
-     * @param $flat_grid
-     * @param $list
-     * @return array
-     */
-    public function _limit_counts( $flat_grid, $list ) {
-        $flat_grid_limited = [];
-        foreach( $flat_grid as $value ) {
-            $flat_grid_limited[$value['grid_id']] = $value;
-
-            if( isset( $list[$value['grid_id']] ) && ! empty( $list[$value['grid_id']] ) ) {
-                if( $list[$value['grid_id']] <= $value['needed'] ) {
-                    $flat_grid_limited[$value['grid_id']]['reported'] = $list[$value['grid_id']];
-                } else {
-                    $flat_grid_limited[$value['grid_id']]['reported'] = $value['needed'];
-                }
-            }
-
-
-        }
-        return $flat_grid_limited;
     }
 }
 
