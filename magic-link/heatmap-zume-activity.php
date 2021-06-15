@@ -517,7 +517,7 @@ class DT_Network_Dashboard_Public_Heatmap_Activity
         $grid_list = $this->query_activity_grid();
 
         $data = [];
-        foreach( $list as $v ){
+        foreach ( $list as $v ){
             $data[$v['grid_id']] = [
                 'grid_id' => $v['grid_id'],
                 'percent' => 0,
@@ -533,10 +533,10 @@ class DT_Network_Dashboard_Public_Heatmap_Activity
                 $needed = 1;
             }
 
-            if ( isset( $grid_list[$v['grid_id']] ) && ! empty($grid_list[$v['grid_id']]['count']) ){
+            if ( isset( $grid_list[$v['grid_id']] ) && ! empty( $grid_list[$v['grid_id']]['count'] ) ){
                 $count = $grid_list[$v['grid_id']]['count'];
-                if ( ! empty($count) && ! empty($needed) ){
-                    $percent = round($count / $needed * 100 );
+                if ( ! empty( $count ) && ! empty( $needed ) ){
+                    $percent = round( $count / $needed * 100 );
 
                     $data[$v['grid_id']]['percent'] = $percent;
                     $data[$v['grid_id']]['reported'] = $grid_list[$v['grid_id']]['count'];
@@ -612,7 +612,7 @@ class DT_Network_Dashboard_Public_Heatmap_Activity
             ", ARRAY_A );
 
         $data = [];
-        foreach( $list as $item ){
+        foreach ( $list as $item ){
             $data[$item['grid_id']] = $item;
         }
 
@@ -711,13 +711,13 @@ class DT_Network_Dashboard_Public_Heatmap_Activity
         $params = $request->get_json_params() ?? $request->get_body_params();
 
         if ( ! isset( $params['grid_id'] ) ) {
-            return new WP_Error(__METHOD__, 'no grid id' );
+            return new WP_Error( __METHOD__, 'no grid id' );
         }
         if ( ! isset( $params['offset'] ) ) {
-            return new WP_Error(__METHOD__, 'no grid id' );
+            return new WP_Error( __METHOD__, 'no grid id' );
         }
-        $grid_id = sanitize_text_field( wp_unslash( $params['grid_id']));
-        $offset = sanitize_text_field( wp_unslash( $params['offset']));
+        $grid_id = sanitize_text_field( wp_unslash( $params['grid_id'] ) );
+        $offset = sanitize_text_field( wp_unslash( $params['offset'] ) );
 
         return $this->query_movement_data( $grid_id, $offset );
 
@@ -729,11 +729,12 @@ class DT_Network_Dashboard_Public_Heatmap_Activity
         $ids[] = $grid_id;
         $children = Disciple_Tools_Mapping_Queries::get_children_by_grid_id( $grid_id );
         if ( ! empty( $children ) ) {
-            foreach( $children as $child ){
+            foreach ( $children as $child ){
                 $ids[] = $child['grid_id'];
             }
         }
         $prepared_list = dt_array_to_sql( $ids );
+        // phpcs:disable
         $list = $wpdb->get_results("
                 SELECT
                        id,
@@ -749,26 +750,27 @@ class DT_Network_Dashboard_Public_Heatmap_Activity
                 FROM $wpdb->dt_movement_log
                 WHERE grid_id IN ($prepared_list)
                 ORDER BY timestamp DESC", ARRAY_A);
+        // phpcs:enable
         if ( empty( $list ) ){
             return [];
         }
 
-        foreach( $list as $index => $item ){
+        foreach ( $list as $index => $item ){
             $list[$index]['payload'] = maybe_unserialize( $item['payload'] );
-            $list[$index]['formatted_time'] = date( 'M, d Y, g:i a', $item['timestamp'] + $offset );
+            $list[$index]['formatted_time'] = gmdate( 'M, d Y, g:i a', $item['timestamp'] + $offset );
         }
 
         if ( function_exists( 'zume_log_actions' ) ) {
-            $list = zume_log_actions($list);
+            $list = zume_log_actions( $list );
         }
         if ( function_exists( 'dt_network_dashboard_translate_log_generations' ) ) {
-            $list = dt_network_dashboard_translate_log_generations($list);
+            $list = dt_network_dashboard_translate_log_generations( $list );
         }
         if ( function_exists( 'dt_network_dashboard_translate_log_new_posts' ) ) {
-            $list = dt_network_dashboard_translate_log_new_posts($list);
+            $list = dt_network_dashboard_translate_log_new_posts( $list );
         }
 
-        foreach( $list as $index => $item ){
+        foreach ( $list as $index => $item ){
             if ( ! isset( $item['message'] ) ) {
                 $list[$index]['message'] = 'Non-public movement event reported.';
             }

@@ -132,7 +132,7 @@ class DT_Network_Dashboard_Public_Heatmap_Trainings extends DT_Network_Dashboard
         ?>
         <script>
             jQuery(document).ready(function($){
-                let asset_url = '<?php echo plugin_dir_url(__FILE__) ?>'
+                let asset_url = '<?php echo esc_url_raw( plugin_dir_url( __FILE__ ) ) ?>'
 
                 $('.training-content').append(`
                 <div class="grid-x grid-padding-x" >

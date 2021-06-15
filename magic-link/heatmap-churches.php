@@ -122,7 +122,7 @@ class DT_Network_Dashboard_Public_Heatmap_Churches
                 'jquery-touch-punch'
             ], filemtime( plugin_dir_path( __FILE__ ) .'heatmap.js' ), true );
 
-            wp_enqueue_style( $this->key, trailingslashit( plugin_dir_url( __FILE__ ) ) . 'heatmap.css', ['site-css'], filemtime( plugin_dir_path( __FILE__ ) .'heatmap.css' ));
+            wp_enqueue_style( $this->key, trailingslashit( plugin_dir_url( __FILE__ ) ) . 'heatmap.css', [ 'site-css' ], filemtime( plugin_dir_path( __FILE__ ) .'heatmap.css' ) );
 
 //            wp_enqueue_script( 'service-worker', trailingslashit( plugin_dir_url( __FILE__ ) ) . 'service-worker.js', [
 //                'jquery',
@@ -282,7 +282,7 @@ class DT_Network_Dashboard_Public_Heatmap_Churches
         ?>
         <style>
             #initialize-screen {
-                background-image: url("<?php echo plugin_dir_url(__FILE__) ?>initialize-background.jpg");
+                background-image: url("<?php echo esc_url( plugin_dir_url( __FILE__ ) ) ?>initialize-background.jpg");
                 background-size:cover;
             }
         </style>
@@ -313,7 +313,7 @@ class DT_Network_Dashboard_Public_Heatmap_Churches
 
     public function body(){
         DT_Mapbox_API::geocoder_scripts();
-        include('heatmap.html');
+        include( 'heatmap.html' );
     }
 
     /**
@@ -326,7 +326,7 @@ class DT_Network_Dashboard_Public_Heatmap_Churches
 
         $data = [];
         $highest_value = 1;
-        foreach( $flat_grid as $i => $v ){
+        foreach ( $flat_grid as $i => $v ){
             $data[$i] = [
                 'grid_id' => $i,
                 'population' => number_format_i18n( $v['population'] ),
@@ -342,9 +342,9 @@ class DT_Network_Dashboard_Public_Heatmap_Churches
                 $needed = 1;
             }
 
-            if ( isset( $grid_totals[$v['grid_id']] ) && ! empty($grid_totals[$v['grid_id']]) ){
+            if ( isset( $grid_totals[$v['grid_id']] ) && ! empty( $grid_totals[$v['grid_id']] ) ){
                 $reported = $grid_totals[$v['grid_id']];
-                if ( ! empty($reported) && ! empty($needed) ){
+                if ( ! empty( $reported ) && ! empty( $needed ) ){
                     $data[$v['grid_id']]['needed'] = $needed;
 
                     if ( $reported > $needed ) {
@@ -352,7 +352,7 @@ class DT_Network_Dashboard_Public_Heatmap_Churches
                     }
                     $data[$v['grid_id']]['reported'] = $reported;
 
-                    $percent = round($reported / $needed * 100 );
+                    $percent = round( $reported / $needed * 100 );
                     if ( 100 < $percent ) {
                         $percent = 100;
                     } else {
@@ -420,8 +420,8 @@ class DT_Network_Dashboard_Public_Heatmap_Churches
             case 'world':
                 return $this->endpoint_get_level( $params['grid_id'], $action );
             case 'activity_data':
-                $grid_id = sanitize_text_field( wp_unslash( $params['grid_id']));
-                $offset = sanitize_text_field( wp_unslash( $params['offset']));
+                $grid_id = sanitize_text_field( wp_unslash( $params['grid_id'] ) );
+                $offset = sanitize_text_field( wp_unslash( $params['offset'] ) );
                 return $this->query_activity_data( $grid_id, $offset );
             case 'new_report':
                 return $this->endpoint_new_report( $params['data'] );
@@ -474,7 +474,7 @@ class DT_Network_Dashboard_Public_Heatmap_Churches
 
         $grid = Zume_Public_Heatmap_Queries::query_grid_elements( $grid_id ); // get level ids for grid_id
 
-        if ( isset( $flat_grid_limited[$grid[$administrative_level]] ) && ! empty( $flat_grid_limited[$grid[$administrative_level]]) ) {
+        if ( isset( $flat_grid_limited[$grid[$administrative_level]] ) && ! empty( $flat_grid_limited[$grid[$administrative_level]] ) ) {
             $level = $flat_grid_limited[$grid[$administrative_level]];
         }
         else {
@@ -485,7 +485,7 @@ class DT_Network_Dashboard_Public_Heatmap_Churches
         if ( 100 < $percent ) {
             $percent = 100;
         } else {
-            $percent = number_format_i18n( $percent, 2);
+            $percent = number_format_i18n( $percent, 2 );
         }
         $data = [
             'name' => $level['name'],
@@ -499,93 +499,6 @@ class DT_Network_Dashboard_Public_Heatmap_Churches
         return $data;
     }
 
-    public function get_world_total() {
-        return Zume_Public_Heatmap_Queries::query_world_churches_total();
-    }
-
-//    public function endpoint_get_grid_id( $grid_id ) {
-//        global $wpdb;
-//
-//        // get grid elements for design
-//        $grid = $wpdb->get_row( $wpdb->prepare( "
-//            SELECT
-//              g.grid_id,
-//              g.level,
-//              g.alt_name as name,
-//              gn.alt_name as parent_name,
-//              g.country_code,
-//              (SELECT COUNT(prs.grid_id) FROM $wpdb->dt_location_grid as prs WHERE prs.parent_id = g.parent_id ) as peers
-//            FROM $wpdb->dt_location_grid as g
-//            LEFT JOIN $wpdb->dt_location_grid as gn ON g.parent_id=gn.grid_id
-//            WHERE g.grid_id = %s
-//        ", $grid_id ), ARRAY_A );
-//
-//        // set array
-//        $population_division = $this->get_population_division( $grid['country_code'] );
-//        $data = [
-//            'level' => $grid['level'],
-//            'parent_level' => $grid['level'] - 1, // one level higher than current
-//            'population_division' => number_format_i18n( $population_division ), // label for content not calculation
-//            'name' => $grid['name'],
-//            'parent_name' => $grid['parent_name'],
-//            'peers' => $grid['peers'],
-//            'levels' => [],
-//            'self' => [],
-//        ];
-//
-//        // add levels
-//        $levels = $this->_get_flat_levels( $grid_id );
-//        foreach( $levels as $index => $level ) {
-//            $percent = ceil( $level['reported'] / $level['needed'] * 100 );
-//            if ( 100 < $percent ) {
-//                $percent = 100;
-//            }
-//            $data['levels'][] = [
-//                'name' => $level['name'],
-//                'grid_id' => (int) $level['grid_id'],
-//                'population' => number_format_i18n( $level['population'] ),
-//                'needed' => number_format_i18n( $level['needed'] ),
-//                'reported' => number_format_i18n( $level['reported'] ),
-//                'percent' => $percent,
-//            ];
-//        }
-//
-//        // build self section
-//        foreach( $data['levels'] as $i => $v ) {
-//            $data['self'] = $v;
-//            break;
-//        }
-//
-//        return $data;
-//    }
-
-
-
-//    public function _get_flat_levels( $grid_id ) {
-//        $list = $this->get_list(); // get list of training counts
-//        $flat_grid = Zume_Public_Heatmap_Queries::query_flat_grid(); // get flat grid
-//        $flat_grid_limited = $this->_limit_counts( $flat_grid, $list ); // limit counts to no larger than needed per location.
-//
-//        $data = [];
-//        $grid = Zume_Public_Heatmap_Queries::query_grid_elements( $grid_id ); // get level ids for grid_id
-//        foreach( $grid as $id ) {
-//            if ( empty( $id ) ) {
-//                continue;
-//            }
-//            if ( isset( $flat_grid_limited[$id] ) ){
-//                $data[$id] = $flat_grid_limited[$id];
-//            }
-//        }
-//
-//        return $data;
-//    }
-
-//    public function get_list() {
-//        return Zume_Public_Heatmap_Queries::query_church_location_grid_totals( null, true );
-//    }
-
-
-
     /**
      * Function limits counts to no higher than the location need. This keeps from inflating the counts up the levels.
      * @param $flat_grid
@@ -594,38 +507,35 @@ class DT_Network_Dashboard_Public_Heatmap_Churches
      */
     public function _limit_counts( $flat_grid, $list ) {
         $flat_grid_limited = [];
-        foreach( $flat_grid as $value ) {
+        foreach ( $flat_grid as $value ) {
             $flat_grid_limited[$value['grid_id']] = $value;
 
-            if( isset( $list[$value['grid_id']] ) && ! empty( $list[$value['grid_id']] ) ) {
-                if( $list[$value['grid_id']] <= $value['needed'] ) {
+            if ( isset( $list[$value['grid_id']] ) && ! empty( $list[$value['grid_id']] ) ) {
+                if ( $list[$value['grid_id']] <= $value['needed'] ) {
                     $flat_grid_limited[$value['grid_id']]['reported'] = $list[$value['grid_id']];
                 } else {
                     $flat_grid_limited[$value['grid_id']]['reported'] = $value['needed'];
                 }
             }
-
-
         }
         return $flat_grid_limited;
     }
 
-    /**
-     * Activity list
-     * @param WP_REST_Request $request
-     * @return array|mixed|object|WP_Error|null
-     */
+    /****************************************************************************************
+     * ACTIVITY SECTION
+     ****************************************************************************************/
+
     public function activity_data( WP_REST_Request $request ){
         $params = $request->get_json_params() ?? $request->get_body_params();
 
         if ( ! isset( $params['grid_id'] ) ) {
-            return new WP_Error(__METHOD__, 'no grid id' );
+            return new WP_Error( __METHOD__, 'no grid id' );
         }
         if ( ! isset( $params['offset'] ) ) {
-            return new WP_Error(__METHOD__, 'no grid id' );
+            return new WP_Error( __METHOD__, 'no grid id' );
         }
-        $grid_id = sanitize_text_field( wp_unslash( $params['grid_id']));
-        $offset = sanitize_text_field( wp_unslash( $params['offset']));
+        $grid_id = sanitize_text_field( wp_unslash( $params['grid_id'] ) );
+        $offset = sanitize_text_field( wp_unslash( $params['offset'] ) );
 
         return $this->query_activity_data( $grid_id, $offset );
     }
@@ -636,11 +546,12 @@ class DT_Network_Dashboard_Public_Heatmap_Churches
         $ids[] = $grid_id;
         $children = Disciple_Tools_Mapping_Queries::get_children_by_grid_id( $grid_id );
         if ( ! empty( $children ) ) {
-            foreach( $children as $child ){
+            foreach ( $children as $child ){
                 $ids[] = $child['grid_id'];
             }
         }
         $prepared_list = dt_array_to_sql( $ids );
+        // phpcs:disable
         $list = $wpdb->get_results("
                 SELECT
                        id,
@@ -656,26 +567,27 @@ class DT_Network_Dashboard_Public_Heatmap_Churches
                 FROM $wpdb->dt_movement_log
                 WHERE grid_id IN ($prepared_list)
                 ORDER BY timestamp DESC", ARRAY_A);
+        // phpcs:enable
         if ( empty( $list ) ){
             return [];
         }
 
-        foreach( $list as $index => $item ){
+        foreach ( $list as $index => $item ){
             $list[$index]['payload'] = maybe_unserialize( $item['payload'] );
-            $list[$index]['formatted_time'] = date( 'M, d Y, g:i a', $item['timestamp'] + $offset );
+            $list[$index]['formatted_time'] = gmdate( 'M, d Y, g:i a', $item['timestamp'] + $offset );
         }
 
         if ( function_exists( 'zume_log_actions' ) ) {
-            $list = zume_log_actions($list);
+            $list = zume_log_actions( $list );
         }
         if ( function_exists( 'dt_network_dashboard_translate_log_generations' ) ) {
-            $list = dt_network_dashboard_translate_log_generations($list);
+            $list = dt_network_dashboard_translate_log_generations( $list );
         }
         if ( function_exists( 'dt_network_dashboard_translate_log_new_posts' ) ) {
-            $list = dt_network_dashboard_translate_log_new_posts($list);
+            $list = dt_network_dashboard_translate_log_new_posts( $list );
         }
 
-        foreach( $list as $index => $item ){
+        foreach ( $list as $index => $item ){
             if ( ! isset( $item['message'] ) ) {
                 $list[$index]['message'] = 'Non-public movement event reported.';
             }
@@ -684,13 +596,17 @@ class DT_Network_Dashboard_Public_Heatmap_Churches
         return $list;
     }
 
+    /****************************************************************************************
+     * NEW REPORTS SECTION
+     ****************************************************************************************/
+
     public function endpoint_new_report( $form_data ) {
         global $wpdb;
         if ( ! isset( $form_data['grid_id'], $form_data['name'], $form_data['email'], $form_data['phone'], $form_data['list'] ) ) {
-            return new WP_Error(__METHOD__, 'Missing params.', ['status' => 400 ] );
+            return new WP_Error( __METHOD__, 'Missing params.', [ 'status' => 400 ] );
         }
         if ( ! is_array( $form_data['list'] ) || empty( $form_data['list'] ) ) {
-            return new WP_Error(__METHOD__, 'List missing.', ['status' => 400 ] );
+            return new WP_Error( __METHOD__, 'List missing.', [ 'status' => 400 ] );
         }
 
         $contact_id = false;
@@ -698,22 +614,24 @@ class DT_Network_Dashboard_Public_Heatmap_Churches
         // try to get contact_id and contact
         if ( isset( $form_data['contact_id'] ) && ! empty( $form_data['contact_id'] ) ) {
             $contact_id = (int) $form_data['contact_id'];
-            $contact = DT_Posts::get_post('contacts', $contact_id, false, false );
+            $contact = DT_Posts::get_post( 'contacts', $contact_id, false, false );
             if ( is_wp_error( $contact ) ){
                 return $contact;
             }
         }
         else if ( isset( $form_data['return_reporter'] ) && $form_data['return_reporter'] ) {
             $email = sanitize_email( wp_unslash( $form_data['email'] ) );
+            // phpcs:disable
             $contact_ids = $wpdb->get_results($wpdb->prepare( "
                 SELECT DISTINCT pm.post_id
                 FROM $wpdb->postmeta as pm
                 JOIN $wpdb->postmeta as pm1 ON pm.post_id=pm1.post_id AND pm1.meta_key LIKE 'contact_email%' AND pm1.meta_key NOT LIKE '%details'
                 WHERE pm.meta_key = 'overall_status' AND pm.meta_value = 'active' AND pm1.meta_value = %s
             ", $email ), ARRAY_A );
+            // phpcs:enable
             if ( ! empty( $contact_ids ) ){
                 $contact_id = $contact_ids[0]['post_id'];
-                $contact = DT_Posts::get_post('contacts', $contact_id, false, false );
+                $contact = DT_Posts::get_post( 'contacts', $contact_id, false, false );
                 if ( is_wp_error( $contact ) ){
                     return $contact;
                 }
@@ -728,10 +646,10 @@ class DT_Network_Dashboard_Public_Heatmap_Churches
                 "overall_status" => "new",
                 "type" => "access",
                 "contact_email" => [
-                    ["value" => $form_data['email']],
+                    [ "value" => $form_data['email'] ],
                 ],
                 "contact_phone" => [
-                    ["value" => $form_data['phone']],
+                    [ "value" => $form_data['phone'] ],
                 ],
                 'notes' => [
                     'source_note' => 'Submitted from public heatmap.'
@@ -762,7 +680,7 @@ class DT_Network_Dashboard_Public_Heatmap_Churches
         // create groups
         $group_ids = [];
         $groups = [];
-        foreach( $form_data['list'] as $group ) {
+        foreach ( $form_data['list'] as $group ) {
             $fields = [
                 'title' => $group['name'],
                 'member_count' => $group['members'],
@@ -812,13 +730,13 @@ class DT_Network_Dashboard_Public_Heatmap_Churches
         // create connections
         $connection_ids = [];
         if ( ! empty( $group_ids ) ) {
-            foreach( $group_ids as $gid ) {
+            foreach ( $group_ids as $gid ) {
                 $fields = [
                     "peer_groups" => [
                         "values" => [],
                     ]
                 ];
-                foreach( $group_ids as $subid ) {
+                foreach ( $group_ids as $subid ) {
                     if ( $gid === $subid ) {
                         continue;
                     }
@@ -843,7 +761,7 @@ class DT_Network_Dashboard_Public_Heatmap_Churches
 //        if ( is_null($grid_totals)) {
 //            $grid_totals = Zume_Public_Heatmap_Queries::query_church_location_grid_totals();
 //        }
-        if ( isset( $grid_totals[$grid_id])){
+        if ( isset( $grid_totals[$grid_id] )){
             return (int) $grid_totals[$grid_id]['count'];
         }
         else {
@@ -852,14 +770,10 @@ class DT_Network_Dashboard_Public_Heatmap_Churches
     }
 
 
-    /**
-     * CLASS EXTENSION CUSTOMIZATION FUNCTIONS
-     */
+    /****************************************************************************************
+     *  CLASS EXTENSION CUSTOMIZATION FUNCTIONS
+     ****************************************************************************************/
 
-    /**
-     * Can be customized with class extension
-     * @return array
-     */
     public function get_grid_totals(){
         return Zume_Public_Heatmap_Queries::query_church_grid_totals();
     }
@@ -892,7 +806,7 @@ class DT_Network_Dashboard_Public_Heatmap_Churches
         ?>
         <script>
             jQuery(document).ready(function($){
-                let asset_url = '<?php echo plugin_dir_url(__FILE__) ?>'
+                let asset_url = '<?php echo esc_url( plugin_dir_url( __FILE__ ) ) ?>'
                 $('.training-content').append(`
                 <div class="grid-x grid-padding-x" >
                     <div class="cell center">

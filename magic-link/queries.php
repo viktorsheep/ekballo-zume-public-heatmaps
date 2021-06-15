@@ -9,9 +9,9 @@ class Zume_Public_Heatmap_Queries {
      *
      * @return array
      */
-    public static function query_saturation_list () : array {
+    public static function query_saturation_list() : array {
 
-        if ( false !== ( $value = get_transient( __METHOD__) ) ) {
+        if ( false !== ( $value = get_transient( __METHOD__ ) ) ) { // phpcs:ignore
             return $value;
         }
 
@@ -246,10 +246,10 @@ class Zume_Public_Heatmap_Queries {
 //        return $list;
 //    }
 
-    public static function query_church_grid_totals( $administrative_level = NULL ) {
+    public static function query_church_grid_totals( $administrative_level = null ) {
         global $wpdb;
 
-        switch( $administrative_level ) {
+        switch ( $administrative_level ) {
             case 'a0':
                 $results = $wpdb->get_results( "
                     SELECT t0.admin0_grid_id as grid_id, count(t0.admin0_grid_id) as count
@@ -379,8 +379,8 @@ class Zume_Public_Heatmap_Queries {
                     GROUP BY 'World'
                     ", ARRAY_A );
                 break;
-                default:
-                    $results = $wpdb->get_results( "
+            default:
+                $results = $wpdb->get_results( "
                         SELECT t0.admin0_grid_id as grid_id, count(t0.admin0_grid_id) as count
                         FROM (
                          SELECT lg.admin0_grid_id, lg.admin1_grid_id, lg.admin2_grid_id, lg.admin3_grid_id, lg.admin4_grid_id, lg.admin5_grid_id
@@ -444,10 +444,10 @@ class Zume_Public_Heatmap_Queries {
         return $list;
     }
 
-    public static function query_training_grid_totals( $administrative_level = NULL ) {
+    public static function query_training_grid_totals( $administrative_level = null ) {
         global $wpdb;
 
-        switch( $administrative_level ) {
+        switch ( $administrative_level ) {
             case 'a0':
                 $results = $wpdb->get_results( "
                     SELECT t0.admin0_grid_id as grid_id, count(t0.admin0_grid_id) as count
@@ -752,7 +752,7 @@ class Zume_Public_Heatmap_Queries {
         return $list;
     }
 
-    public static function query_activity_location_grid_totals( ) {
+    public static function query_activity_location_grid_totals() {
 
         global $wpdb;
 
@@ -1273,9 +1273,9 @@ class Zume_Public_Heatmap_Queries {
 
     public static function query_flat_grid_by_level( $administrative_level ) {
         global $wpdb;
-        switch( $administrative_level ) {
+        switch ( $administrative_level ) {
             case 'a0':
-                $results =  $wpdb->get_results("
+                $results = $wpdb->get_results("
                     # 'Needs' GROUPED BY country
                     SELECT tb0.admin0_grid_id as grid_id, loc.name,loc.country_code, SUM(tb0.population) as population, SUM(tb0.needed) as needed, (0) as reported, (0) as percent
                     FROM (
@@ -1373,7 +1373,7 @@ class Zume_Public_Heatmap_Queries {
                 ", ARRAY_A );
                 break;
             case 'a1':
-                $results =  $wpdb->get_results("
+                $results = $wpdb->get_results("
                     # 'Needs' GROUPED BY state level
                     SELECT tb1.admin1_grid_id as grid_id, loc.name, loc.country_code, SUM(tb1.population) as population, SUM(tb1.needed) as needed, (0) as reported, (0) as percent
                     FROM (
@@ -1470,7 +1470,7 @@ class Zume_Public_Heatmap_Queries {
                 ", ARRAY_A );
                 break;
             case 'a2':
-                $results =  $wpdb->get_results("
+                $results = $wpdb->get_results("
                     # 'Needs' GROUPED BY county level
                     SELECT tb2.admin2_grid_id as grid_id, loc.name, loc.country_code, SUM(tb2.population) as population, SUM(tb2.needed) as needed, (0) as reported, (0) as percent
                     FROM (
@@ -1567,7 +1567,7 @@ class Zume_Public_Heatmap_Queries {
                 ", ARRAY_A );
                 break;
             case 'a3':
-                $results =  $wpdb->get_results("
+                $results = $wpdb->get_results("
                     # 'Needs' GROUPED BY sub-county level
                     SELECT tb3.admin3_grid_id as grid_id, loc.name, loc.country_code, SUM(tb3.population) as population, SUM(tb3.needed) as needed, (0) as reported, (0) as percent
                     FROM (
@@ -1666,7 +1666,7 @@ class Zume_Public_Heatmap_Queries {
                 ", ARRAY_A );
                 break;
             case 'world':
-                $results =  $wpdb->get_results("
+                $results = $wpdb->get_results("
                     # World
                     SELECT 1 as grid_id, 'World' as name,'' as country_code, SUM(tbw.population) as population, SUM(tbw.needed) as needed, (0) as reported, (0) as percent
                     FROM (
@@ -1769,7 +1769,7 @@ class Zume_Public_Heatmap_Queries {
                 ", ARRAY_A );
                 break;
             default:
-                $results =  $wpdb->get_results("
+                $results = $wpdb->get_results("
                     # 48367 Records
                     # 'Needs' GROUPED BY sub-county level
                     SELECT tb3.admin3_grid_id as grid_id, loc.name, loc.country_code, SUM(tb3.population) as population, SUM(tb3.needed) as needed, (0) as reported, (0) as percent
@@ -2680,7 +2680,7 @@ class Zume_Public_Heatmap_Queries {
 
     public static function query_flat_grid_world() {
         global $wpdb;
-        $flat_world= $wpdb->get_row("
+        $flat_world = $wpdb->get_row("
             # World
             SELECT 1 as grid_id, 'World','' as country_code, SUM(tbw.population) as population, SUM(tbw.needed) as needed, (0) as reported, (0) as percent
             FROM (
