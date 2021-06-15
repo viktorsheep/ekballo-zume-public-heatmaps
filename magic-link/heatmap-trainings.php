@@ -25,6 +25,8 @@ class DT_Network_Dashboard_Public_Heatmap_Trainings extends DT_Network_Dashboard
     public $root = "zume_app";
     public $type = 'heatmap_trainings';
     public $post_type = 'trainings';
+    public $us_div = 5000; // this is 1 for every 5000
+    public $global_div = 50000; // this equals 1 for every 50000
 
     private static $_instance = null;
     public static function instance() {
@@ -112,16 +114,16 @@ class DT_Network_Dashboard_Public_Heatmap_Trainings extends DT_Network_Dashboard
         return Zume_Public_Heatmap_Queries::query_training_grid_totals();
     }
 
-    public function get_list_by_level( $administrative_level ) {
-        return Zume_Public_Heatmap_Queries::query_training_grid_totals( $administrative_level );
-    }
-
     public function get_population_division( $country_code ){
-        $population_division = 50000;
+        $population_division = $this->global_div;
         if ( $country_code === 'US' ){
-            $population_division = 5000;
+            $population_division = $this->us_div;
         }
         return $population_division;
+    }
+
+    public function get_grid_totals_by_level( $administrative_level ) {
+        return Zume_Public_Heatmap_Queries::query_training_grid_totals( $administrative_level );
     }
 
     public function _browser_tab_title( $title ){

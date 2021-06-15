@@ -102,149 +102,1003 @@ class Zume_Public_Heatmap_Queries {
         return $list;
     }
 
-//    public static function query_church_location_grid_totals( $status = null, $simple = false ) {
-//
-//        global $wpdb;
-//
-//        if ( $status ) {
-//            $results = $wpdb->get_results( $wpdb->prepare( "
-//            SELECT t0.admin0_grid_id as grid_id, count(t0.admin0_grid_id) as count
-//            FROM (
-//                SELECT lg.admin0_grid_id, lg.admin1_grid_id, lg.admin2_grid_id, lg.admin3_grid_id, lg.admin4_grid_id, lg.admin5_grid_id
-//                FROM $wpdb->postmeta as pm
-//                JOIN $wpdb->posts as p ON p.ID=pm.post_id AND p.post_type = 'groups'
-//                JOIN $wpdb->postmeta as pm2 ON pm2.post_id=pm.post_id AND pm2.meta_key = 'group_type' AND pm2.meta_value = 'church'
-//                JOIN $wpdb->postmeta as pm3 ON pm3.post_id=pm.post_id AND pm3.meta_key = 'group_status' AND pm3.meta_value = %s
-//                LEFT JOIN $wpdb->dt_location_grid as lg ON pm.meta_value=lg.grid_id
-//                WHERE pm.meta_key = 'location_grid'
-//            ) as t0
-//            GROUP BY t0.admin0_grid_id
-//            UNION
-//            SELECT t1.admin1_grid_id as grid_id, count(t1.admin1_grid_id) as count
-//            FROM (
-//                SELECT lg.admin0_grid_id, lg.admin1_grid_id, lg.admin2_grid_id, lg.admin3_grid_id, lg.admin4_grid_id, lg.admin5_grid_id
-//                FROM $wpdb->postmeta as pm
-//                JOIN $wpdb->posts as p ON p.ID=pm.post_id AND p.post_type = 'groups'
-//                JOIN $wpdb->postmeta as pm2 ON pm2.post_id=pm.post_id AND pm2.meta_key = 'group_type' AND pm2.meta_value = 'church'
-//                JOIN $wpdb->postmeta as pm3 ON pm3.post_id=pm.post_id AND pm3.meta_key = 'group_status' AND pm3.meta_value = %s
-//                LEFT JOIN $wpdb->dt_location_grid as lg ON pm.meta_value=lg.grid_id
-//                WHERE pm.meta_key = 'location_grid'
-//            ) as t1
-//            GROUP BY t1.admin1_grid_id
-//            UNION
-//            SELECT t2.admin2_grid_id as grid_id, count(t2.admin2_grid_id) as count
-//            FROM (
-//                SELECT lg.admin0_grid_id, lg.admin1_grid_id, lg.admin2_grid_id, lg.admin3_grid_id, lg.admin4_grid_id, lg.admin5_grid_id
-//                FROM $wpdb->postmeta as pm
-//                JOIN $wpdb->posts as p ON p.ID=pm.post_id AND p.post_type = 'groups'
-//                JOIN $wpdb->postmeta as pm2 ON pm2.post_id=pm.post_id AND pm2.meta_key = 'group_type' AND pm2.meta_value = 'church'
-//                JOIN $wpdb->postmeta as pm3 ON pm3.post_id=pm.post_id AND pm3.meta_key = 'group_status' AND pm3.meta_value = %s
-//                LEFT JOIN $wpdb->dt_location_grid as lg ON pm.meta_value=lg.grid_id
-//                WHERE pm.meta_key = 'location_grid'
-//            ) as t2
-//            GROUP BY t2.admin2_grid_id
-//            UNION
-//            SELECT t3.admin3_grid_id as grid_id, count(t3.admin3_grid_id) as count
-//            FROM (
-//                SELECT lg.admin0_grid_id, lg.admin1_grid_id, lg.admin2_grid_id, lg.admin3_grid_id, lg.admin4_grid_id, lg.admin5_grid_id
-//                FROM $wpdb->postmeta as pm
-//                JOIN $wpdb->posts as p ON p.ID=pm.post_id AND p.post_type = 'groups'
-//                JOIN $wpdb->postmeta as pm2 ON pm2.post_id=pm.post_id AND pm2.meta_key = 'group_type' AND pm2.meta_value = 'church'
-//                JOIN $wpdb->postmeta as pm3 ON pm3.post_id=pm.post_id AND pm3.meta_key = 'group_status' AND pm3.meta_value = %s
-//                LEFT JOIN $wpdb->dt_location_grid as lg ON pm.meta_value=lg.grid_id
-//                WHERE pm.meta_key = 'location_grid'
-//            ) as t3
-//            GROUP BY t3.admin3_grid_id
-//            ", $status, $status, $status, $status
-//            ), ARRAY_A );
-//
-//        } else {
-//
-//            $results = $wpdb->get_results( "
-//            SELECT t0.admin0_grid_id as grid_id, count(t0.admin0_grid_id) as count
-//            FROM (
-//             SELECT lg.admin0_grid_id, lg.admin1_grid_id, lg.admin2_grid_id, lg.admin3_grid_id, lg.admin4_grid_id, lg.admin5_grid_id
-//                FROM $wpdb->postmeta as pm
-//                JOIN $wpdb->posts as p ON p.ID=pm.post_id AND p.post_type = 'groups'
-//                JOIN $wpdb->postmeta as pm2 ON pm2.post_id=pm.post_id AND pm2.meta_key = 'group_type' AND pm2.meta_value = 'church'
-//                LEFT JOIN $wpdb->dt_location_grid as lg ON pm.meta_value=lg.grid_id
-//                WHERE pm.meta_key = 'location_grid'
-//            ) as t0
-//            GROUP BY t0.admin0_grid_id
-//            UNION ALL
-//            SELECT t1.admin1_grid_id as grid_id, count(t1.admin1_grid_id) as count
-//            FROM (
-//                SELECT lg.admin0_grid_id, lg.admin1_grid_id, lg.admin2_grid_id, lg.admin3_grid_id, lg.admin4_grid_id, lg.admin5_grid_id
-//                FROM $wpdb->postmeta as pm
-//                JOIN $wpdb->posts as p ON p.ID=pm.post_id AND p.post_type = 'groups'
-//                JOIN $wpdb->postmeta as pm2 ON pm2.post_id=pm.post_id AND pm2.meta_key = 'group_type' AND pm2.meta_value = 'church'
-//                LEFT JOIN $wpdb->dt_location_grid as lg ON pm.meta_value=lg.grid_id
-//                WHERE pm.meta_key = 'location_grid'
-//            ) as t1
-//            GROUP BY t1.admin1_grid_id
-//            UNION ALL
-//            SELECT t2.admin2_grid_id as grid_id, count(t2.admin2_grid_id) as count
-//            FROM (
-//                SELECT lg.admin0_grid_id, lg.admin1_grid_id, lg.admin2_grid_id, lg.admin3_grid_id, lg.admin4_grid_id, lg.admin5_grid_id
-//                FROM $wpdb->postmeta as pm
-//                JOIN $wpdb->posts as p ON p.ID=pm.post_id AND p.post_type = 'groups'
-//                JOIN $wpdb->postmeta as pm2 ON pm2.post_id=pm.post_id AND pm2.meta_key = 'group_type' AND pm2.meta_value = 'church'
-//                LEFT JOIN $wpdb->dt_location_grid as lg ON pm.meta_value=lg.grid_id
-//                WHERE pm.meta_key = 'location_grid'
-//            ) as t2
-//            GROUP BY t2.admin2_grid_id
-//            UNION ALL
-//            SELECT t3.admin3_grid_id as grid_id, count(t3.admin3_grid_id) as count
-//            FROM (
-//                SELECT lg.admin0_grid_id, lg.admin1_grid_id, lg.admin2_grid_id, lg.admin3_grid_id, lg.admin4_grid_id, lg.admin5_grid_id
-//                FROM $wpdb->postmeta as pm
-//                JOIN $wpdb->posts as p ON p.ID=pm.post_id AND p.post_type = 'groups'
-//                JOIN $wpdb->postmeta as pm2 ON pm2.post_id=pm.post_id AND pm2.meta_key = 'group_type' AND pm2.meta_value = 'church'
-//                LEFT JOIN $wpdb->dt_location_grid as lg ON pm.meta_value=lg.grid_id
-//                WHERE pm.meta_key = 'location_grid'
-//            ) as t3
-//            GROUP BY t3.admin3_grid_id
-//            UNION ALL
-//            SELECT 1 as grid_id, count('World') as count
-//            FROM (
-//                     SELECT 'World'
-//                     FROM $wpdb->postmeta as pm
-//                              JOIN $wpdb->posts as p ON p.ID=pm.post_id AND p.post_type = 'groups'
-//                              JOIN $wpdb->postmeta as pm2 ON pm2.post_id=pm.post_id AND pm2.meta_key = 'group_type' AND pm2.meta_value = 'church'
-//                              LEFT JOIN $wpdb->dt_location_grid as lg ON pm.meta_value=lg.grid_id
-//                     WHERE pm.meta_key = 'location_grid'
-//                 ) as tw
-//            GROUP BY 'World'
-//            ", ARRAY_A );
-//        }
-//
-//        if ( $simple ) {
-//            // simple gives a key/value pair of grid_id = count
-//            $list = [];
-//            if ( is_array( $results ) ) {
-//                foreach ( $results as $result ) {
-//                    if ( empty( $result['grid_id'] ) ) {
-//                        continue;
-//                    }
-//                    if ( empty( $result['count'] ) ) {
-//                        continue;
-//                    }
-//                    $list[$result['grid_id']] = $result['count'];
-//                }
-//            }
-//        }
-//        else {
-//            // gives full array with key = grid_id, count
-//            $list = [];
-//            if ( is_array( $results ) ) {
-//                foreach ( $results as $result ) {
-//                    $list[$result['grid_id']] = $result;
-//                }
-//            }
-//        }
-//
-//        return $list;
-//    }
+    public static function query_flat_grid_by_level( $administrative_level, $us_div = 5000, $global_div = 50000 ) {
+        global $wpdb;
+        $wpdb->us_div = $us_div;
+        $wpdb->global_div = $global_div;
+        switch ( $administrative_level ) {
+            case 'a0':
+                $results = $wpdb->get_results("
+                    # 'Needs' GROUPED BY country
+                    SELECT tb0.admin0_grid_id as grid_id, loc.name,loc.country_code, SUM(tb0.population) as population, SUM(tb0.needed) as needed, (0) as reported, (0) as percent
+                    FROM (
+                             # 44395 Records
+                             SELECT
+                                 lg1.admin0_grid_id,
+                                 lg1.admin1_grid_id,
+                                 lg1.admin2_grid_id,
+                                 lg1.admin3_grid_id,
+                                 lg1.population,
+                                 IF(ROUND(lg1.population / IF(lg1.country_code = 'US', $wpdb->us_div, $wpdb->global_div )) < 1, 1,
+                                    ROUND(lg1.population / IF(lg1.country_code = 'US', $wpdb->us_div, $wpdb->global_div ))) as needed
+                             FROM $wpdb->dt_location_grid lg1
+                             WHERE lg1.level = 0
+                               AND lg1.grid_id NOT IN (SELECT lg11.admin0_grid_id
+                                                       FROM $wpdb->dt_location_grid lg11
+                                                       WHERE lg11.level = 1
+                                                         AND lg11.admin0_grid_id = lg1.grid_id)
+                               AND lg1.admin0_grid_id NOT IN (100050711, 100219347, 100089589, 100074576, 100259978, 100018514)
+                               AND lg1.admin0_grid_id NOT IN
+                                   (100314737, 100083318, 100041128, 100133112, 100341242, 100132648, 100222839, 100379914, 100055707,
+                                    100379993, 100130389, 100255271, 100363975, 100248845, 100001527, 100342458, 100024289, 100132795,
+                                    100054605, 100253456, 100342975, 100074571)
+                             UNION ALL
+                             SELECT
+                                 lg2.admin0_grid_id,
+                                 lg2.admin1_grid_id,
+                                 lg2.admin2_grid_id,
+                                 lg2.admin3_grid_id,
+                                 lg2.population,
+                                 IF(ROUND(lg2.population / IF(lg2.country_code = 'US', $wpdb->us_div, $wpdb->global_div )) < 1, 1,
+                                    ROUND(lg2.population / IF(lg2.country_code = 'US', $wpdb->us_div, $wpdb->global_div ))) as needed
+                             FROM $wpdb->dt_location_grid lg2
+                             WHERE lg2.level = 1
+                               AND lg2.grid_id NOT IN (SELECT lg22.admin1_grid_id
+                                                       FROM $wpdb->dt_location_grid lg22
+                                                       WHERE lg22.level = 2
+                                                         AND lg22.admin1_grid_id = lg2.grid_id)
+                               AND lg2.admin0_grid_id NOT IN (100050711, 100219347, 100089589, 100074576, 100259978, 100018514)
+                               AND lg2.admin0_grid_id NOT IN
+                                   (100314737, 100083318, 100041128, 100133112, 100341242, 100132648, 100222839, 100379914, 100055707,
+                                    100379993, 100130389, 100255271, 100363975, 100248845, 100001527, 100342458, 100024289, 100132795,
+                                    100054605, 100253456, 100342975, 100074571)
+                             UNION ALL
+                             SELECT
+                                 lg3.admin0_grid_id,
+                                 lg3.admin1_grid_id,
+                                 lg3.admin2_grid_id,
+                                 lg3.admin3_grid_id,
+                                 lg3.population,
+                                 IF(ROUND(lg3.population / IF(lg3.country_code = 'US', $wpdb->us_div, $wpdb->global_div )) < 1, 1,
+                                    ROUND(lg3.population / IF(lg3.country_code = 'US', $wpdb->us_div, $wpdb->global_div ))) as needed
+                             FROM $wpdb->dt_location_grid lg3
+                             WHERE lg3.level = 2
+                               AND lg3.admin0_grid_id NOT IN (100050711, 100219347, 100089589, 100074576, 100259978, 100018514)
+                               AND lg3.admin0_grid_id NOT IN
+                                   (100314737, 100083318, 100041128, 100133112, 100341242, 100132648, 100222839, 100379914, 100055707,
+                                    100379993, 100130389, 100255271, 100363975, 100248845, 100001527, 100342458, 100024289, 100132795,
+                                    100054605, 100253456, 100342975, 100074571)
+                             UNION ALL
+                             SELECT
+                                 lg4.admin0_grid_id,
+                                 lg4.admin1_grid_id,
+                                 lg4.admin2_grid_id,
+                                 lg4.admin3_grid_id,
+                                 lg4.population,
+                                 IF(ROUND(lg4.population / IF(lg4.country_code = 'US', $wpdb->us_div, $wpdb->global_div )) < 1, 1,
+                                    ROUND(lg4.population / IF(lg4.country_code = 'US', $wpdb->us_div, $wpdb->global_div ))) as needed
+                             FROM $wpdb->dt_location_grid lg4
+                             WHERE lg4.level = 1
+                               AND lg4.admin0_grid_id NOT IN (100050711, 100219347, 100089589, 100074576, 100259978, 100018514)
+                               AND lg4.admin0_grid_id IN
+                                   (100314737, 100083318, 100041128, 100133112, 100341242, 100132648, 100222839, 100379914, 100055707,
+                                    100379993, 100130389, 100255271, 100363975, 100248845, 100001527, 100342458, 100024289, 100132795,
+                                    100054605, 100253456, 100342975, 100074571)
+                             UNION ALL
+                             SELECT
+                                 lg5.admin0_grid_id,
+                                 lg5.admin1_grid_id,
+                                 lg5.admin2_grid_id,
+                                 lg5.admin3_grid_id,
+                                 lg5.population,
+                                 IF(ROUND(lg5.population / IF(lg5.country_code = 'US', $wpdb->us_div, $wpdb->global_div )) < 1, 1,
+                                    ROUND(lg5.population / IF(lg5.country_code = 'US', $wpdb->us_div, $wpdb->global_div ))) as needed
+                             FROM $wpdb->dt_location_grid as lg5
+                             WHERE lg5.level = 3
+                               AND lg5.admin0_grid_id IN (100050711, 100219347, 100089589, 100074576, 100259978, 100018514)
+                               AND lg5.admin0_grid_id NOT IN
+                                   (100314737, 100083318, 100041128, 100133112, 100341242, 100132648, 100222839, 100379914, 100055707,
+                                    100379993, 100130389, 100255271, 100363975, 100248845, 100001527, 100342458, 100024289, 100132795,
+                                    100054605, 100253456, 100342975, 100074571)
+                    ) as tb0
+                    LEFT JOIN $wpdb->dt_location_grid loc ON tb0.admin0_grid_id=loc.grid_id
+                    GROUP BY tb0.admin0_grid_id
+                ", ARRAY_A );
+                break;
+            case 'a1':
+                $results = $wpdb->get_results("
+                    # 'Needs' GROUPED BY state level
+                    SELECT tb1.admin1_grid_id as grid_id, loc.name, loc.country_code, SUM(tb1.population) as population, SUM(tb1.needed) as needed, (0) as reported, (0) as percent
+                    FROM (
+                             SELECT
+                                 lg1.admin0_grid_id,
+                                 lg1.admin1_grid_id,
+                                 lg1.admin2_grid_id,
+                                 lg1.admin3_grid_id,
+                                 lg1.population,
+                                 IF(ROUND(lg1.population / IF(lg1.country_code = 'US', $wpdb->us_div, $wpdb->global_div )) < 1, 1,
+                                    ROUND(lg1.population / IF(lg1.country_code = 'US', $wpdb->us_div, $wpdb->global_div ))) as needed
+                             FROM $wpdb->dt_location_grid lg1
+                             WHERE lg1.level = 0
+                               AND lg1.grid_id NOT IN (SELECT lg11.admin0_grid_id
+                                                       FROM $wpdb->dt_location_grid lg11
+                                                       WHERE lg11.level = 1
+                                                         AND lg11.admin0_grid_id = lg1.grid_id)
+                               AND lg1.admin0_grid_id NOT IN (100050711, 100219347, 100089589, 100074576, 100259978, 100018514)
+                               AND lg1.admin0_grid_id NOT IN
+                                   (100314737, 100083318, 100041128, 100133112, 100341242, 100132648, 100222839, 100379914, 100055707,
+                                    100379993, 100130389, 100255271, 100363975, 100248845, 100001527, 100342458, 100024289, 100132795,
+                                    100054605, 100253456, 100342975, 100074571)
+                             UNION ALL
+                             SELECT
+                                 lg2.admin0_grid_id,
+                                 lg2.admin1_grid_id,
+                                 lg2.admin2_grid_id,
+                                 lg2.admin3_grid_id,
+                                 lg2.population,
+                                 IF(ROUND(lg2.population / IF(lg2.country_code = 'US', $wpdb->us_div, $wpdb->global_div )) < 1, 1,
+                                    ROUND(lg2.population / IF(lg2.country_code = 'US', $wpdb->us_div, $wpdb->global_div ))) as needed
+                             FROM $wpdb->dt_location_grid lg2
+                             WHERE lg2.level = 1
+                               AND lg2.grid_id NOT IN (SELECT lg22.admin1_grid_id
+                                                       FROM $wpdb->dt_location_grid lg22
+                                                       WHERE lg22.level = 2
+                                                         AND lg22.admin1_grid_id = lg2.grid_id)
+                               AND lg2.admin0_grid_id NOT IN (100050711, 100219347, 100089589, 100074576, 100259978, 100018514)
+                               AND lg2.admin0_grid_id NOT IN
+                                   (100314737, 100083318, 100041128, 100133112, 100341242, 100132648, 100222839, 100379914, 100055707,
+                                    100379993, 100130389, 100255271, 100363975, 100248845, 100001527, 100342458, 100024289, 100132795,
+                                    100054605, 100253456, 100342975, 100074571)
+                             UNION ALL
+                             SELECT
+                                 lg3.admin0_grid_id,
+                                 lg3.admin1_grid_id,
+                                 lg3.admin2_grid_id,
+                                 lg3.admin3_grid_id,
+                                 lg3.population,
+                                 IF(ROUND(lg3.population / IF(lg3.country_code = 'US', $wpdb->us_div, $wpdb->global_div )) < 1, 1,
+                                    ROUND(lg3.population / IF(lg3.country_code = 'US', $wpdb->us_div, $wpdb->global_div ))) as needed
+                             FROM $wpdb->dt_location_grid lg3
+                             WHERE lg3.level = 2
+                               AND lg3.admin0_grid_id NOT IN (100050711, 100219347, 100089589, 100074576, 100259978, 100018514)
+                               AND lg3.admin0_grid_id NOT IN
+                                   (100314737, 100083318, 100041128, 100133112, 100341242, 100132648, 100222839, 100379914, 100055707,
+                                    100379993, 100130389, 100255271, 100363975, 100248845, 100001527, 100342458, 100024289, 100132795,
+                                    100054605, 100253456, 100342975, 100074571)
+                             UNION ALL
+                             SELECT
+                                 lg4.admin0_grid_id,
+                                 lg4.admin1_grid_id,
+                                 lg4.admin2_grid_id,
+                                 lg4.admin3_grid_id,
+                                 lg4.population,
+                                 IF(ROUND(lg4.population / IF(lg4.country_code = 'US', $wpdb->us_div, $wpdb->global_div )) < 1, 1,
+                                    ROUND(lg4.population / IF(lg4.country_code = 'US', $wpdb->us_div, $wpdb->global_div ))) as needed
+                             FROM $wpdb->dt_location_grid lg4
+                             WHERE lg4.level = 1
+                               AND lg4.admin0_grid_id NOT IN (100050711, 100219347, 100089589, 100074576, 100259978, 100018514)
+                               AND lg4.admin0_grid_id IN
+                                   (100314737, 100083318, 100041128, 100133112, 100341242, 100132648, 100222839, 100379914, 100055707,
+                                    100379993, 100130389, 100255271, 100363975, 100248845, 100001527, 100342458, 100024289, 100132795,
+                                    100054605, 100253456, 100342975, 100074571)
+                             UNION ALL
+                             SELECT
+                                 lg5.admin0_grid_id,
+                                 lg5.admin1_grid_id,
+                                 lg5.admin2_grid_id,
+                                 lg5.admin3_grid_id,
+                                 lg5.population,
+                                 IF(ROUND(lg5.population / IF(lg5.country_code = 'US', $wpdb->us_div, $wpdb->global_div )) < 1, 1,
+                                    ROUND(lg5.population / IF(lg5.country_code = 'US', $wpdb->us_div, $wpdb->global_div ))) as needed
+                             FROM $wpdb->dt_location_grid as lg5
+                             WHERE lg5.level = 3
+                               AND lg5.admin0_grid_id IN (100050711, 100219347, 100089589, 100074576, 100259978, 100018514)
+                               AND lg5.admin0_grid_id NOT IN
+                                   (100314737, 100083318, 100041128, 100133112, 100341242, 100132648, 100222839, 100379914, 100055707,
+                                    100379993, 100130389, 100255271, 100363975, 100248845, 100001527, 100342458, 100024289, 100132795,
+                                    100054605, 100253456, 100342975, 100074571)
+                    ) as tb1
+                    LEFT JOIN $wpdb->dt_location_grid loc ON tb1.admin1_grid_id=loc.grid_id
+                    GROUP BY tb1.admin1_grid_id
+                ", ARRAY_A );
+                break;
+            case 'a2':
+                $results = $wpdb->get_results("
+                    # 'Needs' GROUPED BY county level
+                    SELECT tb2.admin2_grid_id as grid_id, loc.name, loc.country_code, SUM(tb2.population) as population, SUM(tb2.needed) as needed, (0) as reported, (0) as percent
+                    FROM (
+                             SELECT
+                                 lg1.admin0_grid_id,
+                                 lg1.admin1_grid_id,
+                                 lg1.admin2_grid_id,
+                                 lg1.admin3_grid_id,
+                                 lg1.population,
+                                 IF(ROUND(lg1.population / IF(lg1.country_code = 'US', $wpdb->us_div, $wpdb->global_div )) < 1, 1,
+                                    ROUND(lg1.population / IF(lg1.country_code = 'US', $wpdb->us_div, $wpdb->global_div ))) as needed
+                             FROM $wpdb->dt_location_grid lg1
+                             WHERE lg1.level = 0
+                               AND lg1.grid_id NOT IN (SELECT lg11.admin0_grid_id
+                                 FROM $wpdb->dt_location_grid lg11
+                                 WHERE lg11.level = 1
+                               AND lg11.admin0_grid_id = lg1.grid_id)
+                               AND lg1.admin0_grid_id NOT IN (100050711, 100219347, 100089589, 100074576, 100259978, 100018514)
+                               AND lg1.admin0_grid_id NOT IN
+                                 (100314737, 100083318, 100041128, 100133112, 100341242, 100132648, 100222839, 100379914, 100055707,
+                                 100379993, 100130389, 100255271, 100363975, 100248845, 100001527, 100342458, 100024289, 100132795,
+                                 100054605, 100253456, 100342975, 100074571)
+                             UNION ALL
+                             SELECT
+                                 lg2.admin0_grid_id,
+                                 lg2.admin1_grid_id,
+                                 lg2.admin2_grid_id,
+                                 lg2.admin3_grid_id,
+                                 lg2.population,
+                                 IF(ROUND(lg2.population / IF(lg2.country_code = 'US', $wpdb->us_div, $wpdb->global_div )) < 1, 1,
+                                 ROUND(lg2.population / IF(lg2.country_code = 'US', $wpdb->us_div, $wpdb->global_div ))) as needed
+                             FROM $wpdb->dt_location_grid lg2
+                             WHERE lg2.level = 1
+                               AND lg2.grid_id NOT IN (SELECT lg22.admin1_grid_id
+                                 FROM $wpdb->dt_location_grid lg22
+                                 WHERE lg22.level = 2
+                               AND lg22.admin1_grid_id = lg2.grid_id)
+                               AND lg2.admin0_grid_id NOT IN (100050711, 100219347, 100089589, 100074576, 100259978, 100018514)
+                               AND lg2.admin0_grid_id NOT IN
+                                 (100314737, 100083318, 100041128, 100133112, 100341242, 100132648, 100222839, 100379914, 100055707,
+                                 100379993, 100130389, 100255271, 100363975, 100248845, 100001527, 100342458, 100024289, 100132795,
+                                 100054605, 100253456, 100342975, 100074571)
+                             UNION ALL
+                             SELECT
+                                 lg3.admin0_grid_id,
+                                 lg3.admin1_grid_id,
+                                 lg3.admin2_grid_id,
+                                 lg3.admin3_grid_id,
+                                 lg3.population,
+                                 IF(ROUND(lg3.population / IF(lg3.country_code = 'US', $wpdb->us_div, $wpdb->global_div )) < 1, 1,
+                                 ROUND(lg3.population / IF(lg3.country_code = 'US', $wpdb->us_div, $wpdb->global_div ))) as needed
+                             FROM $wpdb->dt_location_grid lg3
+                             WHERE lg3.level = 2
+                               AND lg3.admin0_grid_id NOT IN (100050711, 100219347, 100089589, 100074576, 100259978, 100018514)
+                               AND lg3.admin0_grid_id NOT IN
+                                 (100314737, 100083318, 100041128, 100133112, 100341242, 100132648, 100222839, 100379914, 100055707,
+                                 100379993, 100130389, 100255271, 100363975, 100248845, 100001527, 100342458, 100024289, 100132795,
+                                 100054605, 100253456, 100342975, 100074571)
+                             UNION ALL
+                             SELECT
+                                 lg4.admin0_grid_id,
+                                 lg4.admin1_grid_id,
+                                 lg4.admin2_grid_id,
+                                 lg4.admin3_grid_id,
+                                 lg4.population,
+                                 IF(ROUND(lg4.population / IF(lg4.country_code = 'US', $wpdb->us_div, $wpdb->global_div )) < 1, 1,
+                                 ROUND(lg4.population / IF(lg4.country_code = 'US', $wpdb->us_div, $wpdb->global_div ))) as needed
+                             FROM $wpdb->dt_location_grid lg4
+                             WHERE lg4.level = 1
+                               AND lg4.admin0_grid_id NOT IN (100050711, 100219347, 100089589, 100074576, 100259978, 100018514)
+                               AND lg4.admin0_grid_id IN
+                                 (100314737, 100083318, 100041128, 100133112, 100341242, 100132648, 100222839, 100379914, 100055707,
+                                 100379993, 100130389, 100255271, 100363975, 100248845, 100001527, 100342458, 100024289, 100132795,
+                                 100054605, 100253456, 100342975, 100074571)
+                             UNION ALL
+                             SELECT
+                                 lg5.admin0_grid_id,
+                                 lg5.admin1_grid_id,
+                                 lg5.admin2_grid_id,
+                                 lg5.admin3_grid_id,
+                                 lg5.population,
+                                 IF(ROUND(lg5.population / IF(lg5.country_code = 'US', $wpdb->us_div, $wpdb->global_div )) < 1, 1,
+                                 ROUND(lg5.population / IF(lg5.country_code = 'US', $wpdb->us_div, $wpdb->global_div ))) as needed
+                             FROM $wpdb->dt_location_grid as lg5
+                             WHERE lg5.level = 3
+                               AND lg5.admin0_grid_id IN (100050711, 100219347, 100089589, 100074576, 100259978, 100018514)
+                               AND lg5.admin0_grid_id NOT IN
+                                 (100314737, 100083318, 100041128, 100133112, 100341242, 100132648, 100222839, 100379914, 100055707,
+                                 100379993, 100130389, 100255271, 100363975, 100248845, 100001527, 100342458, 100024289, 100132795,
+                                 100054605, 100253456, 100342975, 100074571)
+                    ) as tb2
+                    LEFT JOIN $wpdb->dt_location_grid loc ON tb2.admin2_grid_id=loc.grid_id
+                    GROUP BY tb2.admin2_grid_id
+                ", ARRAY_A );
+                break;
+            case 'a3':
+                $results = $wpdb->get_results("
+                    # 'Needs' GROUPED BY sub-county level
+                    SELECT tb3.admin3_grid_id as grid_id, loc.name, loc.country_code, SUM(tb3.population) as population, SUM(tb3.needed) as needed, (0) as reported, (0) as percent
+                    FROM (
+                             # 44395 Records
+                             SELECT
+                                 lg1.admin0_grid_id,
+                                 lg1.admin1_grid_id,
+                                 lg1.admin2_grid_id,
+                                 lg1.admin3_grid_id,
+                                 lg1.population,
+                                 IF(ROUND(lg1.population / IF(lg1.country_code = 'US', $wpdb->us_div, $wpdb->global_div )) < 1, 1,
+                                    ROUND(lg1.population / IF(lg1.country_code = 'US', $wpdb->us_div, $wpdb->global_div ))) as needed
+                             FROM $wpdb->dt_location_grid lg1
+                             WHERE lg1.level = 0
+                               AND lg1.grid_id NOT IN (SELECT lg11.admin0_grid_id
+                                                       FROM $wpdb->dt_location_grid lg11
+                                                       WHERE lg11.level = 1
+                                                         AND lg11.admin0_grid_id = lg1.grid_id)
+                               AND lg1.admin0_grid_id NOT IN (100050711, 100219347, 100089589, 100074576, 100259978, 100018514)
+                               AND lg1.admin0_grid_id NOT IN
+                                   (100314737, 100083318, 100041128, 100133112, 100341242, 100132648, 100222839, 100379914, 100055707,
+                                    100379993, 100130389, 100255271, 100363975, 100248845, 100001527, 100342458, 100024289, 100132795,
+                                    100054605, 100253456, 100342975, 100074571)
+                             UNION ALL
+                             SELECT
+                                 lg2.admin0_grid_id,
+                                 lg2.admin1_grid_id,
+                                 lg2.admin2_grid_id,
+                                 lg2.admin3_grid_id,
+                                 lg2.population,
+                                 IF(ROUND(lg2.population / IF(lg2.country_code = 'US', $wpdb->us_div, $wpdb->global_div )) < 1, 1,
+                                    ROUND(lg2.population / IF(lg2.country_code = 'US', $wpdb->us_div, $wpdb->global_div ))) as needed
+                             FROM $wpdb->dt_location_grid lg2
+                             WHERE lg2.level = 1
+                               AND lg2.grid_id NOT IN (SELECT lg22.admin1_grid_id
+                                                       FROM $wpdb->dt_location_grid lg22
+                                                       WHERE lg22.level = 2
+                                                         AND lg22.admin1_grid_id = lg2.grid_id)
+                               AND lg2.admin0_grid_id NOT IN (100050711, 100219347, 100089589, 100074576, 100259978, 100018514)
+                               AND lg2.admin0_grid_id NOT IN
+                                   (100314737, 100083318, 100041128, 100133112, 100341242, 100132648, 100222839, 100379914, 100055707,
+                                    100379993, 100130389, 100255271, 100363975, 100248845, 100001527, 100342458, 100024289, 100132795,
+                                    100054605, 100253456, 100342975, 100074571)
+                             UNION ALL
+                             SELECT
+                                 lg3.admin0_grid_id,
+                                 lg3.admin1_grid_id,
+                                 lg3.admin2_grid_id,
+                                 lg3.admin3_grid_id,
+                                 lg3.population,
+                                 IF(ROUND(lg3.population / IF(lg3.country_code = 'US', $wpdb->us_div, $wpdb->global_div )) < 1, 1,
+                                    ROUND(lg3.population / IF(lg3.country_code = 'US', $wpdb->us_div, $wpdb->global_div ))) as needed
+                             FROM $wpdb->dt_location_grid lg3
+                             WHERE lg3.level = 2
+                               AND lg3.admin0_grid_id NOT IN (100050711, 100219347, 100089589, 100074576, 100259978, 100018514)
+                               AND lg3.admin0_grid_id NOT IN
+                                   (100314737, 100083318, 100041128, 100133112, 100341242, 100132648, 100222839, 100379914, 100055707,
+                                    100379993, 100130389, 100255271, 100363975, 100248845, 100001527, 100342458, 100024289, 100132795,
+                                    100054605, 100253456, 100342975, 100074571)
+                             UNION ALL
+                             SELECT
+                                 lg4.admin0_grid_id,
+                                 lg4.admin1_grid_id,
+                                 lg4.admin2_grid_id,
+                                 lg4.admin3_grid_id,
+                                 lg4.population,
+                                 IF(ROUND(lg4.population / IF(lg4.country_code = 'US', $wpdb->us_div, $wpdb->global_div )) < 1, 1,
+                                    ROUND(lg4.population / IF(lg4.country_code = 'US', $wpdb->us_div, $wpdb->global_div ))) as needed
+                             FROM $wpdb->dt_location_grid lg4
+                             WHERE lg4.level = 1
+                               AND lg4.admin0_grid_id NOT IN (100050711, 100219347, 100089589, 100074576, 100259978, 100018514)
+                               AND lg4.admin0_grid_id IN
+                                   (100314737, 100083318, 100041128, 100133112, 100341242, 100132648, 100222839, 100379914, 100055707,
+                                    100379993, 100130389, 100255271, 100363975, 100248845, 100001527, 100342458, 100024289, 100132795,
+                                    100054605, 100253456, 100342975, 100074571)
+                             UNION ALL
+                             SELECT
+                                 lg5.admin0_grid_id,
+                                 lg5.admin1_grid_id,
+                                 lg5.admin2_grid_id,
+                                 lg5.admin3_grid_id,
+                                 lg5.population,
+                                 IF(ROUND(lg5.population / IF(lg5.country_code = 'US', $wpdb->us_div, $wpdb->global_div )) < 1, 1,
+                                    ROUND(lg5.population / IF(lg5.country_code = 'US', $wpdb->us_div, $wpdb->global_div ))) as needed
+                             FROM $wpdb->dt_location_grid as lg5
+                             WHERE lg5.level = 3
+                               AND lg5.admin0_grid_id IN (100050711, 100219347, 100089589, 100074576, 100259978, 100018514)
+                               AND lg5.admin0_grid_id NOT IN
+                                   (100314737, 100083318, 100041128, 100133112, 100341242, 100132648, 100222839, 100379914, 100055707,
+                                    100379993, 100130389, 100255271, 100363975, 100248845, 100001527, 100342458, 100024289, 100132795,
+                                    100054605, 100253456, 100342975, 100074571)
+                    ) as tb3
+                    LEFT JOIN $wpdb->dt_location_grid loc ON tb3.admin3_grid_id=loc.grid_id
+                    WHERE tb3.admin3_grid_id IS NOT NULL
+                    GROUP BY tb3.admin3_grid_id
+                ", ARRAY_A );
+                break;
+            case 'world':
+                $results = $wpdb->get_results("
+                    # World
+                    SELECT 1 as grid_id, 'World' as name,'' as country_code, SUM(tbw.population) as population, SUM(tbw.needed) as needed, (0) as reported, (0) as percent
+                    FROM (
+                             # 44395 Records
+                             SELECT
+                                 'World',
+                                 lg1.admin0_grid_id,
+                                 lg1.admin1_grid_id,
+                                 lg1.admin2_grid_id,
+                                 lg1.admin3_grid_id,
+                                 lg1.population,
+                                 IF(ROUND(lg1.population / IF(lg1.country_code = 'US', $wpdb->us_div, $wpdb->global_div )) < 1, 1,
+                                    ROUND(lg1.population / IF(lg1.country_code = 'US', $wpdb->us_div, $wpdb->global_div ))) as needed
+                             FROM $wpdb->dt_location_grid lg1
+                             WHERE lg1.level = 0
+                               AND lg1.grid_id NOT IN (SELECT lg11.admin0_grid_id
+                                                       FROM $wpdb->dt_location_grid lg11
+                                                       WHERE lg11.level = 1
+                                                         AND lg11.admin0_grid_id = lg1.grid_id)
+                               AND lg1.admin0_grid_id NOT IN (100050711, 100219347, 100089589, 100074576, 100259978, 100018514)
+                               AND lg1.admin0_grid_id NOT IN
+                                   (100314737, 100083318, 100041128, 100133112, 100341242, 100132648, 100222839, 100379914, 100055707,
+                                    100379993, 100130389, 100255271, 100363975, 100248845, 100001527, 100342458, 100024289, 100132795,
+                                    100054605, 100253456, 100342975, 100074571)
+                             UNION ALL
+                             SELECT
+                                 'World',
+                                 lg2.admin0_grid_id,
+                                 lg2.admin1_grid_id,
+                                 lg2.admin2_grid_id,
+                                 lg2.admin3_grid_id,
+                                 lg2.population,
+                                 IF(ROUND(lg2.population / IF(lg2.country_code = 'US', $wpdb->us_div, $wpdb->global_div )) < 1, 1,
+                                    ROUND(lg2.population / IF(lg2.country_code = 'US', $wpdb->us_div, $wpdb->global_div ))) as needed
+                             FROM $wpdb->dt_location_grid lg2
+                             WHERE lg2.level = 1
+                               AND lg2.grid_id NOT IN (SELECT lg22.admin1_grid_id
+                                                       FROM $wpdb->dt_location_grid lg22
+                                                       WHERE lg22.level = 2
+                                                         AND lg22.admin1_grid_id = lg2.grid_id)
+                               AND lg2.admin0_grid_id NOT IN (100050711, 100219347, 100089589, 100074576, 100259978, 100018514)
+                               AND lg2.admin0_grid_id NOT IN
+                                   (100314737, 100083318, 100041128, 100133112, 100341242, 100132648, 100222839, 100379914, 100055707,
+                                    100379993, 100130389, 100255271, 100363975, 100248845, 100001527, 100342458, 100024289, 100132795,
+                                    100054605, 100253456, 100342975, 100074571)
+                             UNION ALL
+                             SELECT
+                                 'World',
+                                 lg3.admin0_grid_id,
+                                 lg3.admin1_grid_id,
+                                 lg3.admin2_grid_id,
+                                 lg3.admin3_grid_id,
+                                 lg3.population,
+                                 IF(ROUND(lg3.population / IF(lg3.country_code = 'US', $wpdb->us_div, $wpdb->global_div )) < 1, 1,
+                                    ROUND(lg3.population / IF(lg3.country_code = 'US', $wpdb->us_div, $wpdb->global_div ))) as needed
+                             FROM $wpdb->dt_location_grid lg3
+                             WHERE lg3.level = 2
+                               AND lg3.admin0_grid_id NOT IN (100050711, 100219347, 100089589, 100074576, 100259978, 100018514)
+                               AND lg3.admin0_grid_id NOT IN
+                                   (100314737, 100083318, 100041128, 100133112, 100341242, 100132648, 100222839, 100379914, 100055707,
+                                    100379993, 100130389, 100255271, 100363975, 100248845, 100001527, 100342458, 100024289, 100132795,
+                                    100054605, 100253456, 100342975, 100074571)
+                             UNION ALL
+                             SELECT
+                                 'World',
+                                 lg4.admin0_grid_id,
+                                 lg4.admin1_grid_id,
+                                 lg4.admin2_grid_id,
+                                 lg4.admin3_grid_id,
+                                 lg4.population,
+                                 IF(ROUND(lg4.population / IF(lg4.country_code = 'US', $wpdb->us_div, $wpdb->global_div )) < 1, 1,
+                                    ROUND(lg4.population / IF(lg4.country_code = 'US', $wpdb->us_div, $wpdb->global_div ))) as needed
+                             FROM $wpdb->dt_location_grid lg4
+                             WHERE lg4.level = 1
+                               AND lg4.admin0_grid_id NOT IN (100050711, 100219347, 100089589, 100074576, 100259978, 100018514)
+                               AND lg4.admin0_grid_id IN
+                                   (100314737, 100083318, 100041128, 100133112, 100341242, 100132648, 100222839, 100379914, 100055707,
+                                    100379993, 100130389, 100255271, 100363975, 100248845, 100001527, 100342458, 100024289, 100132795,
+                                    100054605, 100253456, 100342975, 100074571)
+                             UNION ALL
+                             SELECT
+                                 'World',
+                                 lg5.admin0_grid_id,
+                                 lg5.admin1_grid_id,
+                                 lg5.admin2_grid_id,
+                                 lg5.admin3_grid_id,
+                                 lg5.population,
+                                 IF(ROUND(lg5.population / IF(lg5.country_code = 'US', $wpdb->us_div, $wpdb->global_div )) < 1, 1,
+                                    ROUND(lg5.population / IF(lg5.country_code = 'US', $wpdb->us_div, $wpdb->global_div ))) as needed
+                             FROM $wpdb->dt_location_grid as lg5
+                             WHERE lg5.level = 3
+                               AND lg5.admin0_grid_id IN (100050711, 100219347, 100089589, 100074576, 100259978, 100018514)
+                               AND lg5.admin0_grid_id NOT IN
+                                   (100314737, 100083318, 100041128, 100133112, 100341242, 100132648, 100222839, 100379914, 100055707,
+                                    100379993, 100130389, 100255271, 100363975, 100248845, 100001527, 100342458, 100024289, 100132795,
+                                    100054605, 100253456, 100342975, 100074571)
+                    ) as tbw
+                    LEFT JOIN $wpdb->dt_location_grid loc ON 1=loc.grid_id
+                    GROUP BY 'World';
+                ", ARRAY_A );
+                break;
+            default:
+                $results = $wpdb->get_results("
+                    # 48367 Records
+                    # 'Needs' GROUPED BY sub-county level
+                    SELECT tb3.admin3_grid_id as grid_id, loc.name, loc.country_code, SUM(tb3.population) as population, SUM(tb3.needed) as needed, (0) as reported, (0) as percent
+                    FROM (
+                             # 44395 Records
+                             SELECT
+                                 lg1.admin0_grid_id,
+                                 lg1.admin1_grid_id,
+                                 lg1.admin2_grid_id,
+                                 lg1.admin3_grid_id,
+                                 lg1.population,
+                                 IF(ROUND(lg1.population / IF(lg1.country_code = 'US', $wpdb->us_div, $wpdb->global_div )) < 1, 1,
+                                    ROUND(lg1.population / IF(lg1.country_code = 'US', $wpdb->us_div, $wpdb->global_div ))) as needed
+                             FROM $wpdb->dt_location_grid lg1
+                             WHERE lg1.level = 0
+                               AND lg1.grid_id NOT IN (SELECT lg11.admin0_grid_id
+                                                       FROM $wpdb->dt_location_grid lg11
+                                                       WHERE lg11.level = 1
+                                                         AND lg11.admin0_grid_id = lg1.grid_id)
+                               AND lg1.admin0_grid_id NOT IN (100050711, 100219347, 100089589, 100074576, 100259978, 100018514)
+                               AND lg1.admin0_grid_id NOT IN
+                                   (100314737, 100083318, 100041128, 100133112, 100341242, 100132648, 100222839, 100379914, 100055707,
+                                    100379993, 100130389, 100255271, 100363975, 100248845, 100001527, 100342458, 100024289, 100132795,
+                                    100054605, 100253456, 100342975, 100074571)
+                             UNION ALL
+                             SELECT
+                                 lg2.admin0_grid_id,
+                                 lg2.admin1_grid_id,
+                                 lg2.admin2_grid_id,
+                                 lg2.admin3_grid_id,
+                                 lg2.population,
+                                 IF(ROUND(lg2.population / IF(lg2.country_code = 'US', $wpdb->us_div, $wpdb->global_div )) < 1, 1,
+                                    ROUND(lg2.population / IF(lg2.country_code = 'US', $wpdb->us_div, $wpdb->global_div ))) as needed
+                             FROM $wpdb->dt_location_grid lg2
+                             WHERE lg2.level = 1
+                               AND lg2.grid_id NOT IN (SELECT lg22.admin1_grid_id
+                                                       FROM $wpdb->dt_location_grid lg22
+                                                       WHERE lg22.level = 2
+                                                         AND lg22.admin1_grid_id = lg2.grid_id)
+                               AND lg2.admin0_grid_id NOT IN (100050711, 100219347, 100089589, 100074576, 100259978, 100018514)
+                               AND lg2.admin0_grid_id NOT IN
+                                   (100314737, 100083318, 100041128, 100133112, 100341242, 100132648, 100222839, 100379914, 100055707,
+                                    100379993, 100130389, 100255271, 100363975, 100248845, 100001527, 100342458, 100024289, 100132795,
+                                    100054605, 100253456, 100342975, 100074571)
+                             UNION ALL
+                             SELECT
+                                 lg3.admin0_grid_id,
+                                 lg3.admin1_grid_id,
+                                 lg3.admin2_grid_id,
+                                 lg3.admin3_grid_id,
+                                 lg3.population,
+                                 IF(ROUND(lg3.population / IF(lg3.country_code = 'US', $wpdb->us_div, $wpdb->global_div )) < 1, 1,
+                                    ROUND(lg3.population / IF(lg3.country_code = 'US', $wpdb->us_div, $wpdb->global_div ))) as needed
+                             FROM $wpdb->dt_location_grid lg3
+                             WHERE lg3.level = 2
+                               AND lg3.admin0_grid_id NOT IN (100050711, 100219347, 100089589, 100074576, 100259978, 100018514)
+                               AND lg3.admin0_grid_id NOT IN
+                                   (100314737, 100083318, 100041128, 100133112, 100341242, 100132648, 100222839, 100379914, 100055707,
+                                    100379993, 100130389, 100255271, 100363975, 100248845, 100001527, 100342458, 100024289, 100132795,
+                                    100054605, 100253456, 100342975, 100074571)
+                             UNION ALL
+                             SELECT
+                                 lg4.admin0_grid_id,
+                                 lg4.admin1_grid_id,
+                                 lg4.admin2_grid_id,
+                                 lg4.admin3_grid_id,
+                                 lg4.population,
+                                 IF(ROUND(lg4.population / IF(lg4.country_code = 'US', $wpdb->us_div, $wpdb->global_div )) < 1, 1,
+                                    ROUND(lg4.population / IF(lg4.country_code = 'US', $wpdb->us_div, $wpdb->global_div ))) as needed
+                             FROM $wpdb->dt_location_grid lg4
+                             WHERE lg4.level = 1
+                               AND lg4.admin0_grid_id NOT IN (100050711, 100219347, 100089589, 100074576, 100259978, 100018514)
+                               AND lg4.admin0_grid_id IN
+                                   (100314737, 100083318, 100041128, 100133112, 100341242, 100132648, 100222839, 100379914, 100055707,
+                                    100379993, 100130389, 100255271, 100363975, 100248845, 100001527, 100342458, 100024289, 100132795,
+                                    100054605, 100253456, 100342975, 100074571)
+                             UNION ALL
+                             SELECT
+                                 lg5.admin0_grid_id,
+                                 lg5.admin1_grid_id,
+                                 lg5.admin2_grid_id,
+                                 lg5.admin3_grid_id,
+                                 lg5.population,
+                                 IF(ROUND(lg5.population / IF(lg5.country_code = 'US', $wpdb->us_div, $wpdb->global_div )) < 1, 1,
+                                    ROUND(lg5.population / IF(lg5.country_code = 'US', $wpdb->us_div, $wpdb->global_div ))) as needed
+                             FROM $wpdb->dt_location_grid as lg5
+                             WHERE lg5.level = 3
+                               AND lg5.admin0_grid_id IN (100050711, 100219347, 100089589, 100074576, 100259978, 100018514)
+                               AND lg5.admin0_grid_id NOT IN
+                                   (100314737, 100083318, 100041128, 100133112, 100341242, 100132648, 100222839, 100379914, 100055707,
+                                    100379993, 100130389, 100255271, 100363975, 100248845, 100001527, 100342458, 100024289, 100132795,
+                                    100054605, 100253456, 100342975, 100074571)
+                    ) as tb3
+                    LEFT JOIN $wpdb->dt_location_grid loc ON tb3.admin3_grid_id=loc.grid_id
+                    WHERE tb3.admin3_grid_id IS NOT NULL
+                    GROUP BY tb3.admin3_grid_id
+
+                    UNION ALL
+
+                    # 'Needs' GROUPED BY county level
+                    SELECT tb2.admin2_grid_id as grid_id, loc.name, loc.country_code, SUM(tb2.population) as population, SUM(tb2.needed) as needed, (0) as reported, (0) as percent
+                    FROM (
+                             SELECT
+                                 lg1.admin0_grid_id,
+                                 lg1.admin1_grid_id,
+                                 lg1.admin2_grid_id,
+                                 lg1.admin3_grid_id,
+                                 lg1.population,
+                                 IF(ROUND(lg1.population / IF(lg1.country_code = 'US', $wpdb->us_div, $wpdb->global_div )) < 1, 1,
+                                    ROUND(lg1.population / IF(lg1.country_code = 'US', $wpdb->us_div, $wpdb->global_div ))) as needed
+                             FROM $wpdb->dt_location_grid lg1
+                             WHERE lg1.level = 0
+                               AND lg1.grid_id NOT IN (SELECT lg11.admin0_grid_id
+                                 FROM $wpdb->dt_location_grid lg11
+                                 WHERE lg11.level = 1
+                               AND lg11.admin0_grid_id = lg1.grid_id)
+                               AND lg1.admin0_grid_id NOT IN (100050711, 100219347, 100089589, 100074576, 100259978, 100018514)
+                               AND lg1.admin0_grid_id NOT IN
+                                 (100314737, 100083318, 100041128, 100133112, 100341242, 100132648, 100222839, 100379914, 100055707,
+                                 100379993, 100130389, 100255271, 100363975, 100248845, 100001527, 100342458, 100024289, 100132795,
+                                 100054605, 100253456, 100342975, 100074571)
+                             UNION ALL
+                             SELECT
+                                 lg2.admin0_grid_id,
+                                 lg2.admin1_grid_id,
+                                 lg2.admin2_grid_id,
+                                 lg2.admin3_grid_id,
+                                 lg2.population,
+                                 IF(ROUND(lg2.population / IF(lg2.country_code = 'US', $wpdb->us_div, $wpdb->global_div )) < 1, 1,
+                                 ROUND(lg2.population / IF(lg2.country_code = 'US', $wpdb->us_div, $wpdb->global_div ))) as needed
+                             FROM $wpdb->dt_location_grid lg2
+                             WHERE lg2.level = 1
+                               AND lg2.grid_id NOT IN (SELECT lg22.admin1_grid_id
+                                 FROM $wpdb->dt_location_grid lg22
+                                 WHERE lg22.level = 2
+                               AND lg22.admin1_grid_id = lg2.grid_id)
+                               AND lg2.admin0_grid_id NOT IN (100050711, 100219347, 100089589, 100074576, 100259978, 100018514)
+                               AND lg2.admin0_grid_id NOT IN
+                                 (100314737, 100083318, 100041128, 100133112, 100341242, 100132648, 100222839, 100379914, 100055707,
+                                 100379993, 100130389, 100255271, 100363975, 100248845, 100001527, 100342458, 100024289, 100132795,
+                                 100054605, 100253456, 100342975, 100074571)
+                             UNION ALL
+                             SELECT
+                                 lg3.admin0_grid_id,
+                                 lg3.admin1_grid_id,
+                                 lg3.admin2_grid_id,
+                                 lg3.admin3_grid_id,
+                                 lg3.population,
+                                 IF(ROUND(lg3.population / IF(lg3.country_code = 'US', $wpdb->us_div, $wpdb->global_div )) < 1, 1,
+                                 ROUND(lg3.population / IF(lg3.country_code = 'US', $wpdb->us_div, $wpdb->global_div ))) as needed
+                             FROM $wpdb->dt_location_grid lg3
+                             WHERE lg3.level = 2
+                               AND lg3.admin0_grid_id NOT IN (100050711, 100219347, 100089589, 100074576, 100259978, 100018514)
+                               AND lg3.admin0_grid_id NOT IN
+                                 (100314737, 100083318, 100041128, 100133112, 100341242, 100132648, 100222839, 100379914, 100055707,
+                                 100379993, 100130389, 100255271, 100363975, 100248845, 100001527, 100342458, 100024289, 100132795,
+                                 100054605, 100253456, 100342975, 100074571)
+                             UNION ALL
+                             SELECT
+                                 lg4.admin0_grid_id,
+                                 lg4.admin1_grid_id,
+                                 lg4.admin2_grid_id,
+                                 lg4.admin3_grid_id,
+                                 lg4.population,
+                                 IF(ROUND(lg4.population / IF(lg4.country_code = 'US', $wpdb->us_div, $wpdb->global_div )) < 1, 1,
+                                 ROUND(lg4.population / IF(lg4.country_code = 'US', $wpdb->us_div, $wpdb->global_div ))) as needed
+                             FROM $wpdb->dt_location_grid lg4
+                             WHERE lg4.level = 1
+                               AND lg4.admin0_grid_id NOT IN (100050711, 100219347, 100089589, 100074576, 100259978, 100018514)
+                               AND lg4.admin0_grid_id IN
+                                 (100314737, 100083318, 100041128, 100133112, 100341242, 100132648, 100222839, 100379914, 100055707,
+                                 100379993, 100130389, 100255271, 100363975, 100248845, 100001527, 100342458, 100024289, 100132795,
+                                 100054605, 100253456, 100342975, 100074571)
+                             UNION ALL
+                             SELECT
+                                 lg5.admin0_grid_id,
+                                 lg5.admin1_grid_id,
+                                 lg5.admin2_grid_id,
+                                 lg5.admin3_grid_id,
+                                 lg5.population,
+                                 IF(ROUND(lg5.population / IF(lg5.country_code = 'US', $wpdb->us_div, $wpdb->global_div )) < 1, 1,
+                                 ROUND(lg5.population / IF(lg5.country_code = 'US', $wpdb->us_div, $wpdb->global_div ))) as needed
+                             FROM $wpdb->dt_location_grid as lg5
+                             WHERE lg5.level = 3
+                               AND lg5.admin0_grid_id IN (100050711, 100219347, 100089589, 100074576, 100259978, 100018514)
+                               AND lg5.admin0_grid_id NOT IN
+                                 (100314737, 100083318, 100041128, 100133112, 100341242, 100132648, 100222839, 100379914, 100055707,
+                                 100379993, 100130389, 100255271, 100363975, 100248845, 100001527, 100342458, 100024289, 100132795,
+                                 100054605, 100253456, 100342975, 100074571)
+                    ) as tb2
+                    LEFT JOIN $wpdb->dt_location_grid loc ON tb2.admin2_grid_id=loc.grid_id
+                    GROUP BY tb2.admin2_grid_id
+
+                    UNION ALL
+
+                    # 'Needs' GROUPED BY state level
+                    SELECT tb1.admin1_grid_id as grid_id, loc.name, loc.country_code, SUM(tb1.population) as population, SUM(tb1.needed) as needed, (0) as reported, (0) as percent
+                    FROM (
+                             SELECT
+                                 lg1.admin0_grid_id,
+                                 lg1.admin1_grid_id,
+                                 lg1.admin2_grid_id,
+                                 lg1.admin3_grid_id,
+                                 lg1.population,
+                                 IF(ROUND(lg1.population / IF(lg1.country_code = 'US', $wpdb->us_div, $wpdb->global_div )) < 1, 1,
+                                    ROUND(lg1.population / IF(lg1.country_code = 'US', $wpdb->us_div, $wpdb->global_div ))) as needed
+                             FROM $wpdb->dt_location_grid lg1
+                             WHERE lg1.level = 0
+                               AND lg1.grid_id NOT IN (SELECT lg11.admin0_grid_id
+                                                       FROM $wpdb->dt_location_grid lg11
+                                                       WHERE lg11.level = 1
+                                                         AND lg11.admin0_grid_id = lg1.grid_id)
+                               AND lg1.admin0_grid_id NOT IN (100050711, 100219347, 100089589, 100074576, 100259978, 100018514)
+                               AND lg1.admin0_grid_id NOT IN
+                                   (100314737, 100083318, 100041128, 100133112, 100341242, 100132648, 100222839, 100379914, 100055707,
+                                    100379993, 100130389, 100255271, 100363975, 100248845, 100001527, 100342458, 100024289, 100132795,
+                                    100054605, 100253456, 100342975, 100074571)
+                             UNION ALL
+                             SELECT
+                                 lg2.admin0_grid_id,
+                                 lg2.admin1_grid_id,
+                                 lg2.admin2_grid_id,
+                                 lg2.admin3_grid_id,
+                                 lg2.population,
+                                 IF(ROUND(lg2.population / IF(lg2.country_code = 'US', $wpdb->us_div, $wpdb->global_div )) < 1, 1,
+                                    ROUND(lg2.population / IF(lg2.country_code = 'US', $wpdb->us_div, $wpdb->global_div ))) as needed
+                             FROM $wpdb->dt_location_grid lg2
+                             WHERE lg2.level = 1
+                               AND lg2.grid_id NOT IN (SELECT lg22.admin1_grid_id
+                                                       FROM $wpdb->dt_location_grid lg22
+                                                       WHERE lg22.level = 2
+                                                         AND lg22.admin1_grid_id = lg2.grid_id)
+                               AND lg2.admin0_grid_id NOT IN (100050711, 100219347, 100089589, 100074576, 100259978, 100018514)
+                               AND lg2.admin0_grid_id NOT IN
+                                   (100314737, 100083318, 100041128, 100133112, 100341242, 100132648, 100222839, 100379914, 100055707,
+                                    100379993, 100130389, 100255271, 100363975, 100248845, 100001527, 100342458, 100024289, 100132795,
+                                    100054605, 100253456, 100342975, 100074571)
+                             UNION ALL
+                             SELECT
+                                 lg3.admin0_grid_id,
+                                 lg3.admin1_grid_id,
+                                 lg3.admin2_grid_id,
+                                 lg3.admin3_grid_id,
+                                 lg3.population,
+                                 IF(ROUND(lg3.population / IF(lg3.country_code = 'US', $wpdb->us_div, $wpdb->global_div )) < 1, 1,
+                                    ROUND(lg3.population / IF(lg3.country_code = 'US', $wpdb->us_div, $wpdb->global_div ))) as needed
+                             FROM $wpdb->dt_location_grid lg3
+                             WHERE lg3.level = 2
+                               AND lg3.admin0_grid_id NOT IN (100050711, 100219347, 100089589, 100074576, 100259978, 100018514)
+                               AND lg3.admin0_grid_id NOT IN
+                                   (100314737, 100083318, 100041128, 100133112, 100341242, 100132648, 100222839, 100379914, 100055707,
+                                    100379993, 100130389, 100255271, 100363975, 100248845, 100001527, 100342458, 100024289, 100132795,
+                                    100054605, 100253456, 100342975, 100074571)
+                             UNION ALL
+                             SELECT
+                                 lg4.admin0_grid_id,
+                                 lg4.admin1_grid_id,
+                                 lg4.admin2_grid_id,
+                                 lg4.admin3_grid_id,
+                                 lg4.population,
+                                 IF(ROUND(lg4.population / IF(lg4.country_code = 'US', $wpdb->us_div, $wpdb->global_div )) < 1, 1,
+                                    ROUND(lg4.population / IF(lg4.country_code = 'US', $wpdb->us_div, $wpdb->global_div ))) as needed
+                             FROM $wpdb->dt_location_grid lg4
+                             WHERE lg4.level = 1
+                               AND lg4.admin0_grid_id NOT IN (100050711, 100219347, 100089589, 100074576, 100259978, 100018514)
+                               AND lg4.admin0_grid_id IN
+                                   (100314737, 100083318, 100041128, 100133112, 100341242, 100132648, 100222839, 100379914, 100055707,
+                                    100379993, 100130389, 100255271, 100363975, 100248845, 100001527, 100342458, 100024289, 100132795,
+                                    100054605, 100253456, 100342975, 100074571)
+                             UNION ALL
+                             SELECT
+                                 lg5.admin0_grid_id,
+                                 lg5.admin1_grid_id,
+                                 lg5.admin2_grid_id,
+                                 lg5.admin3_grid_id,
+                                 lg5.population,
+                                 IF(ROUND(lg5.population / IF(lg5.country_code = 'US', $wpdb->us_div, $wpdb->global_div )) < 1, 1,
+                                    ROUND(lg5.population / IF(lg5.country_code = 'US', $wpdb->us_div, $wpdb->global_div ))) as needed
+                             FROM $wpdb->dt_location_grid as lg5
+                             WHERE lg5.level = 3
+                               AND lg5.admin0_grid_id IN (100050711, 100219347, 100089589, 100074576, 100259978, 100018514)
+                               AND lg5.admin0_grid_id NOT IN
+                                   (100314737, 100083318, 100041128, 100133112, 100341242, 100132648, 100222839, 100379914, 100055707,
+                                    100379993, 100130389, 100255271, 100363975, 100248845, 100001527, 100342458, 100024289, 100132795,
+                                    100054605, 100253456, 100342975, 100074571)
+                    ) as tb1
+                    LEFT JOIN $wpdb->dt_location_grid loc ON tb1.admin1_grid_id=loc.grid_id
+                    GROUP BY tb1.admin1_grid_id
+
+                    UNION ALL
+
+                    # 'Needs' GROUPED BY country
+                    SELECT tb0.admin0_grid_id as grid_id, loc.name,loc.country_code, SUM(tb0.population) as population, SUM(tb0.needed) as needed, (0) as reported, (0) as percent
+                    FROM (
+                             # 44395 Records
+                             SELECT
+                                 lg1.admin0_grid_id,
+                                 lg1.admin1_grid_id,
+                                 lg1.admin2_grid_id,
+                                 lg1.admin3_grid_id,
+                                 lg1.population,
+                                 IF(ROUND(lg1.population / IF(lg1.country_code = 'US', $wpdb->us_div, $wpdb->global_div )) < 1, 1,
+                                    ROUND(lg1.population / IF(lg1.country_code = 'US', $wpdb->us_div, $wpdb->global_div ))) as needed
+                             FROM $wpdb->dt_location_grid lg1
+                             WHERE lg1.level = 0
+                               AND lg1.grid_id NOT IN (SELECT lg11.admin0_grid_id
+                                                       FROM $wpdb->dt_location_grid lg11
+                                                       WHERE lg11.level = 1
+                                                         AND lg11.admin0_grid_id = lg1.grid_id)
+                               AND lg1.admin0_grid_id NOT IN (100050711, 100219347, 100089589, 100074576, 100259978, 100018514)
+                               AND lg1.admin0_grid_id NOT IN
+                                   (100314737, 100083318, 100041128, 100133112, 100341242, 100132648, 100222839, 100379914, 100055707,
+                                    100379993, 100130389, 100255271, 100363975, 100248845, 100001527, 100342458, 100024289, 100132795,
+                                    100054605, 100253456, 100342975, 100074571)
+                             UNION ALL
+                             SELECT
+                                 lg2.admin0_grid_id,
+                                 lg2.admin1_grid_id,
+                                 lg2.admin2_grid_id,
+                                 lg2.admin3_grid_id,
+                                 lg2.population,
+                                 IF(ROUND(lg2.population / IF(lg2.country_code = 'US', $wpdb->us_div, $wpdb->global_div )) < 1, 1,
+                                    ROUND(lg2.population / IF(lg2.country_code = 'US', $wpdb->us_div, $wpdb->global_div ))) as needed
+                             FROM $wpdb->dt_location_grid lg2
+                             WHERE lg2.level = 1
+                               AND lg2.grid_id NOT IN (SELECT lg22.admin1_grid_id
+                                                       FROM $wpdb->dt_location_grid lg22
+                                                       WHERE lg22.level = 2
+                                                         AND lg22.admin1_grid_id = lg2.grid_id)
+                               AND lg2.admin0_grid_id NOT IN (100050711, 100219347, 100089589, 100074576, 100259978, 100018514)
+                               AND lg2.admin0_grid_id NOT IN
+                                   (100314737, 100083318, 100041128, 100133112, 100341242, 100132648, 100222839, 100379914, 100055707,
+                                    100379993, 100130389, 100255271, 100363975, 100248845, 100001527, 100342458, 100024289, 100132795,
+                                    100054605, 100253456, 100342975, 100074571)
+                             UNION ALL
+                             SELECT
+                                 lg3.admin0_grid_id,
+                                 lg3.admin1_grid_id,
+                                 lg3.admin2_grid_id,
+                                 lg3.admin3_grid_id,
+                                 lg3.population,
+                                 IF(ROUND(lg3.population / IF(lg3.country_code = 'US', $wpdb->us_div, $wpdb->global_div )) < 1, 1,
+                                    ROUND(lg3.population / IF(lg3.country_code = 'US', $wpdb->us_div, $wpdb->global_div ))) as needed
+                             FROM $wpdb->dt_location_grid lg3
+                             WHERE lg3.level = 2
+                               AND lg3.admin0_grid_id NOT IN (100050711, 100219347, 100089589, 100074576, 100259978, 100018514)
+                               AND lg3.admin0_grid_id NOT IN
+                                   (100314737, 100083318, 100041128, 100133112, 100341242, 100132648, 100222839, 100379914, 100055707,
+                                    100379993, 100130389, 100255271, 100363975, 100248845, 100001527, 100342458, 100024289, 100132795,
+                                    100054605, 100253456, 100342975, 100074571)
+                             UNION ALL
+                             SELECT
+                                 lg4.admin0_grid_id,
+                                 lg4.admin1_grid_id,
+                                 lg4.admin2_grid_id,
+                                 lg4.admin3_grid_id,
+                                 lg4.population,
+                                 IF(ROUND(lg4.population / IF(lg4.country_code = 'US', $wpdb->us_div, $wpdb->global_div )) < 1, 1,
+                                    ROUND(lg4.population / IF(lg4.country_code = 'US', $wpdb->us_div, $wpdb->global_div ))) as needed
+                             FROM $wpdb->dt_location_grid lg4
+                             WHERE lg4.level = 1
+                               AND lg4.admin0_grid_id NOT IN (100050711, 100219347, 100089589, 100074576, 100259978, 100018514)
+                               AND lg4.admin0_grid_id IN
+                                   (100314737, 100083318, 100041128, 100133112, 100341242, 100132648, 100222839, 100379914, 100055707,
+                                    100379993, 100130389, 100255271, 100363975, 100248845, 100001527, 100342458, 100024289, 100132795,
+                                    100054605, 100253456, 100342975, 100074571)
+                             UNION ALL
+                             SELECT
+                                 lg5.admin0_grid_id,
+                                 lg5.admin1_grid_id,
+                                 lg5.admin2_grid_id,
+                                 lg5.admin3_grid_id,
+                                 lg5.population,
+                                 IF(ROUND(lg5.population / IF(lg5.country_code = 'US', $wpdb->us_div, $wpdb->global_div )) < 1, 1,
+                                    ROUND(lg5.population / IF(lg5.country_code = 'US', $wpdb->us_div, $wpdb->global_div ))) as needed
+                             FROM $wpdb->dt_location_grid as lg5
+                             WHERE lg5.level = 3
+                               AND lg5.admin0_grid_id IN (100050711, 100219347, 100089589, 100074576, 100259978, 100018514)
+                               AND lg5.admin0_grid_id NOT IN
+                                   (100314737, 100083318, 100041128, 100133112, 100341242, 100132648, 100222839, 100379914, 100055707,
+                                    100379993, 100130389, 100255271, 100363975, 100248845, 100001527, 100342458, 100024289, 100132795,
+                                    100054605, 100253456, 100342975, 100074571)
+                    ) as tb0
+                    LEFT JOIN $wpdb->dt_location_grid loc ON tb0.admin0_grid_id=loc.grid_id
+                    GROUP BY tb0.admin0_grid_id
+
+                    UNION ALL
+
+                    # World
+                    SELECT 1 as grid_id, 'World','' as country_code, SUM(tbw.population) as population, SUM(tbw.needed) as needed, (0) as reported, (0) as percent
+                    FROM (
+                             # 44395 Records
+                             SELECT
+                                 'World',
+                                 lg1.admin0_grid_id,
+                                 lg1.admin1_grid_id,
+                                 lg1.admin2_grid_id,
+                                 lg1.admin3_grid_id,
+                                 lg1.population,
+                                 IF(ROUND(lg1.population / IF(lg1.country_code = 'US', $wpdb->us_div, $wpdb->global_div )) < 1, 1,
+                                    ROUND(lg1.population / IF(lg1.country_code = 'US', $wpdb->us_div, $wpdb->global_div ))) as needed
+                             FROM $wpdb->dt_location_grid lg1
+                             WHERE lg1.level = 0
+                               AND lg1.grid_id NOT IN (SELECT lg11.admin0_grid_id
+                                                       FROM $wpdb->dt_location_grid lg11
+                                                       WHERE lg11.level = 1
+                                                         AND lg11.admin0_grid_id = lg1.grid_id)
+                               AND lg1.admin0_grid_id NOT IN (100050711, 100219347, 100089589, 100074576, 100259978, 100018514)
+                               AND lg1.admin0_grid_id NOT IN
+                                   (100314737, 100083318, 100041128, 100133112, 100341242, 100132648, 100222839, 100379914, 100055707,
+                                    100379993, 100130389, 100255271, 100363975, 100248845, 100001527, 100342458, 100024289, 100132795,
+                                    100054605, 100253456, 100342975, 100074571)
+                             UNION ALL
+                             SELECT
+                                 'World',
+                                 lg2.admin0_grid_id,
+                                 lg2.admin1_grid_id,
+                                 lg2.admin2_grid_id,
+                                 lg2.admin3_grid_id,
+                                 lg2.population,
+                                 IF(ROUND(lg2.population / IF(lg2.country_code = 'US', $wpdb->us_div, $wpdb->global_div )) < 1, 1,
+                                    ROUND(lg2.population / IF(lg2.country_code = 'US', $wpdb->us_div, $wpdb->global_div ))) as needed
+                             FROM $wpdb->dt_location_grid lg2
+                             WHERE lg2.level = 1
+                               AND lg2.grid_id NOT IN (SELECT lg22.admin1_grid_id
+                                                       FROM $wpdb->dt_location_grid lg22
+                                                       WHERE lg22.level = 2
+                                                         AND lg22.admin1_grid_id = lg2.grid_id)
+                               AND lg2.admin0_grid_id NOT IN (100050711, 100219347, 100089589, 100074576, 100259978, 100018514)
+                               AND lg2.admin0_grid_id NOT IN
+                                   (100314737, 100083318, 100041128, 100133112, 100341242, 100132648, 100222839, 100379914, 100055707,
+                                    100379993, 100130389, 100255271, 100363975, 100248845, 100001527, 100342458, 100024289, 100132795,
+                                    100054605, 100253456, 100342975, 100074571)
+                             UNION ALL
+                             SELECT
+                                 'World',
+                                 lg3.admin0_grid_id,
+                                 lg3.admin1_grid_id,
+                                 lg3.admin2_grid_id,
+                                 lg3.admin3_grid_id,
+                                 lg3.population,
+                                 IF(ROUND(lg3.population / IF(lg3.country_code = 'US', $wpdb->us_div, $wpdb->global_div )) < 1, 1,
+                                    ROUND(lg3.population / IF(lg3.country_code = 'US', $wpdb->us_div, $wpdb->global_div ))) as needed
+                             FROM $wpdb->dt_location_grid lg3
+                             WHERE lg3.level = 2
+                               AND lg3.admin0_grid_id NOT IN (100050711, 100219347, 100089589, 100074576, 100259978, 100018514)
+                               AND lg3.admin0_grid_id NOT IN
+                                   (100314737, 100083318, 100041128, 100133112, 100341242, 100132648, 100222839, 100379914, 100055707,
+                                    100379993, 100130389, 100255271, 100363975, 100248845, 100001527, 100342458, 100024289, 100132795,
+                                    100054605, 100253456, 100342975, 100074571)
+                             UNION ALL
+                             SELECT
+                                 'World',
+                                 lg4.admin0_grid_id,
+                                 lg4.admin1_grid_id,
+                                 lg4.admin2_grid_id,
+                                 lg4.admin3_grid_id,
+                                 lg4.population,
+                                 IF(ROUND(lg4.population / IF(lg4.country_code = 'US', $wpdb->us_div, $wpdb->global_div )) < 1, 1,
+                                    ROUND(lg4.population / IF(lg4.country_code = 'US', $wpdb->us_div, $wpdb->global_div ))) as needed
+                             FROM $wpdb->dt_location_grid lg4
+                             WHERE lg4.level = 1
+                               AND lg4.admin0_grid_id NOT IN (100050711, 100219347, 100089589, 100074576, 100259978, 100018514)
+                               AND lg4.admin0_grid_id IN
+                                   (100314737, 100083318, 100041128, 100133112, 100341242, 100132648, 100222839, 100379914, 100055707,
+                                    100379993, 100130389, 100255271, 100363975, 100248845, 100001527, 100342458, 100024289, 100132795,
+                                    100054605, 100253456, 100342975, 100074571)
+                             UNION ALL
+                             SELECT
+                                 'World',
+                                 lg5.admin0_grid_id,
+                                 lg5.admin1_grid_id,
+                                 lg5.admin2_grid_id,
+                                 lg5.admin3_grid_id,
+                                 lg5.population,
+                                 IF(ROUND(lg5.population / IF(lg5.country_code = 'US', $wpdb->us_div, $wpdb->global_div )) < 1, 1,
+                                    ROUND(lg5.population / IF(lg5.country_code = 'US', $wpdb->us_div, $wpdb->global_div ))) as needed
+                             FROM $wpdb->dt_location_grid as lg5
+                             WHERE lg5.level = 3
+                               AND lg5.admin0_grid_id IN (100050711, 100219347, 100089589, 100074576, 100259978, 100018514)
+                               AND lg5.admin0_grid_id NOT IN
+                                   (100314737, 100083318, 100041128, 100133112, 100341242, 100132648, 100222839, 100379914, 100055707,
+                                    100379993, 100130389, 100255271, 100363975, 100248845, 100001527, 100342458, 100024289, 100132795,
+                                    100054605, 100253456, 100342975, 100074571)
+                    ) as tbw
+                    LEFT JOIN $wpdb->dt_location_grid loc ON 1=loc.grid_id
+                    GROUP BY 'World';
+                ", ARRAY_A );
+        }
+        dt_write_log( $wpdb->last_query );
+
+        if ( empty( $results ) ) {
+            return [];
+        }
+        return $results;
+    }
 
     public static function query_church_grid_totals( $administrative_level = null ) {
         global $wpdb;
@@ -627,131 +1481,6 @@ class Zume_Public_Heatmap_Queries {
         return $list;
     }
 
-    public static function query_training_location_grid_totals( $status = null, $simple = false ) {
-
-        global $wpdb;
-
-        if ( $status ) {
-            $results = $wpdb->get_results( $wpdb->prepare( "
-            SELECT t0.admin0_grid_id as grid_id, count(t0.admin0_grid_id) as count
-            FROM (
-                SELECT lg.admin0_grid_id, lg.admin1_grid_id, lg.admin2_grid_id, lg.admin3_grid_id, lg.admin4_grid_id, lg.admin5_grid_id
-                FROM $wpdb->postmeta as pm
-                JOIN $wpdb->posts as p ON p.ID=pm.post_id AND p.post_type = 'trainings'
-                JOIN $wpdb->postmeta as pm3 ON pm3.post_id=pm.post_id AND pm3.meta_key = 'status' AND pm3.meta_value = %s
-                LEFT JOIN $wpdb->dt_location_grid as lg ON pm.meta_value=lg.grid_id
-                WHERE pm.meta_key = 'location_grid'
-            ) as t0
-            GROUP BY t0.admin0_grid_id
-            UNION
-            SELECT t1.admin1_grid_id as grid_id, count(t1.admin1_grid_id) as count
-            FROM (
-                SELECT lg.admin0_grid_id, lg.admin1_grid_id, lg.admin2_grid_id, lg.admin3_grid_id, lg.admin4_grid_id, lg.admin5_grid_id
-                FROM $wpdb->postmeta as pm
-                JOIN $wpdb->posts as p ON p.ID=pm.post_id AND p.post_type = 'trainings'
-                JOIN $wpdb->postmeta as pm3 ON pm3.post_id=pm.post_id AND pm3.meta_key = 'status' AND pm3.meta_value = %s
-                LEFT JOIN $wpdb->dt_location_grid as lg ON pm.meta_value=lg.grid_id
-                WHERE pm.meta_key = 'location_grid'
-            ) as t1
-            GROUP BY t1.admin1_grid_id
-            UNION
-            SELECT t2.admin2_grid_id as grid_id, count(t2.admin2_grid_id) as count
-            FROM (
-                SELECT lg.admin0_grid_id, lg.admin1_grid_id, lg.admin2_grid_id, lg.admin3_grid_id, lg.admin4_grid_id, lg.admin5_grid_id
-                FROM $wpdb->postmeta as pm
-                JOIN $wpdb->posts as p ON p.ID=pm.post_id AND p.post_type = 'trainings'
-                JOIN $wpdb->postmeta as pm3 ON pm3.post_id=pm.post_id AND pm3.meta_key = 'status' AND pm3.meta_value = %s
-                LEFT JOIN $wpdb->dt_location_grid as lg ON pm.meta_value=lg.grid_id
-                WHERE pm.meta_key = 'location_grid'
-            ) as t2
-            GROUP BY t2.admin2_grid_id
-            UNION
-            SELECT t3.admin3_grid_id as grid_id, count(t3.admin3_grid_id) as count
-            FROM (
-                SELECT lg.admin0_grid_id, lg.admin1_grid_id, lg.admin2_grid_id, lg.admin3_grid_id, lg.admin4_grid_id, lg.admin5_grid_id
-                FROM $wpdb->postmeta as pm
-                JOIN $wpdb->posts as p ON p.ID=pm.post_id AND p.post_type = 'trainings'
-                JOIN $wpdb->postmeta as pm3 ON pm3.post_id=pm.post_id AND pm3.meta_key = 'status' AND pm3.meta_value = %s
-                LEFT JOIN $wpdb->dt_location_grid as lg ON pm.meta_value=lg.grid_id
-                WHERE pm.meta_key = 'location_grid'
-            ) as t3
-            GROUP BY t3.admin3_grid_id
-            ", $status, $status, $status, $status
-            ), ARRAY_A );
-
-        } else {
-
-            $results = $wpdb->get_results( "
-            SELECT t0.admin0_grid_id as grid_id, count(t0.admin0_grid_id) as count
-            FROM (
-             SELECT lg.admin0_grid_id, lg.admin1_grid_id, lg.admin2_grid_id, lg.admin3_grid_id, lg.admin4_grid_id, lg.admin5_grid_id
-                FROM $wpdb->postmeta as pm
-                JOIN $wpdb->posts as p ON p.ID=pm.post_id AND p.post_type = 'trainings'
-                LEFT JOIN $wpdb->dt_location_grid as lg ON pm.meta_value=lg.grid_id
-                WHERE pm.meta_key = 'location_grid'
-            ) as t0
-            GROUP BY t0.admin0_grid_id
-            UNION
-            SELECT t1.admin1_grid_id as grid_id, count(t1.admin1_grid_id) as count
-            FROM (
-                SELECT lg.admin0_grid_id, lg.admin1_grid_id, lg.admin2_grid_id, lg.admin3_grid_id, lg.admin4_grid_id, lg.admin5_grid_id
-                FROM $wpdb->postmeta as pm
-                JOIN $wpdb->posts as p ON p.ID=pm.post_id AND p.post_type = 'trainings'
-                LEFT JOIN $wpdb->dt_location_grid as lg ON pm.meta_value=lg.grid_id
-                WHERE pm.meta_key = 'location_grid'
-            ) as t1
-            GROUP BY t1.admin1_grid_id
-            UNION
-            SELECT t2.admin2_grid_id as grid_id, count(t2.admin2_grid_id) as count
-            FROM (
-                SELECT lg.admin0_grid_id, lg.admin1_grid_id, lg.admin2_grid_id, lg.admin3_grid_id, lg.admin4_grid_id, lg.admin5_grid_id
-                FROM $wpdb->postmeta as pm
-                JOIN $wpdb->posts as p ON p.ID=pm.post_id AND p.post_type = 'trainings'
-                LEFT JOIN $wpdb->dt_location_grid as lg ON pm.meta_value=lg.grid_id
-                WHERE pm.meta_key = 'location_grid'
-            ) as t2
-            GROUP BY t2.admin2_grid_id
-            UNION
-            SELECT t3.admin3_grid_id as grid_id, count(t3.admin3_grid_id) as count
-            FROM (
-                SELECT lg.admin0_grid_id, lg.admin1_grid_id, lg.admin2_grid_id, lg.admin3_grid_id, lg.admin4_grid_id, lg.admin5_grid_id
-                FROM $wpdb->postmeta as pm
-                JOIN $wpdb->posts as p ON p.ID=pm.post_id AND p.post_type = 'trainings'
-                LEFT JOIN $wpdb->dt_location_grid as lg ON pm.meta_value=lg.grid_id
-                WHERE pm.meta_key = 'location_grid'
-            ) as t3
-            GROUP BY t3.admin3_grid_id
-            ", ARRAY_A );
-        }
-
-        if ( $simple ) {
-            // simple gives a key/value pair of grid_id = count
-            $list = [];
-            if ( is_array( $results ) ) {
-                foreach ( $results as $result ) {
-                    if ( empty( $result['grid_id'] ) ) {
-                        continue;
-                    }
-                    if ( empty( $result['count'] ) ) {
-                        continue;
-                    }
-                    $list[$result['grid_id']] = $result['count'];
-                }
-            }
-        }
-        else {
-            // gives full array with key = grid_id, count
-            $list = [];
-            if ( is_array( $results ) ) {
-                foreach ( $results as $result ) {
-                    $list[$result['grid_id']] = $result;
-                }
-            }
-        }
-
-        return $list;
-    }
-
     public static function query_activity_location_grid_totals() {
 
         global $wpdb;
@@ -804,67 +1533,6 @@ class Zume_Public_Heatmap_Queries {
         return $list;
     }
 
-    public static function query_training_list(){
-        global $wpdb;
-
-        $results = $wpdb->get_results("
-        SELECT t0.admin0_grid_id as grid_id, count(t0.admin0_grid_id) as count
-            FROM (
-             SELECT lg.admin0_grid_id, lg.admin1_grid_id, lg.admin2_grid_id, lg.admin3_grid_id, lg.admin4_grid_id, lg.admin5_grid_id, lg.country_code
-                FROM $wpdb->postmeta as pm
-                JOIN $wpdb->posts as p ON p.ID=pm.post_id AND p.post_type = 'trainings'
-                LEFT JOIN $wpdb->dt_location_grid as lg ON pm.meta_value=lg.grid_id
-                WHERE pm.meta_key = 'location_grid'
-            ) as t0
-            GROUP BY t0.admin0_grid_id
-            UNION
-            SELECT t1.admin1_grid_id as grid_id, count(t1.admin1_grid_id) as count
-            FROM (
-                SELECT lg.admin0_grid_id, lg.admin1_grid_id, lg.admin2_grid_id, lg.admin3_grid_id, lg.admin4_grid_id, lg.admin5_grid_id, lg.country_code
-                FROM $wpdb->postmeta as pm
-                JOIN $wpdb->posts as p ON p.ID=pm.post_id AND p.post_type = 'trainings'
-                LEFT JOIN $wpdb->dt_location_grid as lg ON pm.meta_value=lg.grid_id
-                WHERE pm.meta_key = 'location_grid'
-            ) as t1
-            GROUP BY t1.admin1_grid_id
-            UNION
-            SELECT t2.admin2_grid_id as grid_id, count(t2.admin2_grid_id) as count
-            FROM (
-                SELECT lg.admin0_grid_id, lg.admin1_grid_id, lg.admin2_grid_id, lg.admin3_grid_id, lg.admin4_grid_id, lg.admin5_grid_id, lg.country_code
-                FROM $wpdb->postmeta as pm
-                JOIN $wpdb->posts as p ON p.ID=pm.post_id AND p.post_type = 'trainings'
-                LEFT JOIN $wpdb->dt_location_grid as lg ON pm.meta_value=lg.grid_id
-                WHERE pm.meta_key = 'location_grid'
-            ) as t2
-            GROUP BY t2.admin2_grid_id
-            UNION
-            SELECT t3.admin3_grid_id as grid_id, count(t3.admin3_grid_id) as count
-            FROM (
-                SELECT lg.admin0_grid_id, lg.admin1_grid_id, lg.admin2_grid_id, lg.admin3_grid_id, lg.admin4_grid_id, lg.admin5_grid_id, lg.country_code
-                FROM $wpdb->postmeta as pm
-                JOIN $wpdb->posts as p ON p.ID=pm.post_id AND p.post_type = 'trainings'
-                LEFT JOIN $wpdb->dt_location_grid as lg ON pm.meta_value=lg.grid_id
-                WHERE pm.meta_key = 'location_grid'
-            ) as t3
-            GROUP BY t3.admin3_grid_id
-        ", ARRAY_A );
-
-        $list = [];
-        if ( is_array( $results ) ) {
-            foreach ( $results as $result ) {
-                if ( empty( $result['grid_id'] ) ) {
-                    continue;
-                }
-                if ( empty( $result['count'] ) ) {
-                    continue;
-                }
-                $list[$result['grid_id']] = $result['count'];
-            }
-        }
-
-        return $list;
-    }
-
     public static function query_grid_elements( $grid_id ) {
         global $wpdb;
 
@@ -877,1937 +1545,610 @@ class Zume_Public_Heatmap_Queries {
         return $result;
     }
 
-    public static function query_flat_grid() {
+//    public static function query_training_location_grid_totals( $status = null, $simple = false ) {
+//
+//        global $wpdb;
+//
+//        if ( $status ) {
+//            $results = $wpdb->get_results( $wpdb->prepare( "
+//            SELECT t0.admin0_grid_id as grid_id, count(t0.admin0_grid_id) as count
+//            FROM (
+//                SELECT lg.admin0_grid_id, lg.admin1_grid_id, lg.admin2_grid_id, lg.admin3_grid_id, lg.admin4_grid_id, lg.admin5_grid_id
+//                FROM $wpdb->postmeta as pm
+//                JOIN $wpdb->posts as p ON p.ID=pm.post_id AND p.post_type = 'trainings'
+//                JOIN $wpdb->postmeta as pm3 ON pm3.post_id=pm.post_id AND pm3.meta_key = 'status' AND pm3.meta_value = %s
+//                LEFT JOIN $wpdb->dt_location_grid as lg ON pm.meta_value=lg.grid_id
+//                WHERE pm.meta_key = 'location_grid'
+//            ) as t0
+//            GROUP BY t0.admin0_grid_id
+//            UNION
+//            SELECT t1.admin1_grid_id as grid_id, count(t1.admin1_grid_id) as count
+//            FROM (
+//                SELECT lg.admin0_grid_id, lg.admin1_grid_id, lg.admin2_grid_id, lg.admin3_grid_id, lg.admin4_grid_id, lg.admin5_grid_id
+//                FROM $wpdb->postmeta as pm
+//                JOIN $wpdb->posts as p ON p.ID=pm.post_id AND p.post_type = 'trainings'
+//                JOIN $wpdb->postmeta as pm3 ON pm3.post_id=pm.post_id AND pm3.meta_key = 'status' AND pm3.meta_value = %s
+//                LEFT JOIN $wpdb->dt_location_grid as lg ON pm.meta_value=lg.grid_id
+//                WHERE pm.meta_key = 'location_grid'
+//            ) as t1
+//            GROUP BY t1.admin1_grid_id
+//            UNION
+//            SELECT t2.admin2_grid_id as grid_id, count(t2.admin2_grid_id) as count
+//            FROM (
+//                SELECT lg.admin0_grid_id, lg.admin1_grid_id, lg.admin2_grid_id, lg.admin3_grid_id, lg.admin4_grid_id, lg.admin5_grid_id
+//                FROM $wpdb->postmeta as pm
+//                JOIN $wpdb->posts as p ON p.ID=pm.post_id AND p.post_type = 'trainings'
+//                JOIN $wpdb->postmeta as pm3 ON pm3.post_id=pm.post_id AND pm3.meta_key = 'status' AND pm3.meta_value = %s
+//                LEFT JOIN $wpdb->dt_location_grid as lg ON pm.meta_value=lg.grid_id
+//                WHERE pm.meta_key = 'location_grid'
+//            ) as t2
+//            GROUP BY t2.admin2_grid_id
+//            UNION
+//            SELECT t3.admin3_grid_id as grid_id, count(t3.admin3_grid_id) as count
+//            FROM (
+//                SELECT lg.admin0_grid_id, lg.admin1_grid_id, lg.admin2_grid_id, lg.admin3_grid_id, lg.admin4_grid_id, lg.admin5_grid_id
+//                FROM $wpdb->postmeta as pm
+//                JOIN $wpdb->posts as p ON p.ID=pm.post_id AND p.post_type = 'trainings'
+//                JOIN $wpdb->postmeta as pm3 ON pm3.post_id=pm.post_id AND pm3.meta_key = 'status' AND pm3.meta_value = %s
+//                LEFT JOIN $wpdb->dt_location_grid as lg ON pm.meta_value=lg.grid_id
+//                WHERE pm.meta_key = 'location_grid'
+//            ) as t3
+//            GROUP BY t3.admin3_grid_id
+//            ", $status, $status, $status, $status
+//            ), ARRAY_A );
+//
+//        } else {
+//
+//            $results = $wpdb->get_results( "
+//            SELECT t0.admin0_grid_id as grid_id, count(t0.admin0_grid_id) as count
+//            FROM (
+//             SELECT lg.admin0_grid_id, lg.admin1_grid_id, lg.admin2_grid_id, lg.admin3_grid_id, lg.admin4_grid_id, lg.admin5_grid_id
+//                FROM $wpdb->postmeta as pm
+//                JOIN $wpdb->posts as p ON p.ID=pm.post_id AND p.post_type = 'trainings'
+//                LEFT JOIN $wpdb->dt_location_grid as lg ON pm.meta_value=lg.grid_id
+//                WHERE pm.meta_key = 'location_grid'
+//            ) as t0
+//            GROUP BY t0.admin0_grid_id
+//            UNION
+//            SELECT t1.admin1_grid_id as grid_id, count(t1.admin1_grid_id) as count
+//            FROM (
+//                SELECT lg.admin0_grid_id, lg.admin1_grid_id, lg.admin2_grid_id, lg.admin3_grid_id, lg.admin4_grid_id, lg.admin5_grid_id
+//                FROM $wpdb->postmeta as pm
+//                JOIN $wpdb->posts as p ON p.ID=pm.post_id AND p.post_type = 'trainings'
+//                LEFT JOIN $wpdb->dt_location_grid as lg ON pm.meta_value=lg.grid_id
+//                WHERE pm.meta_key = 'location_grid'
+//            ) as t1
+//            GROUP BY t1.admin1_grid_id
+//            UNION
+//            SELECT t2.admin2_grid_id as grid_id, count(t2.admin2_grid_id) as count
+//            FROM (
+//                SELECT lg.admin0_grid_id, lg.admin1_grid_id, lg.admin2_grid_id, lg.admin3_grid_id, lg.admin4_grid_id, lg.admin5_grid_id
+//                FROM $wpdb->postmeta as pm
+//                JOIN $wpdb->posts as p ON p.ID=pm.post_id AND p.post_type = 'trainings'
+//                LEFT JOIN $wpdb->dt_location_grid as lg ON pm.meta_value=lg.grid_id
+//                WHERE pm.meta_key = 'location_grid'
+//            ) as t2
+//            GROUP BY t2.admin2_grid_id
+//            UNION
+//            SELECT t3.admin3_grid_id as grid_id, count(t3.admin3_grid_id) as count
+//            FROM (
+//                SELECT lg.admin0_grid_id, lg.admin1_grid_id, lg.admin2_grid_id, lg.admin3_grid_id, lg.admin4_grid_id, lg.admin5_grid_id
+//                FROM $wpdb->postmeta as pm
+//                JOIN $wpdb->posts as p ON p.ID=pm.post_id AND p.post_type = 'trainings'
+//                LEFT JOIN $wpdb->dt_location_grid as lg ON pm.meta_value=lg.grid_id
+//                WHERE pm.meta_key = 'location_grid'
+//            ) as t3
+//            GROUP BY t3.admin3_grid_id
+//            ", ARRAY_A );
+//        }
+//
+//        if ( $simple ) {
+//            // simple gives a key/value pair of grid_id = count
+//            $list = [];
+//            if ( is_array( $results ) ) {
+//                foreach ( $results as $result ) {
+//                    if ( empty( $result['grid_id'] ) ) {
+//                        continue;
+//                    }
+//                    if ( empty( $result['count'] ) ) {
+//                        continue;
+//                    }
+//                    $list[$result['grid_id']] = $result['count'];
+//                }
+//            }
+//        }
+//        else {
+//            // gives full array with key = grid_id, count
+//            $list = [];
+//            if ( is_array( $results ) ) {
+//                foreach ( $results as $result ) {
+//                    $list[$result['grid_id']] = $result;
+//                }
+//            }
+//        }
+//
+//        return $list;
+//    }
 
-        global $wpdb;
-        $flat_grid = $wpdb->get_results("
-            # 48367 Records
-            # 'Needs' GROUPED BY sub-county level
-            SELECT tb3.admin3_grid_id as grid_id, loc.name, loc.country_code, SUM(tb3.population) as population, SUM(tb3.needed) as needed, (0) as reported, (0) as percent
-            FROM (
-                     # 44395 Records
-                     SELECT
-                         lg1.admin0_grid_id,
-                         lg1.admin1_grid_id,
-                         lg1.admin2_grid_id,
-                         lg1.admin3_grid_id,
-                         lg1.population,
-                         IF(ROUND(lg1.population / IF(lg1.country_code = 'US', 5000, 50000)) < 1, 1,
-                            ROUND(lg1.population / IF(lg1.country_code = 'US', 5000, 50000))) as needed
-                     FROM $wpdb->dt_location_grid lg1
-                     WHERE lg1.level = 0
-                       AND lg1.grid_id NOT IN (SELECT lg11.admin0_grid_id
-                                               FROM $wpdb->dt_location_grid lg11
-                                               WHERE lg11.level = 1
-                                                 AND lg11.admin0_grid_id = lg1.grid_id)
-                       AND lg1.admin0_grid_id NOT IN (100050711, 100219347, 100089589, 100074576, 100259978, 100018514)
-                       AND lg1.admin0_grid_id NOT IN
-                           (100314737, 100083318, 100041128, 100133112, 100341242, 100132648, 100222839, 100379914, 100055707,
-                            100379993, 100130389, 100255271, 100363975, 100248845, 100001527, 100342458, 100024289, 100132795,
-                            100054605, 100253456, 100342975, 100074571)
-                     UNION ALL
-                     SELECT
-                         lg2.admin0_grid_id,
-                         lg2.admin1_grid_id,
-                         lg2.admin2_grid_id,
-                         lg2.admin3_grid_id,
-                         lg2.population,
-                         IF(ROUND(lg2.population / IF(lg2.country_code = 'US', 5000, 50000)) < 1, 1,
-                            ROUND(lg2.population / IF(lg2.country_code = 'US', 5000, 50000))) as needed
-                     FROM $wpdb->dt_location_grid lg2
-                     WHERE lg2.level = 1
-                       AND lg2.grid_id NOT IN (SELECT lg22.admin1_grid_id
-                                               FROM $wpdb->dt_location_grid lg22
-                                               WHERE lg22.level = 2
-                                                 AND lg22.admin1_grid_id = lg2.grid_id)
-                       AND lg2.admin0_grid_id NOT IN (100050711, 100219347, 100089589, 100074576, 100259978, 100018514)
-                       AND lg2.admin0_grid_id NOT IN
-                           (100314737, 100083318, 100041128, 100133112, 100341242, 100132648, 100222839, 100379914, 100055707,
-                            100379993, 100130389, 100255271, 100363975, 100248845, 100001527, 100342458, 100024289, 100132795,
-                            100054605, 100253456, 100342975, 100074571)
-                     UNION ALL
-                     SELECT
-                         lg3.admin0_grid_id,
-                         lg3.admin1_grid_id,
-                         lg3.admin2_grid_id,
-                         lg3.admin3_grid_id,
-                         lg3.population,
-                         IF(ROUND(lg3.population / IF(lg3.country_code = 'US', 5000, 50000)) < 1, 1,
-                            ROUND(lg3.population / IF(lg3.country_code = 'US', 5000, 50000))) as needed
-                     FROM $wpdb->dt_location_grid lg3
-                     WHERE lg3.level = 2
-                       AND lg3.admin0_grid_id NOT IN (100050711, 100219347, 100089589, 100074576, 100259978, 100018514)
-                       AND lg3.admin0_grid_id NOT IN
-                           (100314737, 100083318, 100041128, 100133112, 100341242, 100132648, 100222839, 100379914, 100055707,
-                            100379993, 100130389, 100255271, 100363975, 100248845, 100001527, 100342458, 100024289, 100132795,
-                            100054605, 100253456, 100342975, 100074571)
-                     UNION ALL
-                     SELECT
-                         lg4.admin0_grid_id,
-                         lg4.admin1_grid_id,
-                         lg4.admin2_grid_id,
-                         lg4.admin3_grid_id,
-                         lg4.population,
-                         IF(ROUND(lg4.population / IF(lg4.country_code = 'US', 5000, 50000)) < 1, 1,
-                            ROUND(lg4.population / IF(lg4.country_code = 'US', 5000, 50000))) as needed
-                     FROM $wpdb->dt_location_grid lg4
-                     WHERE lg4.level = 1
-                       AND lg4.admin0_grid_id NOT IN (100050711, 100219347, 100089589, 100074576, 100259978, 100018514)
-                       AND lg4.admin0_grid_id IN
-                           (100314737, 100083318, 100041128, 100133112, 100341242, 100132648, 100222839, 100379914, 100055707,
-                            100379993, 100130389, 100255271, 100363975, 100248845, 100001527, 100342458, 100024289, 100132795,
-                            100054605, 100253456, 100342975, 100074571)
-                     UNION ALL
-                     SELECT
-                         lg5.admin0_grid_id,
-                         lg5.admin1_grid_id,
-                         lg5.admin2_grid_id,
-                         lg5.admin3_grid_id,
-                         lg5.population,
-                         IF(ROUND(lg5.population / IF(lg5.country_code = 'US', 5000, 50000)) < 1, 1,
-                            ROUND(lg5.population / IF(lg5.country_code = 'US', 5000, 50000))) as needed
-                     FROM $wpdb->dt_location_grid as lg5
-                     WHERE lg5.level = 3
-                       AND lg5.admin0_grid_id IN (100050711, 100219347, 100089589, 100074576, 100259978, 100018514)
-                       AND lg5.admin0_grid_id NOT IN
-                           (100314737, 100083318, 100041128, 100133112, 100341242, 100132648, 100222839, 100379914, 100055707,
-                            100379993, 100130389, 100255271, 100363975, 100248845, 100001527, 100342458, 100024289, 100132795,
-                            100054605, 100253456, 100342975, 100074571)
-            ) as tb3
-            LEFT JOIN $wpdb->dt_location_grid loc ON tb3.admin3_grid_id=loc.grid_id
-            WHERE tb3.admin3_grid_id IS NOT NULL
-            GROUP BY tb3.admin3_grid_id
+//    public static function query_training_list(){
+//        global $wpdb;
+//
+//        $results = $wpdb->get_results("
+//        SELECT t0.admin0_grid_id as grid_id, count(t0.admin0_grid_id) as count
+//            FROM (
+//             SELECT lg.admin0_grid_id, lg.admin1_grid_id, lg.admin2_grid_id, lg.admin3_grid_id, lg.admin4_grid_id, lg.admin5_grid_id, lg.country_code
+//                FROM $wpdb->postmeta as pm
+//                JOIN $wpdb->posts as p ON p.ID=pm.post_id AND p.post_type = 'trainings'
+//                LEFT JOIN $wpdb->dt_location_grid as lg ON pm.meta_value=lg.grid_id
+//                WHERE pm.meta_key = 'location_grid'
+//            ) as t0
+//            GROUP BY t0.admin0_grid_id
+//            UNION
+//            SELECT t1.admin1_grid_id as grid_id, count(t1.admin1_grid_id) as count
+//            FROM (
+//                SELECT lg.admin0_grid_id, lg.admin1_grid_id, lg.admin2_grid_id, lg.admin3_grid_id, lg.admin4_grid_id, lg.admin5_grid_id, lg.country_code
+//                FROM $wpdb->postmeta as pm
+//                JOIN $wpdb->posts as p ON p.ID=pm.post_id AND p.post_type = 'trainings'
+//                LEFT JOIN $wpdb->dt_location_grid as lg ON pm.meta_value=lg.grid_id
+//                WHERE pm.meta_key = 'location_grid'
+//            ) as t1
+//            GROUP BY t1.admin1_grid_id
+//            UNION
+//            SELECT t2.admin2_grid_id as grid_id, count(t2.admin2_grid_id) as count
+//            FROM (
+//                SELECT lg.admin0_grid_id, lg.admin1_grid_id, lg.admin2_grid_id, lg.admin3_grid_id, lg.admin4_grid_id, lg.admin5_grid_id, lg.country_code
+//                FROM $wpdb->postmeta as pm
+//                JOIN $wpdb->posts as p ON p.ID=pm.post_id AND p.post_type = 'trainings'
+//                LEFT JOIN $wpdb->dt_location_grid as lg ON pm.meta_value=lg.grid_id
+//                WHERE pm.meta_key = 'location_grid'
+//            ) as t2
+//            GROUP BY t2.admin2_grid_id
+//            UNION
+//            SELECT t3.admin3_grid_id as grid_id, count(t3.admin3_grid_id) as count
+//            FROM (
+//                SELECT lg.admin0_grid_id, lg.admin1_grid_id, lg.admin2_grid_id, lg.admin3_grid_id, lg.admin4_grid_id, lg.admin5_grid_id, lg.country_code
+//                FROM $wpdb->postmeta as pm
+//                JOIN $wpdb->posts as p ON p.ID=pm.post_id AND p.post_type = 'trainings'
+//                LEFT JOIN $wpdb->dt_location_grid as lg ON pm.meta_value=lg.grid_id
+//                WHERE pm.meta_key = 'location_grid'
+//            ) as t3
+//            GROUP BY t3.admin3_grid_id
+//        ", ARRAY_A );
+//
+//        $list = [];
+//        if ( is_array( $results ) ) {
+//            foreach ( $results as $result ) {
+//                if ( empty( $result['grid_id'] ) ) {
+//                    continue;
+//                }
+//                if ( empty( $result['count'] ) ) {
+//                    continue;
+//                }
+//                $list[$result['grid_id']] = $result['count'];
+//            }
+//        }
+//
+//        return $list;
+//    }
 
-            UNION ALL
+//    public static function query_flat_grid( $us_div = 5000, $global_div = 50000 ) {
+//
+//        global $wpdb;
+//        $wpdb->us_div = $us_div;
+//        $wpdb->global_div = $global_div;
+//        $flat_grid = $wpdb->get_results("
+//            # 48367 Records
+//            # 'Needs' GROUPED BY sub-county level
+//            SELECT tb3.admin3_grid_id as grid_id, loc.name, loc.country_code, SUM(tb3.population) as population, SUM(tb3.needed) as needed, (0) as reported, (0) as percent
+//            FROM (
+//                     # 44395 Records
+//                     SELECT
+//                         lg1.admin0_grid_id,
+//                         lg1.admin1_grid_id,
+//                         lg1.admin2_grid_id,
+//                         lg1.admin3_grid_id,
+//                         lg1.population,
+//                         IF(ROUND(lg1.population / IF(lg1.country_code = 'US', $wpdb->us_div, $wpdb->global_div)) < 1, 1,
+//                            ROUND(lg1.population / IF(lg1.country_code = 'US', $wpdb->us_div, $wpdb->global_div))) as needed
+//                     FROM $wpdb->dt_location_grid lg1
+//                     WHERE lg1.level = 0
+//                       AND lg1.grid_id NOT IN (SELECT lg11.admin0_grid_id
+//                                               FROM $wpdb->dt_location_grid lg11
+//                                               WHERE lg11.level = 1
+//                                                 AND lg11.admin0_grid_id = lg1.grid_id)
+//                       AND lg1.admin0_grid_id NOT IN (100050711, 100219347, 100089589, 100074576, 100259978, 100018514)
+//                       AND lg1.admin0_grid_id NOT IN
+//                           (100314737, 100083318, 100041128, 100133112, 100341242, 100132648, 100222839, 100379914, 100055707,
+//                            100379993, 100130389, 100255271, 100363975, 100248845, 100001527, 100342458, 100024289, 100132795,
+//                            100054605, 100253456, 100342975, 100074571)
+//                     UNION ALL
+//                     SELECT
+//                         lg2.admin0_grid_id,
+//                         lg2.admin1_grid_id,
+//                         lg2.admin2_grid_id,
+//                         lg2.admin3_grid_id,
+//                         lg2.population,
+//                         IF(ROUND(lg2.population / IF(lg2.country_code = 'US', $wpdb->us_div, $wpdb->global_div)) < 1, 1,
+//                            ROUND(lg2.population / IF(lg2.country_code = 'US', $wpdb->us_div, $wpdb->global_div))) as needed
+//                     FROM $wpdb->dt_location_grid lg2
+//                     WHERE lg2.level = 1
+//                       AND lg2.grid_id NOT IN (SELECT lg22.admin1_grid_id
+//                                               FROM $wpdb->dt_location_grid lg22
+//                                               WHERE lg22.level = 2
+//                                                 AND lg22.admin1_grid_id = lg2.grid_id)
+//                       AND lg2.admin0_grid_id NOT IN (100050711, 100219347, 100089589, 100074576, 100259978, 100018514)
+//                       AND lg2.admin0_grid_id NOT IN
+//                           (100314737, 100083318, 100041128, 100133112, 100341242, 100132648, 100222839, 100379914, 100055707,
+//                            100379993, 100130389, 100255271, 100363975, 100248845, 100001527, 100342458, 100024289, 100132795,
+//                            100054605, 100253456, 100342975, 100074571)
+//                     UNION ALL
+//                     SELECT
+//                         lg3.admin0_grid_id,
+//                         lg3.admin1_grid_id,
+//                         lg3.admin2_grid_id,
+//                         lg3.admin3_grid_id,
+//                         lg3.population,
+//                         IF(ROUND(lg3.population / IF(lg3.country_code = 'US', $wpdb->us_div, $wpdb->global_div)) < 1, 1,
+//                            ROUND(lg3.population / IF(lg3.country_code = 'US', $wpdb->us_div, $wpdb->global_div))) as needed
+//                     FROM $wpdb->dt_location_grid lg3
+//                     WHERE lg3.level = 2
+//                       AND lg3.admin0_grid_id NOT IN (100050711, 100219347, 100089589, 100074576, 100259978, 100018514)
+//                       AND lg3.admin0_grid_id NOT IN
+//                           (100314737, 100083318, 100041128, 100133112, 100341242, 100132648, 100222839, 100379914, 100055707,
+//                            100379993, 100130389, 100255271, 100363975, 100248845, 100001527, 100342458, 100024289, 100132795,
+//                            100054605, 100253456, 100342975, 100074571)
+//                     UNION ALL
+//                     SELECT
+//                         lg4.admin0_grid_id,
+//                         lg4.admin1_grid_id,
+//                         lg4.admin2_grid_id,
+//                         lg4.admin3_grid_id,
+//                         lg4.population,
+//                         IF(ROUND(lg4.population / IF(lg4.country_code = 'US', $wpdb->us_div, $wpdb->global_div)) < 1, 1,
+//                            ROUND(lg4.population / IF(lg4.country_code = 'US', $wpdb->us_div, $wpdb->global_div))) as needed
+//                     FROM $wpdb->dt_location_grid lg4
+//                     WHERE lg4.level = 1
+//                       AND lg4.admin0_grid_id NOT IN (100050711, 100219347, 100089589, 100074576, 100259978, 100018514)
+//                       AND lg4.admin0_grid_id IN
+//                           (100314737, 100083318, 100041128, 100133112, 100341242, 100132648, 100222839, 100379914, 100055707,
+//                            100379993, 100130389, 100255271, 100363975, 100248845, 100001527, 100342458, 100024289, 100132795,
+//                            100054605, 100253456, 100342975, 100074571)
+//                     UNION ALL
+//                     SELECT
+//                         lg5.admin0_grid_id,
+//                         lg5.admin1_grid_id,
+//                         lg5.admin2_grid_id,
+//                         lg5.admin3_grid_id,
+//                         lg5.population,
+//                         IF(ROUND(lg5.population / IF(lg5.country_code = 'US', $wpdb->us_div, $wpdb->global_div)) < 1, 1,
+//                            ROUND(lg5.population / IF(lg5.country_code = 'US', $wpdb->us_div, $wpdb->global_div))) as needed
+//                     FROM $wpdb->dt_location_grid as lg5
+//                     WHERE lg5.level = 3
+//                       AND lg5.admin0_grid_id IN (100050711, 100219347, 100089589, 100074576, 100259978, 100018514)
+//                       AND lg5.admin0_grid_id NOT IN
+//                           (100314737, 100083318, 100041128, 100133112, 100341242, 100132648, 100222839, 100379914, 100055707,
+//                            100379993, 100130389, 100255271, 100363975, 100248845, 100001527, 100342458, 100024289, 100132795,
+//                            100054605, 100253456, 100342975, 100074571)
+//            ) as tb3
+//            LEFT JOIN $wpdb->dt_location_grid loc ON tb3.admin3_grid_id=loc.grid_id
+//            WHERE tb3.admin3_grid_id IS NOT NULL
+//            GROUP BY tb3.admin3_grid_id
+//
+//            UNION ALL
+//
+//            # 'Needs' GROUPED BY county level
+//            SELECT tb2.admin2_grid_id as grid_id, loc.name, loc.country_code, SUM(tb2.population) as population, SUM(tb2.needed) as needed, (0) as reported, (0) as percent
+//            FROM (
+//                     SELECT
+//                         lg1.admin0_grid_id,
+//                         lg1.admin1_grid_id,
+//                         lg1.admin2_grid_id,
+//                         lg1.admin3_grid_id,
+//                         lg1.population,
+//                         IF(ROUND(lg1.population / IF(lg1.country_code = 'US', $wpdb->us_div, $wpdb->global_div)) < 1, 1,
+//                            ROUND(lg1.population / IF(lg1.country_code = 'US', $wpdb->us_div, $wpdb->global_div))) as needed
+//                     FROM $wpdb->dt_location_grid lg1
+//                     WHERE lg1.level = 0
+//                       AND lg1.grid_id NOT IN (SELECT lg11.admin0_grid_id
+//                         FROM $wpdb->dt_location_grid lg11
+//                         WHERE lg11.level = 1
+//                       AND lg11.admin0_grid_id = lg1.grid_id)
+//                       AND lg1.admin0_grid_id NOT IN (100050711, 100219347, 100089589, 100074576, 100259978, 100018514)
+//                       AND lg1.admin0_grid_id NOT IN
+//                         (100314737, 100083318, 100041128, 100133112, 100341242, 100132648, 100222839, 100379914, 100055707,
+//                         100379993, 100130389, 100255271, 100363975, 100248845, 100001527, 100342458, 100024289, 100132795,
+//                         100054605, 100253456, 100342975, 100074571)
+//                     UNION ALL
+//                     SELECT
+//                         lg2.admin0_grid_id,
+//                         lg2.admin1_grid_id,
+//                         lg2.admin2_grid_id,
+//                         lg2.admin3_grid_id,
+//                         lg2.population,
+//                         IF(ROUND(lg2.population / IF(lg2.country_code = 'US', $wpdb->us_div, $wpdb->global_div)) < 1, 1,
+//                         ROUND(lg2.population / IF(lg2.country_code = 'US', $wpdb->us_div, $wpdb->global_div))) as needed
+//                     FROM $wpdb->dt_location_grid lg2
+//                     WHERE lg2.level = 1
+//                       AND lg2.grid_id NOT IN (SELECT lg22.admin1_grid_id
+//                         FROM $wpdb->dt_location_grid lg22
+//                         WHERE lg22.level = 2
+//                       AND lg22.admin1_grid_id = lg2.grid_id)
+//                       AND lg2.admin0_grid_id NOT IN (100050711, 100219347, 100089589, 100074576, 100259978, 100018514)
+//                       AND lg2.admin0_grid_id NOT IN
+//                         (100314737, 100083318, 100041128, 100133112, 100341242, 100132648, 100222839, 100379914, 100055707,
+//                         100379993, 100130389, 100255271, 100363975, 100248845, 100001527, 100342458, 100024289, 100132795,
+//                         100054605, 100253456, 100342975, 100074571)
+//                     UNION ALL
+//                     SELECT
+//                         lg3.admin0_grid_id,
+//                         lg3.admin1_grid_id,
+//                         lg3.admin2_grid_id,
+//                         lg3.admin3_grid_id,
+//                         lg3.population,
+//                         IF(ROUND(lg3.population / IF(lg3.country_code = 'US', $wpdb->us_div, $wpdb->global_div)) < 1, 1,
+//                         ROUND(lg3.population / IF(lg3.country_code = 'US', $wpdb->us_div, $wpdb->global_div))) as needed
+//                     FROM $wpdb->dt_location_grid lg3
+//                     WHERE lg3.level = 2
+//                       AND lg3.admin0_grid_id NOT IN (100050711, 100219347, 100089589, 100074576, 100259978, 100018514)
+//                       AND lg3.admin0_grid_id NOT IN
+//                         (100314737, 100083318, 100041128, 100133112, 100341242, 100132648, 100222839, 100379914, 100055707,
+//                         100379993, 100130389, 100255271, 100363975, 100248845, 100001527, 100342458, 100024289, 100132795,
+//                         100054605, 100253456, 100342975, 100074571)
+//                     UNION ALL
+//                     SELECT
+//                         lg4.admin0_grid_id,
+//                         lg4.admin1_grid_id,
+//                         lg4.admin2_grid_id,
+//                         lg4.admin3_grid_id,
+//                         lg4.population,
+//                         IF(ROUND(lg4.population / IF(lg4.country_code = 'US', $wpdb->us_div, $wpdb->global_div)) < 1, 1,
+//                         ROUND(lg4.population / IF(lg4.country_code = 'US', $wpdb->us_div, $wpdb->global_div))) as needed
+//                     FROM $wpdb->dt_location_grid lg4
+//                     WHERE lg4.level = 1
+//                       AND lg4.admin0_grid_id NOT IN (100050711, 100219347, 100089589, 100074576, 100259978, 100018514)
+//                       AND lg4.admin0_grid_id IN
+//                         (100314737, 100083318, 100041128, 100133112, 100341242, 100132648, 100222839, 100379914, 100055707,
+//                         100379993, 100130389, 100255271, 100363975, 100248845, 100001527, 100342458, 100024289, 100132795,
+//                         100054605, 100253456, 100342975, 100074571)
+//                     UNION ALL
+//                     SELECT
+//                         lg5.admin0_grid_id,
+//                         lg5.admin1_grid_id,
+//                         lg5.admin2_grid_id,
+//                         lg5.admin3_grid_id,
+//                         lg5.population,
+//                         IF(ROUND(lg5.population / IF(lg5.country_code = 'US', $wpdb->us_div, $wpdb->global_div)) < 1, 1,
+//                         ROUND(lg5.population / IF(lg5.country_code = 'US', $wpdb->us_div, $wpdb->global_div))) as needed
+//                     FROM $wpdb->dt_location_grid as lg5
+//                     WHERE lg5.level = 3
+//                       AND lg5.admin0_grid_id IN (100050711, 100219347, 100089589, 100074576, 100259978, 100018514)
+//                       AND lg5.admin0_grid_id NOT IN
+//                         (100314737, 100083318, 100041128, 100133112, 100341242, 100132648, 100222839, 100379914, 100055707,
+//                         100379993, 100130389, 100255271, 100363975, 100248845, 100001527, 100342458, 100024289, 100132795,
+//                         100054605, 100253456, 100342975, 100074571)
+//            ) as tb2
+//            LEFT JOIN $wpdb->dt_location_grid loc ON tb2.admin2_grid_id=loc.grid_id
+//            GROUP BY tb2.admin2_grid_id
+//
+//            UNION ALL
+//
+//            # 'Needs' GROUPED BY state level
+//            SELECT tb1.admin1_grid_id as grid_id, loc.name, loc.country_code, SUM(tb1.population) as population, SUM(tb1.needed) as needed, (0) as reported, (0) as percent
+//            FROM (
+//                     SELECT
+//                         lg1.admin0_grid_id,
+//                         lg1.admin1_grid_id,
+//                         lg1.admin2_grid_id,
+//                         lg1.admin3_grid_id,
+//                         lg1.population,
+//                         IF(ROUND(lg1.population / IF(lg1.country_code = 'US', $wpdb->us_div, $wpdb->global_div)) < 1, 1,
+//                            ROUND(lg1.population / IF(lg1.country_code = 'US', $wpdb->us_div, $wpdb->global_div))) as needed
+//                     FROM $wpdb->dt_location_grid lg1
+//                     WHERE lg1.level = 0
+//                       AND lg1.grid_id NOT IN (SELECT lg11.admin0_grid_id
+//                                               FROM $wpdb->dt_location_grid lg11
+//                                               WHERE lg11.level = 1
+//                                                 AND lg11.admin0_grid_id = lg1.grid_id)
+//                       AND lg1.admin0_grid_id NOT IN (100050711, 100219347, 100089589, 100074576, 100259978, 100018514)
+//                       AND lg1.admin0_grid_id NOT IN
+//                           (100314737, 100083318, 100041128, 100133112, 100341242, 100132648, 100222839, 100379914, 100055707,
+//                            100379993, 100130389, 100255271, 100363975, 100248845, 100001527, 100342458, 100024289, 100132795,
+//                            100054605, 100253456, 100342975, 100074571)
+//                     UNION ALL
+//                     SELECT
+//                         lg2.admin0_grid_id,
+//                         lg2.admin1_grid_id,
+//                         lg2.admin2_grid_id,
+//                         lg2.admin3_grid_id,
+//                         lg2.population,
+//                         IF(ROUND(lg2.population / IF(lg2.country_code = 'US', $wpdb->us_div, $wpdb->global_div)) < 1, 1,
+//                            ROUND(lg2.population / IF(lg2.country_code = 'US', $wpdb->us_div, $wpdb->global_div))) as needed
+//                     FROM $wpdb->dt_location_grid lg2
+//                     WHERE lg2.level = 1
+//                       AND lg2.grid_id NOT IN (SELECT lg22.admin1_grid_id
+//                                               FROM $wpdb->dt_location_grid lg22
+//                                               WHERE lg22.level = 2
+//                                                 AND lg22.admin1_grid_id = lg2.grid_id)
+//                       AND lg2.admin0_grid_id NOT IN (100050711, 100219347, 100089589, 100074576, 100259978, 100018514)
+//                       AND lg2.admin0_grid_id NOT IN
+//                           (100314737, 100083318, 100041128, 100133112, 100341242, 100132648, 100222839, 100379914, 100055707,
+//                            100379993, 100130389, 100255271, 100363975, 100248845, 100001527, 100342458, 100024289, 100132795,
+//                            100054605, 100253456, 100342975, 100074571)
+//                     UNION ALL
+//                     SELECT
+//                         lg3.admin0_grid_id,
+//                         lg3.admin1_grid_id,
+//                         lg3.admin2_grid_id,
+//                         lg3.admin3_grid_id,
+//                         lg3.population,
+//                         IF(ROUND(lg3.population / IF(lg3.country_code = 'US', $wpdb->us_div, $wpdb->global_div)) < 1, 1,
+//                            ROUND(lg3.population / IF(lg3.country_code = 'US', $wpdb->us_div, $wpdb->global_div))) as needed
+//                     FROM $wpdb->dt_location_grid lg3
+//                     WHERE lg3.level = 2
+//                       AND lg3.admin0_grid_id NOT IN (100050711, 100219347, 100089589, 100074576, 100259978, 100018514)
+//                       AND lg3.admin0_grid_id NOT IN
+//                           (100314737, 100083318, 100041128, 100133112, 100341242, 100132648, 100222839, 100379914, 100055707,
+//                            100379993, 100130389, 100255271, 100363975, 100248845, 100001527, 100342458, 100024289, 100132795,
+//                            100054605, 100253456, 100342975, 100074571)
+//                     UNION ALL
+//                     SELECT
+//                         lg4.admin0_grid_id,
+//                         lg4.admin1_grid_id,
+//                         lg4.admin2_grid_id,
+//                         lg4.admin3_grid_id,
+//                         lg4.population,
+//                         IF(ROUND(lg4.population / IF(lg4.country_code = 'US', $wpdb->us_div, $wpdb->global_div)) < 1, 1,
+//                            ROUND(lg4.population / IF(lg4.country_code = 'US', $wpdb->us_div, $wpdb->global_div))) as needed
+//                     FROM $wpdb->dt_location_grid lg4
+//                     WHERE lg4.level = 1
+//                       AND lg4.admin0_grid_id NOT IN (100050711, 100219347, 100089589, 100074576, 100259978, 100018514)
+//                       AND lg4.admin0_grid_id IN
+//                           (100314737, 100083318, 100041128, 100133112, 100341242, 100132648, 100222839, 100379914, 100055707,
+//                            100379993, 100130389, 100255271, 100363975, 100248845, 100001527, 100342458, 100024289, 100132795,
+//                            100054605, 100253456, 100342975, 100074571)
+//                     UNION ALL
+//                     SELECT
+//                         lg5.admin0_grid_id,
+//                         lg5.admin1_grid_id,
+//                         lg5.admin2_grid_id,
+//                         lg5.admin3_grid_id,
+//                         lg5.population,
+//                         IF(ROUND(lg5.population / IF(lg5.country_code = 'US', $wpdb->us_div, $wpdb->global_div)) < 1, 1,
+//                            ROUND(lg5.population / IF(lg5.country_code = 'US', $wpdb->us_div, $wpdb->global_div))) as needed
+//                     FROM $wpdb->dt_location_grid as lg5
+//                     WHERE lg5.level = 3
+//                       AND lg5.admin0_grid_id IN (100050711, 100219347, 100089589, 100074576, 100259978, 100018514)
+//                       AND lg5.admin0_grid_id NOT IN
+//                           (100314737, 100083318, 100041128, 100133112, 100341242, 100132648, 100222839, 100379914, 100055707,
+//                            100379993, 100130389, 100255271, 100363975, 100248845, 100001527, 100342458, 100024289, 100132795,
+//                            100054605, 100253456, 100342975, 100074571)
+//            ) as tb1
+//            LEFT JOIN $wpdb->dt_location_grid loc ON tb1.admin1_grid_id=loc.grid_id
+//            GROUP BY tb1.admin1_grid_id
+//
+//            UNION ALL
+//
+//            # 'Needs' GROUPED BY country
+//            SELECT tb0.admin0_grid_id as grid_id, loc.name,loc.country_code, SUM(tb0.population) as population, SUM(tb0.needed) as needed, (0) as reported, (0) as percent
+//            FROM (
+//                     # 44395 Records
+//                     SELECT
+//                         lg1.admin0_grid_id,
+//                         lg1.admin1_grid_id,
+//                         lg1.admin2_grid_id,
+//                         lg1.admin3_grid_id,
+//                         lg1.population,
+//                         IF(ROUND(lg1.population / IF(lg1.country_code = 'US', $wpdb->us_div, $wpdb->global_div)) < 1, 1,
+//                            ROUND(lg1.population / IF(lg1.country_code = 'US', $wpdb->us_div, $wpdb->global_div))) as needed
+//                     FROM $wpdb->dt_location_grid lg1
+//                     WHERE lg1.level = 0
+//                       AND lg1.grid_id NOT IN (SELECT lg11.admin0_grid_id
+//                                               FROM $wpdb->dt_location_grid lg11
+//                                               WHERE lg11.level = 1
+//                                                 AND lg11.admin0_grid_id = lg1.grid_id)
+//                       AND lg1.admin0_grid_id NOT IN (100050711, 100219347, 100089589, 100074576, 100259978, 100018514)
+//                       AND lg1.admin0_grid_id NOT IN
+//                           (100314737, 100083318, 100041128, 100133112, 100341242, 100132648, 100222839, 100379914, 100055707,
+//                            100379993, 100130389, 100255271, 100363975, 100248845, 100001527, 100342458, 100024289, 100132795,
+//                            100054605, 100253456, 100342975, 100074571)
+//                     UNION ALL
+//                     SELECT
+//                         lg2.admin0_grid_id,
+//                         lg2.admin1_grid_id,
+//                         lg2.admin2_grid_id,
+//                         lg2.admin3_grid_id,
+//                         lg2.population,
+//                         IF(ROUND(lg2.population / IF(lg2.country_code = 'US', $wpdb->us_div, $wpdb->global_div)) < 1, 1,
+//                            ROUND(lg2.population / IF(lg2.country_code = 'US', $wpdb->us_div, $wpdb->global_div))) as needed
+//                     FROM $wpdb->dt_location_grid lg2
+//                     WHERE lg2.level = 1
+//                       AND lg2.grid_id NOT IN (SELECT lg22.admin1_grid_id
+//                                               FROM $wpdb->dt_location_grid lg22
+//                                               WHERE lg22.level = 2
+//                                                 AND lg22.admin1_grid_id = lg2.grid_id)
+//                       AND lg2.admin0_grid_id NOT IN (100050711, 100219347, 100089589, 100074576, 100259978, 100018514)
+//                       AND lg2.admin0_grid_id NOT IN
+//                           (100314737, 100083318, 100041128, 100133112, 100341242, 100132648, 100222839, 100379914, 100055707,
+//                            100379993, 100130389, 100255271, 100363975, 100248845, 100001527, 100342458, 100024289, 100132795,
+//                            100054605, 100253456, 100342975, 100074571)
+//                     UNION ALL
+//                     SELECT
+//                         lg3.admin0_grid_id,
+//                         lg3.admin1_grid_id,
+//                         lg3.admin2_grid_id,
+//                         lg3.admin3_grid_id,
+//                         lg3.population,
+//                         IF(ROUND(lg3.population / IF(lg3.country_code = 'US', $wpdb->us_div, $wpdb->global_div)) < 1, 1,
+//                            ROUND(lg3.population / IF(lg3.country_code = 'US', $wpdb->us_div, $wpdb->global_div))) as needed
+//                     FROM $wpdb->dt_location_grid lg3
+//                     WHERE lg3.level = 2
+//                       AND lg3.admin0_grid_id NOT IN (100050711, 100219347, 100089589, 100074576, 100259978, 100018514)
+//                       AND lg3.admin0_grid_id NOT IN
+//                           (100314737, 100083318, 100041128, 100133112, 100341242, 100132648, 100222839, 100379914, 100055707,
+//                            100379993, 100130389, 100255271, 100363975, 100248845, 100001527, 100342458, 100024289, 100132795,
+//                            100054605, 100253456, 100342975, 100074571)
+//                     UNION ALL
+//                     SELECT
+//                         lg4.admin0_grid_id,
+//                         lg4.admin1_grid_id,
+//                         lg4.admin2_grid_id,
+//                         lg4.admin3_grid_id,
+//                         lg4.population,
+//                         IF(ROUND(lg4.population / IF(lg4.country_code = 'US', $wpdb->us_div, $wpdb->global_div)) < 1, 1,
+//                            ROUND(lg4.population / IF(lg4.country_code = 'US', $wpdb->us_div, $wpdb->global_div))) as needed
+//                     FROM $wpdb->dt_location_grid lg4
+//                     WHERE lg4.level = 1
+//                       AND lg4.admin0_grid_id NOT IN (100050711, 100219347, 100089589, 100074576, 100259978, 100018514)
+//                       AND lg4.admin0_grid_id IN
+//                           (100314737, 100083318, 100041128, 100133112, 100341242, 100132648, 100222839, 100379914, 100055707,
+//                            100379993, 100130389, 100255271, 100363975, 100248845, 100001527, 100342458, 100024289, 100132795,
+//                            100054605, 100253456, 100342975, 100074571)
+//                     UNION ALL
+//                     SELECT
+//                         lg5.admin0_grid_id,
+//                         lg5.admin1_grid_id,
+//                         lg5.admin2_grid_id,
+//                         lg5.admin3_grid_id,
+//                         lg5.population,
+//                         IF(ROUND(lg5.population / IF(lg5.country_code = 'US', $wpdb->us_div, $wpdb->global_div)) < 1, 1,
+//                            ROUND(lg5.population / IF(lg5.country_code = 'US', $wpdb->us_div, $wpdb->global_div))) as needed
+//                     FROM $wpdb->dt_location_grid as lg5
+//                     WHERE lg5.level = 3
+//                       AND lg5.admin0_grid_id IN (100050711, 100219347, 100089589, 100074576, 100259978, 100018514)
+//                       AND lg5.admin0_grid_id NOT IN
+//                           (100314737, 100083318, 100041128, 100133112, 100341242, 100132648, 100222839, 100379914, 100055707,
+//                            100379993, 100130389, 100255271, 100363975, 100248845, 100001527, 100342458, 100024289, 100132795,
+//                            100054605, 100253456, 100342975, 100074571)
+//            ) as tb0
+//            LEFT JOIN $wpdb->dt_location_grid loc ON tb0.admin0_grid_id=loc.grid_id
+//            GROUP BY tb0.admin0_grid_id
+//        ", ARRAY_A );
+//
+//        return $flat_grid;
+//    }
 
-            # 'Needs' GROUPED BY county level
-            SELECT tb2.admin2_grid_id as grid_id, loc.name, loc.country_code, SUM(tb2.population) as population, SUM(tb2.needed) as needed, (0) as reported, (0) as percent
-            FROM (
-                     SELECT
-                         lg1.admin0_grid_id,
-                         lg1.admin1_grid_id,
-                         lg1.admin2_grid_id,
-                         lg1.admin3_grid_id,
-                         lg1.population,
-                         IF(ROUND(lg1.population / IF(lg1.country_code = 'US', 5000, 50000)) < 1, 1,
-                            ROUND(lg1.population / IF(lg1.country_code = 'US', 5000, 50000))) as needed
-                     FROM $wpdb->dt_location_grid lg1
-                     WHERE lg1.level = 0
-                       AND lg1.grid_id NOT IN (SELECT lg11.admin0_grid_id
-                         FROM $wpdb->dt_location_grid lg11
-                         WHERE lg11.level = 1
-                       AND lg11.admin0_grid_id = lg1.grid_id)
-                       AND lg1.admin0_grid_id NOT IN (100050711, 100219347, 100089589, 100074576, 100259978, 100018514)
-                       AND lg1.admin0_grid_id NOT IN
-                         (100314737, 100083318, 100041128, 100133112, 100341242, 100132648, 100222839, 100379914, 100055707,
-                         100379993, 100130389, 100255271, 100363975, 100248845, 100001527, 100342458, 100024289, 100132795,
-                         100054605, 100253456, 100342975, 100074571)
-                     UNION ALL
-                     SELECT
-                         lg2.admin0_grid_id,
-                         lg2.admin1_grid_id,
-                         lg2.admin2_grid_id,
-                         lg2.admin3_grid_id,
-                         lg2.population,
-                         IF(ROUND(lg2.population / IF(lg2.country_code = 'US', 5000, 50000)) < 1, 1,
-                         ROUND(lg2.population / IF(lg2.country_code = 'US', 5000, 50000))) as needed
-                     FROM $wpdb->dt_location_grid lg2
-                     WHERE lg2.level = 1
-                       AND lg2.grid_id NOT IN (SELECT lg22.admin1_grid_id
-                         FROM $wpdb->dt_location_grid lg22
-                         WHERE lg22.level = 2
-                       AND lg22.admin1_grid_id = lg2.grid_id)
-                       AND lg2.admin0_grid_id NOT IN (100050711, 100219347, 100089589, 100074576, 100259978, 100018514)
-                       AND lg2.admin0_grid_id NOT IN
-                         (100314737, 100083318, 100041128, 100133112, 100341242, 100132648, 100222839, 100379914, 100055707,
-                         100379993, 100130389, 100255271, 100363975, 100248845, 100001527, 100342458, 100024289, 100132795,
-                         100054605, 100253456, 100342975, 100074571)
-                     UNION ALL
-                     SELECT
-                         lg3.admin0_grid_id,
-                         lg3.admin1_grid_id,
-                         lg3.admin2_grid_id,
-                         lg3.admin3_grid_id,
-                         lg3.population,
-                         IF(ROUND(lg3.population / IF(lg3.country_code = 'US', 5000, 50000)) < 1, 1,
-                         ROUND(lg3.population / IF(lg3.country_code = 'US', 5000, 50000))) as needed
-                     FROM $wpdb->dt_location_grid lg3
-                     WHERE lg3.level = 2
-                       AND lg3.admin0_grid_id NOT IN (100050711, 100219347, 100089589, 100074576, 100259978, 100018514)
-                       AND lg3.admin0_grid_id NOT IN
-                         (100314737, 100083318, 100041128, 100133112, 100341242, 100132648, 100222839, 100379914, 100055707,
-                         100379993, 100130389, 100255271, 100363975, 100248845, 100001527, 100342458, 100024289, 100132795,
-                         100054605, 100253456, 100342975, 100074571)
-                     UNION ALL
-                     SELECT
-                         lg4.admin0_grid_id,
-                         lg4.admin1_grid_id,
-                         lg4.admin2_grid_id,
-                         lg4.admin3_grid_id,
-                         lg4.population,
-                         IF(ROUND(lg4.population / IF(lg4.country_code = 'US', 5000, 50000)) < 1, 1,
-                         ROUND(lg4.population / IF(lg4.country_code = 'US', 5000, 50000))) as needed
-                     FROM $wpdb->dt_location_grid lg4
-                     WHERE lg4.level = 1
-                       AND lg4.admin0_grid_id NOT IN (100050711, 100219347, 100089589, 100074576, 100259978, 100018514)
-                       AND lg4.admin0_grid_id IN
-                         (100314737, 100083318, 100041128, 100133112, 100341242, 100132648, 100222839, 100379914, 100055707,
-                         100379993, 100130389, 100255271, 100363975, 100248845, 100001527, 100342458, 100024289, 100132795,
-                         100054605, 100253456, 100342975, 100074571)
-                     UNION ALL
-                     SELECT
-                         lg5.admin0_grid_id,
-                         lg5.admin1_grid_id,
-                         lg5.admin2_grid_id,
-                         lg5.admin3_grid_id,
-                         lg5.population,
-                         IF(ROUND(lg5.population / IF(lg5.country_code = 'US', 5000, 50000)) < 1, 1,
-                         ROUND(lg5.population / IF(lg5.country_code = 'US', 5000, 50000))) as needed
-                     FROM $wpdb->dt_location_grid as lg5
-                     WHERE lg5.level = 3
-                       AND lg5.admin0_grid_id IN (100050711, 100219347, 100089589, 100074576, 100259978, 100018514)
-                       AND lg5.admin0_grid_id NOT IN
-                         (100314737, 100083318, 100041128, 100133112, 100341242, 100132648, 100222839, 100379914, 100055707,
-                         100379993, 100130389, 100255271, 100363975, 100248845, 100001527, 100342458, 100024289, 100132795,
-                         100054605, 100253456, 100342975, 100074571)
-            ) as tb2
-            LEFT JOIN $wpdb->dt_location_grid loc ON tb2.admin2_grid_id=loc.grid_id
-            GROUP BY tb2.admin2_grid_id
-
-            UNION ALL
-
-            # 'Needs' GROUPED BY state level
-            SELECT tb1.admin1_grid_id as grid_id, loc.name, loc.country_code, SUM(tb1.population) as population, SUM(tb1.needed) as needed, (0) as reported, (0) as percent
-            FROM (
-                     SELECT
-                         lg1.admin0_grid_id,
-                         lg1.admin1_grid_id,
-                         lg1.admin2_grid_id,
-                         lg1.admin3_grid_id,
-                         lg1.population,
-                         IF(ROUND(lg1.population / IF(lg1.country_code = 'US', 5000, 50000)) < 1, 1,
-                            ROUND(lg1.population / IF(lg1.country_code = 'US', 5000, 50000))) as needed
-                     FROM $wpdb->dt_location_grid lg1
-                     WHERE lg1.level = 0
-                       AND lg1.grid_id NOT IN (SELECT lg11.admin0_grid_id
-                                               FROM $wpdb->dt_location_grid lg11
-                                               WHERE lg11.level = 1
-                                                 AND lg11.admin0_grid_id = lg1.grid_id)
-                       AND lg1.admin0_grid_id NOT IN (100050711, 100219347, 100089589, 100074576, 100259978, 100018514)
-                       AND lg1.admin0_grid_id NOT IN
-                           (100314737, 100083318, 100041128, 100133112, 100341242, 100132648, 100222839, 100379914, 100055707,
-                            100379993, 100130389, 100255271, 100363975, 100248845, 100001527, 100342458, 100024289, 100132795,
-                            100054605, 100253456, 100342975, 100074571)
-                     UNION ALL
-                     SELECT
-                         lg2.admin0_grid_id,
-                         lg2.admin1_grid_id,
-                         lg2.admin2_grid_id,
-                         lg2.admin3_grid_id,
-                         lg2.population,
-                         IF(ROUND(lg2.population / IF(lg2.country_code = 'US', 5000, 50000)) < 1, 1,
-                            ROUND(lg2.population / IF(lg2.country_code = 'US', 5000, 50000))) as needed
-                     FROM $wpdb->dt_location_grid lg2
-                     WHERE lg2.level = 1
-                       AND lg2.grid_id NOT IN (SELECT lg22.admin1_grid_id
-                                               FROM $wpdb->dt_location_grid lg22
-                                               WHERE lg22.level = 2
-                                                 AND lg22.admin1_grid_id = lg2.grid_id)
-                       AND lg2.admin0_grid_id NOT IN (100050711, 100219347, 100089589, 100074576, 100259978, 100018514)
-                       AND lg2.admin0_grid_id NOT IN
-                           (100314737, 100083318, 100041128, 100133112, 100341242, 100132648, 100222839, 100379914, 100055707,
-                            100379993, 100130389, 100255271, 100363975, 100248845, 100001527, 100342458, 100024289, 100132795,
-                            100054605, 100253456, 100342975, 100074571)
-                     UNION ALL
-                     SELECT
-                         lg3.admin0_grid_id,
-                         lg3.admin1_grid_id,
-                         lg3.admin2_grid_id,
-                         lg3.admin3_grid_id,
-                         lg3.population,
-                         IF(ROUND(lg3.population / IF(lg3.country_code = 'US', 5000, 50000)) < 1, 1,
-                            ROUND(lg3.population / IF(lg3.country_code = 'US', 5000, 50000))) as needed
-                     FROM $wpdb->dt_location_grid lg3
-                     WHERE lg3.level = 2
-                       AND lg3.admin0_grid_id NOT IN (100050711, 100219347, 100089589, 100074576, 100259978, 100018514)
-                       AND lg3.admin0_grid_id NOT IN
-                           (100314737, 100083318, 100041128, 100133112, 100341242, 100132648, 100222839, 100379914, 100055707,
-                            100379993, 100130389, 100255271, 100363975, 100248845, 100001527, 100342458, 100024289, 100132795,
-                            100054605, 100253456, 100342975, 100074571)
-                     UNION ALL
-                     SELECT
-                         lg4.admin0_grid_id,
-                         lg4.admin1_grid_id,
-                         lg4.admin2_grid_id,
-                         lg4.admin3_grid_id,
-                         lg4.population,
-                         IF(ROUND(lg4.population / IF(lg4.country_code = 'US', 5000, 50000)) < 1, 1,
-                            ROUND(lg4.population / IF(lg4.country_code = 'US', 5000, 50000))) as needed
-                     FROM $wpdb->dt_location_grid lg4
-                     WHERE lg4.level = 1
-                       AND lg4.admin0_grid_id NOT IN (100050711, 100219347, 100089589, 100074576, 100259978, 100018514)
-                       AND lg4.admin0_grid_id IN
-                           (100314737, 100083318, 100041128, 100133112, 100341242, 100132648, 100222839, 100379914, 100055707,
-                            100379993, 100130389, 100255271, 100363975, 100248845, 100001527, 100342458, 100024289, 100132795,
-                            100054605, 100253456, 100342975, 100074571)
-                     UNION ALL
-                     SELECT
-                         lg5.admin0_grid_id,
-                         lg5.admin1_grid_id,
-                         lg5.admin2_grid_id,
-                         lg5.admin3_grid_id,
-                         lg5.population,
-                         IF(ROUND(lg5.population / IF(lg5.country_code = 'US', 5000, 50000)) < 1, 1,
-                            ROUND(lg5.population / IF(lg5.country_code = 'US', 5000, 50000))) as needed
-                     FROM $wpdb->dt_location_grid as lg5
-                     WHERE lg5.level = 3
-                       AND lg5.admin0_grid_id IN (100050711, 100219347, 100089589, 100074576, 100259978, 100018514)
-                       AND lg5.admin0_grid_id NOT IN
-                           (100314737, 100083318, 100041128, 100133112, 100341242, 100132648, 100222839, 100379914, 100055707,
-                            100379993, 100130389, 100255271, 100363975, 100248845, 100001527, 100342458, 100024289, 100132795,
-                            100054605, 100253456, 100342975, 100074571)
-            ) as tb1
-            LEFT JOIN $wpdb->dt_location_grid loc ON tb1.admin1_grid_id=loc.grid_id
-            GROUP BY tb1.admin1_grid_id
-
-            UNION ALL
-
-            # 'Needs' GROUPED BY country
-            SELECT tb0.admin0_grid_id as grid_id, loc.name,loc.country_code, SUM(tb0.population) as population, SUM(tb0.needed) as needed, (0) as reported, (0) as percent
-            FROM (
-                     # 44395 Records
-                     SELECT
-                         lg1.admin0_grid_id,
-                         lg1.admin1_grid_id,
-                         lg1.admin2_grid_id,
-                         lg1.admin3_grid_id,
-                         lg1.population,
-                         IF(ROUND(lg1.population / IF(lg1.country_code = 'US', 5000, 50000)) < 1, 1,
-                            ROUND(lg1.population / IF(lg1.country_code = 'US', 5000, 50000))) as needed
-                     FROM $wpdb->dt_location_grid lg1
-                     WHERE lg1.level = 0
-                       AND lg1.grid_id NOT IN (SELECT lg11.admin0_grid_id
-                                               FROM $wpdb->dt_location_grid lg11
-                                               WHERE lg11.level = 1
-                                                 AND lg11.admin0_grid_id = lg1.grid_id)
-                       AND lg1.admin0_grid_id NOT IN (100050711, 100219347, 100089589, 100074576, 100259978, 100018514)
-                       AND lg1.admin0_grid_id NOT IN
-                           (100314737, 100083318, 100041128, 100133112, 100341242, 100132648, 100222839, 100379914, 100055707,
-                            100379993, 100130389, 100255271, 100363975, 100248845, 100001527, 100342458, 100024289, 100132795,
-                            100054605, 100253456, 100342975, 100074571)
-                     UNION ALL
-                     SELECT
-                         lg2.admin0_grid_id,
-                         lg2.admin1_grid_id,
-                         lg2.admin2_grid_id,
-                         lg2.admin3_grid_id,
-                         lg2.population,
-                         IF(ROUND(lg2.population / IF(lg2.country_code = 'US', 5000, 50000)) < 1, 1,
-                            ROUND(lg2.population / IF(lg2.country_code = 'US', 5000, 50000))) as needed
-                     FROM $wpdb->dt_location_grid lg2
-                     WHERE lg2.level = 1
-                       AND lg2.grid_id NOT IN (SELECT lg22.admin1_grid_id
-                                               FROM $wpdb->dt_location_grid lg22
-                                               WHERE lg22.level = 2
-                                                 AND lg22.admin1_grid_id = lg2.grid_id)
-                       AND lg2.admin0_grid_id NOT IN (100050711, 100219347, 100089589, 100074576, 100259978, 100018514)
-                       AND lg2.admin0_grid_id NOT IN
-                           (100314737, 100083318, 100041128, 100133112, 100341242, 100132648, 100222839, 100379914, 100055707,
-                            100379993, 100130389, 100255271, 100363975, 100248845, 100001527, 100342458, 100024289, 100132795,
-                            100054605, 100253456, 100342975, 100074571)
-                     UNION ALL
-                     SELECT
-                         lg3.admin0_grid_id,
-                         lg3.admin1_grid_id,
-                         lg3.admin2_grid_id,
-                         lg3.admin3_grid_id,
-                         lg3.population,
-                         IF(ROUND(lg3.population / IF(lg3.country_code = 'US', 5000, 50000)) < 1, 1,
-                            ROUND(lg3.population / IF(lg3.country_code = 'US', 5000, 50000))) as needed
-                     FROM $wpdb->dt_location_grid lg3
-                     WHERE lg3.level = 2
-                       AND lg3.admin0_grid_id NOT IN (100050711, 100219347, 100089589, 100074576, 100259978, 100018514)
-                       AND lg3.admin0_grid_id NOT IN
-                           (100314737, 100083318, 100041128, 100133112, 100341242, 100132648, 100222839, 100379914, 100055707,
-                            100379993, 100130389, 100255271, 100363975, 100248845, 100001527, 100342458, 100024289, 100132795,
-                            100054605, 100253456, 100342975, 100074571)
-                     UNION ALL
-                     SELECT
-                         lg4.admin0_grid_id,
-                         lg4.admin1_grid_id,
-                         lg4.admin2_grid_id,
-                         lg4.admin3_grid_id,
-                         lg4.population,
-                         IF(ROUND(lg4.population / IF(lg4.country_code = 'US', 5000, 50000)) < 1, 1,
-                            ROUND(lg4.population / IF(lg4.country_code = 'US', 5000, 50000))) as needed
-                     FROM $wpdb->dt_location_grid lg4
-                     WHERE lg4.level = 1
-                       AND lg4.admin0_grid_id NOT IN (100050711, 100219347, 100089589, 100074576, 100259978, 100018514)
-                       AND lg4.admin0_grid_id IN
-                           (100314737, 100083318, 100041128, 100133112, 100341242, 100132648, 100222839, 100379914, 100055707,
-                            100379993, 100130389, 100255271, 100363975, 100248845, 100001527, 100342458, 100024289, 100132795,
-                            100054605, 100253456, 100342975, 100074571)
-                     UNION ALL
-                     SELECT
-                         lg5.admin0_grid_id,
-                         lg5.admin1_grid_id,
-                         lg5.admin2_grid_id,
-                         lg5.admin3_grid_id,
-                         lg5.population,
-                         IF(ROUND(lg5.population / IF(lg5.country_code = 'US', 5000, 50000)) < 1, 1,
-                            ROUND(lg5.population / IF(lg5.country_code = 'US', 5000, 50000))) as needed
-                     FROM $wpdb->dt_location_grid as lg5
-                     WHERE lg5.level = 3
-                       AND lg5.admin0_grid_id IN (100050711, 100219347, 100089589, 100074576, 100259978, 100018514)
-                       AND lg5.admin0_grid_id NOT IN
-                           (100314737, 100083318, 100041128, 100133112, 100341242, 100132648, 100222839, 100379914, 100055707,
-                            100379993, 100130389, 100255271, 100363975, 100248845, 100001527, 100342458, 100024289, 100132795,
-                            100054605, 100253456, 100342975, 100074571)
-            ) as tb0
-            LEFT JOIN $wpdb->dt_location_grid loc ON tb0.admin0_grid_id=loc.grid_id
-            GROUP BY tb0.admin0_grid_id
-        ", ARRAY_A );
-
-        return $flat_grid;
-    }
-
-    public static function query_flat_grid_by_level( $administrative_level ) {
-        global $wpdb;
-        switch ( $administrative_level ) {
-            case 'a0':
-                $results = $wpdb->get_results("
-                    # 'Needs' GROUPED BY country
-                    SELECT tb0.admin0_grid_id as grid_id, loc.name,loc.country_code, SUM(tb0.population) as population, SUM(tb0.needed) as needed, (0) as reported, (0) as percent
-                    FROM (
-                             # 44395 Records
-                             SELECT
-                                 lg1.admin0_grid_id,
-                                 lg1.admin1_grid_id,
-                                 lg1.admin2_grid_id,
-                                 lg1.admin3_grid_id,
-                                 lg1.population,
-                                 IF(ROUND(lg1.population / IF(lg1.country_code = 'US', 5000, 50000)) < 1, 1,
-                                    ROUND(lg1.population / IF(lg1.country_code = 'US', 5000, 50000))) as needed
-                             FROM $wpdb->dt_location_grid lg1
-                             WHERE lg1.level = 0
-                               AND lg1.grid_id NOT IN (SELECT lg11.admin0_grid_id
-                                                       FROM $wpdb->dt_location_grid lg11
-                                                       WHERE lg11.level = 1
-                                                         AND lg11.admin0_grid_id = lg1.grid_id)
-                               AND lg1.admin0_grid_id NOT IN (100050711, 100219347, 100089589, 100074576, 100259978, 100018514)
-                               AND lg1.admin0_grid_id NOT IN
-                                   (100314737, 100083318, 100041128, 100133112, 100341242, 100132648, 100222839, 100379914, 100055707,
-                                    100379993, 100130389, 100255271, 100363975, 100248845, 100001527, 100342458, 100024289, 100132795,
-                                    100054605, 100253456, 100342975, 100074571)
-                             UNION ALL
-                             SELECT
-                                 lg2.admin0_grid_id,
-                                 lg2.admin1_grid_id,
-                                 lg2.admin2_grid_id,
-                                 lg2.admin3_grid_id,
-                                 lg2.population,
-                                 IF(ROUND(lg2.population / IF(lg2.country_code = 'US', 5000, 50000)) < 1, 1,
-                                    ROUND(lg2.population / IF(lg2.country_code = 'US', 5000, 50000))) as needed
-                             FROM $wpdb->dt_location_grid lg2
-                             WHERE lg2.level = 1
-                               AND lg2.grid_id NOT IN (SELECT lg22.admin1_grid_id
-                                                       FROM $wpdb->dt_location_grid lg22
-                                                       WHERE lg22.level = 2
-                                                         AND lg22.admin1_grid_id = lg2.grid_id)
-                               AND lg2.admin0_grid_id NOT IN (100050711, 100219347, 100089589, 100074576, 100259978, 100018514)
-                               AND lg2.admin0_grid_id NOT IN
-                                   (100314737, 100083318, 100041128, 100133112, 100341242, 100132648, 100222839, 100379914, 100055707,
-                                    100379993, 100130389, 100255271, 100363975, 100248845, 100001527, 100342458, 100024289, 100132795,
-                                    100054605, 100253456, 100342975, 100074571)
-                             UNION ALL
-                             SELECT
-                                 lg3.admin0_grid_id,
-                                 lg3.admin1_grid_id,
-                                 lg3.admin2_grid_id,
-                                 lg3.admin3_grid_id,
-                                 lg3.population,
-                                 IF(ROUND(lg3.population / IF(lg3.country_code = 'US', 5000, 50000)) < 1, 1,
-                                    ROUND(lg3.population / IF(lg3.country_code = 'US', 5000, 50000))) as needed
-                             FROM $wpdb->dt_location_grid lg3
-                             WHERE lg3.level = 2
-                               AND lg3.admin0_grid_id NOT IN (100050711, 100219347, 100089589, 100074576, 100259978, 100018514)
-                               AND lg3.admin0_grid_id NOT IN
-                                   (100314737, 100083318, 100041128, 100133112, 100341242, 100132648, 100222839, 100379914, 100055707,
-                                    100379993, 100130389, 100255271, 100363975, 100248845, 100001527, 100342458, 100024289, 100132795,
-                                    100054605, 100253456, 100342975, 100074571)
-                             UNION ALL
-                             SELECT
-                                 lg4.admin0_grid_id,
-                                 lg4.admin1_grid_id,
-                                 lg4.admin2_grid_id,
-                                 lg4.admin3_grid_id,
-                                 lg4.population,
-                                 IF(ROUND(lg4.population / IF(lg4.country_code = 'US', 5000, 50000)) < 1, 1,
-                                    ROUND(lg4.population / IF(lg4.country_code = 'US', 5000, 50000))) as needed
-                             FROM $wpdb->dt_location_grid lg4
-                             WHERE lg4.level = 1
-                               AND lg4.admin0_grid_id NOT IN (100050711, 100219347, 100089589, 100074576, 100259978, 100018514)
-                               AND lg4.admin0_grid_id IN
-                                   (100314737, 100083318, 100041128, 100133112, 100341242, 100132648, 100222839, 100379914, 100055707,
-                                    100379993, 100130389, 100255271, 100363975, 100248845, 100001527, 100342458, 100024289, 100132795,
-                                    100054605, 100253456, 100342975, 100074571)
-                             UNION ALL
-                             SELECT
-                                 lg5.admin0_grid_id,
-                                 lg5.admin1_grid_id,
-                                 lg5.admin2_grid_id,
-                                 lg5.admin3_grid_id,
-                                 lg5.population,
-                                 IF(ROUND(lg5.population / IF(lg5.country_code = 'US', 5000, 50000)) < 1, 1,
-                                    ROUND(lg5.population / IF(lg5.country_code = 'US', 5000, 50000))) as needed
-                             FROM $wpdb->dt_location_grid as lg5
-                             WHERE lg5.level = 3
-                               AND lg5.admin0_grid_id IN (100050711, 100219347, 100089589, 100074576, 100259978, 100018514)
-                               AND lg5.admin0_grid_id NOT IN
-                                   (100314737, 100083318, 100041128, 100133112, 100341242, 100132648, 100222839, 100379914, 100055707,
-                                    100379993, 100130389, 100255271, 100363975, 100248845, 100001527, 100342458, 100024289, 100132795,
-                                    100054605, 100253456, 100342975, 100074571)
-                    ) as tb0
-                    LEFT JOIN $wpdb->dt_location_grid loc ON tb0.admin0_grid_id=loc.grid_id
-                    GROUP BY tb0.admin0_grid_id
-                ", ARRAY_A );
-                break;
-            case 'a1':
-                $results = $wpdb->get_results("
-                    # 'Needs' GROUPED BY state level
-                    SELECT tb1.admin1_grid_id as grid_id, loc.name, loc.country_code, SUM(tb1.population) as population, SUM(tb1.needed) as needed, (0) as reported, (0) as percent
-                    FROM (
-                             SELECT
-                                 lg1.admin0_grid_id,
-                                 lg1.admin1_grid_id,
-                                 lg1.admin2_grid_id,
-                                 lg1.admin3_grid_id,
-                                 lg1.population,
-                                 IF(ROUND(lg1.population / IF(lg1.country_code = 'US', 5000, 50000)) < 1, 1,
-                                    ROUND(lg1.population / IF(lg1.country_code = 'US', 5000, 50000))) as needed
-                             FROM $wpdb->dt_location_grid lg1
-                             WHERE lg1.level = 0
-                               AND lg1.grid_id NOT IN (SELECT lg11.admin0_grid_id
-                                                       FROM $wpdb->dt_location_grid lg11
-                                                       WHERE lg11.level = 1
-                                                         AND lg11.admin0_grid_id = lg1.grid_id)
-                               AND lg1.admin0_grid_id NOT IN (100050711, 100219347, 100089589, 100074576, 100259978, 100018514)
-                               AND lg1.admin0_grid_id NOT IN
-                                   (100314737, 100083318, 100041128, 100133112, 100341242, 100132648, 100222839, 100379914, 100055707,
-                                    100379993, 100130389, 100255271, 100363975, 100248845, 100001527, 100342458, 100024289, 100132795,
-                                    100054605, 100253456, 100342975, 100074571)
-                             UNION ALL
-                             SELECT
-                                 lg2.admin0_grid_id,
-                                 lg2.admin1_grid_id,
-                                 lg2.admin2_grid_id,
-                                 lg2.admin3_grid_id,
-                                 lg2.population,
-                                 IF(ROUND(lg2.population / IF(lg2.country_code = 'US', 5000, 50000)) < 1, 1,
-                                    ROUND(lg2.population / IF(lg2.country_code = 'US', 5000, 50000))) as needed
-                             FROM $wpdb->dt_location_grid lg2
-                             WHERE lg2.level = 1
-                               AND lg2.grid_id NOT IN (SELECT lg22.admin1_grid_id
-                                                       FROM $wpdb->dt_location_grid lg22
-                                                       WHERE lg22.level = 2
-                                                         AND lg22.admin1_grid_id = lg2.grid_id)
-                               AND lg2.admin0_grid_id NOT IN (100050711, 100219347, 100089589, 100074576, 100259978, 100018514)
-                               AND lg2.admin0_grid_id NOT IN
-                                   (100314737, 100083318, 100041128, 100133112, 100341242, 100132648, 100222839, 100379914, 100055707,
-                                    100379993, 100130389, 100255271, 100363975, 100248845, 100001527, 100342458, 100024289, 100132795,
-                                    100054605, 100253456, 100342975, 100074571)
-                             UNION ALL
-                             SELECT
-                                 lg3.admin0_grid_id,
-                                 lg3.admin1_grid_id,
-                                 lg3.admin2_grid_id,
-                                 lg3.admin3_grid_id,
-                                 lg3.population,
-                                 IF(ROUND(lg3.population / IF(lg3.country_code = 'US', 5000, 50000)) < 1, 1,
-                                    ROUND(lg3.population / IF(lg3.country_code = 'US', 5000, 50000))) as needed
-                             FROM $wpdb->dt_location_grid lg3
-                             WHERE lg3.level = 2
-                               AND lg3.admin0_grid_id NOT IN (100050711, 100219347, 100089589, 100074576, 100259978, 100018514)
-                               AND lg3.admin0_grid_id NOT IN
-                                   (100314737, 100083318, 100041128, 100133112, 100341242, 100132648, 100222839, 100379914, 100055707,
-                                    100379993, 100130389, 100255271, 100363975, 100248845, 100001527, 100342458, 100024289, 100132795,
-                                    100054605, 100253456, 100342975, 100074571)
-                             UNION ALL
-                             SELECT
-                                 lg4.admin0_grid_id,
-                                 lg4.admin1_grid_id,
-                                 lg4.admin2_grid_id,
-                                 lg4.admin3_grid_id,
-                                 lg4.population,
-                                 IF(ROUND(lg4.population / IF(lg4.country_code = 'US', 5000, 50000)) < 1, 1,
-                                    ROUND(lg4.population / IF(lg4.country_code = 'US', 5000, 50000))) as needed
-                             FROM $wpdb->dt_location_grid lg4
-                             WHERE lg4.level = 1
-                               AND lg4.admin0_grid_id NOT IN (100050711, 100219347, 100089589, 100074576, 100259978, 100018514)
-                               AND lg4.admin0_grid_id IN
-                                   (100314737, 100083318, 100041128, 100133112, 100341242, 100132648, 100222839, 100379914, 100055707,
-                                    100379993, 100130389, 100255271, 100363975, 100248845, 100001527, 100342458, 100024289, 100132795,
-                                    100054605, 100253456, 100342975, 100074571)
-                             UNION ALL
-                             SELECT
-                                 lg5.admin0_grid_id,
-                                 lg5.admin1_grid_id,
-                                 lg5.admin2_grid_id,
-                                 lg5.admin3_grid_id,
-                                 lg5.population,
-                                 IF(ROUND(lg5.population / IF(lg5.country_code = 'US', 5000, 50000)) < 1, 1,
-                                    ROUND(lg5.population / IF(lg5.country_code = 'US', 5000, 50000))) as needed
-                             FROM $wpdb->dt_location_grid as lg5
-                             WHERE lg5.level = 3
-                               AND lg5.admin0_grid_id IN (100050711, 100219347, 100089589, 100074576, 100259978, 100018514)
-                               AND lg5.admin0_grid_id NOT IN
-                                   (100314737, 100083318, 100041128, 100133112, 100341242, 100132648, 100222839, 100379914, 100055707,
-                                    100379993, 100130389, 100255271, 100363975, 100248845, 100001527, 100342458, 100024289, 100132795,
-                                    100054605, 100253456, 100342975, 100074571)
-                    ) as tb1
-                    LEFT JOIN $wpdb->dt_location_grid loc ON tb1.admin1_grid_id=loc.grid_id
-                    GROUP BY tb1.admin1_grid_id
-                ", ARRAY_A );
-                break;
-            case 'a2':
-                $results = $wpdb->get_results("
-                    # 'Needs' GROUPED BY county level
-                    SELECT tb2.admin2_grid_id as grid_id, loc.name, loc.country_code, SUM(tb2.population) as population, SUM(tb2.needed) as needed, (0) as reported, (0) as percent
-                    FROM (
-                             SELECT
-                                 lg1.admin0_grid_id,
-                                 lg1.admin1_grid_id,
-                                 lg1.admin2_grid_id,
-                                 lg1.admin3_grid_id,
-                                 lg1.population,
-                                 IF(ROUND(lg1.population / IF(lg1.country_code = 'US', 5000, 50000)) < 1, 1,
-                                    ROUND(lg1.population / IF(lg1.country_code = 'US', 5000, 50000))) as needed
-                             FROM $wpdb->dt_location_grid lg1
-                             WHERE lg1.level = 0
-                               AND lg1.grid_id NOT IN (SELECT lg11.admin0_grid_id
-                                 FROM $wpdb->dt_location_grid lg11
-                                 WHERE lg11.level = 1
-                               AND lg11.admin0_grid_id = lg1.grid_id)
-                               AND lg1.admin0_grid_id NOT IN (100050711, 100219347, 100089589, 100074576, 100259978, 100018514)
-                               AND lg1.admin0_grid_id NOT IN
-                                 (100314737, 100083318, 100041128, 100133112, 100341242, 100132648, 100222839, 100379914, 100055707,
-                                 100379993, 100130389, 100255271, 100363975, 100248845, 100001527, 100342458, 100024289, 100132795,
-                                 100054605, 100253456, 100342975, 100074571)
-                             UNION ALL
-                             SELECT
-                                 lg2.admin0_grid_id,
-                                 lg2.admin1_grid_id,
-                                 lg2.admin2_grid_id,
-                                 lg2.admin3_grid_id,
-                                 lg2.population,
-                                 IF(ROUND(lg2.population / IF(lg2.country_code = 'US', 5000, 50000)) < 1, 1,
-                                 ROUND(lg2.population / IF(lg2.country_code = 'US', 5000, 50000))) as needed
-                             FROM $wpdb->dt_location_grid lg2
-                             WHERE lg2.level = 1
-                               AND lg2.grid_id NOT IN (SELECT lg22.admin1_grid_id
-                                 FROM $wpdb->dt_location_grid lg22
-                                 WHERE lg22.level = 2
-                               AND lg22.admin1_grid_id = lg2.grid_id)
-                               AND lg2.admin0_grid_id NOT IN (100050711, 100219347, 100089589, 100074576, 100259978, 100018514)
-                               AND lg2.admin0_grid_id NOT IN
-                                 (100314737, 100083318, 100041128, 100133112, 100341242, 100132648, 100222839, 100379914, 100055707,
-                                 100379993, 100130389, 100255271, 100363975, 100248845, 100001527, 100342458, 100024289, 100132795,
-                                 100054605, 100253456, 100342975, 100074571)
-                             UNION ALL
-                             SELECT
-                                 lg3.admin0_grid_id,
-                                 lg3.admin1_grid_id,
-                                 lg3.admin2_grid_id,
-                                 lg3.admin3_grid_id,
-                                 lg3.population,
-                                 IF(ROUND(lg3.population / IF(lg3.country_code = 'US', 5000, 50000)) < 1, 1,
-                                 ROUND(lg3.population / IF(lg3.country_code = 'US', 5000, 50000))) as needed
-                             FROM $wpdb->dt_location_grid lg3
-                             WHERE lg3.level = 2
-                               AND lg3.admin0_grid_id NOT IN (100050711, 100219347, 100089589, 100074576, 100259978, 100018514)
-                               AND lg3.admin0_grid_id NOT IN
-                                 (100314737, 100083318, 100041128, 100133112, 100341242, 100132648, 100222839, 100379914, 100055707,
-                                 100379993, 100130389, 100255271, 100363975, 100248845, 100001527, 100342458, 100024289, 100132795,
-                                 100054605, 100253456, 100342975, 100074571)
-                             UNION ALL
-                             SELECT
-                                 lg4.admin0_grid_id,
-                                 lg4.admin1_grid_id,
-                                 lg4.admin2_grid_id,
-                                 lg4.admin3_grid_id,
-                                 lg4.population,
-                                 IF(ROUND(lg4.population / IF(lg4.country_code = 'US', 5000, 50000)) < 1, 1,
-                                 ROUND(lg4.population / IF(lg4.country_code = 'US', 5000, 50000))) as needed
-                             FROM $wpdb->dt_location_grid lg4
-                             WHERE lg4.level = 1
-                               AND lg4.admin0_grid_id NOT IN (100050711, 100219347, 100089589, 100074576, 100259978, 100018514)
-                               AND lg4.admin0_grid_id IN
-                                 (100314737, 100083318, 100041128, 100133112, 100341242, 100132648, 100222839, 100379914, 100055707,
-                                 100379993, 100130389, 100255271, 100363975, 100248845, 100001527, 100342458, 100024289, 100132795,
-                                 100054605, 100253456, 100342975, 100074571)
-                             UNION ALL
-                             SELECT
-                                 lg5.admin0_grid_id,
-                                 lg5.admin1_grid_id,
-                                 lg5.admin2_grid_id,
-                                 lg5.admin3_grid_id,
-                                 lg5.population,
-                                 IF(ROUND(lg5.population / IF(lg5.country_code = 'US', 5000, 50000)) < 1, 1,
-                                 ROUND(lg5.population / IF(lg5.country_code = 'US', 5000, 50000))) as needed
-                             FROM $wpdb->dt_location_grid as lg5
-                             WHERE lg5.level = 3
-                               AND lg5.admin0_grid_id IN (100050711, 100219347, 100089589, 100074576, 100259978, 100018514)
-                               AND lg5.admin0_grid_id NOT IN
-                                 (100314737, 100083318, 100041128, 100133112, 100341242, 100132648, 100222839, 100379914, 100055707,
-                                 100379993, 100130389, 100255271, 100363975, 100248845, 100001527, 100342458, 100024289, 100132795,
-                                 100054605, 100253456, 100342975, 100074571)
-                    ) as tb2
-                    LEFT JOIN $wpdb->dt_location_grid loc ON tb2.admin2_grid_id=loc.grid_id
-                    GROUP BY tb2.admin2_grid_id
-                ", ARRAY_A );
-                break;
-            case 'a3':
-                $results = $wpdb->get_results("
-                    # 'Needs' GROUPED BY sub-county level
-                    SELECT tb3.admin3_grid_id as grid_id, loc.name, loc.country_code, SUM(tb3.population) as population, SUM(tb3.needed) as needed, (0) as reported, (0) as percent
-                    FROM (
-                             # 44395 Records
-                             SELECT
-                                 lg1.admin0_grid_id,
-                                 lg1.admin1_grid_id,
-                                 lg1.admin2_grid_id,
-                                 lg1.admin3_grid_id,
-                                 lg1.population,
-                                 IF(ROUND(lg1.population / IF(lg1.country_code = 'US', 5000, 50000)) < 1, 1,
-                                    ROUND(lg1.population / IF(lg1.country_code = 'US', 5000, 50000))) as needed
-                             FROM $wpdb->dt_location_grid lg1
-                             WHERE lg1.level = 0
-                               AND lg1.grid_id NOT IN (SELECT lg11.admin0_grid_id
-                                                       FROM $wpdb->dt_location_grid lg11
-                                                       WHERE lg11.level = 1
-                                                         AND lg11.admin0_grid_id = lg1.grid_id)
-                               AND lg1.admin0_grid_id NOT IN (100050711, 100219347, 100089589, 100074576, 100259978, 100018514)
-                               AND lg1.admin0_grid_id NOT IN
-                                   (100314737, 100083318, 100041128, 100133112, 100341242, 100132648, 100222839, 100379914, 100055707,
-                                    100379993, 100130389, 100255271, 100363975, 100248845, 100001527, 100342458, 100024289, 100132795,
-                                    100054605, 100253456, 100342975, 100074571)
-                             UNION ALL
-                             SELECT
-                                 lg2.admin0_grid_id,
-                                 lg2.admin1_grid_id,
-                                 lg2.admin2_grid_id,
-                                 lg2.admin3_grid_id,
-                                 lg2.population,
-                                 IF(ROUND(lg2.population / IF(lg2.country_code = 'US', 5000, 50000)) < 1, 1,
-                                    ROUND(lg2.population / IF(lg2.country_code = 'US', 5000, 50000))) as needed
-                             FROM $wpdb->dt_location_grid lg2
-                             WHERE lg2.level = 1
-                               AND lg2.grid_id NOT IN (SELECT lg22.admin1_grid_id
-                                                       FROM $wpdb->dt_location_grid lg22
-                                                       WHERE lg22.level = 2
-                                                         AND lg22.admin1_grid_id = lg2.grid_id)
-                               AND lg2.admin0_grid_id NOT IN (100050711, 100219347, 100089589, 100074576, 100259978, 100018514)
-                               AND lg2.admin0_grid_id NOT IN
-                                   (100314737, 100083318, 100041128, 100133112, 100341242, 100132648, 100222839, 100379914, 100055707,
-                                    100379993, 100130389, 100255271, 100363975, 100248845, 100001527, 100342458, 100024289, 100132795,
-                                    100054605, 100253456, 100342975, 100074571)
-                             UNION ALL
-                             SELECT
-                                 lg3.admin0_grid_id,
-                                 lg3.admin1_grid_id,
-                                 lg3.admin2_grid_id,
-                                 lg3.admin3_grid_id,
-                                 lg3.population,
-                                 IF(ROUND(lg3.population / IF(lg3.country_code = 'US', 5000, 50000)) < 1, 1,
-                                    ROUND(lg3.population / IF(lg3.country_code = 'US', 5000, 50000))) as needed
-                             FROM $wpdb->dt_location_grid lg3
-                             WHERE lg3.level = 2
-                               AND lg3.admin0_grid_id NOT IN (100050711, 100219347, 100089589, 100074576, 100259978, 100018514)
-                               AND lg3.admin0_grid_id NOT IN
-                                   (100314737, 100083318, 100041128, 100133112, 100341242, 100132648, 100222839, 100379914, 100055707,
-                                    100379993, 100130389, 100255271, 100363975, 100248845, 100001527, 100342458, 100024289, 100132795,
-                                    100054605, 100253456, 100342975, 100074571)
-                             UNION ALL
-                             SELECT
-                                 lg4.admin0_grid_id,
-                                 lg4.admin1_grid_id,
-                                 lg4.admin2_grid_id,
-                                 lg4.admin3_grid_id,
-                                 lg4.population,
-                                 IF(ROUND(lg4.population / IF(lg4.country_code = 'US', 5000, 50000)) < 1, 1,
-                                    ROUND(lg4.population / IF(lg4.country_code = 'US', 5000, 50000))) as needed
-                             FROM $wpdb->dt_location_grid lg4
-                             WHERE lg4.level = 1
-                               AND lg4.admin0_grid_id NOT IN (100050711, 100219347, 100089589, 100074576, 100259978, 100018514)
-                               AND lg4.admin0_grid_id IN
-                                   (100314737, 100083318, 100041128, 100133112, 100341242, 100132648, 100222839, 100379914, 100055707,
-                                    100379993, 100130389, 100255271, 100363975, 100248845, 100001527, 100342458, 100024289, 100132795,
-                                    100054605, 100253456, 100342975, 100074571)
-                             UNION ALL
-                             SELECT
-                                 lg5.admin0_grid_id,
-                                 lg5.admin1_grid_id,
-                                 lg5.admin2_grid_id,
-                                 lg5.admin3_grid_id,
-                                 lg5.population,
-                                 IF(ROUND(lg5.population / IF(lg5.country_code = 'US', 5000, 50000)) < 1, 1,
-                                    ROUND(lg5.population / IF(lg5.country_code = 'US', 5000, 50000))) as needed
-                             FROM $wpdb->dt_location_grid as lg5
-                             WHERE lg5.level = 3
-                               AND lg5.admin0_grid_id IN (100050711, 100219347, 100089589, 100074576, 100259978, 100018514)
-                               AND lg5.admin0_grid_id NOT IN
-                                   (100314737, 100083318, 100041128, 100133112, 100341242, 100132648, 100222839, 100379914, 100055707,
-                                    100379993, 100130389, 100255271, 100363975, 100248845, 100001527, 100342458, 100024289, 100132795,
-                                    100054605, 100253456, 100342975, 100074571)
-                    ) as tb3
-                    LEFT JOIN $wpdb->dt_location_grid loc ON tb3.admin3_grid_id=loc.grid_id
-                    WHERE tb3.admin3_grid_id IS NOT NULL
-                    GROUP BY tb3.admin3_grid_id
-                ", ARRAY_A );
-                break;
-            case 'world':
-                $results = $wpdb->get_results("
-                    # World
-                    SELECT 1 as grid_id, 'World' as name,'' as country_code, SUM(tbw.population) as population, SUM(tbw.needed) as needed, (0) as reported, (0) as percent
-                    FROM (
-                             # 44395 Records
-                             SELECT
-                                 'World',
-                                 lg1.admin0_grid_id,
-                                 lg1.admin1_grid_id,
-                                 lg1.admin2_grid_id,
-                                 lg1.admin3_grid_id,
-                                 lg1.population,
-                                 IF(ROUND(lg1.population / IF(lg1.country_code = 'US', 5000, 50000)) < 1, 1,
-                                    ROUND(lg1.population / IF(lg1.country_code = 'US', 5000, 50000))) as needed
-                             FROM $wpdb->dt_location_grid lg1
-                             WHERE lg1.level = 0
-                               AND lg1.grid_id NOT IN (SELECT lg11.admin0_grid_id
-                                                       FROM $wpdb->dt_location_grid lg11
-                                                       WHERE lg11.level = 1
-                                                         AND lg11.admin0_grid_id = lg1.grid_id)
-                               AND lg1.admin0_grid_id NOT IN (100050711, 100219347, 100089589, 100074576, 100259978, 100018514)
-                               AND lg1.admin0_grid_id NOT IN
-                                   (100314737, 100083318, 100041128, 100133112, 100341242, 100132648, 100222839, 100379914, 100055707,
-                                    100379993, 100130389, 100255271, 100363975, 100248845, 100001527, 100342458, 100024289, 100132795,
-                                    100054605, 100253456, 100342975, 100074571)
-                             UNION ALL
-                             SELECT
-                                 'World',
-                                 lg2.admin0_grid_id,
-                                 lg2.admin1_grid_id,
-                                 lg2.admin2_grid_id,
-                                 lg2.admin3_grid_id,
-                                 lg2.population,
-                                 IF(ROUND(lg2.population / IF(lg2.country_code = 'US', 5000, 50000)) < 1, 1,
-                                    ROUND(lg2.population / IF(lg2.country_code = 'US', 5000, 50000))) as needed
-                             FROM $wpdb->dt_location_grid lg2
-                             WHERE lg2.level = 1
-                               AND lg2.grid_id NOT IN (SELECT lg22.admin1_grid_id
-                                                       FROM $wpdb->dt_location_grid lg22
-                                                       WHERE lg22.level = 2
-                                                         AND lg22.admin1_grid_id = lg2.grid_id)
-                               AND lg2.admin0_grid_id NOT IN (100050711, 100219347, 100089589, 100074576, 100259978, 100018514)
-                               AND lg2.admin0_grid_id NOT IN
-                                   (100314737, 100083318, 100041128, 100133112, 100341242, 100132648, 100222839, 100379914, 100055707,
-                                    100379993, 100130389, 100255271, 100363975, 100248845, 100001527, 100342458, 100024289, 100132795,
-                                    100054605, 100253456, 100342975, 100074571)
-                             UNION ALL
-                             SELECT
-                                 'World',
-                                 lg3.admin0_grid_id,
-                                 lg3.admin1_grid_id,
-                                 lg3.admin2_grid_id,
-                                 lg3.admin3_grid_id,
-                                 lg3.population,
-                                 IF(ROUND(lg3.population / IF(lg3.country_code = 'US', 5000, 50000)) < 1, 1,
-                                    ROUND(lg3.population / IF(lg3.country_code = 'US', 5000, 50000))) as needed
-                             FROM $wpdb->dt_location_grid lg3
-                             WHERE lg3.level = 2
-                               AND lg3.admin0_grid_id NOT IN (100050711, 100219347, 100089589, 100074576, 100259978, 100018514)
-                               AND lg3.admin0_grid_id NOT IN
-                                   (100314737, 100083318, 100041128, 100133112, 100341242, 100132648, 100222839, 100379914, 100055707,
-                                    100379993, 100130389, 100255271, 100363975, 100248845, 100001527, 100342458, 100024289, 100132795,
-                                    100054605, 100253456, 100342975, 100074571)
-                             UNION ALL
-                             SELECT
-                                 'World',
-                                 lg4.admin0_grid_id,
-                                 lg4.admin1_grid_id,
-                                 lg4.admin2_grid_id,
-                                 lg4.admin3_grid_id,
-                                 lg4.population,
-                                 IF(ROUND(lg4.population / IF(lg4.country_code = 'US', 5000, 50000)) < 1, 1,
-                                    ROUND(lg4.population / IF(lg4.country_code = 'US', 5000, 50000))) as needed
-                             FROM $wpdb->dt_location_grid lg4
-                             WHERE lg4.level = 1
-                               AND lg4.admin0_grid_id NOT IN (100050711, 100219347, 100089589, 100074576, 100259978, 100018514)
-                               AND lg4.admin0_grid_id IN
-                                   (100314737, 100083318, 100041128, 100133112, 100341242, 100132648, 100222839, 100379914, 100055707,
-                                    100379993, 100130389, 100255271, 100363975, 100248845, 100001527, 100342458, 100024289, 100132795,
-                                    100054605, 100253456, 100342975, 100074571)
-                             UNION ALL
-                             SELECT
-                                 'World',
-                                 lg5.admin0_grid_id,
-                                 lg5.admin1_grid_id,
-                                 lg5.admin2_grid_id,
-                                 lg5.admin3_grid_id,
-                                 lg5.population,
-                                 IF(ROUND(lg5.population / IF(lg5.country_code = 'US', 5000, 50000)) < 1, 1,
-                                    ROUND(lg5.population / IF(lg5.country_code = 'US', 5000, 50000))) as needed
-                             FROM $wpdb->dt_location_grid as lg5
-                             WHERE lg5.level = 3
-                               AND lg5.admin0_grid_id IN (100050711, 100219347, 100089589, 100074576, 100259978, 100018514)
-                               AND lg5.admin0_grid_id NOT IN
-                                   (100314737, 100083318, 100041128, 100133112, 100341242, 100132648, 100222839, 100379914, 100055707,
-                                    100379993, 100130389, 100255271, 100363975, 100248845, 100001527, 100342458, 100024289, 100132795,
-                                    100054605, 100253456, 100342975, 100074571)
-                    ) as tbw
-                    LEFT JOIN $wpdb->dt_location_grid loc ON 1=loc.grid_id
-                    GROUP BY 'World';
-                ", ARRAY_A );
-                break;
-            default:
-                $results = $wpdb->get_results("
-                    # 48367 Records
-                    # 'Needs' GROUPED BY sub-county level
-                    SELECT tb3.admin3_grid_id as grid_id, loc.name, loc.country_code, SUM(tb3.population) as population, SUM(tb3.needed) as needed, (0) as reported, (0) as percent
-                    FROM (
-                             # 44395 Records
-                             SELECT
-                                 lg1.admin0_grid_id,
-                                 lg1.admin1_grid_id,
-                                 lg1.admin2_grid_id,
-                                 lg1.admin3_grid_id,
-                                 lg1.population,
-                                 IF(ROUND(lg1.population / IF(lg1.country_code = 'US', 5000, 50000)) < 1, 1,
-                                    ROUND(lg1.population / IF(lg1.country_code = 'US', 5000, 50000))) as needed
-                             FROM $wpdb->dt_location_grid lg1
-                             WHERE lg1.level = 0
-                               AND lg1.grid_id NOT IN (SELECT lg11.admin0_grid_id
-                                                       FROM $wpdb->dt_location_grid lg11
-                                                       WHERE lg11.level = 1
-                                                         AND lg11.admin0_grid_id = lg1.grid_id)
-                               AND lg1.admin0_grid_id NOT IN (100050711, 100219347, 100089589, 100074576, 100259978, 100018514)
-                               AND lg1.admin0_grid_id NOT IN
-                                   (100314737, 100083318, 100041128, 100133112, 100341242, 100132648, 100222839, 100379914, 100055707,
-                                    100379993, 100130389, 100255271, 100363975, 100248845, 100001527, 100342458, 100024289, 100132795,
-                                    100054605, 100253456, 100342975, 100074571)
-                             UNION ALL
-                             SELECT
-                                 lg2.admin0_grid_id,
-                                 lg2.admin1_grid_id,
-                                 lg2.admin2_grid_id,
-                                 lg2.admin3_grid_id,
-                                 lg2.population,
-                                 IF(ROUND(lg2.population / IF(lg2.country_code = 'US', 5000, 50000)) < 1, 1,
-                                    ROUND(lg2.population / IF(lg2.country_code = 'US', 5000, 50000))) as needed
-                             FROM $wpdb->dt_location_grid lg2
-                             WHERE lg2.level = 1
-                               AND lg2.grid_id NOT IN (SELECT lg22.admin1_grid_id
-                                                       FROM $wpdb->dt_location_grid lg22
-                                                       WHERE lg22.level = 2
-                                                         AND lg22.admin1_grid_id = lg2.grid_id)
-                               AND lg2.admin0_grid_id NOT IN (100050711, 100219347, 100089589, 100074576, 100259978, 100018514)
-                               AND lg2.admin0_grid_id NOT IN
-                                   (100314737, 100083318, 100041128, 100133112, 100341242, 100132648, 100222839, 100379914, 100055707,
-                                    100379993, 100130389, 100255271, 100363975, 100248845, 100001527, 100342458, 100024289, 100132795,
-                                    100054605, 100253456, 100342975, 100074571)
-                             UNION ALL
-                             SELECT
-                                 lg3.admin0_grid_id,
-                                 lg3.admin1_grid_id,
-                                 lg3.admin2_grid_id,
-                                 lg3.admin3_grid_id,
-                                 lg3.population,
-                                 IF(ROUND(lg3.population / IF(lg3.country_code = 'US', 5000, 50000)) < 1, 1,
-                                    ROUND(lg3.population / IF(lg3.country_code = 'US', 5000, 50000))) as needed
-                             FROM $wpdb->dt_location_grid lg3
-                             WHERE lg3.level = 2
-                               AND lg3.admin0_grid_id NOT IN (100050711, 100219347, 100089589, 100074576, 100259978, 100018514)
-                               AND lg3.admin0_grid_id NOT IN
-                                   (100314737, 100083318, 100041128, 100133112, 100341242, 100132648, 100222839, 100379914, 100055707,
-                                    100379993, 100130389, 100255271, 100363975, 100248845, 100001527, 100342458, 100024289, 100132795,
-                                    100054605, 100253456, 100342975, 100074571)
-                             UNION ALL
-                             SELECT
-                                 lg4.admin0_grid_id,
-                                 lg4.admin1_grid_id,
-                                 lg4.admin2_grid_id,
-                                 lg4.admin3_grid_id,
-                                 lg4.population,
-                                 IF(ROUND(lg4.population / IF(lg4.country_code = 'US', 5000, 50000)) < 1, 1,
-                                    ROUND(lg4.population / IF(lg4.country_code = 'US', 5000, 50000))) as needed
-                             FROM $wpdb->dt_location_grid lg4
-                             WHERE lg4.level = 1
-                               AND lg4.admin0_grid_id NOT IN (100050711, 100219347, 100089589, 100074576, 100259978, 100018514)
-                               AND lg4.admin0_grid_id IN
-                                   (100314737, 100083318, 100041128, 100133112, 100341242, 100132648, 100222839, 100379914, 100055707,
-                                    100379993, 100130389, 100255271, 100363975, 100248845, 100001527, 100342458, 100024289, 100132795,
-                                    100054605, 100253456, 100342975, 100074571)
-                             UNION ALL
-                             SELECT
-                                 lg5.admin0_grid_id,
-                                 lg5.admin1_grid_id,
-                                 lg5.admin2_grid_id,
-                                 lg5.admin3_grid_id,
-                                 lg5.population,
-                                 IF(ROUND(lg5.population / IF(lg5.country_code = 'US', 5000, 50000)) < 1, 1,
-                                    ROUND(lg5.population / IF(lg5.country_code = 'US', 5000, 50000))) as needed
-                             FROM $wpdb->dt_location_grid as lg5
-                             WHERE lg5.level = 3
-                               AND lg5.admin0_grid_id IN (100050711, 100219347, 100089589, 100074576, 100259978, 100018514)
-                               AND lg5.admin0_grid_id NOT IN
-                                   (100314737, 100083318, 100041128, 100133112, 100341242, 100132648, 100222839, 100379914, 100055707,
-                                    100379993, 100130389, 100255271, 100363975, 100248845, 100001527, 100342458, 100024289, 100132795,
-                                    100054605, 100253456, 100342975, 100074571)
-                    ) as tb3
-                    LEFT JOIN $wpdb->dt_location_grid loc ON tb3.admin3_grid_id=loc.grid_id
-                    WHERE tb3.admin3_grid_id IS NOT NULL
-                    GROUP BY tb3.admin3_grid_id
-
-                    UNION ALL
-
-                    # 'Needs' GROUPED BY county level
-                    SELECT tb2.admin2_grid_id as grid_id, loc.name, loc.country_code, SUM(tb2.population) as population, SUM(tb2.needed) as needed, (0) as reported, (0) as percent
-                    FROM (
-                             SELECT
-                                 lg1.admin0_grid_id,
-                                 lg1.admin1_grid_id,
-                                 lg1.admin2_grid_id,
-                                 lg1.admin3_grid_id,
-                                 lg1.population,
-                                 IF(ROUND(lg1.population / IF(lg1.country_code = 'US', 5000, 50000)) < 1, 1,
-                                    ROUND(lg1.population / IF(lg1.country_code = 'US', 5000, 50000))) as needed
-                             FROM $wpdb->dt_location_grid lg1
-                             WHERE lg1.level = 0
-                               AND lg1.grid_id NOT IN (SELECT lg11.admin0_grid_id
-                                 FROM $wpdb->dt_location_grid lg11
-                                 WHERE lg11.level = 1
-                               AND lg11.admin0_grid_id = lg1.grid_id)
-                               AND lg1.admin0_grid_id NOT IN (100050711, 100219347, 100089589, 100074576, 100259978, 100018514)
-                               AND lg1.admin0_grid_id NOT IN
-                                 (100314737, 100083318, 100041128, 100133112, 100341242, 100132648, 100222839, 100379914, 100055707,
-                                 100379993, 100130389, 100255271, 100363975, 100248845, 100001527, 100342458, 100024289, 100132795,
-                                 100054605, 100253456, 100342975, 100074571)
-                             UNION ALL
-                             SELECT
-                                 lg2.admin0_grid_id,
-                                 lg2.admin1_grid_id,
-                                 lg2.admin2_grid_id,
-                                 lg2.admin3_grid_id,
-                                 lg2.population,
-                                 IF(ROUND(lg2.population / IF(lg2.country_code = 'US', 5000, 50000)) < 1, 1,
-                                 ROUND(lg2.population / IF(lg2.country_code = 'US', 5000, 50000))) as needed
-                             FROM $wpdb->dt_location_grid lg2
-                             WHERE lg2.level = 1
-                               AND lg2.grid_id NOT IN (SELECT lg22.admin1_grid_id
-                                 FROM $wpdb->dt_location_grid lg22
-                                 WHERE lg22.level = 2
-                               AND lg22.admin1_grid_id = lg2.grid_id)
-                               AND lg2.admin0_grid_id NOT IN (100050711, 100219347, 100089589, 100074576, 100259978, 100018514)
-                               AND lg2.admin0_grid_id NOT IN
-                                 (100314737, 100083318, 100041128, 100133112, 100341242, 100132648, 100222839, 100379914, 100055707,
-                                 100379993, 100130389, 100255271, 100363975, 100248845, 100001527, 100342458, 100024289, 100132795,
-                                 100054605, 100253456, 100342975, 100074571)
-                             UNION ALL
-                             SELECT
-                                 lg3.admin0_grid_id,
-                                 lg3.admin1_grid_id,
-                                 lg3.admin2_grid_id,
-                                 lg3.admin3_grid_id,
-                                 lg3.population,
-                                 IF(ROUND(lg3.population / IF(lg3.country_code = 'US', 5000, 50000)) < 1, 1,
-                                 ROUND(lg3.population / IF(lg3.country_code = 'US', 5000, 50000))) as needed
-                             FROM $wpdb->dt_location_grid lg3
-                             WHERE lg3.level = 2
-                               AND lg3.admin0_grid_id NOT IN (100050711, 100219347, 100089589, 100074576, 100259978, 100018514)
-                               AND lg3.admin0_grid_id NOT IN
-                                 (100314737, 100083318, 100041128, 100133112, 100341242, 100132648, 100222839, 100379914, 100055707,
-                                 100379993, 100130389, 100255271, 100363975, 100248845, 100001527, 100342458, 100024289, 100132795,
-                                 100054605, 100253456, 100342975, 100074571)
-                             UNION ALL
-                             SELECT
-                                 lg4.admin0_grid_id,
-                                 lg4.admin1_grid_id,
-                                 lg4.admin2_grid_id,
-                                 lg4.admin3_grid_id,
-                                 lg4.population,
-                                 IF(ROUND(lg4.population / IF(lg4.country_code = 'US', 5000, 50000)) < 1, 1,
-                                 ROUND(lg4.population / IF(lg4.country_code = 'US', 5000, 50000))) as needed
-                             FROM $wpdb->dt_location_grid lg4
-                             WHERE lg4.level = 1
-                               AND lg4.admin0_grid_id NOT IN (100050711, 100219347, 100089589, 100074576, 100259978, 100018514)
-                               AND lg4.admin0_grid_id IN
-                                 (100314737, 100083318, 100041128, 100133112, 100341242, 100132648, 100222839, 100379914, 100055707,
-                                 100379993, 100130389, 100255271, 100363975, 100248845, 100001527, 100342458, 100024289, 100132795,
-                                 100054605, 100253456, 100342975, 100074571)
-                             UNION ALL
-                             SELECT
-                                 lg5.admin0_grid_id,
-                                 lg5.admin1_grid_id,
-                                 lg5.admin2_grid_id,
-                                 lg5.admin3_grid_id,
-                                 lg5.population,
-                                 IF(ROUND(lg5.population / IF(lg5.country_code = 'US', 5000, 50000)) < 1, 1,
-                                 ROUND(lg5.population / IF(lg5.country_code = 'US', 5000, 50000))) as needed
-                             FROM $wpdb->dt_location_grid as lg5
-                             WHERE lg5.level = 3
-                               AND lg5.admin0_grid_id IN (100050711, 100219347, 100089589, 100074576, 100259978, 100018514)
-                               AND lg5.admin0_grid_id NOT IN
-                                 (100314737, 100083318, 100041128, 100133112, 100341242, 100132648, 100222839, 100379914, 100055707,
-                                 100379993, 100130389, 100255271, 100363975, 100248845, 100001527, 100342458, 100024289, 100132795,
-                                 100054605, 100253456, 100342975, 100074571)
-                    ) as tb2
-                    LEFT JOIN $wpdb->dt_location_grid loc ON tb2.admin2_grid_id=loc.grid_id
-                    GROUP BY tb2.admin2_grid_id
-
-                    UNION ALL
-
-                    # 'Needs' GROUPED BY state level
-                    SELECT tb1.admin1_grid_id as grid_id, loc.name, loc.country_code, SUM(tb1.population) as population, SUM(tb1.needed) as needed, (0) as reported, (0) as percent
-                    FROM (
-                             SELECT
-                                 lg1.admin0_grid_id,
-                                 lg1.admin1_grid_id,
-                                 lg1.admin2_grid_id,
-                                 lg1.admin3_grid_id,
-                                 lg1.population,
-                                 IF(ROUND(lg1.population / IF(lg1.country_code = 'US', 5000, 50000)) < 1, 1,
-                                    ROUND(lg1.population / IF(lg1.country_code = 'US', 5000, 50000))) as needed
-                             FROM $wpdb->dt_location_grid lg1
-                             WHERE lg1.level = 0
-                               AND lg1.grid_id NOT IN (SELECT lg11.admin0_grid_id
-                                                       FROM $wpdb->dt_location_grid lg11
-                                                       WHERE lg11.level = 1
-                                                         AND lg11.admin0_grid_id = lg1.grid_id)
-                               AND lg1.admin0_grid_id NOT IN (100050711, 100219347, 100089589, 100074576, 100259978, 100018514)
-                               AND lg1.admin0_grid_id NOT IN
-                                   (100314737, 100083318, 100041128, 100133112, 100341242, 100132648, 100222839, 100379914, 100055707,
-                                    100379993, 100130389, 100255271, 100363975, 100248845, 100001527, 100342458, 100024289, 100132795,
-                                    100054605, 100253456, 100342975, 100074571)
-                             UNION ALL
-                             SELECT
-                                 lg2.admin0_grid_id,
-                                 lg2.admin1_grid_id,
-                                 lg2.admin2_grid_id,
-                                 lg2.admin3_grid_id,
-                                 lg2.population,
-                                 IF(ROUND(lg2.population / IF(lg2.country_code = 'US', 5000, 50000)) < 1, 1,
-                                    ROUND(lg2.population / IF(lg2.country_code = 'US', 5000, 50000))) as needed
-                             FROM $wpdb->dt_location_grid lg2
-                             WHERE lg2.level = 1
-                               AND lg2.grid_id NOT IN (SELECT lg22.admin1_grid_id
-                                                       FROM $wpdb->dt_location_grid lg22
-                                                       WHERE lg22.level = 2
-                                                         AND lg22.admin1_grid_id = lg2.grid_id)
-                               AND lg2.admin0_grid_id NOT IN (100050711, 100219347, 100089589, 100074576, 100259978, 100018514)
-                               AND lg2.admin0_grid_id NOT IN
-                                   (100314737, 100083318, 100041128, 100133112, 100341242, 100132648, 100222839, 100379914, 100055707,
-                                    100379993, 100130389, 100255271, 100363975, 100248845, 100001527, 100342458, 100024289, 100132795,
-                                    100054605, 100253456, 100342975, 100074571)
-                             UNION ALL
-                             SELECT
-                                 lg3.admin0_grid_id,
-                                 lg3.admin1_grid_id,
-                                 lg3.admin2_grid_id,
-                                 lg3.admin3_grid_id,
-                                 lg3.population,
-                                 IF(ROUND(lg3.population / IF(lg3.country_code = 'US', 5000, 50000)) < 1, 1,
-                                    ROUND(lg3.population / IF(lg3.country_code = 'US', 5000, 50000))) as needed
-                             FROM $wpdb->dt_location_grid lg3
-                             WHERE lg3.level = 2
-                               AND lg3.admin0_grid_id NOT IN (100050711, 100219347, 100089589, 100074576, 100259978, 100018514)
-                               AND lg3.admin0_grid_id NOT IN
-                                   (100314737, 100083318, 100041128, 100133112, 100341242, 100132648, 100222839, 100379914, 100055707,
-                                    100379993, 100130389, 100255271, 100363975, 100248845, 100001527, 100342458, 100024289, 100132795,
-                                    100054605, 100253456, 100342975, 100074571)
-                             UNION ALL
-                             SELECT
-                                 lg4.admin0_grid_id,
-                                 lg4.admin1_grid_id,
-                                 lg4.admin2_grid_id,
-                                 lg4.admin3_grid_id,
-                                 lg4.population,
-                                 IF(ROUND(lg4.population / IF(lg4.country_code = 'US', 5000, 50000)) < 1, 1,
-                                    ROUND(lg4.population / IF(lg4.country_code = 'US', 5000, 50000))) as needed
-                             FROM $wpdb->dt_location_grid lg4
-                             WHERE lg4.level = 1
-                               AND lg4.admin0_grid_id NOT IN (100050711, 100219347, 100089589, 100074576, 100259978, 100018514)
-                               AND lg4.admin0_grid_id IN
-                                   (100314737, 100083318, 100041128, 100133112, 100341242, 100132648, 100222839, 100379914, 100055707,
-                                    100379993, 100130389, 100255271, 100363975, 100248845, 100001527, 100342458, 100024289, 100132795,
-                                    100054605, 100253456, 100342975, 100074571)
-                             UNION ALL
-                             SELECT
-                                 lg5.admin0_grid_id,
-                                 lg5.admin1_grid_id,
-                                 lg5.admin2_grid_id,
-                                 lg5.admin3_grid_id,
-                                 lg5.population,
-                                 IF(ROUND(lg5.population / IF(lg5.country_code = 'US', 5000, 50000)) < 1, 1,
-                                    ROUND(lg5.population / IF(lg5.country_code = 'US', 5000, 50000))) as needed
-                             FROM $wpdb->dt_location_grid as lg5
-                             WHERE lg5.level = 3
-                               AND lg5.admin0_grid_id IN (100050711, 100219347, 100089589, 100074576, 100259978, 100018514)
-                               AND lg5.admin0_grid_id NOT IN
-                                   (100314737, 100083318, 100041128, 100133112, 100341242, 100132648, 100222839, 100379914, 100055707,
-                                    100379993, 100130389, 100255271, 100363975, 100248845, 100001527, 100342458, 100024289, 100132795,
-                                    100054605, 100253456, 100342975, 100074571)
-                    ) as tb1
-                    LEFT JOIN $wpdb->dt_location_grid loc ON tb1.admin1_grid_id=loc.grid_id
-                    GROUP BY tb1.admin1_grid_id
-
-                    UNION ALL
-
-                    # 'Needs' GROUPED BY country
-                    SELECT tb0.admin0_grid_id as grid_id, loc.name,loc.country_code, SUM(tb0.population) as population, SUM(tb0.needed) as needed, (0) as reported, (0) as percent
-                    FROM (
-                             # 44395 Records
-                             SELECT
-                                 lg1.admin0_grid_id,
-                                 lg1.admin1_grid_id,
-                                 lg1.admin2_grid_id,
-                                 lg1.admin3_grid_id,
-                                 lg1.population,
-                                 IF(ROUND(lg1.population / IF(lg1.country_code = 'US', 5000, 50000)) < 1, 1,
-                                    ROUND(lg1.population / IF(lg1.country_code = 'US', 5000, 50000))) as needed
-                             FROM $wpdb->dt_location_grid lg1
-                             WHERE lg1.level = 0
-                               AND lg1.grid_id NOT IN (SELECT lg11.admin0_grid_id
-                                                       FROM $wpdb->dt_location_grid lg11
-                                                       WHERE lg11.level = 1
-                                                         AND lg11.admin0_grid_id = lg1.grid_id)
-                               AND lg1.admin0_grid_id NOT IN (100050711, 100219347, 100089589, 100074576, 100259978, 100018514)
-                               AND lg1.admin0_grid_id NOT IN
-                                   (100314737, 100083318, 100041128, 100133112, 100341242, 100132648, 100222839, 100379914, 100055707,
-                                    100379993, 100130389, 100255271, 100363975, 100248845, 100001527, 100342458, 100024289, 100132795,
-                                    100054605, 100253456, 100342975, 100074571)
-                             UNION ALL
-                             SELECT
-                                 lg2.admin0_grid_id,
-                                 lg2.admin1_grid_id,
-                                 lg2.admin2_grid_id,
-                                 lg2.admin3_grid_id,
-                                 lg2.population,
-                                 IF(ROUND(lg2.population / IF(lg2.country_code = 'US', 5000, 50000)) < 1, 1,
-                                    ROUND(lg2.population / IF(lg2.country_code = 'US', 5000, 50000))) as needed
-                             FROM $wpdb->dt_location_grid lg2
-                             WHERE lg2.level = 1
-                               AND lg2.grid_id NOT IN (SELECT lg22.admin1_grid_id
-                                                       FROM $wpdb->dt_location_grid lg22
-                                                       WHERE lg22.level = 2
-                                                         AND lg22.admin1_grid_id = lg2.grid_id)
-                               AND lg2.admin0_grid_id NOT IN (100050711, 100219347, 100089589, 100074576, 100259978, 100018514)
-                               AND lg2.admin0_grid_id NOT IN
-                                   (100314737, 100083318, 100041128, 100133112, 100341242, 100132648, 100222839, 100379914, 100055707,
-                                    100379993, 100130389, 100255271, 100363975, 100248845, 100001527, 100342458, 100024289, 100132795,
-                                    100054605, 100253456, 100342975, 100074571)
-                             UNION ALL
-                             SELECT
-                                 lg3.admin0_grid_id,
-                                 lg3.admin1_grid_id,
-                                 lg3.admin2_grid_id,
-                                 lg3.admin3_grid_id,
-                                 lg3.population,
-                                 IF(ROUND(lg3.population / IF(lg3.country_code = 'US', 5000, 50000)) < 1, 1,
-                                    ROUND(lg3.population / IF(lg3.country_code = 'US', 5000, 50000))) as needed
-                             FROM $wpdb->dt_location_grid lg3
-                             WHERE lg3.level = 2
-                               AND lg3.admin0_grid_id NOT IN (100050711, 100219347, 100089589, 100074576, 100259978, 100018514)
-                               AND lg3.admin0_grid_id NOT IN
-                                   (100314737, 100083318, 100041128, 100133112, 100341242, 100132648, 100222839, 100379914, 100055707,
-                                    100379993, 100130389, 100255271, 100363975, 100248845, 100001527, 100342458, 100024289, 100132795,
-                                    100054605, 100253456, 100342975, 100074571)
-                             UNION ALL
-                             SELECT
-                                 lg4.admin0_grid_id,
-                                 lg4.admin1_grid_id,
-                                 lg4.admin2_grid_id,
-                                 lg4.admin3_grid_id,
-                                 lg4.population,
-                                 IF(ROUND(lg4.population / IF(lg4.country_code = 'US', 5000, 50000)) < 1, 1,
-                                    ROUND(lg4.population / IF(lg4.country_code = 'US', 5000, 50000))) as needed
-                             FROM $wpdb->dt_location_grid lg4
-                             WHERE lg4.level = 1
-                               AND lg4.admin0_grid_id NOT IN (100050711, 100219347, 100089589, 100074576, 100259978, 100018514)
-                               AND lg4.admin0_grid_id IN
-                                   (100314737, 100083318, 100041128, 100133112, 100341242, 100132648, 100222839, 100379914, 100055707,
-                                    100379993, 100130389, 100255271, 100363975, 100248845, 100001527, 100342458, 100024289, 100132795,
-                                    100054605, 100253456, 100342975, 100074571)
-                             UNION ALL
-                             SELECT
-                                 lg5.admin0_grid_id,
-                                 lg5.admin1_grid_id,
-                                 lg5.admin2_grid_id,
-                                 lg5.admin3_grid_id,
-                                 lg5.population,
-                                 IF(ROUND(lg5.population / IF(lg5.country_code = 'US', 5000, 50000)) < 1, 1,
-                                    ROUND(lg5.population / IF(lg5.country_code = 'US', 5000, 50000))) as needed
-                             FROM $wpdb->dt_location_grid as lg5
-                             WHERE lg5.level = 3
-                               AND lg5.admin0_grid_id IN (100050711, 100219347, 100089589, 100074576, 100259978, 100018514)
-                               AND lg5.admin0_grid_id NOT IN
-                                   (100314737, 100083318, 100041128, 100133112, 100341242, 100132648, 100222839, 100379914, 100055707,
-                                    100379993, 100130389, 100255271, 100363975, 100248845, 100001527, 100342458, 100024289, 100132795,
-                                    100054605, 100253456, 100342975, 100074571)
-                    ) as tb0
-                    LEFT JOIN $wpdb->dt_location_grid loc ON tb0.admin0_grid_id=loc.grid_id
-                    GROUP BY tb0.admin0_grid_id
-
-                    UNION ALL
-
-                    # World
-                    SELECT 1 as grid_id, 'World','' as country_code, SUM(tbw.population) as population, SUM(tbw.needed) as needed, (0) as reported, (0) as percent
-                    FROM (
-                             # 44395 Records
-                             SELECT
-                                 'World',
-                                 lg1.admin0_grid_id,
-                                 lg1.admin1_grid_id,
-                                 lg1.admin2_grid_id,
-                                 lg1.admin3_grid_id,
-                                 lg1.population,
-                                 IF(ROUND(lg1.population / IF(lg1.country_code = 'US', 5000, 50000)) < 1, 1,
-                                    ROUND(lg1.population / IF(lg1.country_code = 'US', 5000, 50000))) as needed
-                             FROM $wpdb->dt_location_grid lg1
-                             WHERE lg1.level = 0
-                               AND lg1.grid_id NOT IN (SELECT lg11.admin0_grid_id
-                                                       FROM $wpdb->dt_location_grid lg11
-                                                       WHERE lg11.level = 1
-                                                         AND lg11.admin0_grid_id = lg1.grid_id)
-                               AND lg1.admin0_grid_id NOT IN (100050711, 100219347, 100089589, 100074576, 100259978, 100018514)
-                               AND lg1.admin0_grid_id NOT IN
-                                   (100314737, 100083318, 100041128, 100133112, 100341242, 100132648, 100222839, 100379914, 100055707,
-                                    100379993, 100130389, 100255271, 100363975, 100248845, 100001527, 100342458, 100024289, 100132795,
-                                    100054605, 100253456, 100342975, 100074571)
-                             UNION ALL
-                             SELECT
-                                 'World',
-                                 lg2.admin0_grid_id,
-                                 lg2.admin1_grid_id,
-                                 lg2.admin2_grid_id,
-                                 lg2.admin3_grid_id,
-                                 lg2.population,
-                                 IF(ROUND(lg2.population / IF(lg2.country_code = 'US', 5000, 50000)) < 1, 1,
-                                    ROUND(lg2.population / IF(lg2.country_code = 'US', 5000, 50000))) as needed
-                             FROM $wpdb->dt_location_grid lg2
-                             WHERE lg2.level = 1
-                               AND lg2.grid_id NOT IN (SELECT lg22.admin1_grid_id
-                                                       FROM $wpdb->dt_location_grid lg22
-                                                       WHERE lg22.level = 2
-                                                         AND lg22.admin1_grid_id = lg2.grid_id)
-                               AND lg2.admin0_grid_id NOT IN (100050711, 100219347, 100089589, 100074576, 100259978, 100018514)
-                               AND lg2.admin0_grid_id NOT IN
-                                   (100314737, 100083318, 100041128, 100133112, 100341242, 100132648, 100222839, 100379914, 100055707,
-                                    100379993, 100130389, 100255271, 100363975, 100248845, 100001527, 100342458, 100024289, 100132795,
-                                    100054605, 100253456, 100342975, 100074571)
-                             UNION ALL
-                             SELECT
-                                 'World',
-                                 lg3.admin0_grid_id,
-                                 lg3.admin1_grid_id,
-                                 lg3.admin2_grid_id,
-                                 lg3.admin3_grid_id,
-                                 lg3.population,
-                                 IF(ROUND(lg3.population / IF(lg3.country_code = 'US', 5000, 50000)) < 1, 1,
-                                    ROUND(lg3.population / IF(lg3.country_code = 'US', 5000, 50000))) as needed
-                             FROM $wpdb->dt_location_grid lg3
-                             WHERE lg3.level = 2
-                               AND lg3.admin0_grid_id NOT IN (100050711, 100219347, 100089589, 100074576, 100259978, 100018514)
-                               AND lg3.admin0_grid_id NOT IN
-                                   (100314737, 100083318, 100041128, 100133112, 100341242, 100132648, 100222839, 100379914, 100055707,
-                                    100379993, 100130389, 100255271, 100363975, 100248845, 100001527, 100342458, 100024289, 100132795,
-                                    100054605, 100253456, 100342975, 100074571)
-                             UNION ALL
-                             SELECT
-                                 'World',
-                                 lg4.admin0_grid_id,
-                                 lg4.admin1_grid_id,
-                                 lg4.admin2_grid_id,
-                                 lg4.admin3_grid_id,
-                                 lg4.population,
-                                 IF(ROUND(lg4.population / IF(lg4.country_code = 'US', 5000, 50000)) < 1, 1,
-                                    ROUND(lg4.population / IF(lg4.country_code = 'US', 5000, 50000))) as needed
-                             FROM $wpdb->dt_location_grid lg4
-                             WHERE lg4.level = 1
-                               AND lg4.admin0_grid_id NOT IN (100050711, 100219347, 100089589, 100074576, 100259978, 100018514)
-                               AND lg4.admin0_grid_id IN
-                                   (100314737, 100083318, 100041128, 100133112, 100341242, 100132648, 100222839, 100379914, 100055707,
-                                    100379993, 100130389, 100255271, 100363975, 100248845, 100001527, 100342458, 100024289, 100132795,
-                                    100054605, 100253456, 100342975, 100074571)
-                             UNION ALL
-                             SELECT
-                                 'World',
-                                 lg5.admin0_grid_id,
-                                 lg5.admin1_grid_id,
-                                 lg5.admin2_grid_id,
-                                 lg5.admin3_grid_id,
-                                 lg5.population,
-                                 IF(ROUND(lg5.population / IF(lg5.country_code = 'US', 5000, 50000)) < 1, 1,
-                                    ROUND(lg5.population / IF(lg5.country_code = 'US', 5000, 50000))) as needed
-                             FROM $wpdb->dt_location_grid as lg5
-                             WHERE lg5.level = 3
-                               AND lg5.admin0_grid_id IN (100050711, 100219347, 100089589, 100074576, 100259978, 100018514)
-                               AND lg5.admin0_grid_id NOT IN
-                                   (100314737, 100083318, 100041128, 100133112, 100341242, 100132648, 100222839, 100379914, 100055707,
-                                    100379993, 100130389, 100255271, 100363975, 100248845, 100001527, 100342458, 100024289, 100132795,
-                                    100054605, 100253456, 100342975, 100074571)
-                    ) as tbw
-                    LEFT JOIN $wpdb->dt_location_grid loc ON 1=loc.grid_id
-                    GROUP BY 'World';
-                ", ARRAY_A );
-        }
-
-        if ( empty( $results ) ) {
-            return [];
-        }
-        return $results;
-    }
-
-    public static function query_flat_grid_a3() {
-        global $wpdb;
-        $flat_grid = $wpdb->get_results("
-            # 'Needs' GROUPED BY sub-county level
-            SELECT tb3.admin3_grid_id as grid_id, loc.name, loc.country_code, SUM(tb3.population) as population, SUM(tb3.needed) as needed, (0) as reported, (0) as percent
-            FROM (
-                     # 44395 Records
-                     SELECT
-                         lg1.admin0_grid_id,
-                         lg1.admin1_grid_id,
-                         lg1.admin2_grid_id,
-                         lg1.admin3_grid_id,
-                         lg1.population,
-                         IF(ROUND(lg1.population / IF(lg1.country_code = 'US', 5000, 50000)) < 1, 1,
-                            ROUND(lg1.population / IF(lg1.country_code = 'US', 5000, 50000))) as needed
-                     FROM $wpdb->dt_location_grid lg1
-                     WHERE lg1.level = 0
-                       AND lg1.grid_id NOT IN (SELECT lg11.admin0_grid_id
-                                               FROM $wpdb->dt_location_grid lg11
-                                               WHERE lg11.level = 1
-                                                 AND lg11.admin0_grid_id = lg1.grid_id)
-                       AND lg1.admin0_grid_id NOT IN (100050711, 100219347, 100089589, 100074576, 100259978, 100018514)
-                       AND lg1.admin0_grid_id NOT IN
-                           (100314737, 100083318, 100041128, 100133112, 100341242, 100132648, 100222839, 100379914, 100055707,
-                            100379993, 100130389, 100255271, 100363975, 100248845, 100001527, 100342458, 100024289, 100132795,
-                            100054605, 100253456, 100342975, 100074571)
-                     UNION ALL
-                     SELECT
-                         lg2.admin0_grid_id,
-                         lg2.admin1_grid_id,
-                         lg2.admin2_grid_id,
-                         lg2.admin3_grid_id,
-                         lg2.population,
-                         IF(ROUND(lg2.population / IF(lg2.country_code = 'US', 5000, 50000)) < 1, 1,
-                            ROUND(lg2.population / IF(lg2.country_code = 'US', 5000, 50000))) as needed
-                     FROM $wpdb->dt_location_grid lg2
-                     WHERE lg2.level = 1
-                       AND lg2.grid_id NOT IN (SELECT lg22.admin1_grid_id
-                                               FROM $wpdb->dt_location_grid lg22
-                                               WHERE lg22.level = 2
-                                                 AND lg22.admin1_grid_id = lg2.grid_id)
-                       AND lg2.admin0_grid_id NOT IN (100050711, 100219347, 100089589, 100074576, 100259978, 100018514)
-                       AND lg2.admin0_grid_id NOT IN
-                           (100314737, 100083318, 100041128, 100133112, 100341242, 100132648, 100222839, 100379914, 100055707,
-                            100379993, 100130389, 100255271, 100363975, 100248845, 100001527, 100342458, 100024289, 100132795,
-                            100054605, 100253456, 100342975, 100074571)
-                     UNION ALL
-                     SELECT
-                         lg3.admin0_grid_id,
-                         lg3.admin1_grid_id,
-                         lg3.admin2_grid_id,
-                         lg3.admin3_grid_id,
-                         lg3.population,
-                         IF(ROUND(lg3.population / IF(lg3.country_code = 'US', 5000, 50000)) < 1, 1,
-                            ROUND(lg3.population / IF(lg3.country_code = 'US', 5000, 50000))) as needed
-                     FROM $wpdb->dt_location_grid lg3
-                     WHERE lg3.level = 2
-                       AND lg3.admin0_grid_id NOT IN (100050711, 100219347, 100089589, 100074576, 100259978, 100018514)
-                       AND lg3.admin0_grid_id NOT IN
-                           (100314737, 100083318, 100041128, 100133112, 100341242, 100132648, 100222839, 100379914, 100055707,
-                            100379993, 100130389, 100255271, 100363975, 100248845, 100001527, 100342458, 100024289, 100132795,
-                            100054605, 100253456, 100342975, 100074571)
-                     UNION ALL
-                     SELECT
-                         lg4.admin0_grid_id,
-                         lg4.admin1_grid_id,
-                         lg4.admin2_grid_id,
-                         lg4.admin3_grid_id,
-                         lg4.population,
-                         IF(ROUND(lg4.population / IF(lg4.country_code = 'US', 5000, 50000)) < 1, 1,
-                            ROUND(lg4.population / IF(lg4.country_code = 'US', 5000, 50000))) as needed
-                     FROM $wpdb->dt_location_grid lg4
-                     WHERE lg4.level = 1
-                       AND lg4.admin0_grid_id NOT IN (100050711, 100219347, 100089589, 100074576, 100259978, 100018514)
-                       AND lg4.admin0_grid_id IN
-                           (100314737, 100083318, 100041128, 100133112, 100341242, 100132648, 100222839, 100379914, 100055707,
-                            100379993, 100130389, 100255271, 100363975, 100248845, 100001527, 100342458, 100024289, 100132795,
-                            100054605, 100253456, 100342975, 100074571)
-                     UNION ALL
-                     SELECT
-                         lg5.admin0_grid_id,
-                         lg5.admin1_grid_id,
-                         lg5.admin2_grid_id,
-                         lg5.admin3_grid_id,
-                         lg5.population,
-                         IF(ROUND(lg5.population / IF(lg5.country_code = 'US', 5000, 50000)) < 1, 1,
-                            ROUND(lg5.population / IF(lg5.country_code = 'US', 5000, 50000))) as needed
-                     FROM $wpdb->dt_location_grid as lg5
-                     WHERE lg5.level = 3
-                       AND lg5.admin0_grid_id IN (100050711, 100219347, 100089589, 100074576, 100259978, 100018514)
-                       AND lg5.admin0_grid_id NOT IN
-                           (100314737, 100083318, 100041128, 100133112, 100341242, 100132648, 100222839, 100379914, 100055707,
-                            100379993, 100130389, 100255271, 100363975, 100248845, 100001527, 100342458, 100024289, 100132795,
-                            100054605, 100253456, 100342975, 100074571)
-            ) as tb3
-            LEFT JOIN $wpdb->dt_location_grid loc ON tb3.admin3_grid_id=loc.grid_id
-            WHERE tb3.admin3_grid_id IS NOT NULL
-            GROUP BY tb3.admin3_grid_id
-        ", ARRAY_A );
-
-        return $flat_grid;
-    }
-
-    public static function query_flat_grid_a2() {
-
-        global $wpdb;
-        $flat_grid = $wpdb->get_results("
-            # 'Needs' GROUPED BY county level
-            SELECT tb2.admin2_grid_id as grid_id, loc.name, loc.country_code, SUM(tb2.population) as population, SUM(tb2.needed) as needed, (0) as reported, (0) as percent
-            FROM (
-                     SELECT
-                         lg1.admin0_grid_id,
-                         lg1.admin1_grid_id,
-                         lg1.admin2_grid_id,
-                         lg1.admin3_grid_id,
-                         lg1.population,
-                         IF(ROUND(lg1.population / IF(lg1.country_code = 'US', 5000, 50000)) < 1, 1,
-                            ROUND(lg1.population / IF(lg1.country_code = 'US', 5000, 50000))) as needed
-                     FROM $wpdb->dt_location_grid lg1
-                     WHERE lg1.level = 0
-                       AND lg1.grid_id NOT IN (SELECT lg11.admin0_grid_id
-                         FROM $wpdb->dt_location_grid lg11
-                         WHERE lg11.level = 1
-                       AND lg11.admin0_grid_id = lg1.grid_id)
-                       AND lg1.admin0_grid_id NOT IN (100050711, 100219347, 100089589, 100074576, 100259978, 100018514)
-                       AND lg1.admin0_grid_id NOT IN
-                         (100314737, 100083318, 100041128, 100133112, 100341242, 100132648, 100222839, 100379914, 100055707,
-                         100379993, 100130389, 100255271, 100363975, 100248845, 100001527, 100342458, 100024289, 100132795,
-                         100054605, 100253456, 100342975, 100074571)
-                     UNION ALL
-                     SELECT
-                         lg2.admin0_grid_id,
-                         lg2.admin1_grid_id,
-                         lg2.admin2_grid_id,
-                         lg2.admin3_grid_id,
-                         lg2.population,
-                         IF(ROUND(lg2.population / IF(lg2.country_code = 'US', 5000, 50000)) < 1, 1,
-                         ROUND(lg2.population / IF(lg2.country_code = 'US', 5000, 50000))) as needed
-                     FROM $wpdb->dt_location_grid lg2
-                     WHERE lg2.level = 1
-                       AND lg2.grid_id NOT IN (SELECT lg22.admin1_grid_id
-                         FROM $wpdb->dt_location_grid lg22
-                         WHERE lg22.level = 2
-                       AND lg22.admin1_grid_id = lg2.grid_id)
-                       AND lg2.admin0_grid_id NOT IN (100050711, 100219347, 100089589, 100074576, 100259978, 100018514)
-                       AND lg2.admin0_grid_id NOT IN
-                         (100314737, 100083318, 100041128, 100133112, 100341242, 100132648, 100222839, 100379914, 100055707,
-                         100379993, 100130389, 100255271, 100363975, 100248845, 100001527, 100342458, 100024289, 100132795,
-                         100054605, 100253456, 100342975, 100074571)
-                     UNION ALL
-                     SELECT
-                         lg3.admin0_grid_id,
-                         lg3.admin1_grid_id,
-                         lg3.admin2_grid_id,
-                         lg3.admin3_grid_id,
-                         lg3.population,
-                         IF(ROUND(lg3.population / IF(lg3.country_code = 'US', 5000, 50000)) < 1, 1,
-                         ROUND(lg3.population / IF(lg3.country_code = 'US', 5000, 50000))) as needed
-                     FROM $wpdb->dt_location_grid lg3
-                     WHERE lg3.level = 2
-                       AND lg3.admin0_grid_id NOT IN (100050711, 100219347, 100089589, 100074576, 100259978, 100018514)
-                       AND lg3.admin0_grid_id NOT IN
-                         (100314737, 100083318, 100041128, 100133112, 100341242, 100132648, 100222839, 100379914, 100055707,
-                         100379993, 100130389, 100255271, 100363975, 100248845, 100001527, 100342458, 100024289, 100132795,
-                         100054605, 100253456, 100342975, 100074571)
-                     UNION ALL
-                     SELECT
-                         lg4.admin0_grid_id,
-                         lg4.admin1_grid_id,
-                         lg4.admin2_grid_id,
-                         lg4.admin3_grid_id,
-                         lg4.population,
-                         IF(ROUND(lg4.population / IF(lg4.country_code = 'US', 5000, 50000)) < 1, 1,
-                         ROUND(lg4.population / IF(lg4.country_code = 'US', 5000, 50000))) as needed
-                     FROM $wpdb->dt_location_grid lg4
-                     WHERE lg4.level = 1
-                       AND lg4.admin0_grid_id NOT IN (100050711, 100219347, 100089589, 100074576, 100259978, 100018514)
-                       AND lg4.admin0_grid_id IN
-                         (100314737, 100083318, 100041128, 100133112, 100341242, 100132648, 100222839, 100379914, 100055707,
-                         100379993, 100130389, 100255271, 100363975, 100248845, 100001527, 100342458, 100024289, 100132795,
-                         100054605, 100253456, 100342975, 100074571)
-                     UNION ALL
-                     SELECT
-                         lg5.admin0_grid_id,
-                         lg5.admin1_grid_id,
-                         lg5.admin2_grid_id,
-                         lg5.admin3_grid_id,
-                         lg5.population,
-                         IF(ROUND(lg5.population / IF(lg5.country_code = 'US', 5000, 50000)) < 1, 1,
-                         ROUND(lg5.population / IF(lg5.country_code = 'US', 5000, 50000))) as needed
-                     FROM $wpdb->dt_location_grid as lg5
-                     WHERE lg5.level = 3
-                       AND lg5.admin0_grid_id IN (100050711, 100219347, 100089589, 100074576, 100259978, 100018514)
-                       AND lg5.admin0_grid_id NOT IN
-                         (100314737, 100083318, 100041128, 100133112, 100341242, 100132648, 100222839, 100379914, 100055707,
-                         100379993, 100130389, 100255271, 100363975, 100248845, 100001527, 100342458, 100024289, 100132795,
-                         100054605, 100253456, 100342975, 100074571)
-            ) as tb2
-            LEFT JOIN $wpdb->dt_location_grid loc ON tb2.admin2_grid_id=loc.grid_id
-            GROUP BY tb2.admin2_grid_id
-
-        ", ARRAY_A );
-
-        return $flat_grid;
-    }
-
-    public static function query_flat_grid_a1() {
-
-        global $wpdb;
-        $flat_grid = $wpdb->get_results("
-            # 'Needs' GROUPED BY state level
-            SELECT tb1.admin1_grid_id as grid_id, loc.name, loc.country_code, SUM(tb1.population) as population, SUM(tb1.needed) as needed, (0) as reported, (0) as percent
-            FROM (
-                     SELECT
-                         lg1.admin0_grid_id,
-                         lg1.admin1_grid_id,
-                         lg1.admin2_grid_id,
-                         lg1.admin3_grid_id,
-                         lg1.population,
-                         IF(ROUND(lg1.population / IF(lg1.country_code = 'US', 5000, 50000)) < 1, 1,
-                            ROUND(lg1.population / IF(lg1.country_code = 'US', 5000, 50000))) as needed
-                     FROM $wpdb->dt_location_grid lg1
-                     WHERE lg1.level = 0
-                       AND lg1.grid_id NOT IN (SELECT lg11.admin0_grid_id
-                                               FROM $wpdb->dt_location_grid lg11
-                                               WHERE lg11.level = 1
-                                                 AND lg11.admin0_grid_id = lg1.grid_id)
-                       AND lg1.admin0_grid_id NOT IN (100050711, 100219347, 100089589, 100074576, 100259978, 100018514)
-                       AND lg1.admin0_grid_id NOT IN
-                           (100314737, 100083318, 100041128, 100133112, 100341242, 100132648, 100222839, 100379914, 100055707,
-                            100379993, 100130389, 100255271, 100363975, 100248845, 100001527, 100342458, 100024289, 100132795,
-                            100054605, 100253456, 100342975, 100074571)
-                     UNION ALL
-                     SELECT
-                         lg2.admin0_grid_id,
-                         lg2.admin1_grid_id,
-                         lg2.admin2_grid_id,
-                         lg2.admin3_grid_id,
-                         lg2.population,
-                         IF(ROUND(lg2.population / IF(lg2.country_code = 'US', 5000, 50000)) < 1, 1,
-                            ROUND(lg2.population / IF(lg2.country_code = 'US', 5000, 50000))) as needed
-                     FROM $wpdb->dt_location_grid lg2
-                     WHERE lg2.level = 1
-                       AND lg2.grid_id NOT IN (SELECT lg22.admin1_grid_id
-                                               FROM $wpdb->dt_location_grid lg22
-                                               WHERE lg22.level = 2
-                                                 AND lg22.admin1_grid_id = lg2.grid_id)
-                       AND lg2.admin0_grid_id NOT IN (100050711, 100219347, 100089589, 100074576, 100259978, 100018514)
-                       AND lg2.admin0_grid_id NOT IN
-                           (100314737, 100083318, 100041128, 100133112, 100341242, 100132648, 100222839, 100379914, 100055707,
-                            100379993, 100130389, 100255271, 100363975, 100248845, 100001527, 100342458, 100024289, 100132795,
-                            100054605, 100253456, 100342975, 100074571)
-                     UNION ALL
-                     SELECT
-                         lg3.admin0_grid_id,
-                         lg3.admin1_grid_id,
-                         lg3.admin2_grid_id,
-                         lg3.admin3_grid_id,
-                         lg3.population,
-                         IF(ROUND(lg3.population / IF(lg3.country_code = 'US', 5000, 50000)) < 1, 1,
-                            ROUND(lg3.population / IF(lg3.country_code = 'US', 5000, 50000))) as needed
-                     FROM $wpdb->dt_location_grid lg3
-                     WHERE lg3.level = 2
-                       AND lg3.admin0_grid_id NOT IN (100050711, 100219347, 100089589, 100074576, 100259978, 100018514)
-                       AND lg3.admin0_grid_id NOT IN
-                           (100314737, 100083318, 100041128, 100133112, 100341242, 100132648, 100222839, 100379914, 100055707,
-                            100379993, 100130389, 100255271, 100363975, 100248845, 100001527, 100342458, 100024289, 100132795,
-                            100054605, 100253456, 100342975, 100074571)
-                     UNION ALL
-                     SELECT
-                         lg4.admin0_grid_id,
-                         lg4.admin1_grid_id,
-                         lg4.admin2_grid_id,
-                         lg4.admin3_grid_id,
-                         lg4.population,
-                         IF(ROUND(lg4.population / IF(lg4.country_code = 'US', 5000, 50000)) < 1, 1,
-                            ROUND(lg4.population / IF(lg4.country_code = 'US', 5000, 50000))) as needed
-                     FROM $wpdb->dt_location_grid lg4
-                     WHERE lg4.level = 1
-                       AND lg4.admin0_grid_id NOT IN (100050711, 100219347, 100089589, 100074576, 100259978, 100018514)
-                       AND lg4.admin0_grid_id IN
-                           (100314737, 100083318, 100041128, 100133112, 100341242, 100132648, 100222839, 100379914, 100055707,
-                            100379993, 100130389, 100255271, 100363975, 100248845, 100001527, 100342458, 100024289, 100132795,
-                            100054605, 100253456, 100342975, 100074571)
-                     UNION ALL
-                     SELECT
-                         lg5.admin0_grid_id,
-                         lg5.admin1_grid_id,
-                         lg5.admin2_grid_id,
-                         lg5.admin3_grid_id,
-                         lg5.population,
-                         IF(ROUND(lg5.population / IF(lg5.country_code = 'US', 5000, 50000)) < 1, 1,
-                            ROUND(lg5.population / IF(lg5.country_code = 'US', 5000, 50000))) as needed
-                     FROM $wpdb->dt_location_grid as lg5
-                     WHERE lg5.level = 3
-                       AND lg5.admin0_grid_id IN (100050711, 100219347, 100089589, 100074576, 100259978, 100018514)
-                       AND lg5.admin0_grid_id NOT IN
-                           (100314737, 100083318, 100041128, 100133112, 100341242, 100132648, 100222839, 100379914, 100055707,
-                            100379993, 100130389, 100255271, 100363975, 100248845, 100001527, 100342458, 100024289, 100132795,
-                            100054605, 100253456, 100342975, 100074571)
-            ) as tb1
-            LEFT JOIN $wpdb->dt_location_grid loc ON tb1.admin1_grid_id=loc.grid_id
-            GROUP BY tb1.admin1_grid_id
-
-        ", ARRAY_A );
-
-        return $flat_grid;
-    }
-
-    public static function query_flat_grid_a0() {
-
-        global $wpdb;
-        $flat_grid = $wpdb->get_results("
-            # 'Needs' GROUPED BY country
-            SELECT tb0.admin0_grid_id as grid_id, loc.name,loc.country_code, SUM(tb0.population) as population, SUM(tb0.needed) as needed, (0) as reported, (0) as percent
-            FROM (
-                     # 44395 Records
-                     SELECT
-                         lg1.admin0_grid_id,
-                         lg1.admin1_grid_id,
-                         lg1.admin2_grid_id,
-                         lg1.admin3_grid_id,
-                         lg1.population,
-                         IF(ROUND(lg1.population / IF(lg1.country_code = 'US', 5000, 50000)) < 1, 1,
-                            ROUND(lg1.population / IF(lg1.country_code = 'US', 5000, 50000))) as needed
-                     FROM $wpdb->dt_location_grid lg1
-                     WHERE lg1.level = 0
-                       AND lg1.grid_id NOT IN (SELECT lg11.admin0_grid_id
-                                               FROM $wpdb->dt_location_grid lg11
-                                               WHERE lg11.level = 1
-                                                 AND lg11.admin0_grid_id = lg1.grid_id)
-                       AND lg1.admin0_grid_id NOT IN (100050711, 100219347, 100089589, 100074576, 100259978, 100018514)
-                       AND lg1.admin0_grid_id NOT IN
-                           (100314737, 100083318, 100041128, 100133112, 100341242, 100132648, 100222839, 100379914, 100055707,
-                            100379993, 100130389, 100255271, 100363975, 100248845, 100001527, 100342458, 100024289, 100132795,
-                            100054605, 100253456, 100342975, 100074571)
-                     UNION ALL
-                     SELECT
-                         lg2.admin0_grid_id,
-                         lg2.admin1_grid_id,
-                         lg2.admin2_grid_id,
-                         lg2.admin3_grid_id,
-                         lg2.population,
-                         IF(ROUND(lg2.population / IF(lg2.country_code = 'US', 5000, 50000)) < 1, 1,
-                            ROUND(lg2.population / IF(lg2.country_code = 'US', 5000, 50000))) as needed
-                     FROM $wpdb->dt_location_grid lg2
-                     WHERE lg2.level = 1
-                       AND lg2.grid_id NOT IN (SELECT lg22.admin1_grid_id
-                                               FROM $wpdb->dt_location_grid lg22
-                                               WHERE lg22.level = 2
-                                                 AND lg22.admin1_grid_id = lg2.grid_id)
-                       AND lg2.admin0_grid_id NOT IN (100050711, 100219347, 100089589, 100074576, 100259978, 100018514)
-                       AND lg2.admin0_grid_id NOT IN
-                           (100314737, 100083318, 100041128, 100133112, 100341242, 100132648, 100222839, 100379914, 100055707,
-                            100379993, 100130389, 100255271, 100363975, 100248845, 100001527, 100342458, 100024289, 100132795,
-                            100054605, 100253456, 100342975, 100074571)
-                     UNION ALL
-                     SELECT
-                         lg3.admin0_grid_id,
-                         lg3.admin1_grid_id,
-                         lg3.admin2_grid_id,
-                         lg3.admin3_grid_id,
-                         lg3.population,
-                         IF(ROUND(lg3.population / IF(lg3.country_code = 'US', 5000, 50000)) < 1, 1,
-                            ROUND(lg3.population / IF(lg3.country_code = 'US', 5000, 50000))) as needed
-                     FROM $wpdb->dt_location_grid lg3
-                     WHERE lg3.level = 2
-                       AND lg3.admin0_grid_id NOT IN (100050711, 100219347, 100089589, 100074576, 100259978, 100018514)
-                       AND lg3.admin0_grid_id NOT IN
-                           (100314737, 100083318, 100041128, 100133112, 100341242, 100132648, 100222839, 100379914, 100055707,
-                            100379993, 100130389, 100255271, 100363975, 100248845, 100001527, 100342458, 100024289, 100132795,
-                            100054605, 100253456, 100342975, 100074571)
-                     UNION ALL
-                     SELECT
-                         lg4.admin0_grid_id,
-                         lg4.admin1_grid_id,
-                         lg4.admin2_grid_id,
-                         lg4.admin3_grid_id,
-                         lg4.population,
-                         IF(ROUND(lg4.population / IF(lg4.country_code = 'US', 5000, 50000)) < 1, 1,
-                            ROUND(lg4.population / IF(lg4.country_code = 'US', 5000, 50000))) as needed
-                     FROM $wpdb->dt_location_grid lg4
-                     WHERE lg4.level = 1
-                       AND lg4.admin0_grid_id NOT IN (100050711, 100219347, 100089589, 100074576, 100259978, 100018514)
-                       AND lg4.admin0_grid_id IN
-                           (100314737, 100083318, 100041128, 100133112, 100341242, 100132648, 100222839, 100379914, 100055707,
-                            100379993, 100130389, 100255271, 100363975, 100248845, 100001527, 100342458, 100024289, 100132795,
-                            100054605, 100253456, 100342975, 100074571)
-                     UNION ALL
-                     SELECT
-                         lg5.admin0_grid_id,
-                         lg5.admin1_grid_id,
-                         lg5.admin2_grid_id,
-                         lg5.admin3_grid_id,
-                         lg5.population,
-                         IF(ROUND(lg5.population / IF(lg5.country_code = 'US', 5000, 50000)) < 1, 1,
-                            ROUND(lg5.population / IF(lg5.country_code = 'US', 5000, 50000))) as needed
-                     FROM $wpdb->dt_location_grid as lg5
-                     WHERE lg5.level = 3
-                       AND lg5.admin0_grid_id IN (100050711, 100219347, 100089589, 100074576, 100259978, 100018514)
-                       AND lg5.admin0_grid_id NOT IN
-                           (100314737, 100083318, 100041128, 100133112, 100341242, 100132648, 100222839, 100379914, 100055707,
-                            100379993, 100130389, 100255271, 100363975, 100248845, 100001527, 100342458, 100024289, 100132795,
-                            100054605, 100253456, 100342975, 100074571)
-            ) as tb0
-            LEFT JOIN $wpdb->dt_location_grid loc ON tb0.admin0_grid_id=loc.grid_id
-            GROUP BY tb0.admin0_grid_id
-        ", ARRAY_A );
-
-        return $flat_grid;
-    }
-
-    public static function query_flat_grid_world() {
-        global $wpdb;
-        $flat_world = $wpdb->get_row("
-            # World
-            SELECT 1 as grid_id, 'World','' as country_code, SUM(tbw.population) as population, SUM(tbw.needed) as needed, (0) as reported, (0) as percent
-            FROM (
-                     # 44395 Records
-                     SELECT
-                         'World',
-                         lg1.admin0_grid_id,
-                         lg1.admin1_grid_id,
-                         lg1.admin2_grid_id,
-                         lg1.admin3_grid_id,
-                         lg1.population,
-                         IF(ROUND(lg1.population / IF(lg1.country_code = 'US', 5000, 50000)) < 1, 1,
-                            ROUND(lg1.population / IF(lg1.country_code = 'US', 5000, 50000))) as needed
-                     FROM $wpdb->dt_location_grid lg1
-                     WHERE lg1.level = 0
-                       AND lg1.grid_id NOT IN (SELECT lg11.admin0_grid_id
-                                               FROM $wpdb->dt_location_grid lg11
-                                               WHERE lg11.level = 1
-                                                 AND lg11.admin0_grid_id = lg1.grid_id)
-                       AND lg1.admin0_grid_id NOT IN (100050711, 100219347, 100089589, 100074576, 100259978, 100018514)
-                       AND lg1.admin0_grid_id NOT IN
-                           (100314737, 100083318, 100041128, 100133112, 100341242, 100132648, 100222839, 100379914, 100055707,
-                            100379993, 100130389, 100255271, 100363975, 100248845, 100001527, 100342458, 100024289, 100132795,
-                            100054605, 100253456, 100342975, 100074571)
-                     UNION ALL
-                     SELECT
-                         'World',
-                         lg2.admin0_grid_id,
-                         lg2.admin1_grid_id,
-                         lg2.admin2_grid_id,
-                         lg2.admin3_grid_id,
-                         lg2.population,
-                         IF(ROUND(lg2.population / IF(lg2.country_code = 'US', 5000, 50000)) < 1, 1,
-                            ROUND(lg2.population / IF(lg2.country_code = 'US', 5000, 50000))) as needed
-                     FROM $wpdb->dt_location_grid lg2
-                     WHERE lg2.level = 1
-                       AND lg2.grid_id NOT IN (SELECT lg22.admin1_grid_id
-                                               FROM $wpdb->dt_location_grid lg22
-                                               WHERE lg22.level = 2
-                                                 AND lg22.admin1_grid_id = lg2.grid_id)
-                       AND lg2.admin0_grid_id NOT IN (100050711, 100219347, 100089589, 100074576, 100259978, 100018514)
-                       AND lg2.admin0_grid_id NOT IN
-                           (100314737, 100083318, 100041128, 100133112, 100341242, 100132648, 100222839, 100379914, 100055707,
-                            100379993, 100130389, 100255271, 100363975, 100248845, 100001527, 100342458, 100024289, 100132795,
-                            100054605, 100253456, 100342975, 100074571)
-                     UNION ALL
-                     SELECT
-                         'World',
-                         lg3.admin0_grid_id,
-                         lg3.admin1_grid_id,
-                         lg3.admin2_grid_id,
-                         lg3.admin3_grid_id,
-                         lg3.population,
-                         IF(ROUND(lg3.population / IF(lg3.country_code = 'US', 5000, 50000)) < 1, 1,
-                            ROUND(lg3.population / IF(lg3.country_code = 'US', 5000, 50000))) as needed
-                     FROM $wpdb->dt_location_grid lg3
-                     WHERE lg3.level = 2
-                       AND lg3.admin0_grid_id NOT IN (100050711, 100219347, 100089589, 100074576, 100259978, 100018514)
-                       AND lg3.admin0_grid_id NOT IN
-                           (100314737, 100083318, 100041128, 100133112, 100341242, 100132648, 100222839, 100379914, 100055707,
-                            100379993, 100130389, 100255271, 100363975, 100248845, 100001527, 100342458, 100024289, 100132795,
-                            100054605, 100253456, 100342975, 100074571)
-                     UNION ALL
-                     SELECT
-                         'World',
-                         lg4.admin0_grid_id,
-                         lg4.admin1_grid_id,
-                         lg4.admin2_grid_id,
-                         lg4.admin3_grid_id,
-                         lg4.population,
-                         IF(ROUND(lg4.population / IF(lg4.country_code = 'US', 5000, 50000)) < 1, 1,
-                            ROUND(lg4.population / IF(lg4.country_code = 'US', 5000, 50000))) as needed
-                     FROM $wpdb->dt_location_grid lg4
-                     WHERE lg4.level = 1
-                       AND lg4.admin0_grid_id NOT IN (100050711, 100219347, 100089589, 100074576, 100259978, 100018514)
-                       AND lg4.admin0_grid_id IN
-                           (100314737, 100083318, 100041128, 100133112, 100341242, 100132648, 100222839, 100379914, 100055707,
-                            100379993, 100130389, 100255271, 100363975, 100248845, 100001527, 100342458, 100024289, 100132795,
-                            100054605, 100253456, 100342975, 100074571)
-                     UNION ALL
-                     SELECT
-                         'World',
-                         lg5.admin0_grid_id,
-                         lg5.admin1_grid_id,
-                         lg5.admin2_grid_id,
-                         lg5.admin3_grid_id,
-                         lg5.population,
-                         IF(ROUND(lg5.population / IF(lg5.country_code = 'US', 5000, 50000)) < 1, 1,
-                            ROUND(lg5.population / IF(lg5.country_code = 'US', 5000, 50000))) as needed
-                     FROM $wpdb->dt_location_grid as lg5
-                     WHERE lg5.level = 3
-                       AND lg5.admin0_grid_id IN (100050711, 100219347, 100089589, 100074576, 100259978, 100018514)
-                       AND lg5.admin0_grid_id NOT IN
-                           (100314737, 100083318, 100041128, 100133112, 100341242, 100132648, 100222839, 100379914, 100055707,
-                            100379993, 100130389, 100255271, 100363975, 100248845, 100001527, 100342458, 100024289, 100132795,
-                            100054605, 100253456, 100342975, 100074571)
-            ) as tbw
-            LEFT JOIN $wpdb->dt_location_grid loc ON 1=loc.grid_id
-            GROUP BY 'World';
-        ", ARRAY_A );
-
-        return $flat_world;
-    }
-
-    public static function query_world_churches_total(){
-        global $wpdb;
-        return $wpdb->get_var("
-            SELECT COUNT(p.ID) as count
-            FROM $wpdb->postmeta as pm
-            JOIN $wpdb->posts as p ON p.ID=pm.post_id AND p.post_type = 'groups'
-            JOIN $wpdb->postmeta as pm2 ON pm2.post_id=pm.post_id AND pm2.meta_key = 'group_type' AND pm2.meta_value = 'church'
-            JOIN $wpdb->postmeta as pm3 ON pm3.post_id=pm.post_id AND pm3.meta_key = 'group_status' AND (pm3.meta_value = 'active' OR pm3.meta_value = 'inactive')
-            LEFT JOIN $wpdb->dt_location_grid as lg ON pm.meta_value=lg.grid_id
-            WHERE pm.meta_key = 'location_grid'
-        ");
-    }
-
-    public static function query_world_trainings_total(){
-        global $wpdb;
-        return $wpdb->get_var("
-            SELECT COUNT(p.ID) as count
-                FROM $wpdb->postmeta as pm
-                JOIN $wpdb->posts as p ON p.ID=pm.post_id AND p.post_type = 'trainings'
-                LEFT JOIN $wpdb->dt_location_grid as lg ON pm.meta_value=lg.grid_id
-                WHERE pm.meta_key = 'location_grid'
-        ");
-    }
-
+//    public static function query_world_churches_total(){
+//        global $wpdb;
+//        return $wpdb->get_var("
+//            SELECT COUNT(p.ID) as count
+//            FROM $wpdb->postmeta as pm
+//            JOIN $wpdb->posts as p ON p.ID=pm.post_id AND p.post_type = 'groups'
+//            JOIN $wpdb->postmeta as pm2 ON pm2.post_id=pm.post_id AND pm2.meta_key = 'group_type' AND pm2.meta_value = 'church'
+//            JOIN $wpdb->postmeta as pm3 ON pm3.post_id=pm.post_id AND pm3.meta_key = 'group_status' AND (pm3.meta_value = 'active' OR pm3.meta_value = 'inactive')
+//            LEFT JOIN $wpdb->dt_location_grid as lg ON pm.meta_value=lg.grid_id
+//            WHERE pm.meta_key = 'location_grid'
+//        ");
+//    }
+//
+//    public static function query_world_trainings_total(){
+//        global $wpdb;
+//        return $wpdb->get_var("
+//            SELECT COUNT(p.ID) as count
+//                FROM $wpdb->postmeta as pm
+//                JOIN $wpdb->posts as p ON p.ID=pm.post_id AND p.post_type = 'trainings'
+//                LEFT JOIN $wpdb->dt_location_grid as lg ON pm.meta_value=lg.grid_id
+//                WHERE pm.meta_key = 'location_grid'
+//        ");
+//    }
 
 }

@@ -26,6 +26,8 @@ class DT_Network_Dashboard_Public_Heatmap_Churches
     public $type = 'heatmap_churches';
     public $key = 'zume_app_heatmap_churches';
     public $post_type = 'groups';
+    public $us_div = 2500; // this is 2 for every 5000
+    public $global_div = 25000; // this equals 2 for every 50000
 
     private static $_instance = null;
     public static function instance() {
@@ -442,13 +444,13 @@ class DT_Network_Dashboard_Public_Heatmap_Churches
               gn.alt_name as parent_name,
               g.country_code,
               g.population,
-              IF(ROUND(g.population / IF(g.country_code = 'US', 5000, 50000)) < 1, 1,
-                 ROUND(g.population / IF(g.country_code = 'US', 5000, 50000))) as needed,
+              IF(ROUND(g.population / IF(g.country_code = 'US', %d, %d)) < 1, 1,
+                 ROUND(g.population / IF(g.country_code = 'US', %d, %d))) as needed,
               (SELECT COUNT(prs.grid_id) FROM $wpdb->dt_location_grid as prs WHERE prs.parent_id = g.parent_id ) as peers
             FROM $wpdb->dt_location_grid as g
             LEFT JOIN $wpdb->dt_location_grid as gn ON g.parent_id=gn.grid_id
             WHERE g.grid_id = %s
-        ", $grid_id ), ARRAY_A );
+        ", $this->us_div, $this->global_div, $this->us_div, $this->global_div, $grid_id ), ARRAY_A );
 
         // set array
         $population_division = $this->get_population_division( $grid['country_code'] );
@@ -468,8 +470,8 @@ class DT_Network_Dashboard_Public_Heatmap_Churches
 
     public function endpoint_get_level( $grid_id, $administrative_level ) {
         // add levels
-        $list = $this->get_list_by_level( $administrative_level ); // get list of training counts
-        $flat_grid = Zume_Public_Heatmap_Queries::query_flat_grid_by_level( $administrative_level );
+        $list = $this->get_grid_totals_by_level( $administrative_level ); // get list of training counts
+        $flat_grid = Zume_Public_Heatmap_Queries::query_flat_grid_by_level( $administrative_level, $this->us_div, $this->global_div );
         $flat_grid_limited = $this->_limit_counts( $flat_grid, $list ); // limit counts to no larger than needed per location.
 
         $grid = Zume_Public_Heatmap_Queries::query_grid_elements( $grid_id ); // get level ids for grid_id
@@ -778,7 +780,7 @@ class DT_Network_Dashboard_Public_Heatmap_Churches
         return Zume_Public_Heatmap_Queries::query_church_grid_totals();
     }
 
-    public function get_list_by_level( $administrative_level ) {
+    public function get_grid_totals_by_level( $administrative_level ) {
         return Zume_Public_Heatmap_Queries::query_church_grid_totals( $administrative_level );
     }
 
@@ -788,9 +790,9 @@ class DT_Network_Dashboard_Public_Heatmap_Churches
      * @return float|int
      */
     public function get_population_division( $country_code ){
-        $population_division = 50000 / 2;
+        $population_division = $this->global_div * 2;
         if ( $country_code === 'US' ){
-            $population_division = 5000 / 2;
+            $population_division = $this->us_div * 2;
         }
         return $population_division;
     }
