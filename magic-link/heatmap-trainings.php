@@ -109,19 +109,17 @@ class DT_Network_Dashboard_Public_Heatmap_Trainings extends DT_Network_Dashboard
     }
 
     public function get_grid_totals(){
-        return Zume_Public_Heatmap_Queries::query_training_location_grid_totals();
+        return Zume_Public_Heatmap_Queries::query_training_grid_totals();
     }
 
-    public function get_world_total() {
-        return Zume_Public_Heatmap_Queries::query_world_trainings_total();
+    public function get_list_by_level( $administrative_level ) {
+        return Zume_Public_Heatmap_Queries::query_training_grid_totals( $administrative_level );
     }
-    public function get_list() {
-        return Zume_Public_Heatmap_Queries::query_training_location_grid_totals( null, true );
-    }
+
     public function get_population_division( $country_code ){
-        $population_division = 25000;
+        $population_division = 50000;
         if ( $country_code === 'US' ){
-            $population_division = 2500;
+            $population_division = 5000;
         }
         return $population_division;
     }

@@ -5,6 +5,7 @@ if(/(android|bb\d+|meego).+mobile|avantgo|bada\/|blackberry|blazer|compal|elaine
   isMobile = true;
 }
 
+/* Rest APIs */
 window.get_grid_data = ( action, grid_id) => {
   return jQuery.ajax({
     type: "POST",
@@ -21,14 +22,14 @@ window.get_grid_data = ( action, grid_id) => {
       jQuery('#error').html(e)
     })
 }
-window.get_movement_data = (grid_id) => {
+window.get_activity_data = (grid_id) => {
   let offset = new Date().getTimezoneOffset();
   return jQuery.ajax({
     type: "POST",
-    data: JSON.stringify({ action: 'POST', parts: jsObject.parts, grid_id: grid_id, offset: offset }),
+    data: JSON.stringify({ action: 'activity_data', parts: jsObject.parts, grid_id: grid_id, offset: offset }),
     contentType: "application/json; charset=utf-8",
     dataType: "json",
-    url: jsObject.root + jsObject.parts.root + '/v1/' + jsObject.parts.type + '/movement_data',
+    url: jsObject.root + jsObject.parts.root + '/v1/' + jsObject.parts.type,
     beforeSend: function (xhr) {
       xhr.setRequestHeader('X-WP-Nonce', jsObject.nonce )
     }
@@ -39,7 +40,24 @@ window.get_movement_data = (grid_id) => {
     })
 }
 
+window.new_report = ( action, form_data ) => {
+  return jQuery.ajax({
+    type: "POST",
+    data: JSON.stringify({ action: action, parts: jsObject.parts, data: form_data }),
+    contentType: "application/json; charset=utf-8",
+    dataType: "json",
+    url: jsObject.root + jsObject.parts.root + '/v1/' + jsObject.parts.type,
+    beforeSend: function (xhr) {
+      xhr.setRequestHeader('X-WP-Nonce', jsObject.nonce )
+    }
+  })
+    .fail(function(e) {
+      console.log(e)
+      jQuery('#error').html(e)
+    })
+}
 
+/* Document Ready && Precache */
 jQuery(document).ready(function($){
   clearInterval(window.fiveMinuteTimer)
 
@@ -132,6 +150,9 @@ jQuery(document).ready(function($){
 
 }) /* .ready() */
 
+/**************************
+ * Load map when precache is complete
+ **************************/
 function load_map() {
   jQuery('#initialize-screen').hide()
 
@@ -313,22 +334,34 @@ function load_map() {
 
             jQuery('.temp-spinner').html(`<span class="loading-spinner active"></span>`)
 
-            window.get_grid_data( 'self', e.features[0].properties.grid_id)
+            window.get_grid_data( 'self', e.features[0].properties.grid_id )
               .done(function(data){
                 load_self_content( data )
               })
-            window.get_grid_data( 'levels', e.features[0].properties.grid_id)
+            window.get_grid_data( 'a0', e.features[0].properties.grid_id )
               .done(function(data){
-                load_levels_content( data )
+                load_level_content( data, 'a0' )
               })
-            window.get_grid_data( 'world', e.features[0].properties.grid_id)
+            window.get_grid_data( 'a1', e.features[0].properties.grid_id )
               .done(function(data){
-                load_world_content( data )
+                load_level_content( data, 'a1' )
+              })
+            window.get_grid_data( 'a2', e.features[0].properties.grid_id )
+              .done(function(data){
+                load_level_content( data, 'a2' )
+              })
+            window.get_grid_data( 'a3', e.features[0].properties.grid_id )
+              .done(function(data){
+                load_level_content( data, 'a3' )
+              })
+            window.get_grid_data( 'world', e.features[0].properties.grid_id )
+              .done(function(data){
+                load_level_content( data, 'world' )
               })
 
             let ac = $('#activity-content')
             ac.html('<span class="loading-spinner active"></span>')
-            window.get_movement_data(e.features[0].properties.grid_id)
+            window.get_activity_data(e.features[0].properties.grid_id)
               .done(function(data){
                 console.log(data)
                 ac.empty()
@@ -484,16 +517,7 @@ function load_map() {
       list: list
     }
 
-    jQuery.ajax({
-      type: "POST",
-      data: JSON.stringify({ action: 'new_report', parts: jsObject.parts, data: form_data }),
-      contentType: "application/json; charset=utf-8",
-      dataType: "json",
-      url: jsObject.root + jsObject.parts.root + '/v1/' + jsObject.parts.type,
-      beforeSend: function (xhr) {
-        xhr.setRequestHeader('X-WP-Nonce', jsObject.nonce )
-      }
-    })
+    window.new_report( 'new_report', form_data )
       .done(function(response){
         jQuery('.loading-spinner').removeClass('active')
         console.log(response)
@@ -502,12 +526,14 @@ function load_map() {
         window.contact_email = email
 
       })
-      .fail(function(e) {
-        console.log(e)
-        jQuery('#error').html(e)
-      })
   })
 } /* .preCache */
+
+
+
+/**************************
+Support Functions
+***************************/
 
 function show_details_panel(){
   $('#details-panel').show()
@@ -539,79 +565,113 @@ function load_self_content( data ) {
   }
 }
 
-function load_levels_content( data ) {
-  if ( 'groups' === jsObject.post_type ) {
+// function load_levels_content( data ) {
+//   if ( 'groups' === jsObject.post_type ) {
+//     let gl = jQuery('#goals-list')
+//     gl.empty()
+//     jQuery.each(data.levels, function(i,v){
+//       gl.append(`
+//     <div class="cell">
+//         <strong>${v.name}</strong><br>
+//         Population: <span>${v.population}</span><br>
+//         Churches Needed: <span>${v.needed}</span><br>
+//         Churches Reported: <span>${v.reported}</span><br>
+//         Goal Reached: <span>${v.percent}</span>%
+//         <meter class="meter" value="${v.percent}" min="0" low="33" high="66" optimum="100" max="100"></meter>
+//     </div>
+//     `)
+//     })
+//   }
+//   else if ( 'trainings' === jsObject.post_type ) {
+//     let gl = jQuery('#goals-list')
+//     gl.empty()
+//     jQuery.each(data.levels, function(i,v){
+//       gl.append(`
+//     <div class="cell">
+//         <strong>${v.name}</strong><br>
+//         Population: <span>${v.population}</span><br>
+//         Trainings Needed: <span>${v.needed}</span><br>
+//         Trainings Reported: <span>${v.reported}</span><br>
+//         Goal Reached: <span>${v.percent}</span>%
+//         <meter class="meter" value="${v.percent}" min="0" low="33" high="66" optimum="100" max="100"></meter>
+//     </div>
+//     `)
+//     })
+//   }
+// }
 
-    let gl = jQuery('#goals-list')
+function load_level_content( data, level ) {
+  if ( 'groups' === jsObject.post_type ) {
+    let gl = jQuery('#'+level+'-list-item')
     gl.empty()
-    jQuery.each(data.levels, function(i,v){
+    if ( false !== data ) {
       gl.append(`
-    <div class="cell">
-        <strong>${v.name}</strong><br>
-        Population: <span>${v.population}</span><br>
-        Churches Needed: <span>${v.needed}</span><br>
-        Churches Reported: <span>${v.reported}</span><br>
-        Goal Reached: <span>${v.percent}</span>%
-        <meter class="meter" value="${v.percent}" min="0" low="33" high="66" optimum="100" max="100"></meter>
-    </div>
-    `)
-    })
+      <div class="cell">
+          <strong>${data.name}</strong><br>
+          Population: <span>${data.population}</span><br>
+          Churches Needed: <span>${data.needed}</span><br>
+          Churches Reported: <span>${data.reported}</span><br>
+          Goal Reached: <span>${data.percent}</span>%
+          <meter class="meter" value="${data.percent}" min="0" low="33" high="66" optimum="100" max="100"></meter>
+      </div>
+      `)
+    }
+
   }
   else if ( 'trainings' === jsObject.post_type ) {
-
-    let gl = jQuery('#goals-list')
+    let gl = jQuery('#'+level+'-list-item')
     gl.empty()
-    jQuery.each(data.levels, function(i,v){
+    if ( false !== data ) {
       gl.append(`
-    <div class="cell">
-        <strong>${v.name}</strong><br>
-        Population: <span>${v.population}</span><br>
-        Trainings Needed: <span>${v.needed}</span><br>
-        Trainings Reported: <span>${v.reported}</span><br>
-        Goal Reached: <span>${v.percent}</span>%
-        <meter class="meter" value="${v.percent}" min="0" low="33" high="66" optimum="100" max="100"></meter>
-    </div>
-    `)
-    })
+      <div class="cell">
+          <strong>${data.name}</strong><br>
+          Population: <span>${data.population}</span><br>
+          Trainings Needed: <span>${data.needed}</span><br>
+          Trainings Reported: <span>${data.reported}</span><br>
+          Goal Reached: <span>${data.percent}</span>%
+          <meter class="meter" value="${data.percent}" min="0" low="33" high="66" optimum="100" max="100"></meter>
+      </div>
+      `)
+    }
   }
 
 }
 
-function load_world_content( data ) {
-  if ( 'groups' === jsObject.post_type ) {
-    let wl = jQuery('#world-list')
-    wl.empty()
-    jQuery.each(data, function(i,v){
-      wl.append(`
-        <div class="cell">
-            <strong>${v.name}</strong><br>
-            Population: <span>${v.population}</span><br>
-            Churches Needed: <span>${v.needed}</span><br>
-            Churches Reported: <span>${v.reported}</span><br>
-            Goal Reached: <span>${v.percent}</span>%
-            <meter class="meter" value="${v.percent}" min="0" low="33" high="66" optimum="100" max="100"></meter>
-        </div>
-    `)
-    })
-  }
-  else if ( 'trainings' === jsObject.post_type ) {
-    let wl = jQuery('#world-list')
-    wl.empty()
-    jQuery.each(data, function(i,v){
-      wl.append(`
-        <div class="cell">
-            <strong>${v.name}</strong><br>
-            Population: <span>${v.population}</span><br>
-            Trainings Needed: <span>${v.needed}</span><br>
-            Trainings Reported: <span>${v.reported}</span><br>
-            Goal Reached: <span>${v.percent}</span>%
-            <meter class="meter" value="${v.percent}" min="0" low="33" high="66" optimum="100" max="100"></meter>
-        </div>
-    `)
-    })
-  }
-
-}
+// function load_world_content( data ) {
+//   if ( 'groups' === jsObject.post_type ) {
+//     let wl = jQuery('#world-list')
+//     wl.empty()
+//     jQuery.each(data, function(i,v){
+//       wl.append(`
+//         <div class="cell">
+//             <strong>${v.name}</strong><br>
+//             Population: <span>${v.population}</span><br>
+//             Churches Needed: <span>${v.needed}</span><br>
+//             Churches Reported: <span>${v.reported}</span><br>
+//             Goal Reached: <span>${v.percent}</span>%
+//             <meter class="meter" value="${v.percent}" min="0" low="33" high="66" optimum="100" max="100"></meter>
+//         </div>
+//     `)
+//     })
+//   }
+//   else if ( 'trainings' === jsObject.post_type ) {
+//     let wl = jQuery('#world-list')
+//     wl.empty()
+//     jQuery.each(data, function(i,v){
+//       wl.append(`
+//         <div class="cell">
+//             <strong>${v.name}</strong><br>
+//             Population: <span>${v.population}</span><br>
+//             Trainings Needed: <span>${v.needed}</span><br>
+//             Trainings Reported: <span>${v.reported}</span><br>
+//             Goal Reached: <span>${v.percent}</span>%
+//             <meter class="meter" value="${v.percent}" min="0" low="33" high="66" optimum="100" max="100"></meter>
+//         </div>
+//     `)
+//     })
+//   }
+//
+// }
 
 function remove_row( id ) {
   let submit_button = $('#submit-report')
