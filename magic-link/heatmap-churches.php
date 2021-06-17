@@ -504,8 +504,18 @@ class DT_Network_Dashboard_Public_Heatmap_Churches
                 $needed = 1;
             }
             $level['needed'] = $needed;
+            if ( $administrative_level === 'world' ) {
+                $world_population = 7860000000;
+                $us_population = 331000000;
+                $global_pop_block = $this->global_div;
+                $us_pop_block = $this->us_div;
+                $world_population_without_us = $world_population - $us_population;
+                $needed_without_us = $world_population_without_us / $global_pop_block;
+                $needed_in_the_us = $us_population / $us_pop_block;
+                $level['needed'] = $needed_without_us + $needed_in_the_us;
+            }
         }
-
+        // @todo end temp cover for populations
 
         $data = [
             'name' => $level['name'],
@@ -788,6 +798,8 @@ class DT_Network_Dashboard_Public_Heatmap_Churches
             return 0;
         }
     }
+
+
 
 
     /****************************************************************************************
