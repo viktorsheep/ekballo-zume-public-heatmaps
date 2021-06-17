@@ -1546,7 +1546,8 @@ class Zume_Public_Heatmap_Queries {
                    lg2.population as a2_population,
                    lg1.population as a1_population,
                    lg0.population as a0_population,
-                   lgw.population as world_population
+                   lgw.population as world_population,
+                   lg.country_code
             FROM $wpdb->dt_location_grid lg
             LEFT JOIN $wpdb->dt_location_grid lg0 ON lg.admin0_grid_id=lg0.grid_id
             LEFT JOIN $wpdb->dt_location_grid lg1 ON lg.admin1_grid_id=lg1.grid_id

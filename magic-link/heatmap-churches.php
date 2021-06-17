@@ -497,6 +497,13 @@ class DT_Network_Dashboard_Public_Heatmap_Churches
             && ! empty( $grid[$administrative_level . '_population'] )
             && in_array($administrative_level, ['a0', 'world'] ) ) {
             $level['population'] = $grid[$administrative_level . '_population'];
+
+            $population_division = $this->get_population_division( $grid['country_code'] );
+            $needed = round( $level['population']  / ( $population_division / 2 ) );
+            if ( $needed < 1 ){
+                $needed = 1;
+            }
+            $level['needed'] = $needed;
         }
 
 
