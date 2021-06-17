@@ -106,7 +106,6 @@ jQuery(document).ready(function($){
   let initialize_screen = jQuery('.initialize-progress')
 
   jQuery.each(asset_list, function(i,v) {
-    console.log(v)
     jQuery.ajax({
       url: jsObject.mirror_url + 'tiles/world/saturation/' + v,
       dataType: 'json',
@@ -119,7 +118,6 @@ jQuery(document).ready(function($){
       }
     })
       .done(function(x){
-        console.log(v + ' returned')
         loop++
         initialize_screen.val(loop)
 

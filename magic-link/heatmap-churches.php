@@ -489,6 +489,17 @@ class DT_Network_Dashboard_Public_Heatmap_Churches
         } else {
             $percent = number_format_i18n( $percent, 2 );
         }
+
+        /**
+         * @todo temp cover for populations
+         */
+        if ( isset( $grid[$administrative_level . '_population'] )
+            && ! empty( $grid[$administrative_level . '_population'] )
+            && in_array($administrative_level, ['a0', 'world'] ) ) {
+            $level['population'] = $grid[$administrative_level . '_population'];
+        }
+
+
         $data = [
             'name' => $level['name'],
             'grid_id' => (int) $level['grid_id'],
