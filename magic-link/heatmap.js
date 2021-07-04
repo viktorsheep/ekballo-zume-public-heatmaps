@@ -174,6 +174,8 @@ function load_map() {
     ptt = 'Trainings'
   } else if ( 'trained_people' === jsObject.post_type ) {
     ptt = 'Trained People'
+  } else if ( 'activity' === jsObject.post_type ) {
+    ptt = 'Activity'
   }
   else if ( 'registrations' === jsObject.post_type ) {
     ptt = 'Registrations'
@@ -575,7 +577,7 @@ function load_self_content( data ) {
       <span class="self_name ucwords  bold">${data.name}</span> needs
       <span class="self_needed bold">${data.needed}</span> new trainings.
     `)
-  } else if ('registrations' === jsObject.post_type) {
+  } else if ('registrations' === jsObject.post_type || 'activity' === jsObject.post_type) {
     jQuery('#custom-paragraph').html(`
       <span class="self_name ucwords temp-spinner bold">${data.name}</span> is one of <span class="self_peers  bold">${data.peers}</span>
       administrative divisions in <span class="parent_name ucwords bold">${data.parent_name}</span> and it has a population of
@@ -626,6 +628,20 @@ function load_level_content( data, level ) {
           <strong>${data.name}</strong><br>
           Population: <span>${data.population}</span><br>
           Registrations Reported: <span>${data.reported}</span><br>
+          <hr>
+      </div>
+      `)
+    }
+  }
+  else if ( 'activity' === jsObject.post_type ) {
+    let gl = jQuery('#'+level+'-list-item')
+    gl.empty()
+    if ( data ) {
+      gl.append(`
+      <div class="cell">
+          <strong>${data.name}</strong><br>
+          Population: <span>${data.population}</span><br>
+          Activities Reported: <span>${data.reported}</span><br>
           <hr>
       </div>
       `)

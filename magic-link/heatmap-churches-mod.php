@@ -1,7 +1,7 @@
 <?php
 if ( !defined( 'ABSPATH' ) ) { exit; } // Exit if accessed directly.
 
-if ( strpos( dt_get_url_path(), 'zume_app' ) !== false || dt_is_rest() ){
+if ( strpos( dt_get_url_path(), 'zume_app/heatmap_churches' ) !== false || dt_is_rest() ){
     DT_Network_Dashboard_Public_Heatmap_Churches::instance();
 }
 
@@ -16,7 +16,7 @@ add_filter('dt_network_dashboard_supported_public_links', function( $supported_l
 }, 10, 1 );
 
 
-class DT_Network_Dashboard_Public_Heatmap_Churches
+class DT_Network_Dashboard_Public_Heatmap_Churches extends DT_Network_Dashboard_Public_Heatmap_Base
 {
 
     public $magic = false;
@@ -25,8 +25,6 @@ class DT_Network_Dashboard_Public_Heatmap_Churches
     public $type = 'heatmap_churches';
     public $key = 'zume_app_heatmap_churches';
     public $post_type = 'groups';
-    public $us_div = 2500; // this is 2 for every 5000
-    public $global_div = 25000; // this equals 2 for every 50000
 
     private static $_instance = null;
     public static function instance() {
@@ -37,15 +35,16 @@ class DT_Network_Dashboard_Public_Heatmap_Churches
     } // End instance()
 
     public function __construct() {
+        parent::__construct();
 
         // register type
         $this->magic = new DT_Magic_URL( $this->root );
         add_filter( 'dt_magic_url_register_types', [ $this, '_register_type' ], 10, 1 );
 
         // register REST and REST access
-        add_filter( 'dt_allow_rest_access', [ $this, '_authorize_url' ], 100, 1 );
-        add_action( 'rest_api_init', [ $this, 'add_endpoints' ] );
-        add_action( 'wp_enqueue_scripts', [ $this, '_wp_enqueue_scripts' ], 100 );
+//        add_filter( 'dt_allow_rest_access', [ $this, '_authorize_url' ], 100, 1 );
+//        add_action( 'rest_api_init', [ $this, 'add_endpoints' ] );
+//        add_action( 'wp_enqueue_scripts', [ $this, '_wp_enqueue_scripts' ], 100 );
 
 
         // fail if not valid url
@@ -93,27 +92,28 @@ class DT_Network_Dashboard_Public_Heatmap_Churches
 
     }
 
-    public function _register_type( array $types ) : array {
-        if ( ! isset( $types[$this->root] ) ) {
-            $types[$this->root] = [];
-        }
-        $types[$this->root][$this->type] = [
-            'name' => 'Magic',
-            'root' => $this->root,
-            'type' => $this->type,
-            'meta_key' => 'public_key',
-            'actions' => [
-                '' => 'Manage',
-            ],
-            'post_type' => $this->post_type,
-        ];
-        return $types;
-    }
+//    public function _register_type( array $types ) : array {
+//        if ( ! isset( $types[$this->root] ) ) {
+//            $types[$this->root] = [];
+//        }
+//        $types[$this->root][$this->type] = [
+//            'name' => 'Magic',
+//            'root' => $this->root,
+//            'type' => $this->type,
+//            'meta_key' => 'public_key',
+//            'actions' => [
+//                '' => 'Manage',
+//            ],
+//            'post_type' => $this->post_type,
+//        ];
+//        return $types;
+//    }
 
     public function _wp_enqueue_scripts(){
         $url = dt_get_url_path();
         if ( strpos( $url, $this->root . '/' . $this->type ) !== false ) {
             wp_enqueue_script( 'lodash' );
+//            wp_enqueue_script( 'moment' );
             wp_enqueue_script( 'jquery-ui' );
             wp_enqueue_script( 'jquery-touch-punch' );
 
@@ -124,7 +124,10 @@ class DT_Network_Dashboard_Public_Heatmap_Churches
 
             wp_enqueue_style( $this->key, trailingslashit( plugin_dir_url( __FILE__ ) ) . 'heatmap.css', [ 'site-css' ], filemtime( plugin_dir_path( __FILE__ ) .'heatmap.css' ) );
 
-
+//            wp_enqueue_script( 'service-worker', trailingslashit( plugin_dir_url( __FILE__ ) ) . 'service-worker.js', [
+//                'jquery',
+//                'jquery-touch-punch'
+//            ], filemtime( plugin_dir_path( __FILE__ ) .'service-worker.js' ), true );
         }
     }
 
