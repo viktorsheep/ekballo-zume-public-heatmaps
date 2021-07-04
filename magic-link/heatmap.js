@@ -170,8 +170,10 @@ function load_map() {
   let ptt = ''
   if ( 'groups' === jsObject.post_type ){
     ptt = 'Churches'
-  } else if ( 'trainings' === jsObject.post_type || 'trained_people' === jsObject.post_type ) {
+  } else if ( 'trainings' === jsObject.post_type  ) {
     ptt = 'Trainings'
+  } else if ( 'trained_people' === jsObject.post_type ) {
+    ptt = 'Trained People'
   }
   else if ( 'registrations' === jsObject.post_type ) {
     ptt = 'Registrations'
