@@ -1480,6 +1480,354 @@ class Zume_Public_Heatmap_Queries {
         return $list;
     }
 
+    public static function query_registration_grid_totals( $administrative_level = null ) {
+        global $wpdb;
+
+        switch ( $administrative_level ) {
+            case 'a0':
+                $results = $wpdb->get_results( "
+                    SELECT t0.admin0_grid_id as grid_id, count(t0.admin0_grid_id) as count
+                    FROM (
+                             SELECT lg.admin0_grid_id, lg.admin1_grid_id, lg.admin2_grid_id, lg.admin3_grid_id, lg.admin4_grid_id, lg.admin5_grid_id
+                             FROM $wpdb->usermeta as um
+                                      LEFT JOIN $wpdb->dt_location_grid as lg ON um.meta_value=lg.grid_id
+                             WHERE um.meta_key = 'zume_location_grid_from_ip'
+                         ) as t0
+                    GROUP BY t0.admin0_grid_id
+                    ", ARRAY_A );
+                break;
+            case 'a1':
+                $results = $wpdb->get_results( "
+                    SELECT t1.admin1_grid_id as grid_id, count(t1.admin1_grid_id) as count
+                    FROM (
+                             SELECT lg.admin0_grid_id, lg.admin1_grid_id, lg.admin2_grid_id, lg.admin3_grid_id, lg.admin4_grid_id, lg.admin5_grid_id
+                             FROM $wpdb->usermeta as um
+                                      LEFT JOIN $wpdb->dt_location_grid as lg ON um.meta_value=lg.grid_id
+                             WHERE um.meta_key = 'zume_location_grid_from_ip'
+                         ) as t1
+                    GROUP BY t1.admin1_grid_id
+                    ", ARRAY_A );
+                break;
+            case 'a2':
+                $results = $wpdb->get_results( "
+                    SELECT t2.admin2_grid_id as grid_id, count(t2.admin2_grid_id) as count
+                    FROM (
+                             SELECT lg.admin0_grid_id, lg.admin1_grid_id, lg.admin2_grid_id, lg.admin3_grid_id, lg.admin4_grid_id, lg.admin5_grid_id
+                             FROM $wpdb->usermeta as um
+                                      LEFT JOIN $wpdb->dt_location_grid as lg ON um.meta_value=lg.grid_id
+                             WHERE um.meta_key = 'zume_location_grid_from_ip'
+                         ) as t2
+                    GROUP BY t2.admin2_grid_id
+                    ", ARRAY_A );
+                break;
+            case 'a3':
+                $results = $wpdb->get_results( "
+                    SELECT t3.admin3_grid_id as grid_id, count(t3.admin3_grid_id) as count
+                    FROM (
+                             SELECT lg.admin0_grid_id, lg.admin1_grid_id, lg.admin2_grid_id, lg.admin3_grid_id, lg.admin4_grid_id, lg.admin5_grid_id
+                             FROM $wpdb->usermeta as um
+                                      LEFT JOIN $wpdb->dt_location_grid as lg ON um.meta_value=lg.grid_id
+                             WHERE um.meta_key = 'zume_location_grid_from_ip'
+                         ) as t3
+                    GROUP BY t3.admin3_grid_id
+                    ", ARRAY_A );
+                break;
+            case 'world':
+                $results = $wpdb->get_results( "
+                    SELECT 1 as grid_id, count('World') as count
+                    FROM (
+                        SELECT 'World'
+                        FROM $wpdb->usermeta as um
+                             LEFT JOIN $wpdb->dt_location_grid as lg ON um.meta_value=lg.grid_id
+                        WHERE um.meta_key = 'zume_location_grid_from_ip'
+                    ) as tw
+                    GROUP BY 'World'
+                    ", ARRAY_A );
+                break;
+            case 'full':
+                $results = $wpdb->get_results( "
+                    SELECT t0.admin0_grid_id as grid_id, count(t0.admin0_grid_id) as count
+                    FROM (
+                             SELECT lg.admin0_grid_id, lg.admin1_grid_id, lg.admin2_grid_id, lg.admin3_grid_id, lg.admin4_grid_id, lg.admin5_grid_id
+                             FROM $wpdb->usermeta as um
+                                      LEFT JOIN $wpdb->dt_location_grid as lg ON um.meta_value=lg.grid_id
+                             WHERE um.meta_key = 'zume_location_grid_from_ip'
+                         ) as t0
+                    GROUP BY t0.admin0_grid_id
+                    UNION ALL
+                    SELECT t1.admin1_grid_id as grid_id, count(t1.admin1_grid_id) as count
+                    FROM (
+                             SELECT lg.admin0_grid_id, lg.admin1_grid_id, lg.admin2_grid_id, lg.admin3_grid_id, lg.admin4_grid_id, lg.admin5_grid_id
+                             FROM $wpdb->usermeta as um
+                                      LEFT JOIN $wpdb->dt_location_grid as lg ON um.meta_value=lg.grid_id
+                             WHERE um.meta_key = 'zume_location_grid_from_ip'
+                         ) as t1
+                    GROUP BY t1.admin1_grid_id
+                    UNION ALL
+                    SELECT t2.admin2_grid_id as grid_id, count(t2.admin2_grid_id) as count
+                    FROM (
+                             SELECT lg.admin0_grid_id, lg.admin1_grid_id, lg.admin2_grid_id, lg.admin3_grid_id, lg.admin4_grid_id, lg.admin5_grid_id
+                             FROM $wpdb->usermeta as um
+                                      LEFT JOIN $wpdb->dt_location_grid as lg ON um.meta_value=lg.grid_id
+                             WHERE um.meta_key = 'zume_location_grid_from_ip'
+                         ) as t2
+                    GROUP BY t2.admin2_grid_id
+                    UNION ALL
+                    SELECT t3.admin3_grid_id as grid_id, count(t3.admin3_grid_id) as count
+                    FROM (
+                             SELECT lg.admin0_grid_id, lg.admin1_grid_id, lg.admin2_grid_id, lg.admin3_grid_id, lg.admin4_grid_id, lg.admin5_grid_id
+                             FROM $wpdb->usermeta as um
+                                      LEFT JOIN $wpdb->dt_location_grid as lg ON um.meta_value=lg.grid_id
+                             WHERE um.meta_key = 'zume_location_grid_from_ip'
+                         ) as t3
+                    GROUP BY t3.admin3_grid_id
+                    UNION ALL
+                    SELECT 1 as grid_id, count('World') as count
+                    FROM (
+                        SELECT 'World'
+                        FROM $wpdb->usermeta as um
+                             LEFT JOIN $wpdb->dt_location_grid as lg ON um.meta_value=lg.grid_id
+                        WHERE um.meta_key = 'zume_location_grid_from_ip'
+                    ) as tw
+                    GROUP BY 'World'
+                    ", ARRAY_A );
+                break;
+            default:
+                $results = $wpdb->get_results( "
+                    SELECT t0.admin0_grid_id as grid_id, count(t0.admin0_grid_id) as count
+                    FROM (
+                             SELECT lg.admin0_grid_id, lg.admin1_grid_id, lg.admin2_grid_id, lg.admin3_grid_id, lg.admin4_grid_id, lg.admin5_grid_id
+                             FROM $wpdb->usermeta as um
+                                      LEFT JOIN $wpdb->dt_location_grid as lg ON um.meta_value=lg.grid_id
+                             WHERE um.meta_key = 'zume_location_grid_from_ip'
+                         ) as t0
+                    GROUP BY t0.admin0_grid_id
+                    UNION ALL
+                    SELECT t1.admin1_grid_id as grid_id, count(t1.admin1_grid_id) as count
+                    FROM (
+                             SELECT lg.admin0_grid_id, lg.admin1_grid_id, lg.admin2_grid_id, lg.admin3_grid_id, lg.admin4_grid_id, lg.admin5_grid_id
+                             FROM $wpdb->usermeta as um
+                                      LEFT JOIN $wpdb->dt_location_grid as lg ON um.meta_value=lg.grid_id
+                             WHERE um.meta_key = 'zume_location_grid_from_ip'
+                         ) as t1
+                    GROUP BY t1.admin1_grid_id
+                    UNION ALL
+                    SELECT t2.admin2_grid_id as grid_id, count(t2.admin2_grid_id) as count
+                    FROM (
+                             SELECT lg.admin0_grid_id, lg.admin1_grid_id, lg.admin2_grid_id, lg.admin3_grid_id, lg.admin4_grid_id, lg.admin5_grid_id
+                             FROM $wpdb->usermeta as um
+                                      LEFT JOIN $wpdb->dt_location_grid as lg ON um.meta_value=lg.grid_id
+                             WHERE um.meta_key = 'zume_location_grid_from_ip'
+                         ) as t2
+                    GROUP BY t2.admin2_grid_id
+                    UNION ALL
+                    SELECT t3.admin3_grid_id as grid_id, count(t3.admin3_grid_id) as count
+                    FROM (
+                             SELECT lg.admin0_grid_id, lg.admin1_grid_id, lg.admin2_grid_id, lg.admin3_grid_id, lg.admin4_grid_id, lg.admin5_grid_id
+                             FROM $wpdb->usermeta as um
+                                      LEFT JOIN $wpdb->dt_location_grid as lg ON um.meta_value=lg.grid_id
+                             WHERE um.meta_key = 'zume_location_grid_from_ip'
+                         ) as t3
+                    GROUP BY t3.admin3_grid_id
+                    ", ARRAY_A );
+                break;
+        }
+
+        $list = [];
+        if ( is_array( $results ) ) {
+            foreach ( $results as $result ) {
+                if ( empty( $result['grid_id'] ) ) {
+                    continue;
+                }
+                if ( empty( $result['count'] ) ) {
+                    continue;
+                }
+                $list[$result['grid_id']] = $result['count'];
+            }
+        }
+
+        return $list;
+    }
+
+    public static function query_trained_people_grid_totals( $administrative_level = null ) {
+        global $wpdb;
+
+        switch ( $administrative_level ) {
+            case 'a0':
+                $results = $wpdb->get_results( "
+                    SELECT t0.admin0_grid_id as grid_id, count(t0.admin0_grid_id) as count
+                    FROM (
+                             SELECT lg.admin0_grid_id, lg.admin1_grid_id, lg.admin2_grid_id, lg.admin3_grid_id, lg.admin4_grid_id, lg.admin5_grid_id
+                             FROM $wpdb->usermeta as um
+                             JOIN $wpdb->usermeta uc ON uc.user_id=um.user_id AND uc.meta_key = 'zume_training_complete'
+                             LEFT JOIN $wpdb->dt_location_grid as lg ON um.meta_value=lg.grid_id
+                             WHERE um.meta_key = 'zume_location_grid_from_ip'
+                         ) as t0
+                    GROUP BY t0.admin0_grid_id
+                    ", ARRAY_A );
+                break;
+            case 'a1':
+                $results = $wpdb->get_results( "
+                    SELECT t1.admin1_grid_id as grid_id, count(t1.admin1_grid_id) as count
+                    FROM (
+                             SELECT lg.admin0_grid_id, lg.admin1_grid_id, lg.admin2_grid_id, lg.admin3_grid_id, lg.admin4_grid_id, lg.admin5_grid_id
+                             FROM $wpdb->usermeta as um
+                             JOIN $wpdb->usermeta uc ON uc.user_id=um.user_id AND uc.meta_key = 'zume_training_complete'
+                             LEFT JOIN $wpdb->dt_location_grid as lg ON um.meta_value=lg.grid_id
+                             WHERE um.meta_key = 'zume_location_grid_from_ip'
+                         ) as t1
+                    GROUP BY t1.admin1_grid_id
+                    ", ARRAY_A );
+                break;
+            case 'a2':
+                $results = $wpdb->get_results( "
+                     SELECT t2.admin2_grid_id as grid_id, count(t2.admin2_grid_id) as count
+                    FROM (
+                             SELECT lg.admin0_grid_id, lg.admin1_grid_id, lg.admin2_grid_id, lg.admin3_grid_id, lg.admin4_grid_id, lg.admin5_grid_id
+                             FROM $wpdb->usermeta as um
+                             JOIN $wpdb->usermeta uc ON uc.user_id=um.user_id AND uc.meta_key = 'zume_training_complete'
+                             LEFT JOIN $wpdb->dt_location_grid as lg ON um.meta_value=lg.grid_id
+                             WHERE um.meta_key = 'zume_location_grid_from_ip'
+                         ) as t2
+                    GROUP BY t2.admin2_grid_id
+                    ", ARRAY_A );
+                break;
+            case 'a3':
+                $results = $wpdb->get_results( "
+                    SELECT t3.admin3_grid_id as grid_id, count(t3.admin3_grid_id) as count
+                    FROM (
+                             SELECT lg.admin0_grid_id, lg.admin1_grid_id, lg.admin2_grid_id, lg.admin3_grid_id, lg.admin4_grid_id, lg.admin5_grid_id
+                             FROM $wpdb->usermeta as um
+                             JOIN $wpdb->usermeta uc ON uc.user_id=um.user_id AND uc.meta_key = 'zume_training_complete'
+                             LEFT JOIN $wpdb->dt_location_grid as lg ON um.meta_value=lg.grid_id
+                             WHERE um.meta_key = 'zume_location_grid_from_ip'
+                         ) as t3
+                    GROUP BY t3.admin3_grid_id
+                    ", ARRAY_A );
+                break;
+            case 'world':
+                $results = $wpdb->get_results( "
+                    SELECT 1 as grid_id, count('World') as count
+                    FROM (
+                        SELECT 'World'
+                        FROM $wpdb->usermeta as um
+                             JOIN $wpdb->usermeta uc ON uc.user_id=um.user_id AND uc.meta_key = 'zume_training_complete'
+                             LEFT JOIN $wpdb->dt_location_grid as lg ON um.meta_value=lg.grid_id
+                        WHERE um.meta_key = 'zume_location_grid_from_ip'
+                    ) as tw
+                    GROUP BY 'World'
+                    ", ARRAY_A );
+                break;
+            case 'full':
+                $results = $wpdb->get_results( "
+                    SELECT t0.admin0_grid_id as grid_id, count(t0.admin0_grid_id) as count
+                    FROM (
+                             SELECT lg.admin0_grid_id, lg.admin1_grid_id, lg.admin2_grid_id, lg.admin3_grid_id, lg.admin4_grid_id, lg.admin5_grid_id
+                             FROM $wpdb->usermeta as um
+                                      LEFT JOIN $wpdb->dt_location_grid as lg ON um.meta_value=lg.grid_id
+                             WHERE um.meta_key = 'zume_location_grid_from_ip'
+                         ) as t0
+                    GROUP BY t0.admin0_grid_id
+                    UNION ALL
+                    SELECT t1.admin1_grid_id as grid_id, count(t1.admin1_grid_id) as count
+                    FROM (
+                             SELECT lg.admin0_grid_id, lg.admin1_grid_id, lg.admin2_grid_id, lg.admin3_grid_id, lg.admin4_grid_id, lg.admin5_grid_id
+                             FROM $wpdb->usermeta as um
+                                      LEFT JOIN $wpdb->dt_location_grid as lg ON um.meta_value=lg.grid_id
+                             WHERE um.meta_key = 'zume_location_grid_from_ip'
+                         ) as t1
+                    GROUP BY t1.admin1_grid_id
+                    UNION ALL
+                    SELECT t2.admin2_grid_id as grid_id, count(t2.admin2_grid_id) as count
+                    FROM (
+                             SELECT lg.admin0_grid_id, lg.admin1_grid_id, lg.admin2_grid_id, lg.admin3_grid_id, lg.admin4_grid_id, lg.admin5_grid_id
+                             FROM $wpdb->usermeta as um
+                                      LEFT JOIN $wpdb->dt_location_grid as lg ON um.meta_value=lg.grid_id
+                             WHERE um.meta_key = 'zume_location_grid_from_ip'
+                         ) as t2
+                    GROUP BY t2.admin2_grid_id
+                    UNION ALL
+                    SELECT t3.admin3_grid_id as grid_id, count(t3.admin3_grid_id) as count
+                    FROM (
+                             SELECT lg.admin0_grid_id, lg.admin1_grid_id, lg.admin2_grid_id, lg.admin3_grid_id, lg.admin4_grid_id, lg.admin5_grid_id
+                             FROM $wpdb->usermeta as um
+                                      LEFT JOIN $wpdb->dt_location_grid as lg ON um.meta_value=lg.grid_id
+                             WHERE um.meta_key = 'zume_location_grid_from_ip'
+                         ) as t3
+                    GROUP BY t3.admin3_grid_id
+                    UNION ALL
+                    SELECT 1 as grid_id, count('World') as count
+                    FROM (
+                            SELECT 'World'
+                            FROM $wpdb->usermeta as um
+                            JOIN $wpdb->usermeta uc ON uc.user_id=um.user_id AND uc.meta_key = 'zume_training_complete'
+                            LEFT JOIN $wpdb->dt_location_grid as lg ON um.meta_value=lg.grid_id
+                            WHERE um.meta_key = 'zume_location_grid_from_ip'
+                    ) as tw
+                    GROUP BY 'World'
+                    ", ARRAY_A );
+                break;
+            default:
+                $results = $wpdb->get_results( "
+                    SELECT t0.admin0_grid_id as grid_id, count(t0.admin0_grid_id) as count
+                    FROM (
+                             SELECT lg.admin0_grid_id, lg.admin1_grid_id, lg.admin2_grid_id, lg.admin3_grid_id, lg.admin4_grid_id, lg.admin5_grid_id
+                             FROM $wpdb->usermeta as um
+                             JOIN $wpdb->usermeta uc ON uc.user_id=um.user_id AND uc.meta_key = 'zume_training_complete'
+                             LEFT JOIN $wpdb->dt_location_grid as lg ON um.meta_value=lg.grid_id
+                             WHERE um.meta_key = 'zume_location_grid_from_ip'
+                         ) as t0
+                    GROUP BY t0.admin0_grid_id
+                    UNION ALL
+                    SELECT t1.admin1_grid_id as grid_id, count(t1.admin1_grid_id) as count
+                    FROM (
+                             SELECT lg.admin0_grid_id, lg.admin1_grid_id, lg.admin2_grid_id, lg.admin3_grid_id, lg.admin4_grid_id, lg.admin5_grid_id
+                             FROM $wpdb->usermeta as um
+                             JOIN $wpdb->usermeta uc ON uc.user_id=um.user_id AND uc.meta_key = 'zume_training_complete'
+                             LEFT JOIN $wpdb->dt_location_grid as lg ON um.meta_value=lg.grid_id
+                             WHERE um.meta_key = 'zume_location_grid_from_ip'
+                         ) as t1
+                    GROUP BY t1.admin1_grid_id
+                    UNION ALL
+                    SELECT t2.admin2_grid_id as grid_id, count(t2.admin2_grid_id) as count
+                    FROM (
+                             SELECT lg.admin0_grid_id, lg.admin1_grid_id, lg.admin2_grid_id, lg.admin3_grid_id, lg.admin4_grid_id, lg.admin5_grid_id
+                             FROM $wpdb->usermeta as um
+                             JOIN $wpdb->usermeta uc ON uc.user_id=um.user_id AND uc.meta_key = 'zume_training_complete'
+                             LEFT JOIN $wpdb->dt_location_grid as lg ON um.meta_value=lg.grid_id
+                             WHERE um.meta_key = 'zume_location_grid_from_ip'
+                         ) as t2
+                    GROUP BY t2.admin2_grid_id
+                    UNION ALL
+                    SELECT t3.admin3_grid_id as grid_id, count(t3.admin3_grid_id) as count
+                    FROM (
+                             SELECT lg.admin0_grid_id, lg.admin1_grid_id, lg.admin2_grid_id, lg.admin3_grid_id, lg.admin4_grid_id, lg.admin5_grid_id
+                             FROM $wpdb->usermeta as um
+                             JOIN $wpdb->usermeta uc ON uc.user_id=um.user_id AND uc.meta_key = 'zume_training_complete'
+                             LEFT JOIN $wpdb->dt_location_grid as lg ON um.meta_value=lg.grid_id
+                             WHERE um.meta_key = 'zume_location_grid_from_ip'
+                         ) as t3
+                    GROUP BY t3.admin3_grid_id
+                    ", ARRAY_A );
+                break;
+        }
+
+        $list = [];
+        if ( is_array( $results ) ) {
+            foreach ( $results as $result ) {
+                if ( empty( $result['grid_id'] ) ) {
+                    continue;
+                }
+                if ( empty( $result['count'] ) ) {
+                    continue;
+                }
+                $list[$result['grid_id']] = $result['count'];
+            }
+        }
+
+        return $list;
+    }
+
     public static function query_activity_location_grid_totals() {
 
         global $wpdb;

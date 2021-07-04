@@ -18,7 +18,6 @@ window.get_grid_data = ( action, grid_id) => {
     }
   })
     .fail(function(e) {
-      console.log(e)
       jQuery('#error').html(e)
     })
 }
@@ -35,7 +34,6 @@ window.get_activity_data = (grid_id) => {
     }
   })
     .fail(function(e) {
-      console.log(e)
       jQuery('#error').html(e)
     })
 }
@@ -52,7 +50,6 @@ window.new_report = ( action, form_data ) => {
     }
   })
     .fail(function(e) {
-      console.log(e)
       jQuery('#error').html(e)
     })
 }
@@ -94,6 +91,8 @@ jQuery(document).ready(function($){
 
     `)
 
+  let initialize_screen = jQuery('.initialize-progress')
+
   // preload all geojson
   let asset_list = []
   var i = 1;
@@ -103,8 +102,21 @@ jQuery(document).ready(function($){
   }
 
   let loop = 0
-  let initialize_screen = jQuery('.initialize-progress')
-
+  let list = 0
+  window.load_map_triggered = 0
+  window.get_grid_data( 'grid_data', 0)
+    .done(function(x){
+      list = 1
+      jsObject.grid_data = x
+      if ( loop > 44 && list > 0 && window.load_map_triggered !== 1 ){
+        window.load_map_triggered = 1
+        load_map()
+      }
+    })
+    .fail(function(){
+      console.log('Error getting grid data')
+      jsObject.grid_data = {'data': {}, 'highest_value': 1 }
+    })
   jQuery.each(asset_list, function(i,v) {
     jQuery.ajax({
       url: jsObject.mirror_url + 'tiles/world/saturation/' + v,
@@ -137,7 +149,8 @@ jQuery(document).ready(function($){
           jQuery('#initialize-dothis').show()
         }
 
-        if ( loop > 44 ){
+        if ( loop > 44 && list > 0 && window.load_map_triggered !== 1 ){
+          window.load_map_triggered = 1
           load_map()
         }
       })
@@ -145,7 +158,6 @@ jQuery(document).ready(function($){
         loop++
       })
   })
-
 }) /* .ready() */
 
 /**************************
@@ -158,20 +170,22 @@ function load_map() {
   let ptt = ''
   if ( 'groups' === jsObject.post_type ){
     ptt = 'Churches'
-  } else {
+  } else if ( 'trainings' === jsObject.post_type || 'trained_people' === jsObject.post_type ) {
     ptt = 'Trainings'
+  }
+  else if ( 'registrations' === jsObject.post_type ) {
+    ptt = 'Registrations'
   }
   $('#panel-type-title').html(ptt)
 
   $('.loading-spinner').removeClass('active')
 
   let center = [-98, 38.88]
-  if ( typeof jsObject.ipstack.latitude !== 'undefined' ) {
-    center = [jsObject.ipstack.longitude, jsObject.ipstack.latitude]
-  }
-
+  // if ( typeof jsObject.ipstack.latitude !== 'undefined' ) {
+  //   center = [jsObject.ipstack.longitude, jsObject.ipstack.latitude]
+  // }
   mapboxgl.accessToken = jsObject.map_key;
-  var map = new mapboxgl.Map({
+  let map = new mapboxgl.Map({
     container: 'map',
     style: 'mapbox://styles/mapbox/light-v10',
     center: center,
@@ -207,6 +221,7 @@ function load_map() {
   map.dragRotate.disable();
   map.touchZoomRotate.disableRotation();
 
+
   window.previous_hover = false
 
   let asset_list = []
@@ -234,7 +249,7 @@ function load_map() {
         map.on('load', function() {
 
           jQuery.each(geojson.features, function (i, v) {
-            if (jsObject.grid_data.data[v.id]) {
+            if (typeof jsObject.grid_data.data[v.id] !== 'undefined' ) {
               geojson.features[i].properties.value = parseInt(jsObject.grid_data.data[v.id].percent)
             } else {
               geojson.features[i].properties.value = 0
@@ -361,7 +376,6 @@ function load_map() {
             ac.html('<span class="loading-spinner active"></span>')
             window.get_activity_data(e.features[0].properties.grid_id)
               .done(function(data){
-                console.log(data)
                 ac.empty()
                 if ( data.length < 1 ) {
                   ac.append(`<div>No Movement Activity</div>`)
@@ -518,7 +532,6 @@ function load_map() {
     window.new_report( 'new_report', form_data )
       .done(function(response){
         jQuery('.loading-spinner').removeClass('active')
-        console.log(response)
 
         window.contact_id = response.contact.ID
         window.contact_email = email
@@ -551,7 +564,7 @@ function load_self_content( data ) {
       <span class="self_name ucwords  bold">${data.name}</span> needs
       <span class="self_needed bold">${data.needed}</span> new churches.
     `)
-  } else if ('trainings' === jsObject.post_type) {
+  } else if ('trainings' === jsObject.post_type || 'trained_people' === jsObject.post_type ) {
     jQuery('#custom-paragraph').html(`
       <span class="self_name ucwords temp-spinner bold">${data.name}</span> is one of <span class="self_peers  bold">${data.peers}</span>
       administrative divisions in <span class="parent_name ucwords bold">${data.parent_name}</span> and it has a population of
@@ -560,44 +573,14 @@ function load_self_content( data ) {
       <span class="self_name ucwords  bold">${data.name}</span> needs
       <span class="self_needed bold">${data.needed}</span> new trainings.
     `)
+  } else if ('registrations' === jsObject.post_type) {
+    jQuery('#custom-paragraph').html(`
+      <span class="self_name ucwords temp-spinner bold">${data.name}</span> is one of <span class="self_peers  bold">${data.peers}</span>
+      administrative divisions in <span class="parent_name ucwords bold">${data.parent_name}</span> and it has a population of
+      <span class="self_population  bold">${data.population}</span>.
+    `)
   }
 }
-
-// function load_levels_content( data ) {
-//   if ( 'groups' === jsObject.post_type ) {
-//     let gl = jQuery('#goals-list')
-//     gl.empty()
-//     jQuery.each(data.levels, function(i,v){
-//       gl.append(`
-//     <div class="cell">
-//         <strong>${v.name}</strong><br>
-//         Population: <span>${v.population}</span><br>
-//         Churches Needed: <span>${v.needed}</span><br>
-//         Churches Reported: <span>${v.reported}</span><br>
-//         Goal Reached: <span>${v.percent}</span>%
-//         <meter class="meter" value="${v.percent}" min="0" low="33" high="66" optimum="100" max="100"></meter>
-//     </div>
-//     `)
-//     })
-//   }
-//   else if ( 'trainings' === jsObject.post_type ) {
-//     let gl = jQuery('#goals-list')
-//     gl.empty()
-//     jQuery.each(data.levels, function(i,v){
-//       gl.append(`
-//     <div class="cell">
-//         <strong>${v.name}</strong><br>
-//         Population: <span>${v.population}</span><br>
-//         Trainings Needed: <span>${v.needed}</span><br>
-//         Trainings Reported: <span>${v.reported}</span><br>
-//         Goal Reached: <span>${v.percent}</span>%
-//         <meter class="meter" value="${v.percent}" min="0" low="33" high="66" optimum="100" max="100"></meter>
-//     </div>
-//     `)
-//     })
-//   }
-// }
-
 function load_level_content( data, level ) {
   if ( 'groups' === jsObject.post_type ) {
     let gl = jQuery('#'+level+'-list-item')
@@ -616,7 +599,7 @@ function load_level_content( data, level ) {
     }
 
   }
-  else if ( 'trainings' === jsObject.post_type ) {
+  else if ( 'trainings' === jsObject.post_type || 'trained_people' === jsObject.post_type  ) {
     let gl = jQuery('#'+level+'-list-item')
     gl.empty()
     if ( false !== data ) {
@@ -632,45 +615,22 @@ function load_level_content( data, level ) {
       `)
     }
   }
+  else if ( 'registrations' === jsObject.post_type ) {
+    let gl = jQuery('#'+level+'-list-item')
+    gl.empty()
+    if ( data ) {
+      gl.append(`
+      <div class="cell">
+          <strong>${data.name}</strong><br>
+          Population: <span>${data.population}</span><br>
+          Registrations Reported: <span>${data.reported}</span><br>
+          <hr>
+      </div>
+      `)
+    }
+  }
 
 }
-
-// function load_world_content( data ) {
-//   if ( 'groups' === jsObject.post_type ) {
-//     let wl = jQuery('#world-list')
-//     wl.empty()
-//     jQuery.each(data, function(i,v){
-//       wl.append(`
-//         <div class="cell">
-//             <strong>${v.name}</strong><br>
-//             Population: <span>${v.population}</span><br>
-//             Churches Needed: <span>${v.needed}</span><br>
-//             Churches Reported: <span>${v.reported}</span><br>
-//             Goal Reached: <span>${v.percent}</span>%
-//             <meter class="meter" value="${v.percent}" min="0" low="33" high="66" optimum="100" max="100"></meter>
-//         </div>
-//     `)
-//     })
-//   }
-//   else if ( 'trainings' === jsObject.post_type ) {
-//     let wl = jQuery('#world-list')
-//     wl.empty()
-//     jQuery.each(data, function(i,v){
-//       wl.append(`
-//         <div class="cell">
-//             <strong>${v.name}</strong><br>
-//             Population: <span>${v.population}</span><br>
-//             Trainings Needed: <span>${v.needed}</span><br>
-//             Trainings Reported: <span>${v.reported}</span><br>
-//             Goal Reached: <span>${v.percent}</span>%
-//             <meter class="meter" value="${v.percent}" min="0" low="33" high="66" optimum="100" max="100"></meter>
-//         </div>
-//     `)
-//     })
-//   }
-//
-// }
-
 function remove_row( id ) {
   let submit_button = $('#submit-report')
   jQuery('.row-'+id).remove();

@@ -5,7 +5,6 @@ if ( strpos( dt_get_url_path(), 'zume_app' ) !== false || dt_is_rest() ){
     DT_Network_Dashboard_Public_Heatmap_Churches::instance();
 }
 
-
 add_filter('dt_network_dashboard_supported_public_links', function( $supported_links ){
     $supported_links[] = [
         'name' => 'Public Heatmap ( Churches )',
@@ -115,7 +114,7 @@ class DT_Network_Dashboard_Public_Heatmap_Churches
         $url = dt_get_url_path();
         if ( strpos( $url, $this->root . '/' . $this->type ) !== false ) {
             wp_enqueue_script( 'lodash' );
-            wp_enqueue_script( 'moment' );
+//            wp_enqueue_script( 'moment' );
             wp_enqueue_script( 'jquery-ui' );
             wp_enqueue_script( 'jquery-touch-punch' );
 
@@ -242,9 +241,9 @@ class DT_Network_Dashboard_Public_Heatmap_Churches
             'shared-functions',
             'mapbox-gl',
             'mapbox-cookie',
-            'mapbox-search-widget',
-            'google-search-widget',
-            'jquery-cookie',
+//            'mapbox-search-widget',
+//            'google-search-widget',
+//            'jquery-cookie',
             $this->key
         ];
 
@@ -291,6 +290,7 @@ class DT_Network_Dashboard_Public_Heatmap_Churches
         <?php
     }
     public function header_javascript(){
+        $data = [];
         ?>
         <script>
             let jsObject = [<?php echo json_encode([
@@ -301,11 +301,12 @@ class DT_Network_Dashboard_Public_Heatmap_Churches
                 'nonce' => wp_create_nonce( 'wp_rest' ),
                 'parts' => $this->parts,
                 'post_type' => $this->post_type,
-                'ipstack' => DT_Ipstack_API::geocode_current_visitor(),
+                //                'ipstack' => DT_Ipstack_API::geocode_current_visitor(),
                 'trans' => [
                     'add' => __( 'Add Magic', 'disciple_tools' ),
                 ],
-                'grid_data' => $this->_initial_polygon_value_list(),
+                'grid_data' => ['data' => [], 'highest_value' => 1 ],
+                // 'grid_data' => $this->_initial_polygon_value_list(),
             ]) ?>][0]
         </script>
         <?php
@@ -427,6 +428,8 @@ class DT_Network_Dashboard_Public_Heatmap_Churches
                 return $this->query_activity_data( $grid_id, $offset );
             case 'new_report':
                 return $this->endpoint_new_report( $params['data'] );
+            case 'grid_data':
+                return $this->_initial_polygon_value_list();
             default:
                 return new WP_Error( __METHOD__, "Missing valid action", [ 'status' => 400 ] );
         }
@@ -495,11 +498,11 @@ class DT_Network_Dashboard_Public_Heatmap_Churches
          */
         if ( isset( $grid[$administrative_level . '_population'] )
             && ! empty( $grid[$administrative_level . '_population'] )
-            && in_array($administrative_level, ['a0', 'world'] ) ) {
+            && in_array( $administrative_level, [ 'a0', 'world' ] ) ) {
             $level['population'] = $grid[$administrative_level . '_population'];
 
             $population_division = $this->get_population_division( $grid['country_code'] );
-            $needed = round( $level['population']  / ( $population_division / 2 ) );
+            $needed = round( $level['population'] / ( $population_division / 2 ) );
             if ( $needed < 1 ){
                 $needed = 1;
             }
@@ -516,6 +519,10 @@ class DT_Network_Dashboard_Public_Heatmap_Churches
             }
         }
         // @todo end temp cover for populations
+
+        if ( empty( $level['name'] ) ) {
+            return false;
+        }
 
         $data = [
             'name' => $level['name'],
