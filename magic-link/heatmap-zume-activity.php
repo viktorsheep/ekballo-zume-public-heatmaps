@@ -21,7 +21,7 @@ add_filter('dt_network_dashboard_supported_public_links', function( $supported_l
 }, 10, 1 );
 
 
-class DT_Network_Dashboard_Public_Heatmap_Activity
+class DT_Network_Dashboard_Public_Heatmap_Activity extends DT_Network_Dashboard_Public_Heatmap_Base
 {
 
     public $magic = false;
@@ -39,6 +39,7 @@ class DT_Network_Dashboard_Public_Heatmap_Activity
     } // End instance()
 
     public function __construct() {
+        parent::__construct();
 
         // register type
         $this->magic = new DT_Magic_URL( $this->root );

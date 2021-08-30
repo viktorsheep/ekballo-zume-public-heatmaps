@@ -17,7 +17,7 @@ add_filter('dt_network_dashboard_supported_public_links', function( $supported_l
 }, 10, 1 );
 
 
-class DT_Network_Dashboard_Public_Heatmap_Activity extends DT_Network_Dashboard_Public_Heatmap_Churches
+class DT_Network_Dashboard_Public_Heatmap_Activity extends DT_Network_Dashboard_Public_Heatmap_Base
 {
 
     public $magic = false;
