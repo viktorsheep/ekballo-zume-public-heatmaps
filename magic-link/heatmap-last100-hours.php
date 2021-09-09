@@ -2,7 +2,7 @@
 if ( !defined( 'ABSPATH' ) ) { exit; } // Exit if accessed directly.
 
 if ( strpos( dt_get_url_path(), 'zume_app' ) !== false || dt_is_rest() ){
-    DT_Network_Dashboard_Public_Heatmap_100hours::instance();
+    Zume_Public_Heatmap_100hours::instance();
 }
 
 add_filter('dt_network_dashboard_supported_public_links', function( $supported_links ){
@@ -16,18 +16,18 @@ add_filter('dt_network_dashboard_supported_public_links', function( $supported_l
 }, 10, 1 );
 
 
-class DT_Network_Dashboard_Public_Heatmap_100hours extends DT_Network_Dashboard_Public_Heatmap_Base
-{
+/**
+ * Class Disciple_Tools_Plugin_Starter_Template_Magic_Link
+ */
+class Zume_Public_Heatmap_100hours extends DT_Magic_Url_Base {
 
     public $magic = false;
     public $parts = false;
-    public $root = "zume_app";
-    public $type = 'last_100_hours';
-    public $post_type = 'contact';
-    public $namespace = 'movement_maps_stats/v1/';
-    public $token = 'last100hours_map';
-    public $ip_response;
-    public static $languages;
+    public $page_title = 'Last 100 Hours';
+    public $root = "zume_app"; // @todo define the root of the url {yoursite}/root/type/key/action
+    public $type = 'last_100_hours'; // @todo define the type
+    public $post_type = 'contacts'; // @todo set the post type this magic link connects with.
+    private $meta_key = '';
 
     private static $_instance = null;
     public static function instance() {
@@ -38,130 +38,117 @@ class DT_Network_Dashboard_Public_Heatmap_100hours extends DT_Network_Dashboard_
     } // End instance()
 
     public function __construct() {
-
+        $this->meta_key = $this->root . '_' . $this->type . '_magic_key';
         parent::__construct();
 
-        // register type
-        $this->magic = new DT_Magic_URL( $this->root );
-        add_filter( 'dt_magic_url_register_types', [ $this, '_register_type' ], 10, 1 );
-
-        // register REST and REST access
-        add_filter( 'dt_allow_rest_access', [ $this, '_authorize_url' ], 100, 1 );
+        /**
+         * post type and module section
+         */
         add_action( 'rest_api_init', [ $this, 'add_endpoints' ] );
 
 
-        // fail if not valid url
+        /**
+         * tests if other URL
+         */
         $url = dt_get_url_path();
         if ( strpos( $url, $this->root . '/' . $this->type ) === false ) {
             return;
         }
-
-        // fail to blank if not valid url
-        $this->parts = $this->magic->parse_url_parts();
-        if ( ! $this->parts ){
-            // @note this returns a blank page for bad url, instead of redirecting to login
-            add_filter( 'dt_templates_for_urls', function ( $template_for_url ) {
-                $url = dt_get_url_path();
-                $template_for_url[ $url ] = 'template-blank.php';
-                return $template_for_url;
-            }, 199, 1 );
-            add_filter( 'dt_blank_access', function(){ return true;
-            } );
-            add_filter( 'dt_allow_non_login_access', function(){ return true;
-            }, 100, 1 );
+        /**
+         * tests magic link parts are registered and have valid elements
+         */
+        if ( !$this->check_parts_match( false ) ){
             return;
         }
 
-        // fail if does not match type
-        if ( $this->type !== $this->parts['type'] ){
-            return;
+        // require classes
+        if ( ! class_exists( 'DT_Ipstack_API' ) ) {
+            require_once( trailingslashit( get_theme_file_path() ) . 'dt-mapping/geocode-api/ipstack-api.php' );
         }
-
-//        require_once ( plugin_dir_path(__DIR__) . 'shortcodes/shortcode-map-last100.php' );
+        if ( ! class_exists( 'DT_Mapbox_API' ) ) {
+            require_once( trailingslashit( get_theme_file_path() ) . 'dt-mapping/geocode-api/mapbox-api.php' );
+        }
 
         // load if valid url
-        add_filter( "dt_blank_title", [ $this, "_browser_tab_title" ] );
-        add_action( 'dt_blank_head', [ $this, '_header' ] );
-        add_action( 'dt_blank_footer', [ $this, '_footer' ] );
         add_action( 'dt_blank_body', [ $this, 'body' ] ); // body for no post key
-
-        // load page elements
-        add_action( 'wp_print_scripts', [ $this, '_print_scripts' ], 1500 );
-        add_action( 'wp_print_styles', [ $this, '_print_styles' ], 1500 );
-
-        // register url and access
-        add_filter( 'dt_templates_for_urls', [ $this, '_register_url' ], 199, 1 );
-        add_filter( 'dt_blank_access', [ $this, '_has_access' ] );
-        add_filter( 'dt_allow_non_login_access', function(){ return true;
-        }, 100, 1 );
+        add_filter( 'dt_magic_url_base_allowed_css', [ $this, 'dt_magic_url_base_allowed_css' ], 10, 1 );
+        add_filter( 'dt_magic_url_base_allowed_js', [ $this, 'dt_magic_url_base_allowed_js' ], 10, 1 );
 
     }
 
-    public function _authorize_url( $authorized ){
-        if ( isset( $_SERVER['REQUEST_URI'] ) && strpos( sanitize_text_field( wp_unslash( $_SERVER['REQUEST_URI'] ) ), $this->root . '/v1/'.$this->type ) !== false ) {
-            $authorized = true;
-        }
-        return $authorized;
+    public function dt_magic_url_base_allowed_js( $allowed_js ) {
+        // @todo add or remove js files with this filter
+        return $allowed_js;
     }
 
-
-    public function add_api_routes() {
-        register_rest_route(
-            $this->root, '/'.$this->type, [
-                [
-                    'methods' => WP_REST_Server::CREATABLE,
-                    'callback' => [$this, 'points_geojson'],
-                ],
-            ]
-        );
+    public function dt_magic_url_base_allowed_css( $allowed_css ) {
+        // @todo add or remove js files with this filter
+        return $allowed_css;
     }
 
-    public function points_geojson( WP_REST_Request $request ) {
-        $params = $request->get_json_params() ?? $request->get_body_params();
-        if ( isset( $params['timezone_offset'] ) && ! empty( $params['timezone_offset']  ) ) {
-            $tz_name = sanitize_text_field( wp_unslash($params['timezone_offset'] ));
-        } else {
-            $tz_name = 'America/Denver';
-        }
-        $country = 'none';
-        if ( isset( $params['country'] ) && ! empty( $params['country'] )) {
-            $country = sanitize_text_field( wp_unslash( $params['country'] ) );
-        }
-        $language = 'none';
-        if ( isset( $params['language'] ) && ! empty( $params['language'] )) {
-            $language = sanitize_text_field( wp_unslash( $params['language'] ) );
-        }
-
-        return Movement_Shortcode_Utilities::query_contacts_points_geojson( $tz_name, $country, $language );
-    }
-
-    public function instructions_for_shortcode(){
+    /**
+     * Writes custom styles to header
+     *
+     * @see DT_Magic_Url_Base()->header_style() for default state
+     * @todo remove if not needed
+     */
+    public function header_style(){
         ?>
-        <p>
-            Last 100 Map<br>
-            <code>[<?php echo $this->token ?>]</code><br>
-            Add this to a page in the website and set template to empty container (full-width, no styling except header and footer.)
-        </p>
+        <style>
+            body {
+                background-color: white;
+                padding: 1em;
+            }
+        </style>
         <?php
+    }
+
+
+    /**
+     * Writes javascript to the header
+     *
+     * @see DT_Magic_Url_Base()->header_javascript() for default state
+     * @todo remove if not needed
+     */
+    public function header_javascript(){
+
+        ?>
+        <script>
+            console.log('insert header_javascript')
+        </script>
+        <?php
+    }
+
+    /**
+     * Writes javascript to the footer
+     *
+     * @see DT_Magic_Url_Base()->footer_javascript() for default state
+     * @todo remove if not needed
+     */
+    public function footer_javascript(){
+        ?>
+        <script>
+            console.log('insert footer_javascript')
+
+            let jsObject = [<?php echo json_encode([
+                'map_key' => DT_Mapbox_API::get_key(),
+                'root' => esc_url_raw( rest_url() ),
+                'nonce' => wp_create_nonce( 'wp_rest' ),
+                'parts' => $this->parts,
+                'translations' => [
+                    'add' => __( 'Add Magic', 'disciple-tools-plugin-starter-template' ),
+                ],
+            ]) ?>][0]
+
+
+        </script>
+        <?php
+        return true;
     }
 
     public function body(){
         DT_Mapbox_API::geocoder_scripts();
 
-
-        // require classes
-        if ( ! class_exists( 'DT_Ipstack_API' ) ) {
-            require_once( get_theme_file_path() . '/dt-mapping/geocode-api/ipstack-api.php' );
-        }
-        if ( ! class_exists( 'DT_Mapbox_API' ) ) {
-            require_once( get_theme_file_path() . '/dt-mapping/geocode-api/mapbox-api.php' );
-        }
-
-        // call registered scripts
-        wp_enqueue_script( 'jquery-cookie' );
-        wp_enqueue_script( 'mapbox-cookie');
-        wp_enqueue_script( 'mapbox-gl');
-        wp_enqueue_style( 'mapbox-gl-css');
 
         // set timezone info
         // Expects to be installed in a theme like Zume.Vision that has a full copy of the dt-mapping folder from Disciple Tools.
@@ -910,5 +897,86 @@ class DT_Network_Dashboard_Public_Heatmap_100hours extends DT_Network_Dashboard_
         </script>
         <?php
     }
+
+    /**
+     * Register REST Endpoints
+     * @link https://github.com/DiscipleTools/disciple-tools-theme/wiki/Site-to-Site-Link for outside of wordpress authentication
+     */
+    public function add_endpoints() {
+        $namespace = $this->root . '/v1';
+        register_rest_route(
+            $namespace, '/'.$this->type, [
+                [
+                    'methods'  => "GET",
+                    'callback' => [ $this, 'endpoint_get' ],
+                    'permission_callback' => function( WP_REST_Request $request ){
+                        return true;
+//                        $magic = new DT_Magic_URL( $this->root );
+//                        return $magic->verify_rest_endpoint_permissions_on_post( $request );
+                    },
+                ],
+            ]
+        );
+        register_rest_route(
+            $namespace, '/'.$this->type, [
+                [
+                    'methods'  => "POST",
+                    'callback' => [ $this, 'update_record' ],
+                    'permission_callback' => function( WP_REST_Request $request ){
+                        return true;
+//                        $magic = new DT_Magic_URL( $this->root );
+//                        return $magic->verify_rest_endpoint_permissions_on_post( $request );
+                    },
+                ],
+            ]
+        );
+    }
+
+    public function update_record( WP_REST_Request $request ) {
+        $params = $request->get_params();
+        $params = dt_recursive_sanitize_array( $params );
+
+        $post_id = $params["parts"]["post_id"]; //has been verified in verify_rest_endpoint_permissions_on_post()
+
+        $args = [];
+        if ( !is_user_logged_in() ){
+            $args["comment_author"] = "Magic Link Submission";
+            wp_set_current_user( 0 );
+            $current_user = wp_get_current_user();
+            $current_user->add_cap( "magic_link" );
+            $current_user->display_name = "Magic Link Submission";
+        }
+
+        if ( isset( $params["update"]["comment"] ) && !empty( $params["update"]["comment"] ) ){
+            $update = DT_Posts::add_post_comment( $this->post_type, $post_id, $params["update"]["comment"], "comment", $args, false );
+            if ( is_wp_error( $update ) ){
+                return $update;
+            }
+        }
+
+        if ( isset( $params["update"]["start_date"] ) && !empty( $params["update"]["start_date"] ) ){
+            $update = DT_Posts::update_post( $this->post_type, $post_id, [ "start_date" => $params["update"]["start_date"] ], false, false );
+            if ( is_wp_error( $update ) ){
+                return $update;
+            }
+        }
+
+        return true;
+    }
+
+    public function endpoint_get( WP_REST_Request $request ) {
+        $params = $request->get_params();
+        if ( ! isset( $params['parts'], $params['action'] ) ) {
+            return new WP_Error( __METHOD__, "Missing parameters", [ 'status' => 400 ] );
+        }
+
+        $data = [];
+
+        $data[] = [ 'name' => 'List item' ]; // @todo remove example
+        $data[] = [ 'name' => 'List item' ]; // @todo remove example
+
+        return $data;
+    }
 }
+
 

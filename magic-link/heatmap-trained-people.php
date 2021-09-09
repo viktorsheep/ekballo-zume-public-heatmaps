@@ -2,7 +2,7 @@
 if ( !defined( 'ABSPATH' ) ) { exit; } // Exit if accessed directly.
 
 if ( strpos( dt_get_url_path(), 'zume_app' ) !== false || dt_is_rest() ){
-    DT_Network_Dashboard_Public_Heatmap_Trained_People::instance();
+    Zume_Public_Heatmap_Trained_People::instance();
 }
 
 
@@ -17,7 +17,7 @@ add_filter('dt_network_dashboard_supported_public_links', function( $supported_l
 }, 10, 1 );
 
 
-class DT_Network_Dashboard_Public_Heatmap_Trained_People extends DT_Network_Dashboard_Public_Heatmap_Base
+class Zume_Public_Heatmap_Trained_People extends Zume_Public_Heatmap_Base
 {
 
     public $magic = false;
@@ -134,7 +134,7 @@ class DT_Network_Dashboard_Public_Heatmap_Trained_People extends DT_Network_Dash
         ?>
         <script>
             jQuery(document).ready(function($){
-                let asset_url = '<?php echo esc_url_raw( plugin_dir_url( __FILE__ ) ) ?>'
+                let asset_url = '<?php echo esc_url( trailingslashit( plugin_dir_url( __DIR__ ) ) . 'images/' ) ?>'
 
                 $('.training-content').append(`
                 <div class="grid-x grid-padding-x" >

@@ -92,8 +92,8 @@ class Zume_Public_Heatmaps {
         require_once( 'magic-link/heatmap-registrations.php' );
         require_once( 'magic-link/heatmap-trained-people.php' );
         require_once( 'magic-link/heatmap-last100-hours.php' );
+        require_once( 'magic-link/heatmap-last100-utilities.php' );
 
-        require_once ( 'shortcodes/shortcode-map-last100.php' );
 
         if ( is_admin() ) {
             require_once( 'admin/admin-menu-and-tabs.php' ); // adds starter admin page and section for plugin
@@ -105,27 +105,6 @@ class Zume_Public_Heatmaps {
             add_filter( 'plugin_row_meta', [ $this, 'plugin_description_links' ], 10, 4 );
         }
 
-//        $files = scandir(plugin_dir_path(__FILE__) . 'shortcodes');
-//        foreach ( $files as $file ) {
-//            if ( 'shortcode' === substr( $file, 0, 9 ) ){
-//                require_once( plugin_dir_path(__FILE__) . 'shortcodes/' . $file );
-//            }
-//        }
-
-//        if ( is_multisite() ) {
-//            global $wpdb;
-//            $enabled_sites = get_site_option( 'movement_map_approved_sites' );
-//            // test if this site is approved through the multisite plugin
-//            if ( isset( $enabled_sites[get_current_blog_id()] ) ) {
-//                $wpdb->dt_movement_log = $enabled_sites[get_current_blog_id()]['table'];
-//                return true;
-//            } else {
-//                return false;
-//            }
-//        } else {
-//            // plugin cannot run on single site disciple tools system.
-//            return false;
-//        }
     }
 
     /**
