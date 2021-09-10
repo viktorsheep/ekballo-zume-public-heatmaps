@@ -92,8 +92,6 @@ class Zume_Public_Heatmaps {
         require_once( 'magic-link/heatmap-registrations.php' );
         require_once( 'magic-link/heatmap-trained-people.php' );
         require_once( 'magic-link/heatmap-last100-hours.php' );
-        require_once( 'magic-link/heatmap-last100-utilities.php' );
-
 
         if ( is_admin() ) {
             require_once( 'admin/admin-menu-and-tabs.php' ); // adds starter admin page and section for plugin
