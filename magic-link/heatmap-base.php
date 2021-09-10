@@ -2,19 +2,19 @@
 if ( !defined( 'ABSPATH' ) ) { exit; } // Exit if accessed directly.
 
 if ( strpos( dt_get_url_path(), 'zume_app' ) !== false || dt_is_rest() ){
-    DT_Network_Dashboard_Public_Heatmap_Base::instance();
+    Zume_Public_Heatmap_Base::instance();
 }
 
 
-class DT_Network_Dashboard_Public_Heatmap_Base
+class Zume_Public_Heatmap_Base
 {
 
     public $magic = false;
     public $parts = false;
     public $root = "zume_app";
-    public $type = 'heatmap_churches';
-    public $key = 'zume_app_heatmap_churches';
-    public $post_type = 'groups';
+    public $type = '';
+    public $key = '';
+    public $post_type = '';
     public $us_div = 2500; // this is 2 for every 5000
     public $global_div = 25000; // this equals 2 for every 50000
 
@@ -27,7 +27,7 @@ class DT_Network_Dashboard_Public_Heatmap_Base
     } // End instance()
 
     public function __construct() {
-
+//        parent::__construct();
         // register type
         $this->magic = new DT_Magic_URL( $this->root );
 //        add_filter( 'dt_magic_url_register_types', [ $this, '_register_type' ], 10, 1 );
@@ -774,7 +774,7 @@ class DT_Network_Dashboard_Public_Heatmap_Base
         ?>
         <script>
             jQuery(document).ready(function($){
-                let asset_url = '<?php echo esc_url( plugin_dir_url( __FILE__ ) ) ?>'
+                let asset_url = '<?php echo esc_url( trailingslashit( plugin_dir_url( __DIR__ ) ) . 'images/' ) ?>'
                 $('.training-content').append(`
                 <div class="grid-x grid-padding-x" >
                     <div class="cell center">

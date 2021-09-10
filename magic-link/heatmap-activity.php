@@ -2,7 +2,7 @@
 if ( !defined( 'ABSPATH' ) ) { exit; } // Exit if accessed directly.
 
 if ( strpos( dt_get_url_path(), 'zume_app/heatmap_activity' ) !== false || dt_is_rest() ){
-    DT_Network_Dashboard_Public_Heatmap_Activity::instance();
+    Zume_Public_Heatmap_Activity::instance();
 }
 
 
@@ -17,7 +17,7 @@ add_filter('dt_network_dashboard_supported_public_links', function( $supported_l
 }, 10, 1 );
 
 
-class DT_Network_Dashboard_Public_Heatmap_Activity extends DT_Network_Dashboard_Public_Heatmap_Churches
+class Zume_Public_Heatmap_Activity extends Zume_Public_Heatmap_Base
 {
 
     public $magic = false;

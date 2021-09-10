@@ -85,11 +85,13 @@ class Zume_Public_Heatmaps {
     private function __construct() {
 
         require_once( 'magic-link/queries.php' );
+        require_once( 'magic-link/heatmap-base.php' );
         require_once( 'magic-link/heatmap-churches.php' );
         require_once( 'magic-link/heatmap-activity.php' );
         require_once( 'magic-link/heatmap-trainings.php' );
         require_once( 'magic-link/heatmap-registrations.php' );
         require_once( 'magic-link/heatmap-trained-people.php' );
+        require_once( 'magic-link/heatmap-last100-hours.php' );
 
         if ( is_admin() ) {
             require_once( 'admin/admin-menu-and-tabs.php' ); // adds starter admin page and section for plugin
@@ -100,6 +102,7 @@ class Zume_Public_Heatmaps {
         if ( is_admin() ) { // adds links to the plugin description area in the plugin admin list.
             add_filter( 'plugin_row_meta', [ $this, 'plugin_description_links' ], 10, 4 );
         }
+
     }
 
     /**
@@ -292,3 +295,80 @@ if ( ! function_exists( "dt_hook_ajax_notice_handler" )){
 //        }
 //    }
 //} );
+
+
+
+if ( ! function_exists('persecuted_countries' ) ){
+    function persecuted_countries() : array {
+        return [
+            'North Korea',
+            'Afghanistan',
+            'Somolia',
+            'Libya',
+            'Pakistan',
+            'Eritrea',
+            'Sudan',
+            'Yemen',
+            'Iran',
+            'India',
+            'Syria',
+            'Nigeria',
+            'Saudi Arabia',
+            'Maldives',
+            'Iraq',
+            'Egypt',
+            'Algeria',
+            'Uzbekistan',
+            'Myanmar',
+            'Laos',
+            'Vietnam',
+            'Turkmenistan',
+            'China',
+            'Mauritania',
+            'Central African Republic',
+            'Morocco',
+            'Qatar',
+            'Burkina Faso',
+            'Mali',
+            'Sri Lanka',
+            'Tajikistan',
+            'Nepal',
+            'Jordan',
+            'Tunisia',
+            'Kazakhstan',
+            'Turkey',
+            'Brunei',
+            'Bangladesh',
+            'Ethiopia',
+            'Malaysia',
+            'Colombia',
+            'Oman',
+            'Kuwait',
+            'Kenya',
+            'Bhutan',
+            'Russian Federation',
+            'United Arab Emirates',
+            'Cameroon',
+            'Indonesia',
+            'Niger'
+        ];
+    }
+}
+
+function movement_maps_stats_plugin_must_be_multisite() {
+    $message = __( "'Movement Maps & Stats' plugin must be run on a multisite server with a network dashboard enabled disciple tools system. Please disable plugin.", "dt_dashboard_plugin" );
+    ?>
+    <div class="notice notice-error notice-dt-dashboard is-dismissible" data-notice="dt-dashboard">
+        <p><?php echo esc_html( $message );?></p>
+    </div>
+    <?php
+}
+function movement_maps_stats_plugin_must_not_be_disciple_tools() {
+    $message = __( "'Movement Maps & Stats' plugin is to be installed on a non-disciple tools website on a multisite server with a network dashboard enabled disciple tools system.", "dt_dashboard_plugin" );
+    ?>
+    <div class="notice notice-error notice-dt-dashboard is-dismissible" data-notice="dt-dashboard">
+        <p><?php echo esc_html( $message );?></p>
+    </div>
+    <?php
+}
+
