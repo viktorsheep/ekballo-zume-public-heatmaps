@@ -571,9 +571,6 @@ class Zume_Public_Heatmap_Base
         if ( ! isset( $form_data['grid_id'], $form_data['name'], $form_data['email'], $form_data['phone'], $form_data['list'] ) ) {
             return new WP_Error( __METHOD__, 'Missing params.', [ 'status' => 400 ] );
         }
-        if ( ! is_array( $form_data['list'] ) || empty( $form_data['list'] ) ) {
-            return new WP_Error( __METHOD__, 'List missing.', [ 'status' => 400 ] );
-        }
 
         $contact_id = false;
 

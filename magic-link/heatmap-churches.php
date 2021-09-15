@@ -162,5 +162,46 @@ class Zume_Public_Heatmap_Churches extends Zume_Public_Heatmap_Base
         <?php
     }
 
+    public function endpoint_new_report( $form_data )
+    {
+        global $wpdb;
+        if (!isset( $form_data['name'], $form_data['email'], $form_data['phone'] )) {
+            return new WP_Error(__METHOD__, 'Missing params.', ['status' => 400]);
+        }
+
+
+        $contact_id = false;
+
+        // find the reporter
+        // try to get contact_id and contact
+        if (isset($form_data['contact_id']) && !empty($form_data['contact_id'])) {
+            $contact_id = (int)$form_data['contact_id'];
+            $contact = DT_Posts::get_post('contacts', $contact_id, false, false);
+            if (is_wp_error($contact)) {
+                return $contact;
+            }
+        } else if (isset($form_data['return_reporter']) && $form_data['return_reporter']) {
+            $email = sanitize_email(wp_unslash($form_data['email']));
+            // phpcs:disable
+            $contact_ids = $wpdb->get_results($wpdb->prepare("
+                SELECT DISTINCT pm.post_id
+                FROM $wpdb->postmeta as pm
+                JOIN $wpdb->postmeta as pm1 ON pm.post_id=pm1.post_id AND pm1.meta_key LIKE 'contact_email%' AND pm1.meta_key NOT LIKE '%details'
+                WHERE pm.meta_key = 'overall_status' AND pm.meta_value = 'active' AND pm1.meta_value = %s
+            ", $email), ARRAY_A);
+            // phpcs:enable
+            if (!empty($contact_ids)) {
+                $contact_id = $contact_ids[0]['post_id'];
+                $contact = DT_Posts::get_post('contacts', $contact_id, false, false);
+                if (is_wp_error($contact)) {
+                    return $contact;
+                }
+            }
+        }
+
+        // create contact and send link.
+
+        return true;
+    }
 }
 

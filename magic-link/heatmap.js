@@ -501,16 +501,6 @@ function load_map() {
       return;
     }
 
-    let list = []
-    jQuery.each( jQuery('.list-row'), function(i,v){
-      let row_id = jQuery(this).data('id')
-      list.push({
-        name: jQuery('.name-'+row_id).val(),
-        members: jQuery('.members-'+row_id).val(),
-        start: jQuery('.start-'+row_id).val()
-      })
-    })
-
     let grid_id = jQuery('#report-grid-id').val()
     let return_reporter = jQuery('#return-reporter').is(':checked');
 
@@ -529,8 +519,7 @@ function load_map() {
       phone: phone,
       grid_id: grid_id,
       contact_id: contact_id,
-      return_reporter: return_reporter,
-      list: list
+      return_reporter: return_reporter
     }
 
     window.new_report( 'new_report', form_data )
