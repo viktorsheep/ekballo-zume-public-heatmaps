@@ -350,7 +350,7 @@ class Zume_Public_Heatmap_Base
             case 'a1':
             case 'a0':
             case 'world':
-                return $this->endpoint_get_level( $params['grid_id'], $action );
+                 return $this->endpoint_get_level( $params['grid_id'], $action );
             case 'activity_data':
                 $grid_id = sanitize_text_field( wp_unslash( $params['grid_id'] ) );
                 $offset = sanitize_text_field( wp_unslash( $params['offset'] ) );
@@ -421,6 +421,71 @@ class Zume_Public_Heatmap_Base
         } else {
             $percent = number_format_i18n( $percent, 2 );
         }
+
+        /**
+         * @todo temp cover for populations
+         */
+        if ( isset( $grid[$administrative_level . '_population'] )
+            && ! empty( $grid[$administrative_level . '_population'] )
+            && in_array( $administrative_level, [ 'a0', 'world' ] ) ) {
+            $level['population'] = $grid[$administrative_level . '_population'];
+
+            $population_division = $this->get_population_division( $grid['country_code'] );
+            $needed = round( $level['population'] / ( $population_division / 2 ) );
+            if ( $needed < 1 ){
+                $needed = 1;
+            }
+            $level['needed'] = $needed;
+            if ( $administrative_level === 'world' ) {
+                $world_population = 7860000000;
+                $us_population = 331000000;
+                $global_pop_block = $this->global_div;
+                $us_pop_block = $this->us_div;
+                $world_population_without_us = $world_population - $us_population;
+                $needed_without_us = $world_population_without_us / $global_pop_block;
+                $needed_in_the_us = $us_population / $us_pop_block;
+                $level['needed'] = $needed_without_us + $needed_in_the_us;
+            }
+        }
+        // @todo end temp cover for populations
+
+        if ( empty( $level['name'] ) ) {
+            return false;
+        }
+
+        $data = [
+            'name' => $level['name'],
+            'grid_id' => (int) $level['grid_id'],
+            'population' => number_format_i18n( $level['population'] ),
+            'needed' => number_format_i18n( $level['needed'] ),
+            'reported' => number_format_i18n( $level['reported'] ),
+            'percent' => $percent,
+        ];
+
+        return $data;
+    }
+
+    public function endpoint_get_activity_level( $grid_id, $administrative_level ) {
+        dt_write_log(__METHOD__);
+        // add levels
+        $list = Zume_Public_Heatmap_Queries::query_activity_grid_totals( $administrative_level ); // get list of training counts
+        $flat_grid = Zume_Public_Heatmap_Queries::query_flat_grid_by_level( $administrative_level, $this->us_div, $this->global_div );
+
+
+
+        $flat_grid_limited = $this->_limit_counts( $flat_grid, $list ); // limit counts to no larger than needed per location.
+
+        $grid = Zume_Public_Heatmap_Queries::query_grid_elements( $grid_id ); // get level ids for grid_id
+
+        if ( isset( $flat_grid_limited[$grid[$administrative_level]] ) && ! empty( $flat_grid_limited[$grid[$administrative_level]] ) ) {
+            $level = $flat_grid_limited[$grid[$administrative_level]];
+        }
+        else {
+            return false;
+        }
+
+        $percent = ceil( $level['reported'] / $level['needed'] * 100 );
+
 
         /**
          * @todo temp cover for populations

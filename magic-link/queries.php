@@ -1491,7 +1491,7 @@ class Zume_Public_Heatmap_Queries {
                     FROM (
                              SELECT lg.admin0_grid_id, lg.admin1_grid_id, lg.admin2_grid_id, lg.admin3_grid_id, lg.admin4_grid_id, lg.admin5_grid_id
                              FROM $wpdb->usermeta as um
-                                      LEFT JOIN $wpdb->dt_location_grid as lg ON um.meta_value=lg.grid_id
+                             JOIN $wpdb->dt_location_grid as lg ON um.meta_value=lg.grid_id
                              WHERE um.meta_key = 'zume_location_grid_from_ip'
                          ) as t0
                     GROUP BY t0.admin0_grid_id
@@ -1839,8 +1839,8 @@ class Zume_Public_Heatmap_Queries {
                     FROM (
                      SELECT lg.admin0_grid_id, lg.admin1_grid_id, lg.admin2_grid_id, lg.admin3_grid_id, lg.admin4_grid_id, lg.admin5_grid_id
                         FROM $wpdb->dt_movement_log ml
-                        LEFT JOIN $wpdb->dt_location_grid lg ON lg.grid_id=ml.grid_id
-                        WHERE ml.grid_id != 0
+                        JOIN $wpdb->dt_location_grid lg ON lg.grid_id=ml.grid_id
+                        WHERE ml.grid_id > 0
                     ) as t0
                     GROUP BY t0.admin0_grid_id
                     ", ARRAY_A );
@@ -1851,8 +1851,8 @@ class Zume_Public_Heatmap_Queries {
                     FROM (
                         SELECT lg.admin0_grid_id, lg.admin1_grid_id, lg.admin2_grid_id, lg.admin3_grid_id, lg.admin4_grid_id, lg.admin5_grid_id
                         FROM $wpdb->dt_movement_log ml
-                        LEFT JOIN $wpdb->dt_location_grid lg ON lg.grid_id=ml.grid_id
-                        WHERE ml.grid_id != 0
+                        JOIN $wpdb->dt_location_grid lg ON lg.grid_id=ml.grid_id
+                        WHERE ml.grid_id > 0
                     ) as t1
                     GROUP BY t1.admin1_grid_id
                     ", ARRAY_A );
@@ -1863,8 +1863,8 @@ class Zume_Public_Heatmap_Queries {
                     FROM (
                         SELECT lg.admin0_grid_id, lg.admin1_grid_id, lg.admin2_grid_id, lg.admin3_grid_id, lg.admin4_grid_id, lg.admin5_grid_id
                         FROM $wpdb->dt_movement_log ml
-                        LEFT JOIN $wpdb->dt_location_grid lg ON lg.grid_id=ml.grid_id
-                        WHERE ml.grid_id != 0
+                        JOIN $wpdb->dt_location_grid lg ON lg.grid_id=ml.grid_id
+                        WHERE ml.grid_id > 0
                     ) as t2
                     GROUP BY t2.admin2_grid_id
                     ", ARRAY_A );
@@ -1875,8 +1875,8 @@ class Zume_Public_Heatmap_Queries {
                     FROM (
                         SELECT lg.admin0_grid_id, lg.admin1_grid_id, lg.admin2_grid_id, lg.admin3_grid_id, lg.admin4_grid_id, lg.admin5_grid_id
                         FROM $wpdb->dt_movement_log ml
-                        LEFT JOIN $wpdb->dt_location_grid lg ON lg.grid_id=ml.grid_id
-                        WHERE ml.grid_id != 0
+                        JOIN $wpdb->dt_location_grid lg ON lg.grid_id=ml.grid_id
+                        WHERE ml.grid_id > 0
                     ) as t3
                     GROUP BY t3.admin2_grid_id
                     ", ARRAY_A );
@@ -1898,38 +1898,56 @@ class Zume_Public_Heatmap_Queries {
                     SELECT t0.admin0_grid_id as grid_id, count(t0.admin0_grid_id) as count
                     FROM (
                      SELECT lg.admin0_grid_id, lg.admin1_grid_id, lg.admin2_grid_id, lg.admin3_grid_id, lg.admin4_grid_id, lg.admin5_grid_id
-                        FROM $wpdb->dt_movement_log ml
-                        LEFT JOIN $wpdb->dt_location_grid lg ON lg.grid_id=ml.grid_id
-                        WHERE ml.grid_id != 0
+                        FROM $wpdb->dt_movement_log as ml
+                        JOIN $wpdb->dt_location_grid as lg ON ml.grid_id=lg.grid_id
+                        WHERE ml.grid_id > 0
                     ) as t0
                     GROUP BY t0.admin0_grid_id
                     UNION
                     SELECT t1.admin1_grid_id as grid_id, count(t1.admin1_grid_id) as count
                     FROM (
-                        SELECT lg.admin0_grid_id, lg.admin1_grid_id, lg.admin2_grid_id, lg.admin3_grid_id, lg.admin4_grid_id, lg.admin5_grid_id
-                        FROM $wpdb->dt_movement_log ml
-                        LEFT JOIN $wpdb->dt_location_grid lg ON lg.grid_id=ml.grid_id
-                        WHERE ml.grid_id != 0
+                     SELECT lg.admin0_grid_id, lg.admin1_grid_id, lg.admin2_grid_id, lg.admin3_grid_id, lg.admin4_grid_id, lg.admin5_grid_id
+                        FROM $wpdb->dt_movement_log as ml
+                        JOIN $wpdb->dt_location_grid as lg ON ml.grid_id=lg.grid_id
+                        WHERE ml.grid_id > 0
                     ) as t1
                     GROUP BY t1.admin1_grid_id
                     UNION
                     SELECT t2.admin2_grid_id as grid_id, count(t2.admin2_grid_id) as count
                     FROM (
                         SELECT lg.admin0_grid_id, lg.admin1_grid_id, lg.admin2_grid_id, lg.admin3_grid_id, lg.admin4_grid_id, lg.admin5_grid_id
-                        FROM $wpdb->dt_movement_log ml
-                        LEFT JOIN $wpdb->dt_location_grid lg ON lg.grid_id=ml.grid_id
-                        WHERE ml.grid_id != 0
+                        FROM $wpdb->dt_movement_log as ml
+                        JOIN $wpdb->dt_location_grid as lg ON ml.grid_id=lg.grid_id
+                        WHERE ml.grid_id > 0
                     ) as t2
                     GROUP BY t2.admin2_grid_id
                     UNION
                     SELECT t3.admin3_grid_id as grid_id, count(t3.admin3_grid_id) as count
                     FROM (
                         SELECT lg.admin0_grid_id, lg.admin1_grid_id, lg.admin2_grid_id, lg.admin3_grid_id, lg.admin4_grid_id, lg.admin5_grid_id
-                        FROM $wpdb->dt_movement_log ml
-                        LEFT JOIN $wpdb->dt_location_grid lg ON lg.grid_id=ml.grid_id
-                        WHERE ml.grid_id != 0
+                        FROM $wpdb->dt_movement_log as ml
+                        JOIN $wpdb->dt_location_grid as lg ON ml.grid_id=lg.grid_id
+                        WHERE ml.grid_id > 0
                     ) as t3
-                    GROUP BY t3.admin3_grid_id;
+                    GROUP BY t3.admin3_grid_id
+                    UNION
+                    SELECT t4.admin4_grid_id as grid_id, count(t4.admin4_grid_id) as count
+                    FROM (
+                        SELECT lg.admin0_grid_id, lg.admin1_grid_id, lg.admin2_grid_id, lg.admin3_grid_id, lg.admin4_grid_id, lg.admin5_grid_id
+                        FROM $wpdb->dt_movement_log as ml
+                        JOIN $wpdb->dt_location_grid as lg ON ml.grid_id=lg.grid_id
+                        WHERE ml.grid_id > 0
+                    ) as t4
+                    GROUP BY t4.admin4_grid_id
+                    UNION
+                    SELECT t5.admin5_grid_id as grid_id, count(t5.admin5_grid_id) as count
+                    FROM (
+                        SELECT lg.admin0_grid_id, lg.admin1_grid_id, lg.admin2_grid_id, lg.admin3_grid_id, lg.admin4_grid_id, lg.admin5_grid_id
+                        FROM $wpdb->dt_movement_log as ml
+                        JOIN $wpdb->dt_location_grid as lg ON ml.grid_id=lg.grid_id
+                        WHERE ml.grid_id > 0
+                    ) as t5
+                    GROUP BY t5.admin5_grid_id
                     UNION ALL
                     SELECT 1 as grid_id, count('World') as count
                     FROM (
@@ -1946,38 +1964,57 @@ class Zume_Public_Heatmap_Queries {
                     SELECT t0.admin0_grid_id as grid_id, count(t0.admin0_grid_id) as count
                     FROM (
                      SELECT lg.admin0_grid_id, lg.admin1_grid_id, lg.admin2_grid_id, lg.admin3_grid_id, lg.admin4_grid_id, lg.admin5_grid_id
-                        FROM $wpdb->dt_movement_log ml
-                        LEFT JOIN $wpdb->dt_location_grid lg ON lg.grid_id=ml.grid_id
-                        WHERE ml.grid_id != 0
+                        FROM $wpdb->dt_movement_log as ml
+                        JOIN $wpdb->dt_location_grid as lg ON ml.grid_id=lg.grid_id
+                        WHERE ml.grid_id > 0
                     ) as t0
                     GROUP BY t0.admin0_grid_id
                     UNION
                     SELECT t1.admin1_grid_id as grid_id, count(t1.admin1_grid_id) as count
                     FROM (
-                        SELECT lg.admin0_grid_id, lg.admin1_grid_id, lg.admin2_grid_id, lg.admin3_grid_id, lg.admin4_grid_id, lg.admin5_grid_id
-                        FROM $wpdb->dt_movement_log ml
-                        LEFT JOIN $wpdb->dt_location_grid lg ON lg.grid_id=ml.grid_id
-                        WHERE ml.grid_id != 0
+                     SELECT lg.admin0_grid_id, lg.admin1_grid_id, lg.admin2_grid_id, lg.admin3_grid_id, lg.admin4_grid_id, lg.admin5_grid_id
+                        FROM $wpdb->dt_movement_log as ml
+                        JOIN $wpdb->dt_location_grid as lg ON ml.grid_id=lg.grid_id
+                        WHERE ml.grid_id > 0
                     ) as t1
                     GROUP BY t1.admin1_grid_id
                     UNION
                     SELECT t2.admin2_grid_id as grid_id, count(t2.admin2_grid_id) as count
                     FROM (
                         SELECT lg.admin0_grid_id, lg.admin1_grid_id, lg.admin2_grid_id, lg.admin3_grid_id, lg.admin4_grid_id, lg.admin5_grid_id
-                        FROM $wpdb->dt_movement_log ml
-                        LEFT JOIN $wpdb->dt_location_grid lg ON lg.grid_id=ml.grid_id
-                        WHERE ml.grid_id != 0
+                        FROM $wpdb->dt_movement_log as ml
+                        JOIN $wpdb->dt_location_grid as lg ON ml.grid_id=lg.grid_id
+                        WHERE ml.grid_id > 0
                     ) as t2
                     GROUP BY t2.admin2_grid_id
                     UNION
                     SELECT t3.admin3_grid_id as grid_id, count(t3.admin3_grid_id) as count
                     FROM (
                         SELECT lg.admin0_grid_id, lg.admin1_grid_id, lg.admin2_grid_id, lg.admin3_grid_id, lg.admin4_grid_id, lg.admin5_grid_id
-                        FROM $wpdb->dt_movement_log ml
-                        LEFT JOIN $wpdb->dt_location_grid lg ON lg.grid_id=ml.grid_id
-                        WHERE ml.grid_id != 0
+                        FROM $wpdb->dt_movement_log as ml
+                        JOIN $wpdb->dt_location_grid as lg ON ml.grid_id=lg.grid_id
+                        WHERE ml.grid_id > 0
                     ) as t3
-                    GROUP BY t3.admin3_grid_id;
+                    GROUP BY t3.admin3_grid_id
+                    UNION
+                    SELECT t4.admin4_grid_id as grid_id, count(t4.admin4_grid_id) as count
+                    FROM (
+                        SELECT lg.admin0_grid_id, lg.admin1_grid_id, lg.admin2_grid_id, lg.admin3_grid_id, lg.admin4_grid_id, lg.admin5_grid_id
+                        FROM $wpdb->dt_movement_log as ml
+                        JOIN $wpdb->dt_location_grid as lg ON ml.grid_id=lg.grid_id
+                        WHERE ml.grid_id > 0
+                    ) as t4
+                    GROUP BY t4.admin4_grid_id
+                    UNION
+                    SELECT t5.admin5_grid_id as grid_id, count(t5.admin5_grid_id) as count
+                    FROM (
+                        SELECT lg.admin0_grid_id, lg.admin1_grid_id, lg.admin2_grid_id, lg.admin3_grid_id, lg.admin4_grid_id, lg.admin5_grid_id
+                        FROM $wpdb->dt_movement_log as ml
+                        JOIN $wpdb->dt_location_grid as lg ON ml.grid_id=lg.grid_id
+                        WHERE ml.grid_id > 0
+                    ) as t5
+                    GROUP BY t5.admin5_grid_id
+
                     ", ARRAY_A );
                 break;
         }

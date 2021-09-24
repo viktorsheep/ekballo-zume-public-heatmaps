@@ -98,7 +98,7 @@ class Zume_Public_Heatmap_Activity extends Zume_Public_Heatmap_Base
             $types[$this->root] = [];
         }
         $types[$this->root][$this->type] = [
-            'name' => 'Trained People Saturation',
+            'name' => 'Activity',
             'root' => $this->root,
             'type' => $this->type,
             'meta_key' => 'public_key',
@@ -126,6 +126,78 @@ class Zume_Public_Heatmap_Activity extends Zume_Public_Heatmap_Base
         return Zume_Public_Heatmap_Queries::query_activity_grid_totals( $administrative_level );
     }
 
+    public function _limit_counts( $flat_grid, $list ) {
+        $flat_grid_limited = [];
+        foreach ( $flat_grid as $value ) {
+            $flat_grid_limited[$value['grid_id']] = $value;
+
+            if ( isset( $list[$value['grid_id']] ) && ! empty( $list[$value['grid_id']] ) ) {
+                $flat_grid_limited[$value['grid_id']]['reported'] = $list[$value['grid_id']];
+            }
+        }
+        return $flat_grid_limited;
+    }
+
+    /**
+     * Grid list build initial map list of elements and drives sidebar
+     * @return array
+     */
+    public function _initial_polygon_value_list(){
+        $flat_grid = Zume_Public_Heatmap_Queries::query_saturation_list();
+        $grid_totals = $this->get_grid_totals();
+
+        $data = [];
+        $highest_value = 1;
+        foreach ( $flat_grid as $i => $v ){
+            $data[$i] = [
+                'grid_id' => $i,
+                'population' => number_format_i18n( $v['population'] ),
+                'needed' => 1,
+                'reported' => 0,
+                'percent' => 0,
+            ];
+
+            $population_division = $this->get_population_division( $v['country_code'] );
+
+            $needed = round( $v['population'] / $population_division );
+            if ( $needed < 1 ){
+                $needed = 1;
+            }
+
+            if ( isset( $grid_totals[$v['grid_id']] ) && ! empty( $grid_totals[$v['grid_id']] ) ){
+                $reported = $grid_totals[$v['grid_id']];
+                if ( ! empty( $reported ) && ! empty( $needed ) ){
+                    $data[$v['grid_id']]['needed'] = $needed;
+
+                    $data[$v['grid_id']]['reported'] = $reported;
+
+                    $percent = round( $reported / $needed * 100 );
+                    if ( 100 < $percent ) {
+                        $percent = 100;
+                    } else {
+                        $percent = number_format_i18n( $percent, 2 );
+                    }
+                    $data[$v['grid_id']]['percent'] = $percent;
+                }
+            }
+            else {
+                $data[$v['grid_id']]['percent'] = 0;
+                $data[$v['grid_id']]['reported'] = 0;
+                $data[$v['grid_id']]['needed'] = $needed;
+            }
+
+            if ( $highest_value < $data[$v['grid_id']]['reported'] ){
+//                $highest_value = $data[$v['grid_id']]['reported'];
+                $highest_value = 200;
+            }
+        }
+
+        return [
+            'highest_value' => (int) $highest_value,
+            'data' => $data
+        ];
+    }
+
     public function _browser_tab_title( $title ){
         return __( "Zúme Activity Map", 'disciple_tools' );
     }
@@ -135,7 +207,7 @@ class Zume_Public_Heatmap_Activity extends Zume_Public_Heatmap_Base
         <style>#needed-row { display:none;} #goal-row { display:none; }</style>
         <script>
             jQuery(document).ready(function($){
-                let asset_url = '<?php echo esc_url_raw( plugin_dir_url( __FILE__ ) ) ?>'
+                let asset_url = '<?php echo esc_url( trailingslashit( plugin_dir_url( __DIR__ ) ) . 'images/' ) ?>'
 
                 $('.training-content').append(`
                 <div class="grid-x grid-padding-x" >
