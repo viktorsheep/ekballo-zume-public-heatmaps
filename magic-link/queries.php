@@ -103,6 +103,11 @@ class Zume_Public_Heatmap_Queries {
     }
 
     public static function query_flat_grid_by_level( $administrative_level, $us_div = 5000, $global_div = 50000 ) {
+
+        if ( false !== ( $value = get_transient( __METHOD__ . $administrative_level . $us_div . $global_div ) ) ) { // phpcs:ignore
+            return $value;
+        }
+
         global $wpdb;
         $wpdb->us_div = $us_div;
         $wpdb->global_div = $global_div;
@@ -1096,10 +1101,18 @@ class Zume_Public_Heatmap_Queries {
         if ( empty( $results ) ) {
             return [];
         }
+
+        set_transient( __METHOD__ . $administrative_level . $us_div . $global_div, $results, MONTH_IN_SECONDS );
+
         return $results;
     }
 
     public static function query_church_grid_totals( $administrative_level = null ) {
+
+        if ( false !== ( $value = get_transient( __METHOD__ . $administrative_level ) ) ) { // phpcs:ignore
+            return $value;
+        }
+
         global $wpdb;
 
         switch ( $administrative_level ) {
@@ -1294,10 +1307,15 @@ class Zume_Public_Heatmap_Queries {
             }
         }
 
+        set_transient( __METHOD__ . $administrative_level, $list, HOUR_IN_SECONDS . 6 );
+
         return $list;
     }
 
     public static function query_training_grid_totals( $administrative_level = null ) {
+        if ( false !== ( $value = get_transient( __METHOD__ . $administrative_level ) ) ) { // phpcs:ignore
+            return $value;
+        }
         global $wpdb;
 
         switch ( $administrative_level ) {
@@ -1477,11 +1495,18 @@ class Zume_Public_Heatmap_Queries {
             }
         }
 
+        set_transient( __METHOD__ . $administrative_level, $list, HOUR_IN_SECONDS . 6 );
+
         return $list;
     }
 
 
     public static function query_registration_grid_totals( $administrative_level = null ) {
+
+        if ( false !== ( $value = get_transient( __METHOD__ . $administrative_level ) ) ) { // phpcs:ignore
+            return $value;
+        }
+
         global $wpdb;
 
         switch ( $administrative_level ) {
@@ -1647,10 +1672,17 @@ class Zume_Public_Heatmap_Queries {
             }
         }
 
+        set_transient( __METHOD__ . $administrative_level, $list, HOUR_IN_SECONDS . 6 );
+
         return $list;
     }
 
     public static function query_trained_people_grid_totals( $administrative_level = null ) {
+
+        if ( false !== ( $value = get_transient( __METHOD__ . $administrative_level ) ) ) { // phpcs:ignore
+            return $value;
+        }
+
         global $wpdb;
 
         switch ( $administrative_level ) {
@@ -1826,10 +1858,17 @@ class Zume_Public_Heatmap_Queries {
             }
         }
 
+        set_transient( __METHOD__ . $administrative_level, $list, HOUR_IN_SECONDS . 6 );
+
         return $list;
     }
 
     public static function query_activity_grid_totals( $administrative_level = null ) {
+
+        if ( false !== ( $value = get_transient( __METHOD__ . $administrative_level ) ) ) { // phpcs:ignore
+            return $value;
+        }
+
         global $wpdb;
 
         switch ( $administrative_level ) {
@@ -2031,6 +2070,8 @@ class Zume_Public_Heatmap_Queries {
                 $list[$result['grid_id']] = $result['count'];
             }
         }
+
+        set_transient( __METHOD__ . $administrative_level, $list, HOUR_IN_SECONDS . 6 );
 
         return $list;
     }
