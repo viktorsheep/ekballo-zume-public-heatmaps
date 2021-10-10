@@ -84,14 +84,19 @@ class Zume_Public_Heatmaps {
 
     private function __construct() {
 
-        require_once( 'magic-link/queries.php' );
-        require_once( 'magic-link/heatmap-base.php' );
-        require_once( 'magic-link/heatmap-churches.php' );
-        require_once( 'magic-link/heatmap-activity.php' );
-        require_once( 'magic-link/heatmap-trainings.php' );
-        require_once( 'magic-link/heatmap-registrations.php' );
-        require_once( 'magic-link/heatmap-trained-people.php' );
-        require_once( 'magic-link/heatmap-last100-hours.php' );
+        require_once( 'maps/queries.php' );
+        require_once( 'maps/heatmap-base.php' );
+        require_once( 'maps/heatmap-churches.php' );
+        require_once( 'maps/heatmap-activity.php' );
+        require_once( 'maps/heatmap-trainings.php' );
+        require_once( 'maps/heatmap-registrations.php' );
+        require_once( 'maps/heatmap-trained-people.php' );
+        require_once( 'maps/heatmap-last100-hours.php' );
+
+
+        require_once( 'reports/portal-magic-link.php' );
+
+
 
         if ( is_admin() ) {
             require_once( 'admin/admin-menu-and-tabs.php' ); // adds starter admin page and section for plugin
@@ -102,7 +107,6 @@ class Zume_Public_Heatmaps {
         if ( is_admin() ) { // adds links to the plugin description area in the plugin admin list.
             add_filter( 'plugin_row_meta', [ $this, 'plugin_description_links' ], 10, 4 );
         }
-
     }
 
     /**
@@ -114,6 +118,7 @@ class Zume_Public_Heatmaps {
             // You can still use `array_unshift()` to add links at the beginning.
 
             $links_array[] = '<a href="https://disciple.tools">Disciple.Tools Community</a>';
+            $links_array[] = '<a href="https://github.com/ZumeProject/zume-public-heatmaps">Github Project</a>';
         }
 
         return $links_array;
