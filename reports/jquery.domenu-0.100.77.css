@@ -89,31 +89,31 @@
 @media screen and (max-width: 768px) {
     .dd > .dd-list {
         width: 100%;
-        min-width: 768px;
+        max-width: 768px;
     }
     .dd-list {
         width: 100%;
-        min-width: 768px;
+        max-width: 768px;
     }
 }
 @media screen and (max-width: 375px) {
     .dd > .dd-list {
         width: 100%;
-        min-width: 375px;
+        max-width: 375px;
     }
     .dd-list {
         width: 100%;
-        min-width: 375px;
+        max-width: 375px;
     }
 }
 @media screen and (max-width: 320px) {
     .dd > .dd-list {
         width: 100%;
-        min-width: 320px;
+        max-width: 320px;
     }
     .dd-list {
         width: 100%;
-        min-width: 320px;
+        max-width: 320px;
     }
 }
 

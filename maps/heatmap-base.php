@@ -177,7 +177,7 @@ class Zume_Public_Heatmap_Base
             'shared-functions',
             'mapbox-gl',
             'mapbox-cookie',
-//            'jquery-cookie',
+            'jquery-cookie',
             $this->key
         ];
 

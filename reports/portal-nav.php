@@ -20,7 +20,7 @@ if ( is_wp_error( $post ) ){
             <div class="cell"><a href="<?php echo site_url() . '/' . $this->parts['root'] . '/' . $this->parts['type'] . '/' . $this->parts['public_key'] . '/' ?>"><h3>Groups</h3></a></div>
             <div class="cell"><a href="<?php echo site_url() . '/' . $this->parts['root'] . '/' . $this->parts['type'] . '/' . $this->parts['public_key'] . '/map' ?>"><h3>Map</h3></a></div>
             <br><br>
-            <div class="cell"><a href="<?php echo site_url() . '/' . $this->parts['root'] . '/' . $this->parts['type'] . '/' . $this->parts['public_key'] . '/help' ?>"><i class="fi-info" style="font-size:1.5rem;"></i> </a></div>
+            <div class="cell"><a onclick="window.intro_home()"><i class="fi-info" style="font-size:1.5rem;"></i> </a></div>
 <!--            <div class="cell"><a href="--><?php //echo site_url() . '/' . $this->parts['root'] . '/' . $this->parts['type'] . '/' . $this->parts['public_key'] . '/people' ?><!--"><h3>People</h3></a></div>-->
 <!--            <div class="cell"><a href="--><?php //echo site_url() . '/' . $this->parts['root'] . '/' . $this->parts['type'] . '/' . $this->parts['public_key'] . '/pace' ?><!--"><h3>Pace</h3></a></div>-->
         </div>

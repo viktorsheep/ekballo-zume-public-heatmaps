@@ -19,6 +19,7 @@
 <div id="wrapper">
     <div class="dd" id="domenu-0">
         <button class="dd-new-item">+</button>
+        <span class="loading-initial-spinner active"></span>
         <li class="dd-item-blueprint" id="" data-prev_parent="domenu-0">
             <button class="collapse" data-action="collapse" type="button" style="display: none;">–</button>
             <button class="expand" data-action="expand" type="button" style="display: none;">+</button>
@@ -41,7 +42,8 @@
     </div>
 </div>
 
-<div class="reveal large" id="edit-modal" data-v-offset="0" data-reveal>
+
+<div class="reveal large" id="edit-modal" data-v-offset="0" data-close-on-click="false" data-reveal>
     <div id="modal-title"></div>
     <div id="modal-content"></div>
     <button class="close-button" data-close aria-label="Close modal" type="button">

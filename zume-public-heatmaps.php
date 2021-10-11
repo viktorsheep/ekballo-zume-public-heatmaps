@@ -94,7 +94,7 @@ class Zume_Public_Heatmaps {
         require_once( 'maps/heatmap-last100-hours.php' );
 
 
-        require_once( 'reports/portal-magic-link.php' );
+        require_once( 'reports/portal-group-tree.php' );
 
 
 

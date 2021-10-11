@@ -3,9 +3,9 @@ if ( !defined( 'ABSPATH' ) ) { exit; } // Exit if accessed directly.
 
 
 /**
- * Class DT_Contact_Portal_Magic_Link
+ * Class Zume_Portal_App_C
  */
-class DT_Contact_Portal_Magic_Link extends DT_Magic_Url_Base {
+class Zume_Portal_App_C extends DT_Magic_Url_Base {
 
     public $magic = false;
     public $parts = false;
@@ -138,6 +138,7 @@ class DT_Contact_Portal_Magic_Link extends DT_Magic_Url_Base {
                 'map_key' => DT_Mapbox_API::get_key(),
                 'root' => esc_url_raw( rest_url() ),
                 'nonce' => wp_create_nonce( 'wp_rest' ),
+                'intro_images' => trailingslashit( plugin_dir_url( __FILE__ ) ) . 'images/',
                 'parts' => $this->parts,
                 'post' => $post,
                 'translations' => [
@@ -475,4 +476,4 @@ class DT_Contact_Portal_Magic_Link extends DT_Magic_Url_Base {
         return false;
     }
 }
-DT_Contact_Portal_Magic_Link::instance();
+Zume_Portal_App_C::instance();

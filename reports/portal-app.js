@@ -2,7 +2,10 @@
 jQuery(document).ready(function() {
   if ( '' === jsObject.parts.action || 'groups' === jsObject.parts.action ) {
     window.load_tree()
-    window.intro_home()
+    if ( ! Cookies.get('portal_app_groups_intro') ) {
+      window.intro_home()
+    }
+
   } else if (  'map' === jsObject.parts.action ) {
     window.load_map()
   }
@@ -43,6 +46,7 @@ window.load_tree = () => {
       window.load_domenu(data)
 
       jQuery('.loading-spinner').removeClass('active')
+      jQuery('.loading-initial-spinner.active').removeClass('active')
     })
     .fail(function(e) {
       console.log(e)
@@ -588,21 +592,19 @@ function remove_location( id ) {
 }
 window.intro_home = () => {
 
-  if ( Cookies.get('portal_app_groups_intro') ) {
-    return;
-  }
+
   introJs().setOptions({
     steps: [
       {
         element: document.querySelector('#menu-icon'),
-        intro: "Access the side menu for help and other views.<br><img src='https://via.placeholder.com/150' />"
+        intro: `<h1>Menu</h1>Access the side menu for help and other views.<br><br><img src="${jsObject.intro_images}open-menu.gif" />`
       },
       {
         element: document.querySelector('.dd-new-item'),
-        intro: "Add new groups by clicking here.<br><img src='https://via.placeholder.com/150' />"
+        intro: `<h1>Add Groups</h1>Add new groups by clicking here.<br><br><img src="${jsObject.intro_images}create-new-item.gif" />`
       },
       {
-        intro: "<img src='https://via.placeholder.com/150' /><img src='https://via.placeholder.com/150' /><br><img src='https://via.placeholder.com/150' /><img src='https://via.placeholder.com/150' /><br>"
+        intro: `<h1>Generations</h1>You can arrange groups according to generation by just dragging them under their parent church.<br><br><img src="${jsObject.intro_images}nesting-generations.gif" /><br>`
       }
     ]
   }).start();
@@ -611,28 +613,28 @@ window.intro_home = () => {
 }
 
 window.load_map = () => {
+  jQuery('.loading-spinner').removeClass('active')
 
-
-  jQuery('#custom-style').empty().append(`
-        #wrapper {
-            height: ${window.innerHeight}px !important;
-        }
-        #map-wrapper {
-            height: ${window.innerHeight}px !important;
-        }
-        #map {
-            height: ${window.innerHeight}px !important;
-        }
-
-    `)
-
-  mapboxgl.accessToken = jsObject.map_key;
-  var map = new mapboxgl.Map({
-    container: 'map',
-    style: 'mapbox://styles/mapbox/streets-v11',
-    center: [-20, 30],
-    zoom: 1
-  });
+  // jQuery('#custom-style').empty().append(`
+  //       #wrapper {
+  //           height: ${window.innerHeight}px !important;
+  //       }
+  //       #map-wrapper {
+  //           height: ${window.innerHeight}px !important;
+  //       }
+  //       #map {
+  //           height: ${window.innerHeight}px !important;
+  //       }
+  //
+  //   `)
+  //
+  // mapboxgl.accessToken = jsObject.map_key;
+  // var map = new mapboxgl.Map({
+  //   container: 'map',
+  //   style: 'mapbox://styles/mapbox/streets-v11',
+  //   center: [-20, 30],
+  //   zoom: 1
+  // });
 
 
 }

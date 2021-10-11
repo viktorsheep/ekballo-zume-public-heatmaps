@@ -10,17 +10,8 @@
 <!-- nav -->
 <?php require_once ( 'portal-nav.php' ) ?>
 
-<style id="custom-style">
-    #wrapper {
-        height: 2000px !important;
-    }
-    #map-wrapper {
-        height: 2000px !important;
-    }
-    #map {
-        height: 2000px !important;
-    }
-</style>
-<div id="map-wrapper">
-    <div id='map'></div>
-</div>
+<div id="heatmap"></div>
+<script>jQuery(document).ready(function(){
+        jQuery('#heatmap').html(`<iframe width="100%" height="${window.innerHeight}" src="https://global.zume.community/zume_app/heatmap_churches/" frameborder="0" style="border:0" allowfullscreen=""></iframe>`)
+    })
+</script>
