@@ -121,6 +121,7 @@ class Zume_App_Portal_Map extends DT_Magic_Url_Base {
             return;
         }
         ?>
+        <!-- footer js portal-map-->
         <script>
             let jsObject = [<?php echo json_encode([
                 'map_key' => DT_Mapbox_API::get_key(),

@@ -10,8 +10,83 @@
 <!-- nav -->
 <?php require_once ( 'portal-nav.php' ) ?>
 
-<div id="heatmap"></div>
-<script>jQuery(document).ready(function(){
-        jQuery('#heatmap').html(`<iframe width="100%" height="${window.innerHeight}" src="https://global.zume.community/zume_app/heatmap_churches/" frameborder="0" style="border:0" allowfullscreen=""></iframe>`)
-    })
-</script>
+<!--<div id="heatmap"></div>-->
+<!--<script>jQuery(document).ready(function(){-->
+<!--        jQuery('#heatmap').html(`<iframe width="100%" height="${window.innerHeight}" src="https://global.zume.community/zume_app/heatmap_churches/" frameborder="0" style="border:0" allowfullscreen=""></iframe>`)-->
+<!--    })-->
+<!--</script>-->
+
+<style id="custom-style">
+    #wrapper {
+        height: 2000px !important;
+    }
+    #map-wrapper {
+        height: 2000px !important;
+    }
+    #map {
+        height: 2000px !important;
+    }
+</style>
+
+<div id="initialize-screen">
+    <div id="initialize-spinner-wrapper" class="center">
+        <progress class="success initialize-progress" max="46" value="0"></progress><br>
+        Loading the planet ...<br>
+        <span id="initialize-people" style="display:none;">Locating world population...</span><br>
+        <span id="initialize-activity" style="display:none;">Calculating movement activity...</span><br>
+        <span id="initialize-coffee" style="display:none;">Shamelessly brewing coffee...</span><br>
+        <span id="initialize-dothis" style="display:none;">Let's do this...</span><br>
+    </div>
+</div>
+
+<div class="large reveal" id="welcome-modal" data-v-offset="10px" data-reveal>
+    <div id="welcome-content" data-close></div>
+    <div class="center"><button class="button" id="welcome-close-button" data-close>Get Started!</button></div>
+</div>
+
+
+<div class="grid-x">
+    <div class="cell medium-9" id="map-container">
+        <div id="map-wrapper">
+            <span class="loading-spinner active"></span>
+            <div id='map'></div>
+        </div>
+    </div>
+    <div class="cell medium-3" id="map-sidebar-wrapper">
+        <!-- details panel -->
+        <div id="details-panel">
+            <div class="grid-x grid-padding-x" >
+                <div class="cell">
+                    <h1 id="title"></h1>
+                    <h3>Population: <span id="population">0</span></h3>
+                    <hr>
+                </div>
+                <div class="cell">
+                    <h2 id="panel-type-title">Churches</h2>
+                </div>
+                <div class="cell" id="needed-row">
+                    <h3>Needed: <span id="needed">0</span></h3>
+                </div>
+                <div class="cell">
+                    <h3>Reported: <span id="reported">0</span></h3>
+                </div>
+                <div class="cell">
+                    <hr>
+                </div>
+                <div class="cell" id="goal-row">
+                    <h2>Goal: <span id="saturation-goal">0</span>%</h2>
+                    <meter id="meter" class="meter" value="30" min="0" low="33" high="66" optimum="100" max="100"></meter>
+                </div>
+                <div class="cell">
+                    Our community vision is to see 1 training and 2 new churches for every 5000 people in the United States and 50,000 people globally.
+                </div>
+            </div>
+        </div>
+
+        <!-- start screen training-->
+        <div id="training-start-screen" class="training-content"></div>
+        <div id="training-help-screen" class="training-content" style="display:none;"><hr></div>
+        <div class="center"><i class="fi-info" id="help-toggle-icon" onclick="jQuery('#training-help-screen').toggle()"></i></div>
+    </div>
+</div>
+
