@@ -94,8 +94,7 @@ class Zume_Public_Heatmaps {
         require_once( 'magic/heatmap-last100-hours.php' );
 
 
-        require_once( 'magic/portal-groups-gen-builder.php' );
-        require_once( 'magic/portal-map.php' );
+        require_once( 'magic/portal.php' );
 
 
         if ( is_admin() ) {

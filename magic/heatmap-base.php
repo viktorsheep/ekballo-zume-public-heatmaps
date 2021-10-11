@@ -9,12 +9,6 @@ if ( strpos( dt_get_url_path(), 'zume_app' ) !== false || dt_is_rest() ){
 class Zume_Public_Heatmap_Base
 {
 
-    public $magic = false;
-    public $parts = false;
-    public $root = "zume_app";
-    public $type = '';
-    public $key = '';
-    public $post_type = '';
     public $us_div = 2500; // this is 2 for every 5000
     public $global_div = 25000; // this equals 2 for every 50000
 

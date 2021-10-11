@@ -19,6 +19,8 @@ class Zume_App_Portal_Group_Builder extends DT_Magic_Url_Base {
         'map' => "Map",
         'help' => "Help",
     ];
+    public $us_div = 2500; // this is 2 for every 5000
+    public $global_div = 25000; // this equals 2 for every 50000
 
     private static $_instance = null;
     public static function instance() {
@@ -55,7 +57,7 @@ class Zume_App_Portal_Group_Builder extends DT_Magic_Url_Base {
 
         // load if valid url
         if ( 'map' === $this->parts['action'] ) {
-            return;
+            add_action( 'dt_blank_body', [ $this, 'map_body' ] );
         }
         else if ( 'help' === $this->parts['action'] ) {
             add_action( 'dt_blank_body', [ $this, 'help_body' ] );
@@ -67,53 +69,82 @@ class Zume_App_Portal_Group_Builder extends DT_Magic_Url_Base {
         }
 
         // load if valid url
-
         add_filter( 'dt_magic_url_base_allowed_css', [ $this, 'dt_magic_url_base_allowed_css' ], 10, 1 );
         add_filter( 'dt_magic_url_base_allowed_js', [ $this, 'dt_magic_url_base_allowed_js' ], 10, 1 );
         add_action( 'wp_enqueue_scripts', [ $this, 'scripts' ], 99 );
     }
 
     public function dt_magic_url_base_allowed_js( $allowed_js ) {
-        $allowed_js[] = 'portal-app-'.$this->type.'-js';
+
         $allowed_js[] = 'jquery-touch-punch';
-        $allowed_js[] = 'portal-app-domenu-js';
         $allowed_js[] = 'mapbox-gl';
         $allowed_js[] = 'introjs-js';
         $allowed_js[] = 'jquery-cookie';
+
+        if ( 'map' === $this->parts['action'] ) {
+            $allowed_js[] = 'heatmap-js';
+        }
+        else if ( '' === $this->parts['action'] || 'groups' === $this->parts['action'] ) {
+            $allowed_js[] = 'portal-app-group-gen-js';
+            $allowed_js[] = 'portal-app-domenu-js';
+        }
+
         return $allowed_js;
     }
 
     public function dt_magic_url_base_allowed_css( $allowed_css ) {
-        $allowed_css[] = 'portal-app-'.$this->type.'-css';
+
         $allowed_css[] = 'mapbox-gl-css';
-        $allowed_css[] = 'portal-app-domenu-css';
         $allowed_css[] = 'introjs-css';
+
+        if ( 'map' === $this->parts['action'] ) {
+            $allowed_css[] = 'heatmap-css';
+        }
+        else if ( '' === $this->parts['action'] || 'groups' === $this->parts['action'] ) {
+            $allowed_css[] = 'portal-app-group-gen-css';
+            $allowed_css[] = 'portal-app-domenu-css';
+        }
+
         return $allowed_css;
     }
 
     public function scripts() {
         wp_register_script( 'jquery-touch-punch', '/wp-includes/js/jquery/jquery.ui.touch-punch.js' ); // @phpcs:ignore
 
-        wp_enqueue_script( 'portal-app-'.$this->type.'-js', trailingslashit( plugin_dir_url( __FILE__ ) ) . 'portal-app.js', [ 'jquery' ],
-            filemtime( trailingslashit( plugin_dir_path( __FILE__ ) ) .'portal-app.js' ), true );
-
-        wp_enqueue_style( 'portal-app-'.$this->type.'-css', trailingslashit( plugin_dir_url( __FILE__ ) ) . 'portal-app.css', [],
-            filemtime( trailingslashit( plugin_dir_path( __FILE__ ) ) .'portal-app.css' ) );
-
-        wp_enqueue_script( 'portal-app-domenu-js', trailingslashit( plugin_dir_url( __FILE__ ) ) . 'jquery.domenu-0.100.77.min.js', [ 'jquery' ],
-            filemtime( trailingslashit( plugin_dir_path( __FILE__ ) ) .'jquery.domenu-0.100.77.min.js' ), true );
-
-        wp_enqueue_style( 'portal-app-domenu-css', trailingslashit( plugin_dir_url( __FILE__ ) ) . 'jquery.domenu-0.100.77.css', [],
-            filemtime( trailingslashit( plugin_dir_path( __FILE__ ) ) .'jquery.domenu-0.100.77.css' ) );
-
+        /* intro js */
         wp_enqueue_script( 'introjs-js', trailingslashit( plugin_dir_url( __FILE__ ) ) . 'intro.min.js', [ ],
             filemtime( trailingslashit( plugin_dir_path( __FILE__ ) ) .'intro.min.js' ), true );
 
         wp_enqueue_style( 'introjs-css', trailingslashit( plugin_dir_url( __FILE__ ) ) . 'introjs.min.css', [],
             filemtime( trailingslashit( plugin_dir_path( __FILE__ ) ) .'introjs.min.css' ) );
 
+        /* jquery cookie */
         wp_enqueue_script( 'jquery-cookie', trailingslashit( plugin_dir_url( __FILE__ ) ) . 'js.cookie.min.js', [ 'jquery' ],
             filemtime( trailingslashit( plugin_dir_path( __FILE__ ) ) .'js.cookie.min.js' ), true );
+
+        if ( 'map' === $this->parts['action'] ) {
+
+            /* heatmap */
+            wp_enqueue_script( 'heatmap-js', trailingslashit( plugin_dir_url( __FILE__ ) ) . 'heatmap.js', [ ],
+                filemtime( trailingslashit( plugin_dir_path( __FILE__ ) ) .'heatmap.js' ), true );
+
+            wp_enqueue_style( 'heatmap-css', trailingslashit( plugin_dir_url( __FILE__ ) ) . 'heatmap.css', [],
+                filemtime( trailingslashit( plugin_dir_path( __FILE__ ) ) .'heatmap.css' ) );
+        }
+        else if ( '' === $this->parts['action'] || 'groups' === $this->parts['action'] ) {
+            /* group-gen */
+            wp_enqueue_script( 'portal-app-group-gen-js', trailingslashit( plugin_dir_url( __FILE__ ) ) . 'portal-app.js', [ 'jquery' ],
+                filemtime( trailingslashit( plugin_dir_path( __FILE__ ) ) .'portal-app.js' ), true );
+
+            wp_enqueue_style( 'portal-app-group-gen-css', trailingslashit( plugin_dir_url( __FILE__ ) ) . 'portal-app.css', [],
+                filemtime( trailingslashit( plugin_dir_path( __FILE__ ) ) .'portal-app.css' ) );
+            /* domenu */
+            wp_enqueue_script( 'portal-app-domenu-js', trailingslashit( plugin_dir_url( __FILE__ ) ) . 'jquery.domenu-0.100.77.min.js', [ 'jquery' ],
+                filemtime( trailingslashit( plugin_dir_path( __FILE__ ) ) .'jquery.domenu-0.100.77.min.js' ), true );
+
+            wp_enqueue_style( 'portal-app-domenu-css', trailingslashit( plugin_dir_url( __FILE__ ) ) . 'jquery.domenu-0.100.77.css', [],
+                filemtime( trailingslashit( plugin_dir_path( __FILE__ ) ) .'jquery.domenu-0.100.77.css' ) );
+        }
 
     }
 
@@ -132,6 +163,7 @@ class Zume_App_Portal_Group_Builder extends DT_Magic_Url_Base {
         <script>
             let jsObject = [<?php echo json_encode([
                 'map_key' => DT_Mapbox_API::get_key(),
+                'mirror_url' => dt_get_location_grid_mirror( true ),
                 'root' => esc_url_raw( rest_url() ),
                 'nonce' => wp_create_nonce( 'wp_rest' ),
                 'intro_images' => trailingslashit( plugin_dir_url( __FILE__ ) ) . 'images/',
@@ -140,7 +172,47 @@ class Zume_App_Portal_Group_Builder extends DT_Magic_Url_Base {
                 'translations' => [
                     'add' => __( 'Add Magic', 'disciple-tools-contact-portal' ),
                 ],
+                'grid_data' => ['data' => [], 'highest_value' => 1 ],
             ]) ?>][0]
+        </script>
+        <?php
+        $this->customized_welcome_script();
+    }
+
+    /**
+     * Can be customized with class extension
+     */
+    public function customized_welcome_script(){
+        ?>
+        <script>
+            jQuery(document).ready(function($){
+                let asset_url = '<?php echo esc_url( trailingslashit( plugin_dir_url( __DIR__ ) ) . 'images/' ) ?>'
+                $('.training-content').append(`
+                <div class="grid-x grid-padding-x" >
+                    <div class="cell center">
+                        <img class="training-screen-image" src="${asset_url + 'search.svg'}" alt="search icon" />
+                        <h2>Search</h2>
+                        <p>Search for any city or place with the search input.</p>
+                    </div>
+                    <div class="cell center">
+                        <img class="training-screen-image" src="${asset_url + 'zoom.svg'}" alt="zoom icon"  />
+                        <h2>Zoom</h2>
+                        <p>Scroll zoom with your mouse or pinch zoom with track pads and phones to focus on sections of the map.</p>
+                    </div>
+                    <div class="cell center">
+                        <img class="training-screen-image" src="${asset_url + 'drag.svg'}" alt="drag icon"  />
+                        <h2>Drag</h2>
+                        <p>Click and drag the map any direction to look at a different part of the map.</p>
+                    </div>
+                    <div class="cell center">
+                        <img class="training-screen-image" src="${asset_url + 'click.svg'}" alt="click icon" />
+                        <h2>Click</h2>
+                        <p>Click a single section and reveal a details panel with more information about the location.</p>
+                    </div>
+                </div>
+                `)
+
+            })
         </script>
         <?php
     }
@@ -190,12 +262,12 @@ class Zume_App_Portal_Group_Builder extends DT_Magic_Url_Base {
 
     public function groups_body(){
         DT_Mapbox_API::geocoder_scripts();
-        require_once('portal-groups-gen-builder.html');
+        require_once('portal.html');
     }
 
     public function map_body(){
         DT_Mapbox_API::geocoder_scripts();
-        require_once('portal-map-html.php');
+        require_once('portal-map.html');
     }
 
     public function help_body(){
@@ -470,6 +542,33 @@ class Zume_App_Portal_Group_Builder extends DT_Magic_Url_Base {
 
         }
         return false;
+    }
+
+    /* map section */
+
+    public function get_grid_totals(){
+        return Zume_Public_Heatmap_Queries::query_church_grid_totals();
+    }
+
+    public function get_grid_totals_by_level( $administrative_level ) {
+        return Zume_Public_Heatmap_Queries::query_church_grid_totals( $administrative_level );
+    }
+
+    /**
+     * Can be customized with class extension
+     * @param $country_code
+     * @return float|int
+     */
+    public function get_population_division( $country_code ){
+        $population_division = $this->global_div * 2;
+        if ( $country_code === 'US' ){
+            $population_division = $this->us_div * 2;
+        }
+        return $population_division;
+    }
+
+    public function _browser_tab_title( $title ){
+        return __( "Zúme Churches Map", 'disciple_tools' );
     }
 }
 Zume_App_Portal_Group_Builder::instance();
