@@ -46,7 +46,7 @@ window.load_tree = () => {
       window.load_domenu(data)
 
       jQuery('.loading-spinner').removeClass('active')
-      jQuery('.loading-initial-spinner.active').removeClass('active')
+      jQuery('#initial-loading-spinner').hide()
     })
     .fail(function(e) {
       console.log(e)
@@ -601,10 +601,10 @@ window.intro_home = () => {
       },
       {
         element: document.querySelector('.dd-new-item'),
-        intro: `<h1>Add Groups</h1>Add new groups by clicking here.<br><br><img src="${jsObject.intro_images}create-new-item.gif" />`
+        intro: `<h1>Add New Groups</h1>Add new groups by clicking here.<br><br><img src="${jsObject.intro_images}create-new-item.gif" />`
       },
       {
-        intro: `<h1>Generations</h1>You can arrange groups according to generation by just dragging them under their parent church.<br><br><img src="${jsObject.intro_images}nesting-generations.gif" /><br>`
+        intro: `<h1>Set Generations</h1>You can arrange groups according to generation by just dragging them under their parent church.<br><br><img src="${jsObject.intro_images}nesting-generations.gif" /><br>`
       }
     ]
   }).start();

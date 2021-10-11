@@ -3,20 +3,19 @@ if ( !defined( 'ABSPATH' ) ) { exit; } // Exit if accessed directly.
 
 
 /**
- * Class Zume_Portal_App_C
+ * Class Zume_App_Portal_Group_Builder
  */
-class Zume_Portal_App_C extends DT_Magic_Url_Base {
+class Zume_App_Portal_Group_Builder extends DT_Magic_Url_Base {
 
     public $magic = false;
     public $parts = false;
-    public $page_title = 'Portal';
-    public $root = "portal_app";
-    public $type = 'c';
+    public $page_title = 'Zume Portal';
+    public $root = "zume_app";
+    public $type = 'portal';
     public $post_type = 'contacts';
     private $meta_key = '';
     public $type_actions = [
         '' => "Groups",
-        'groups' => "Groups",
         'map' => "Map",
         'help' => "Help",
     ];
@@ -56,10 +55,7 @@ class Zume_Portal_App_C extends DT_Magic_Url_Base {
 
         // load if valid url
         if ( 'map' === $this->parts['action'] ) {
-            add_action( 'dt_blank_body', [ $this, 'map_body' ] );
-        }
-        else if ( 'groups' === $this->parts['action'] ) {
-            add_action( 'dt_blank_body', [ $this, 'groups_body' ] );
+            return;
         }
         else if ( 'help' === $this->parts['action'] ) {
             add_action( 'dt_blank_body', [ $this, 'help_body' ] );
@@ -194,7 +190,7 @@ class Zume_Portal_App_C extends DT_Magic_Url_Base {
 
     public function groups_body(){
         DT_Mapbox_API::geocoder_scripts();
-        require_once('portal-groups-html.php');
+        require_once('portal-groups-gen-builder.html');
     }
 
     public function map_body(){
@@ -476,4 +472,4 @@ class Zume_Portal_App_C extends DT_Magic_Url_Base {
         return false;
     }
 }
-Zume_Portal_App_C::instance();
+Zume_App_Portal_Group_Builder::instance();

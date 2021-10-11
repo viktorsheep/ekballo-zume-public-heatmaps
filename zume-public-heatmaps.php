@@ -84,18 +84,18 @@ class Zume_Public_Heatmaps {
 
     private function __construct() {
 
-        require_once( 'maps/queries.php' );
-        require_once( 'maps/heatmap-base.php' );
-        require_once( 'maps/heatmap-churches.php' );
-        require_once( 'maps/heatmap-activity.php' );
-        require_once( 'maps/heatmap-trainings.php' );
-        require_once( 'maps/heatmap-registrations.php' );
-        require_once( 'maps/heatmap-trained-people.php' );
-        require_once( 'maps/heatmap-last100-hours.php' );
+        require_once( 'magic/heatmap-queries.php' );
+        require_once( 'magic/heatmap-base.php' );
+        require_once( 'magic/heatmap-churches.php' );
+        require_once( 'magic/heatmap-activity.php' );
+        require_once( 'magic/heatmap-trainings.php' );
+        require_once( 'magic/heatmap-registrations.php' );
+        require_once( 'magic/heatmap-trained-people.php' );
+        require_once( 'magic/heatmap-last100-hours.php' );
 
 
-        require_once( 'reports/portal-group-tree.php' );
-
+        require_once( 'magic/portal-groups-gen-builder.php' );
+        require_once( 'magic/portal-map.php' );
 
 
         if ( is_admin() ) {
