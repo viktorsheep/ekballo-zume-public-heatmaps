@@ -52,6 +52,7 @@ class Zume_Public_Heatmap_Churches extends DT_Magic_Url_Base
         $allowed_js[] = 'jquery-touch-punch';
         $allowed_js[] = 'mapbox-gl';
         $allowed_js[] = 'jquery-cookie';
+        $allowed_js[] = 'mapbox-cookie';
         $allowed_js[] = 'heatmap-js';
         return $allowed_js;
     }
@@ -92,6 +93,7 @@ class Zume_Public_Heatmap_Churches extends DT_Magic_Url_Base
                     'add' => __( 'Zume', 'disciple_tools' ),
                 ],
                 'grid_data' => ['data' => [], 'highest_value' => 1 ],
+                'custom_marks' => []
             ]) ?>][0]
         </script>
         <?php

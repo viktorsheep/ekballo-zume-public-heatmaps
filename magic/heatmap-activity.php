@@ -1,20 +1,20 @@
 <?php
 if ( !defined( 'ABSPATH' ) ) { exit; } // Exit if accessed directly.
 
-if ( strpos( dt_get_url_path(), 'zume_app/heatmap_activity' ) !== false || dt_is_rest() ){
+if ( strpos( dt_get_url_path(), 'zume_app' ) !== false || dt_is_rest() ){
     Zume_Public_Heatmap_Activity::instance();
 }
 
-class Zume_Public_Heatmap_Activity extends Zume_Public_Heatmap_Base
+class Zume_Public_Heatmap_Activity extends DT_Magic_Url_Base
 {
-
-    public $magic = false;
-    public $parts = false;
+    public $page_title = 'Zúme Activity';
     public $root = "zume_app";
     public $type = 'heatmap_activity';
+    public $type_name = 'Activity';
     public $post_type = 'activity';
-    public $us_div = 5000; // this is 1 for every 5000
-    public $global_div = 50000; // this equals 1 for every 50000
+    private $meta_key = '';
+    public $us_div = 5000; // this is 2 for every 5000
+    public $global_div = 50000; // this equals 2 for every 50000
 
     private static $_instance = null;
     public static function instance() {
@@ -25,14 +25,9 @@ class Zume_Public_Heatmap_Activity extends Zume_Public_Heatmap_Base
     } // End instance()
 
     public function __construct() {
+        $this->meta_key = $this->root . '_' . $this->type . '_magic_key';
         parent::__construct();
 
-        // register type
-        $this->magic = new DT_Magic_URL( $this->root );
-        add_filter( 'dt_magic_url_register_types', [ $this, '_register_type' ], 10, 1 );
-
-        // register REST and REST access
-        add_filter( 'dt_allow_rest_access', [ $this, '_authorize_url' ], 100, 1 );
         add_action( 'rest_api_init', [ $this, 'add_endpoints' ] );
 
 
@@ -42,97 +37,157 @@ class Zume_Public_Heatmap_Activity extends Zume_Public_Heatmap_Base
             return;
         }
 
-        // fail to blank if not valid url
-        $this->parts = $this->magic->parse_url_parts();
-        if ( ! $this->parts ){
-            // @note this returns a blank page for bad url, instead of redirecting to login
-            add_filter( 'dt_templates_for_urls', function ( $template_for_url ) {
-                $url = dt_get_url_path();
-                $template_for_url[ $url ] = 'template-blank.php';
-                return $template_for_url;
-            }, 199, 1 );
-            add_filter( 'dt_blank_access', function(){ return true;
-            } );
-            add_filter( 'dt_allow_non_login_access', function(){ return true;
-            }, 100, 1 );
+        if ( !$this->check_parts_match( false ) ){
             return;
         }
 
-        // fail if does not match type
-        if ( $this->type !== $this->parts['type'] ){
-            return;
+        add_action( 'dt_blank_body', [ $this, 'body' ] );
+        add_filter( 'dt_magic_url_base_allowed_css', [ $this, 'dt_magic_url_base_allowed_css' ], 10, 1 );
+        add_filter( 'dt_magic_url_base_allowed_js', [ $this, 'dt_magic_url_base_allowed_js' ], 10, 1 );
+        add_action( 'wp_enqueue_scripts', [ $this, 'wp_enqueue_scripts' ], 99 );
+
+    }
+
+    public function dt_magic_url_base_allowed_js( $allowed_js ) {
+        $allowed_js[] = 'jquery-touch-punch';
+        $allowed_js[] = 'mapbox-gl';
+        $allowed_js[] = 'jquery-cookie';
+        $allowed_js[] = 'mapbox-cookie';
+        $allowed_js[] = 'heatmap-js';
+        return $allowed_js;
+    }
+
+    public function dt_magic_url_base_allowed_css( $allowed_css ) {
+        $allowed_css[] = 'mapbox-gl-css';
+        $allowed_css[] = 'introjs-css';
+        $allowed_css[] = 'heatmap-css';
+        $allowed_css[] = 'site-css';
+        return $allowed_css;
+    }
+
+    public function _header(){
+        Zume_App_Heatmap::_header();
+    }
+
+    public static function wp_enqueue_scripts(){
+        Zume_App_Heatmap::wp_enqueue_scripts();
+    }
+
+    public function body(){
+        DT_Mapbox_API::geocoder_scripts();
+        include( 'heatmap.html' );
+    }
+
+    public function footer_javascript(){
+        ?>
+        <script>
+            let jsObject = [<?php echo json_encode([
+                'map_key' => DT_Mapbox_API::get_key(),
+                'mirror_url' => dt_get_location_grid_mirror( true ),
+                'theme_uri' => trailingslashit( get_stylesheet_directory_uri() ),
+                'root' => esc_url_raw( rest_url() ),
+                'nonce' => wp_create_nonce( 'wp_rest' ),
+                'parts' => $this->parts,
+                'post_type' => $this->post_type,
+                'trans' => [
+                    'add' => __( 'Zume', 'disciple_tools' ),
+                ],
+                'grid_data' => ['data' => [], 'highest_value' => 1 ],
+                'custom_marks' => []
+            ]) ?>][0]
+        </script>
+        <?php
+
+        $this->customized_welcome_script();
+        return true;
+    }
+
+    public function customized_welcome_script(){
+        ?>
+        <style>#needed-row { display:none;} #goal-row { display:none; }</style>
+        <script>
+            jQuery(document).ready(function($){
+                let asset_url = '<?php echo esc_url( trailingslashit( plugin_dir_url( __FILE__ ) ) . 'images/' ) ?>'
+                $('.training-content').append(`
+                <div class="grid-x grid-padding-x" >
+                    <div class="cell center">
+                        <img class="training-screen-image" src="${asset_url + 'search.svg'}" alt="search icon" />
+                        <h2>Search</h2>
+                        <p>Search for any city or place with the search input.</p>
+                    </div>
+                    <div class="cell center">
+                        <img class="training-screen-image" src="${asset_url + 'zoom.svg'}" alt="zoom icon"  />
+                        <h2>Zoom</h2>
+                        <p>Scroll zoom with your mouse or pinch zoom with track pads and phones to focus on sections of the map.</p>
+                    </div>
+                    <div class="cell center">
+                        <img class="training-screen-image" src="${asset_url + 'drag.svg'}" alt="drag icon"  />
+                        <h2>Drag</h2>
+                        <p>Click and drag the map any direction to look at a different part of the map.</p>
+                    </div>
+                    <div class="cell center">
+                        <img class="training-screen-image" src="${asset_url + 'click.svg'}" alt="click icon" />
+                        <h2>Click</h2>
+                        <p>Click a single section and reveal a details panel with more information about the location.</p>
+                    </div>
+                </div>
+                `)
+            })
+        </script>
+        <?php
+    }
+
+    public function add_endpoints() {
+        $namespace = $this->root . '/v1';
+        register_rest_route(
+            $namespace,
+            '/'.$this->type,
+            [
+                [
+                    'methods'  => WP_REST_Server::CREATABLE,
+                    'callback' => [ $this, 'endpoint' ],
+                    'permission_callback' => '__return_true',
+                ],
+            ]
+        );
+    }
+
+    public function endpoint( WP_REST_Request $request ) {
+        $params = $request->get_params();
+
+        if ( ! isset( $params['parts'], $params['action'] ) ) {
+            return new WP_Error( __METHOD__, "Missing parameters", [ 'status' => 400 ] );
         }
 
-        // load if valid url
-        add_filter( "dt_blank_title", [ $this, "_browser_tab_title" ] );
-        add_action( 'dt_blank_head', [ $this, '_header' ] );
-        add_action( 'dt_blank_footer', [ $this, '_footer' ] );
-        add_action( 'dt_blank_body', [ $this, 'body' ] ); // body for no post key
+        $params = dt_recursive_sanitize_array( $params );
+        $action = sanitize_text_field( wp_unslash( $params['action'] ) );
 
-        // load page elements
-        add_action( 'wp_print_scripts', [ $this, '_print_scripts' ], 1500 );
-        add_action( 'wp_print_styles', [ $this, '_print_styles' ], 1500 );
-
-        // register url and access
-        add_filter( 'dt_templates_for_urls', [ $this, '_register_url' ], 199, 1 );
-        add_filter( 'dt_blank_access', [ $this, '_has_access' ] );
-        add_filter( 'dt_allow_non_login_access', function(){ return true;
-        }, 100, 1 );
-
-    }
-
-    public function _register_type( array $types ) : array {
-        if ( ! isset( $types[$this->root] ) ) {
-            $types[$this->root] = [];
+        switch ( $action ) {
+            case 'self':
+                return Zume_App_Heatmap::get_self( $params['grid_id'], $this->global_div, $this->us_div );
+            case 'a3':
+            case 'a2':
+            case 'a1':
+            case 'a0':
+            case 'world':
+                $list = Zume_App_Heatmap::query_activity_grid_totals( $action );
+                return Zume_App_Heatmap::endpoint_get_level( $params['grid_id'], $action, $list, $this->global_div, $this->us_div );
+            case 'activity_data':
+                $grid_id = sanitize_text_field( wp_unslash( $params['grid_id'] ) );
+                $offset = sanitize_text_field( wp_unslash( $params['offset'] ) );
+                return Zume_App_Heatmap::query_activity_data( $grid_id, $offset );
+            case 'grid_data':
+//                $grid_totals = Zume_App_Heatmap::query_activity_grid_totals();
+//                return Zume_App_Heatmap::_initial_polygon_value_list( $grid_totals, $this->global_div, $this->us_div );
+                return $this->_initial_polygon_value_list();
+            default:
+                return new WP_Error( __METHOD__, "Missing valid action", [ 'status' => 400 ] );
         }
-        $types[$this->root][$this->type] = [
-            'name' => 'Activity',
-            'root' => $this->root,
-            'type' => $this->type,
-            'meta_key' => 'public_key',
-            'actions' => [
-                '' => 'Manage',
-            ],
-            'post_type' => $this->post_type,
-        ];
-        return $types;
     }
 
-    public function get_grid_totals(){
-        return Zume_App_Heatmap::query_activity_grid_totals();
-    }
-
-    public function get_population_division( $country_code ){
-        $population_division = $this->global_div;
-        if ( $country_code === 'US' ){
-            $population_division = $this->us_div;
-        }
-        return $population_division;
-    }
-
-    public function get_grid_totals_by_level( $administrative_level ) {
-        return Zume_App_Heatmap::query_activity_grid_totals( $administrative_level );
-    }
-
-    public function _limit_counts( $flat_grid, $list ) {
-        $flat_grid_limited = [];
-        foreach ( $flat_grid as $value ) {
-            $flat_grid_limited[$value['grid_id']] = $value;
-
-            if ( isset( $list[$value['grid_id']] ) && ! empty( $list[$value['grid_id']] ) ) {
-                $flat_grid_limited[$value['grid_id']]['reported'] = $list[$value['grid_id']];
-            }
-        }
-        return $flat_grid_limited;
-    }
-
-    /**
-     * Grid list build initial map list of elements and drives sidebar
-     * @return array
-     */
     public function _initial_polygon_value_list(){
         $flat_grid = Zume_App_Heatmap::query_saturation_list();
-        $grid_totals = $this->get_grid_totals();
+        $grid_totals = Zume_App_Heatmap::query_activity_grid_totals();
 
         $data = [];
         $highest_value = 1;
@@ -145,7 +200,7 @@ class Zume_Public_Heatmap_Activity extends Zume_Public_Heatmap_Base
                 'percent' => 0,
             ];
 
-            $population_division = $this->get_population_division( $v['country_code'] );
+            $population_division = Zume_App_Heatmap::get_population_division( $v['country_code'], $this->global_div, $this->us_div );
 
             $needed = round( $v['population'] / $population_division );
             if ( $needed < 1 ){
@@ -184,46 +239,6 @@ class Zume_Public_Heatmap_Activity extends Zume_Public_Heatmap_Base
             'highest_value' => (int) $highest_value,
             'data' => $data
         ];
-    }
-
-    public function _browser_tab_title( $title ){
-        return __( "Zúme Activity Map", 'disciple_tools' );
-    }
-
-    public function customized_welcome_script(){
-        ?>
-        <style>#needed-row { display:none;} #goal-row { display:none; }</style>
-        <script>
-            jQuery(document).ready(function($){
-                let asset_url = '<?php echo esc_url( trailingslashit( plugin_dir_url( __DIR__ ) ) . 'images/' ) ?>'
-
-                $('.training-content').append(`
-                <div class="grid-x grid-padding-x" >
-                    <div class="cell center">
-                        <img class="training-screen-image" src="${asset_url + 'search.svg'}" alt="search icon" />
-                        <h2>Search</h2>
-                        <p>Search for any city or place with the search input.</p>
-                    </div>
-                    <div class="cell center">
-                        <img class="training-screen-image" src="${asset_url + 'zoom.svg'}" alt="zoom icon"  />
-                        <h2>Zoom</h2>
-                        <p>Scroll zoom with your mouse or pinch zoom with track pads and phones to focus on sections of the map.</p>
-                    </div>
-                    <div class="cell center">
-                        <img class="training-screen-image" src="${asset_url + 'drag.svg'}" alt="drag icon"  />
-                        <h2>Drag</h2>
-                        <p>Click and drag the map any direction to look at a different part of the map.</p>
-                    </div>
-                    <div class="cell center">
-                        <img class="training-screen-image" src="${asset_url + 'click.svg'}" alt="click icon" />
-                        <h2>Click</h2>
-                        <p>Click a single section and reveal a details panel with more information about the location.</p>
-                    </div>
-                </div>
-                `)
-            })
-        </script>
-        <?php
     }
 
 }

@@ -5,17 +5,16 @@ if ( strpos( dt_get_url_path(), 'zume_app' ) !== false || dt_is_rest() ){
     Zume_Public_Heatmap_Trained_People::instance();
 }
 
-
-class Zume_Public_Heatmap_Trained_People extends Zume_Public_Heatmap_Base
+class Zume_Public_Heatmap_Trained_People extends DT_Magic_Url_Base
 {
-
-    public $magic = false;
-    public $parts = false;
+    public $page_title = 'Zúme Trained People Map';
     public $root = "zume_app";
     public $type = 'heatmap_trained_people';
+    public $type_name = 'Trained People';
     public $post_type = 'trained_people';
-    public $us_div = 5000; // this is 1 for every 5000
-    public $global_div = 50000; // this equals 1 for every 50000
+    private $meta_key = '';
+    public $us_div = 5000; // this is 2 for every 5000
+    public $global_div = 50000; // this equals 2 for every 50000
 
     private static $_instance = null;
     public static function instance() {
@@ -26,14 +25,9 @@ class Zume_Public_Heatmap_Trained_People extends Zume_Public_Heatmap_Base
     } // End instance()
 
     public function __construct() {
+        $this->meta_key = $this->root . '_' . $this->type . '_magic_key';
         parent::__construct();
 
-        // register type
-        $this->magic = new DT_Magic_URL( $this->root );
-        add_filter( 'dt_magic_url_register_types', [ $this, '_register_type' ], 10, 1 );
-
-        // register REST and REST access
-        add_filter( 'dt_allow_rest_access', [ $this, '_authorize_url' ], 100, 1 );
         add_action( 'rest_api_init', [ $this, 'add_endpoints' ] );
 
 
@@ -43,88 +37,76 @@ class Zume_Public_Heatmap_Trained_People extends Zume_Public_Heatmap_Base
             return;
         }
 
-        // fail to blank if not valid url
-        $this->parts = $this->magic->parse_url_parts();
-        if ( ! $this->parts ){
-            // @note this returns a blank page for bad url, instead of redirecting to login
-            add_filter( 'dt_templates_for_urls', function ( $template_for_url ) {
-                $url = dt_get_url_path();
-                $template_for_url[ $url ] = 'template-blank.php';
-                return $template_for_url;
-            }, 199, 1 );
-            add_filter( 'dt_blank_access', function(){ return true;
-            } );
-            add_filter( 'dt_allow_non_login_access', function(){ return true;
-            }, 100, 1 );
+        if ( !$this->check_parts_match( false ) ){
             return;
         }
 
-        // fail if does not match type
-        if ( $this->type !== $this->parts['type'] ){
-            return;
-        }
-
-        // load if valid url
-        add_filter( "dt_blank_title", [ $this, "_browser_tab_title" ] );
-        add_action( 'dt_blank_head', [ $this, '_header' ] );
-        add_action( 'dt_blank_footer', [ $this, '_footer' ] );
-        add_action( 'dt_blank_body', [ $this, 'body' ] ); // body for no post key
-
-        // load page elements
-        add_action( 'wp_print_scripts', [ $this, '_print_scripts' ], 1500 );
-        add_action( 'wp_print_styles', [ $this, '_print_styles' ], 1500 );
-
-        // register url and access
-        add_filter( 'dt_templates_for_urls', [ $this, '_register_url' ], 199, 1 );
-        add_filter( 'dt_blank_access', [ $this, '_has_access' ] );
-        add_filter( 'dt_allow_non_login_access', function(){ return true;
-        }, 100, 1 );
+        add_action( 'dt_blank_body', [ $this, 'body' ] );
+        add_filter( 'dt_magic_url_base_allowed_css', [ $this, 'dt_magic_url_base_allowed_css' ], 10, 1 );
+        add_filter( 'dt_magic_url_base_allowed_js', [ $this, 'dt_magic_url_base_allowed_js' ], 10, 1 );
+        add_action( 'wp_enqueue_scripts', [ $this, 'wp_enqueue_scripts' ], 99 );
 
     }
 
-    public function _register_type( array $types ) : array {
-        if ( ! isset( $types[$this->root] ) ) {
-            $types[$this->root] = [];
-        }
-        $types[$this->root][$this->type] = [
-            'name' => 'Trained People Saturation',
-            'root' => $this->root,
-            'type' => $this->type,
-            'meta_key' => 'public_key',
-            'actions' => [
-                '' => 'Manage',
-            ],
-            'post_type' => $this->post_type,
-        ];
-        return $types;
+    public function dt_magic_url_base_allowed_js( $allowed_js ) {
+        $allowed_js[] = 'jquery-touch-punch';
+        $allowed_js[] = 'mapbox-gl';
+        $allowed_js[] = 'jquery-cookie';
+        $allowed_js[] = 'mapbox-cookie';
+        $allowed_js[] = 'heatmap-js';
+        return $allowed_js;
     }
 
-    public function get_grid_totals(){
-        return Zume_App_Heatmap::query_trained_people_grid_totals();
+    public function dt_magic_url_base_allowed_css( $allowed_css ) {
+        $allowed_css[] = 'mapbox-gl-css';
+        $allowed_css[] = 'introjs-css';
+        $allowed_css[] = 'heatmap-css';
+        $allowed_css[] = 'site-css';
+        return $allowed_css;
     }
 
-    public function get_population_division( $country_code ){
-        $population_division = $this->global_div;
-        if ( $country_code === 'US' ){
-            $population_division = $this->us_div;
-        }
-        return $population_division;
+    public function _header(){
+        Zume_App_Heatmap::_header();
     }
 
-    public function get_grid_totals_by_level( $administrative_level ) {
-        return Zume_App_Heatmap::query_trained_people_grid_totals( $administrative_level );
+    public static function wp_enqueue_scripts(){
+        Zume_App_Heatmap::wp_enqueue_scripts();
     }
 
-    public function _browser_tab_title( $title ){
-        return __( "Zúme Trained People Map", 'disciple_tools' );
+    public function body(){
+        DT_Mapbox_API::geocoder_scripts();
+        include( 'heatmap.html' );
+    }
+
+    public function footer_javascript(){
+        ?>
+        <script>
+            let jsObject = [<?php echo json_encode([
+                'map_key' => DT_Mapbox_API::get_key(),
+                'mirror_url' => dt_get_location_grid_mirror( true ),
+                'theme_uri' => trailingslashit( get_stylesheet_directory_uri() ),
+                'root' => esc_url_raw( rest_url() ),
+                'nonce' => wp_create_nonce( 'wp_rest' ),
+                'parts' => $this->parts,
+                'post_type' => $this->post_type,
+                'trans' => [
+                    'add' => __( 'Zume', 'disciple_tools' ),
+                ],
+                'grid_data' => ['data' => [], 'highest_value' => 1 ],
+                'custom_marks' => []
+            ]) ?>][0]
+        </script>
+        <?php
+
+        $this->customized_welcome_script();
+        return true;
     }
 
     public function customized_welcome_script(){
         ?>
         <script>
             jQuery(document).ready(function($){
-                let asset_url = '<?php echo esc_url( trailingslashit( plugin_dir_url( __DIR__ ) ) . 'images/' ) ?>'
-
+                let asset_url = '<?php echo esc_url( trailingslashit( plugin_dir_url( __FILE__ ) ) . 'images/' ) ?>'
                 $('.training-content').append(`
                 <div class="grid-x grid-padding-x" >
                     <div class="cell center">
@@ -149,9 +131,57 @@ class Zume_Public_Heatmap_Trained_People extends Zume_Public_Heatmap_Base
                     </div>
                 </div>
                 `)
+
             })
         </script>
         <?php
+    }
+
+    public function add_endpoints() {
+        $namespace = $this->root . '/v1';
+        register_rest_route(
+            $namespace,
+            '/'.$this->type,
+            [
+                [
+                    'methods'  => WP_REST_Server::CREATABLE,
+                    'callback' => [ $this, 'endpoint' ],
+                    'permission_callback' => '__return_true',
+                ],
+            ]
+        );
+    }
+
+    public function endpoint( WP_REST_Request $request ) {
+        $params = $request->get_params();
+
+        if ( ! isset( $params['parts'], $params['action'] ) ) {
+            return new WP_Error( __METHOD__, "Missing parameters", [ 'status' => 400 ] );
+        }
+
+        $params = dt_recursive_sanitize_array( $params );
+        $action = sanitize_text_field( wp_unslash( $params['action'] ) );
+
+        switch ( $action ) {
+            case 'self':
+                return Zume_App_Heatmap::get_self( $params['grid_id'], $this->global_div, $this->us_div );
+            case 'a3':
+            case 'a2':
+            case 'a1':
+            case 'a0':
+            case 'world':
+                $list = Zume_App_Heatmap::query_trained_people_grid_totals( $action );
+                return Zume_App_Heatmap::endpoint_get_level( $params['grid_id'], $action, $list, $this->global_div, $this->us_div );
+            case 'activity_data':
+                $grid_id = sanitize_text_field( wp_unslash( $params['grid_id'] ) );
+                $offset = sanitize_text_field( wp_unslash( $params['offset'] ) );
+                return Zume_App_Heatmap::query_activity_data( $grid_id, $offset );
+            case 'grid_data':
+                $grid_totals = Zume_App_Heatmap::query_trained_people_grid_totals();
+                return Zume_App_Heatmap::_initial_polygon_value_list( $grid_totals, $this->global_div, $this->us_div );
+            default:
+                return new WP_Error( __METHOD__, "Missing valid action", [ 'status' => 400 ] );
+        }
     }
 
 }
