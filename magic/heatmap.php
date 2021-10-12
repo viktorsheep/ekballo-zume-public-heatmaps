@@ -2264,7 +2264,7 @@ class Zume_App_Heatmap {
 
             $population_division = self::get_population_division( $v['country_code'], $global_div, $us_div );
 
-            $needed = round( $v['population'] / ( $population_division / 2 )  );
+            $needed = round( $v['population'] / $population_division );
             if ( $needed < 1 ){
                 $needed = 1;
             }
@@ -2274,17 +2274,15 @@ class Zume_App_Heatmap {
                 if ( ! empty( $reported ) && ! empty( $needed ) ){
                     $data[$v['grid_id']]['needed'] = $needed;
 
-//                    if ( $reported > $needed ) {
-//                        $reported = $needed;
-//                    }
                     $data[$v['grid_id']]['reported'] = $reported;
 
-                    $percent = round( $reported / $needed * 100 );
+                    $percent = ceil( $reported / $needed * 100 );
                     if ( 100 < $percent ) {
                         $percent = 100;
                     } else {
                         $percent = number_format_i18n( $percent, 2 );
                     }
+
                     $data[$v['grid_id']]['percent'] = $percent;
                 }
             }
@@ -2378,7 +2376,7 @@ class Zume_App_Heatmap {
             $level['population'] = $grid[$administrative_level . '_population'];
 
             $population_division = self::get_population_division( $grid['country_code'], $global_div, $us_div );
-            $needed = round( $level['population'] / ( $population_division / 2 ) );
+            $needed = round( $level['population'] / $population_division );
             if ( $needed < 1 ){
                 $needed = 1;
             }
@@ -2430,6 +2428,11 @@ class Zume_App_Heatmap {
         }
 
         $percent = ceil( $level['reported'] / $level['needed'] * 100 );
+        if ( 100 < $percent ) {
+            $percent = 100;
+        } else {
+            $percent = number_format_i18n( $percent, 2 );
+        }
 
         if ( isset( $flat_grid[$grid[$administrative_level]] ) && ! empty( $flat_grid[$grid[$administrative_level]] ) ) {
             $raw_level = $flat_grid[$grid[$administrative_level]];
@@ -2448,7 +2451,7 @@ class Zume_App_Heatmap {
             $level['population'] = $grid[$administrative_level . '_population'];
 
             $population_division = self::get_population_division( $grid['country_code'], $global_div, $us_div );
-            $needed = round( $level['population'] / ( $population_division / 2 ) );
+            $needed = round( $level['population'] / $population_division );
             if ( $needed < 1 ){
                 $needed = 1;
             }
@@ -2505,9 +2508,9 @@ class Zume_App_Heatmap {
     }
 
     public static function get_population_division( $country_code, $global_div, $us_div ){
-        $population_division = $global_div * 2;
+        $population_division = $global_div;
         if ( $country_code === 'US' ){
-            $population_division = $us_div * 2;
+            $population_division = $us_div;
         }
         return $population_division;
     }

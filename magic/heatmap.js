@@ -312,7 +312,7 @@ function load_map() {
             'paint': {
               'fill-color': {
                 property: 'value',
-                stops: [[0, 'rgba(0, 0, 0, 0)'], [1, 'rgb(155, 200, 254)'], [jsObject.grid_data.highest_value, 'rgb(37, 82, 154)']]
+                stops: [[0, 'rgba(0, 0, 0, 0)'], [0.01, 'rgb(155, 200, 254)'], [jsObject.grid_data.highest_value, 'rgb(37, 82, 154)']]
               },
               'fill-opacity': 0.75,
               'fill-outline-color': '#707070'
