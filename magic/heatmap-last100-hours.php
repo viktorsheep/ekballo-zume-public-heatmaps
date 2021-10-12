@@ -5,17 +5,6 @@ if ( strpos( dt_get_url_path(), 'zume_app' ) !== false || dt_is_rest() ){
     Zume_Public_Heatmap_100hours::instance();
 }
 
-add_filter('dt_network_dashboard_supported_public_links', function( $supported_links ){
-    $supported_links[] = [
-        'name' => 'Public Heatmap ( 100 Hours )',
-        'description' => 'Last 100 hours of Zúme activity.',
-        'key' => 'zume_app_last_100_hours',
-        'url' => 'zume_app/last_100_hours'
-    ];
-    return $supported_links;
-}, 10, 1 );
-
-
 /**
  * Class Disciple_Tools_Plugin_Starter_Template_Magic_Link
  */
@@ -146,7 +135,7 @@ class Zume_Public_Heatmap_100hours extends DT_Magic_Url_Base {
         // Expects to be installed in a theme like Zume.Vision that has a full copy of the dt-mapping folder from Disciple Tools.
         $ipstack = new DT_Ipstack_API();
         $ip_address = $ipstack::get_real_ip_address();
-        $this->ip_response = $ipstack::geocode_ip_address($ip_address);
+        $this->ip_response = $ipstack::geocode_ip_address( $ip_address );
 
         // begin echo cache
         ?>
@@ -258,7 +247,7 @@ class Zume_Public_Heatmap_100hours extends DT_Magic_Url_Base {
                 <div id="dynamic-styles"></div>
                 <div id="map-wrapper">
                     <div id='map'></div>
-                    <div id="map-loader" class="spinner-loader"><img src="<?php echo plugin_dir_url(__DIR__) ?>/spinner.svg" width="100px" /></div>
+                    <div id="map-loader" class="spinner-loader"><img src="<?php echo plugin_dir_url( __DIR__ ) ?>/spinner.svg" width="100px" /></div>
                     <div id="map-header"><h3>Last 100 Hours of Zúme</h3></div>
                 </div>
             </div>
@@ -296,7 +285,7 @@ class Zume_Public_Heatmap_100hours extends DT_Magic_Url_Base {
                                 <tbody>
                                 <tr>
                                     <td>
-                                        <img src="<?php echo esc_url( plugin_dir_url(__DIR__) ) . '/images/blessing.jpg' ?>" style="height:200px;" alt="blessing" />
+                                        <img src="<?php echo esc_url( plugin_dir_url( __DIR__ ) ) . '/images/blessing.jpg' ?>" style="height:200px;" alt="blessing" />
                                     </td>
                                     <td><h4>Blessing</h4></td>
                                     <td>
@@ -306,7 +295,7 @@ class Zume_Public_Heatmap_100hours extends DT_Magic_Url_Base {
                                 </tr>
                                 <tr>
                                     <td>
-                                        <img src="<?php echo esc_url( plugin_dir_url(__DIR__) ) . '/images/great-blessing.jpg' ?>" style="height:200px;" alt="great-blessing" />
+                                        <img src="<?php echo esc_url( plugin_dir_url( __DIR__ ) ) . '/images/great-blessing.jpg' ?>" style="height:200px;" alt="great-blessing" />
                                     </td>
                                     <td><h4>Great Blessing</h4></td>
                                     <td>
@@ -316,7 +305,7 @@ class Zume_Public_Heatmap_100hours extends DT_Magic_Url_Base {
                                 </tr>
                                 <tr>
                                     <td>
-                                        <img src="<?php echo esc_url( plugin_dir_url(__DIR__) ) . '/images/greater-blessing.jpg' ?>" style="height:200px;" alt="greater-blessing" />
+                                        <img src="<?php echo esc_url( plugin_dir_url( __DIR__ ) ) . '/images/greater-blessing.jpg' ?>" style="height:200px;" alt="greater-blessing" />
                                     </td>
                                     <td><h4>Greater Blessing</h4></td>
                                     <td>
@@ -326,7 +315,7 @@ class Zume_Public_Heatmap_100hours extends DT_Magic_Url_Base {
                                 </tr>
                                 <tr>
                                     <td>
-                                        <img src="<?php echo esc_url( plugin_dir_url(__DIR__) ) . '/images/greatest-blessing.jpg' ?>" style="width:250px;" alt="greatest-blessing" />
+                                        <img src="<?php echo esc_url( plugin_dir_url( __DIR__ ) ) . '/images/greatest-blessing.jpg' ?>" style="width:250px;" alt="greatest-blessing" />
                                     </td>
                                     <td style="white-space: nowrap;"><h4>Greatest Blessing</h4></td>
                                     <td>
@@ -361,8 +350,8 @@ class Zume_Public_Heatmap_100hours extends DT_Magic_Url_Base {
                                 if ( ! empty( $selected_tz ) ) {
                                     echo '<option value="'.esc_html( $selected_tz ).'" selected>'.esc_html( $selected_tz ).'</option><option disabled>----</option>';
                                 }
-                                $tzlist = DateTimeZone::listIdentifiers(DateTimeZone::ALL);
-                                foreach( $tzlist as $tz ) {
+                                $tzlist = DateTimeZone::listIdentifiers( DateTimeZone::ALL );
+                                foreach ( $tzlist as $tz ) {
                                     echo '<option value="'.esc_html( $tz ).'">'.esc_html( $tz ).'</option>';
                                 }
                                 ?>
@@ -422,7 +411,7 @@ class Zume_Public_Heatmap_100hours extends DT_Magic_Url_Base {
                         <span aria-hidden="true">&times;</span>
                     </button>
                 </div>
-                <div id="list-loader" class="spinner-loader"><img src="<?php echo plugin_dir_url(__DIR__) ?>/spinner.svg" width="50px" /> </div>
+                <div id="list-loader" class="spinner-loader"><img src="<?php echo plugin_dir_url( __DIR__ ) ?>/spinner.svg" width="50px" /> </div>
                 <!-- Activity List -->
                 <div id="activity-wrapper">
                     <ul id="activity-list"></ul>
@@ -898,7 +887,7 @@ class Zume_Public_Heatmap_100hours extends DT_Magic_Url_Base {
             $namespace, '/'.$this->type, [
                 [
                     'methods' => WP_REST_Server::CREATABLE,
-                    'callback' => [$this, 'points_geojson'],
+                    'callback' => [ $this, 'points_geojson' ],
                     'permission_callback' => function( WP_REST_Request $request ){
                         return true;
                     },
@@ -909,8 +898,8 @@ class Zume_Public_Heatmap_100hours extends DT_Magic_Url_Base {
 
     public function points_geojson( WP_REST_Request $request ) {
         $params = $request->get_json_params() ?? $request->get_body_params();
-        if ( isset( $params['timezone_offset'] ) && ! empty( $params['timezone_offset']  ) ) {
-            $tz_name = sanitize_text_field( wp_unslash($params['timezone_offset'] ));
+        if ( isset( $params['timezone_offset'] ) && ! empty( $params['timezone_offset'] ) ) {
+            $tz_name = sanitize_text_field( wp_unslash( $params['timezone_offset'] ) );
         } else {
             $tz_name = 'America/Denver';
         }
@@ -934,31 +923,291 @@ class Zume_Public_Heatmap_100hours_Utilities {
 
     public static function create_initials( $longitude, $latitude, $payload ) : string {
         $letters = [
-            'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'N', 'S',
-            'M', 'N', 'O', 'P', 'R', 'S', 'T', 'U', 'V', 'W', 'E', 'A', 'R', 'I',
-            'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'D', 'E',
-            'M', 'N', 'O', 'P', 'R', 'S', 'T', 'U', 'V', 'W', 'E', 'A', 'R', 'I',
-            'E', 'A', 'R', 'I', 'T', 'N', 'S', 'L', 'E', 'A', 'R', 'I', 'N', 'S',
-            'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'C', 'D',
-            'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'A', 'B',
-            'M', 'N', 'O', 'P', 'R', 'S', 'T', 'U', 'V', 'W', 'E', 'A', 'R', 'I',
-            'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'A', 'B',
-            'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'E', 'A', 'R',
-            'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'N', 'S',
-            'M', 'N', 'O', 'P', 'R', 'S', 'T', 'U', 'V', 'W', 'E', 'A', 'R', 'I',
-            'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'D', 'E',
-            'M', 'N', 'O', 'P', 'R', 'S', 'T', 'U', 'V', 'W', 'E', 'A', 'R', 'I',
-            'E', 'A', 'R', 'I', 'T', 'N', 'S', 'L', 'E', 'A', 'R', 'I', 'N', 'S',
-            'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'C', 'D',
-            'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'A', 'B',
-            'E', 'A', 'R', 'I', 'T', 'N', 'S', 'L', 'E', 'A', 'R', 'I', 'N', 'S',
-            'M', 'N', 'O', 'P', 'R', 'S', 'T', 'U', 'V', 'W', 'E', 'A', 'R', 'I',
-            'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'N', 'S',
+            'A',
+        'B',
+        'C',
+        'D',
+        'E',
+        'F',
+        'G',
+        'H',
+        'I',
+        'J',
+        'K',
+        'L',
+        'N',
+        'S',
+            'M',
+        'N',
+        'O',
+        'P',
+        'R',
+        'S',
+        'T',
+        'U',
+        'V',
+        'W',
+        'E',
+        'A',
+        'R',
+        'I',
+            'A',
+        'B',
+        'C',
+        'D',
+        'E',
+        'F',
+        'G',
+        'H',
+        'I',
+        'J',
+        'K',
+        'L',
+        'D',
+        'E',
+            'M',
+        'N',
+        'O',
+        'P',
+        'R',
+        'S',
+        'T',
+        'U',
+        'V',
+        'W',
+        'E',
+        'A',
+        'R',
+        'I',
+            'E',
+        'A',
+        'R',
+        'I',
+        'T',
+        'N',
+        'S',
+        'L',
+        'E',
+        'A',
+        'R',
+        'I',
+        'N',
+        'S',
+            'A',
+        'B',
+        'C',
+        'D',
+        'E',
+        'F',
+        'G',
+        'H',
+        'I',
+        'J',
+        'K',
+        'L',
+        'C',
+        'D',
+            'A',
+        'B',
+        'C',
+        'D',
+        'E',
+        'F',
+        'G',
+        'H',
+        'I',
+        'J',
+        'K',
+        'L',
+        'A',
+        'B',
+            'M',
+        'N',
+        'O',
+        'P',
+        'R',
+        'S',
+        'T',
+        'U',
+        'V',
+        'W',
+        'E',
+        'A',
+        'R',
+        'I',
+            'A',
+        'B',
+        'C',
+        'D',
+        'E',
+        'F',
+        'G',
+        'H',
+        'I',
+        'J',
+        'K',
+        'L',
+        'A',
+        'B',
+            'M',
+        'N',
+        'O',
+        'P',
+        'Q',
+        'R',
+        'S',
+        'T',
+        'U',
+        'V',
+        'W',
+        'E',
+        'A',
+        'R',
+            'A',
+        'B',
+        'C',
+        'D',
+        'E',
+        'F',
+        'G',
+        'H',
+        'I',
+        'J',
+        'K',
+        'L',
+        'N',
+        'S',
+            'M',
+        'N',
+        'O',
+        'P',
+        'R',
+        'S',
+        'T',
+        'U',
+        'V',
+        'W',
+        'E',
+        'A',
+        'R',
+        'I',
+            'A',
+        'B',
+        'C',
+        'D',
+        'E',
+        'F',
+        'G',
+        'H',
+        'I',
+        'J',
+        'K',
+        'L',
+        'D',
+        'E',
+            'M',
+        'N',
+        'O',
+        'P',
+        'R',
+        'S',
+        'T',
+        'U',
+        'V',
+        'W',
+        'E',
+        'A',
+        'R',
+        'I',
+            'E',
+        'A',
+        'R',
+        'I',
+        'T',
+        'N',
+        'S',
+        'L',
+        'E',
+        'A',
+        'R',
+        'I',
+        'N',
+        'S',
+            'A',
+        'B',
+        'C',
+        'D',
+        'E',
+        'F',
+        'G',
+        'H',
+        'I',
+        'J',
+        'K',
+        'L',
+        'C',
+        'D',
+            'A',
+        'B',
+        'C',
+        'D',
+        'E',
+        'F',
+        'G',
+        'H',
+        'I',
+        'J',
+        'K',
+        'L',
+        'A',
+        'B',
+            'E',
+        'A',
+        'R',
+        'I',
+        'T',
+        'N',
+        'S',
+        'L',
+        'E',
+        'A',
+        'R',
+        'I',
+        'N',
+        'S',
+            'M',
+        'N',
+        'O',
+        'P',
+        'R',
+        'S',
+        'T',
+        'U',
+        'V',
+        'W',
+        'E',
+        'A',
+        'R',
+        'I',
+            'A',
+        'B',
+        'C',
+        'D',
+        'E',
+        'F',
+        'G',
+        'H',
+        'I',
+        'J',
+        'K',
+        'L',
+        'N',
+        'S',
         ];
         $fnum = abs( round( $longitude ) );
         $lnum = abs( round( $latitude ) );
         $list = str_split( hash( 'sha256', maybe_serialize( $payload ) ) );
-        foreach( $list as $character ){
+        foreach ( $list as $character ){
             if ( is_numeric( $character ) ) {
                 $fnum = $fnum + $character;
                 $lnum = $lnum + $character;
@@ -970,10 +1219,10 @@ class Zume_Public_Heatmap_100hours_Utilities {
 
     public static function create_time_string( $timestamp, $timezone_offset ) : string {
         $adjusted_time = $timestamp + $timezone_offset;
-        if ( $timestamp > strtotime('-1 hour') ) {
-            $time_string = self::_time_elapsed_string('@'.$timestamp);
+        if ( $timestamp > strtotime( '-1 hour' ) ) {
+            $time_string = self::_time_elapsed_string( '@'.$timestamp );
         }
-        else if ( $timestamp > strtotime('today+00:00') + $timezone_offset ) {
+        else if ( $timestamp > strtotime( 'today+00:00' ) + $timezone_offset ) {
             $time_string = date( 'g:i a', $adjusted_time );
         }
         else {
@@ -983,11 +1232,11 @@ class Zume_Public_Heatmap_100hours_Utilities {
     }
 
     public static function _time_elapsed_string( $datetime, $full = false ) {
-        $now = new DateTime;
-        $ago = new DateTime($datetime);
-        $diff = $now->diff($ago);
+        $now = new DateTime();
+        $ago = new DateTime( $datetime );
+        $diff = $now->diff( $ago );
 
-        $diff->w = floor($diff->d / 7);
+        $diff->w = floor( $diff->d / 7 );
         $diff->d -= $diff->w * 7;
 
         $string = array(
@@ -1001,14 +1250,15 @@ class Zume_Public_Heatmap_100hours_Utilities {
         );
         foreach ($string as $k => &$v) {
             if ($diff->$k) {
-                $v = $diff->$k . ' ' . $v . ($diff->$k > 1 ? 's' : '');
+                $v = $diff->$k . ' ' . $v . ( $diff->$k > 1 ? 's' : '' );
             } else {
-                unset($string[$k]);
+                unset( $string[$k] );
             }
         }
 
-        if (!$full) $string = array_slice($string, 0, 1);
-        return $string ? implode(', ', $string) . ' ago' : 'just now';
+        if ( !$full) { $string = array_slice( $string, 0, 1 );
+        }
+        return $string ? implode( ', ', $string ) . ' ago' : 'just now';
     }
 
     public static function create_in_language_string( $payload ) : string {
@@ -1029,8 +1279,8 @@ class Zume_Public_Heatmap_100hours_Utilities {
         $restricted = self::_persecuted_countries();
 
         if ( ! isset( $payload['country'] ) ) { // if country is not set, reduce precision to 111km
-            $location['lng'] = round($location['lng'], 0 );
-            $location['lat'] = round($location['lat'], 0 );
+            $location['lng'] = round( $location['lng'], 0 );
+            $location['lat'] = round( $location['lat'], 0 );
             $location['label'] = '';
         }
         else if ( in_array( $payload['country'], $restricted ) ) { // if persecuted country, reduce precision to 111km
@@ -1111,13 +1361,13 @@ class Zume_Public_Heatmap_100hours_Utilities {
             'type' => 'blessing',
         ];
 
-        switch( $action ) {
+        switch ( $action ) {
             case 'starting_group':
-                $data['note'] =  $initials . ' is starting a training group' . $in_language . '! ' . $location_label;
+                $data['note'] = $initials . ' is starting a training group' . $in_language . '! ' . $location_label;
                 $data['type'] = 'greater_blessing';
                 break;
             case 'building_group':
-                $data['note'] =  $initials . ' is growing a training group' . $in_language . '! ' . $location_label;
+                $data['note'] = $initials . ' is growing a training group' . $in_language . '! ' . $location_label;
                 $data['type'] = 'greater_blessing';
                 break;
             case 'leading_1':
@@ -1130,23 +1380,23 @@ class Zume_Public_Heatmap_100hours_Utilities {
             case 'leading_8':
             case 'leading_9':
             case 'leading_10':
-                if ( isset($payload['group_size']) && $payload['group_size'] > 1 ) {
-                    $data['note'] =  $initials . ' is leading a group of '. $payload['group_size'] .' through session ' . str_replace( '_', '', substr( $action, -2, 2 ) ) . $in_language . '! ' . $location_label;
+                if ( isset( $payload['group_size'] ) && $payload['group_size'] > 1 ) {
+                    $data['note'] = $initials . ' is leading a group of '. $payload['group_size'] .' through session ' . str_replace( '_', '', substr( $action, -2, 2 ) ) . $in_language . '! ' . $location_label;
                 } else {
-                    $data['note'] =  $initials . ' is leading a group through session ' . str_replace( '_', '', substr( $action, -2, 2 ) ) . $in_language . '! ' . $location_label;
+                    $data['note'] = $initials . ' is leading a group through session ' . str_replace( '_', '', substr( $action, -2, 2 ) ) . $in_language . '! ' . $location_label;
                 }
                 $data['type'] = 'greatest_blessing';
                 break;
             case 'zume_training':
-                $data['note'] =  $initials . ' is registering for Zúme training' . $in_language . '! ' . $location_label;
+                $data['note'] = $initials . ' is registering for Zúme training' . $in_language . '! ' . $location_label;
                 $data['type'] = 'great_blessing';
                 break;
             case 'zume_vision':
-                $data['note'] =  $initials . ' is joining the Zúme community to engage in Disciple Making Movements' . $in_language . '! ' . $location_label;
+                $data['note'] = $initials . ' is joining the Zúme community to engage in Disciple Making Movements' . $in_language . '! ' . $location_label;
                 $data['type'] = 'greatest_blessing';
                 break;
             case 'coaching':
-                $data['note'] =  $initials . ' is requesting coaching from Zúme coaches' . $in_language . '! ' . $location_label;
+                $data['note'] = $initials . ' is requesting coaching from Zúme coaches' . $in_language . '! ' . $location_label;
                 $data['type'] = 'great_blessing';
                 break;
             case 'studying_1':
@@ -1217,11 +1467,11 @@ class Zume_Public_Heatmap_100hours_Utilities {
                 if ( isset( $payload['title'] ) && ! empty( $payload['title'] ) ) {
                     $title = ' "' . $payload['title'] . '"';
                 }
-                $data['note'] =  $initials . ' is studying' . $title . $in_language . '! ' . $location_label;
+                $data['note'] = $initials . ' is studying' . $title . $in_language . '! ' . $location_label;
                 $data['type'] = 'blessing';
                 break;
             case 'updated_3_month':
-                $data['note'] =  $initials . '  made a three month plan to multiply disciples' . $in_language . '! ' . $location_label;
+                $data['note'] = $initials . '  made a three month plan to multiply disciples' . $in_language . '! ' . $location_label;
                 $data['type'] = 'great_blessing';
                 break;
             default:
@@ -1234,10 +1484,10 @@ class Zume_Public_Heatmap_100hours_Utilities {
     public static function query_contacts_points_geojson( $tz_name, $country = 'none', $language = 'none' ) {
         global $wpdb;
 
-        $utc_time = new DateTime('now', new DateTimeZone($tz_name));
-        $timezoneOffset = $utc_time->format('Z');
+        $utc_time = new DateTime( 'now', new DateTimeZone( $tz_name ) );
+        $timezoneOffset = $utc_time->format( 'Z' );
 
-        $timestamp = strtotime('-100 hours' );
+        $timestamp = strtotime( '-100 hours' );
         $results = $wpdb->get_results( $wpdb->prepare( "
                 SELECT action, category, lng, lat, label, payload, timestamp FROM $wpdb->dt_movement_log WHERE timestamp > %s ORDER BY timestamp DESC
                 ", $timestamp ), ARRAY_A );
@@ -1281,19 +1531,19 @@ class Zume_Public_Heatmap_100hours_Utilities {
             // BUILD NOTE
 
             // time string
-            $time_string = Zume_Public_Heatmap_100hours_Utilities::create_time_string( $result['timestamp'], $timezoneOffset );
+            $time_string = self::create_time_string( $result['timestamp'], $timezoneOffset );
 
             // language
-            $in_language = Zume_Public_Heatmap_100hours_Utilities::create_in_language_string( $payload );
+            $in_language = self::create_in_language_string( $payload );
 
             // initials string
-            $initials = Zume_Public_Heatmap_100hours_Utilities::create_initials( $result['lng'], $result['lat'], $payload );
+            $initials = self::create_initials( $result['lng'], $result['lat'], $payload );
 
             // location string
-            $location = Zume_Public_Heatmap_100hours_Utilities::create_location_precision( $result['lng'], $result['lat'], $result['label'], $payload );
+            $location = self::create_location_precision( $result['lng'], $result['lat'], $result['label'], $payload );
 
             // note and type data
-            $data = Zume_Public_Heatmap_100hours_Utilities::create_note_data( $result['category'], $result['action'], $initials, $in_language, $location['label'], $payload );
+            $data = self::create_note_data( $result['category'], $result['action'], $initials, $in_language, $location['label'], $payload );
 
             // filter out non selected country
             if ( 'none' !== $country && $country !== $payload['country'] ?? '' ) {
@@ -1331,14 +1581,14 @@ class Zume_Public_Heatmap_100hours_Utilities {
         } // end foreach loop
 
         ksort( $countries );
-        ksort($languages);
+        ksort( $languages );
 
         $new_data = array(
             'type' => 'FeatureCollection',
             'counts' => $counts,
             'countries' => $countries,
             'languages' => $languages,
-            'hash' => hash('sha256', serialize( $hash ) ),
+            'hash' => hash( 'sha256', serialize( $hash ) ),
             'features' => $features,
         );
 

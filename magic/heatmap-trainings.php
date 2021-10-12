@@ -6,17 +6,6 @@ if ( strpos( dt_get_url_path(), 'zume_app' ) !== false || dt_is_rest() ){
 }
 
 
-add_filter('dt_network_dashboard_supported_public_links', function( $supported_links ){
-    $supported_links[] = [
-        'name' => 'Public Heatmap ( Trainings )',
-        'description' => 'Trainings map for world saturation',
-        'key' => 'zume_app_heatmap_trainings',
-        'url' => 'zume_app/heatmap_trainings'
-    ];
-    return $supported_links;
-}, 10, 1 );
-
-
 class Zume_Public_Heatmap_Trainings extends Zume_Public_Heatmap_Base
 {
 
@@ -111,7 +100,7 @@ class Zume_Public_Heatmap_Trainings extends Zume_Public_Heatmap_Base
     }
 
     public function get_grid_totals(){
-        return Zume_Public_Heatmap_Queries::query_training_grid_totals();
+        return Zume_App_Heatmap::query_training_grid_totals();
     }
 
     public function get_population_division( $country_code ){
@@ -123,7 +112,7 @@ class Zume_Public_Heatmap_Trainings extends Zume_Public_Heatmap_Base
     }
 
     public function get_grid_totals_by_level( $administrative_level ) {
-        return Zume_Public_Heatmap_Queries::query_training_grid_totals( $administrative_level );
+        return Zume_App_Heatmap::query_training_grid_totals( $administrative_level );
     }
 
     public function _browser_tab_title( $title ){

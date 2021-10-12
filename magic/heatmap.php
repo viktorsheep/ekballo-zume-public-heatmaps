@@ -1,6 +1,9 @@
 <?php
+if ( ! defined( 'ABSPATH' ) ) { exit; } // Exit if accessed directly
 
-class Zume_Public_Heatmap_Queries {
+class Zume_App_Heatmap {
+
+
     /**
      * This query returns the 50k saturation list of locations with population and country code.
      *
@@ -1107,6 +1110,18 @@ class Zume_Public_Heatmap_Queries {
         return $results;
     }
 
+
+    public static function clear_church_grid_totals() {
+        delete_transient('Zume_App_Heatmap::query_church_grid_totals' );
+        delete_transient('Zume_App_Heatmap::query_church_grid_totalsa0' );
+        delete_transient('Zume_App_Heatmap::query_church_grid_totalsa1' );
+        delete_transient('Zume_App_Heatmap::query_church_grid_totalsa2' );
+        delete_transient('Zume_App_Heatmap::query_church_grid_totalsa3' );
+        delete_transient('Zume_App_Heatmap::query_church_grid_totalsa4' );
+        delete_transient('Zume_App_Heatmap::query_church_grid_totalsworld' );
+        delete_transient('Zume_App_Heatmap::query_church_grid_totalsfull' );
+    }
+
     public static function query_church_grid_totals( $administrative_level = null ) {
 
         if ( false !== ( $value = get_transient( __METHOD__ . $administrative_level ) ) ) { // phpcs:ignore
@@ -2154,6 +2169,404 @@ class Zume_Public_Heatmap_Queries {
         ", $grid_id ), ARRAY_A );
 
         return $result;
+    }
+
+    /**
+     * Shared heatmap functions
+     */
+    public static function _header(){
+        ?>
+        <link rel="dns-prefetch" href="https://storage.googleapis.com/" >
+        <link rel="prefetch" href="https://storage.googleapis.com/location-grid-mirror-v2/tiles/world/saturation/1.geojson">
+        <link rel="prefetch" href="https://storage.googleapis.com/location-grid-mirror-v2/tiles/world/saturation/2.geojson">
+        <link rel="prefetch" href="https://storage.googleapis.com/location-grid-mirror-v2/tiles/world/saturation/3.geojson">
+        <link rel="prefetch" href="https://storage.googleapis.com/location-grid-mirror-v2/tiles/world/saturation/4.geojson">
+        <link rel="prefetch" href="https://storage.googleapis.com/location-grid-mirror-v2/tiles/world/saturation/5.geojson">
+        <link rel="prefetch" href="https://storage.googleapis.com/location-grid-mirror-v2/tiles/world/saturation/6.geojson">
+        <link rel="prefetch" href="https://storage.googleapis.com/location-grid-mirror-v2/tiles/world/saturation/7.geojson">
+        <link rel="prefetch" href="https://storage.googleapis.com/location-grid-mirror-v2/tiles/world/saturation/8.geojson">
+        <link rel="prefetch" href="https://storage.googleapis.com/location-grid-mirror-v2/tiles/world/saturation/9.geojson">
+        <link rel="prefetch" href="https://storage.googleapis.com/location-grid-mirror-v2/tiles/world/saturation/10.geojson">
+        <link rel="prefetch" href="https://storage.googleapis.com/location-grid-mirror-v2/tiles/world/saturation/11.geojson">
+        <link rel="prefetch" href="https://storage.googleapis.com/location-grid-mirror-v2/tiles/world/saturation/12.geojson">
+        <link rel="prefetch" href="https://storage.googleapis.com/location-grid-mirror-v2/tiles/world/saturation/13.geojson">
+        <link rel="prefetch" href="https://storage.googleapis.com/location-grid-mirror-v2/tiles/world/saturation/14.geojson">
+        <link rel="prefetch" href="https://storage.googleapis.com/location-grid-mirror-v2/tiles/world/saturation/15.geojson">
+        <link rel="prefetch" href="https://storage.googleapis.com/location-grid-mirror-v2/tiles/world/saturation/16.geojson">
+        <link rel="prefetch" href="https://storage.googleapis.com/location-grid-mirror-v2/tiles/world/saturation/17.geojson">
+        <link rel="prefetch" href="https://storage.googleapis.com/location-grid-mirror-v2/tiles/world/saturation/18.geojson">
+        <link rel="prefetch" href="https://storage.googleapis.com/location-grid-mirror-v2/tiles/world/saturation/19.geojson">
+        <link rel="prefetch" href="https://storage.googleapis.com/location-grid-mirror-v2/tiles/world/saturation/20.geojson">
+        <link rel="prefetch" href="https://storage.googleapis.com/location-grid-mirror-v2/tiles/world/saturation/21.geojson">
+        <link rel="prefetch" href="https://storage.googleapis.com/location-grid-mirror-v2/tiles/world/saturation/22.geojson">
+        <link rel="prefetch" href="https://storage.googleapis.com/location-grid-mirror-v2/tiles/world/saturation/23.geojson">
+        <link rel="prefetch" href="https://storage.googleapis.com/location-grid-mirror-v2/tiles/world/saturation/24.geojson">
+        <link rel="prefetch" href="https://storage.googleapis.com/location-grid-mirror-v2/tiles/world/saturation/25.geojson">
+        <link rel="prefetch" href="https://storage.googleapis.com/location-grid-mirror-v2/tiles/world/saturation/26.geojson">
+        <link rel="prefetch" href="https://storage.googleapis.com/location-grid-mirror-v2/tiles/world/saturation/27.geojson">
+        <link rel="prefetch" href="https://storage.googleapis.com/location-grid-mirror-v2/tiles/world/saturation/28.geojson">
+        <link rel="prefetch" href="https://storage.googleapis.com/location-grid-mirror-v2/tiles/world/saturation/29.geojson">
+        <link rel="prefetch" href="https://storage.googleapis.com/location-grid-mirror-v2/tiles/world/saturation/30.geojson">
+        <link rel="prefetch" href="https://storage.googleapis.com/location-grid-mirror-v2/tiles/world/saturation/31.geojson">
+        <link rel="prefetch" href="https://storage.googleapis.com/location-grid-mirror-v2/tiles/world/saturation/32.geojson">
+        <link rel="prefetch" href="https://storage.googleapis.com/location-grid-mirror-v2/tiles/world/saturation/33.geojson">
+        <link rel="prefetch" href="https://storage.googleapis.com/location-grid-mirror-v2/tiles/world/saturation/34.geojson">
+        <link rel="prefetch" href="https://storage.googleapis.com/location-grid-mirror-v2/tiles/world/saturation/35.geojson">
+        <link rel="prefetch" href="https://storage.googleapis.com/location-grid-mirror-v2/tiles/world/saturation/36.geojson">
+        <link rel="prefetch" href="https://storage.googleapis.com/location-grid-mirror-v2/tiles/world/saturation/37.geojson">
+        <link rel="prefetch" href="https://storage.googleapis.com/location-grid-mirror-v2/tiles/world/saturation/38.geojson">
+        <link rel="prefetch" href="https://storage.googleapis.com/location-grid-mirror-v2/tiles/world/saturation/39.geojson">
+        <link rel="prefetch" href="https://storage.googleapis.com/location-grid-mirror-v2/tiles/world/saturation/40.geojson">
+        <link rel="prefetch" href="https://storage.googleapis.com/location-grid-mirror-v2/tiles/world/saturation/41.geojson">
+        <link rel="prefetch" href="https://storage.googleapis.com/location-grid-mirror-v2/tiles/world/saturation/42.geojson">
+        <link rel="prefetch" href="https://storage.googleapis.com/location-grid-mirror-v2/tiles/world/saturation/43.geojson">
+        <link rel="prefetch" href="https://storage.googleapis.com/location-grid-mirror-v2/tiles/world/saturation/44.geojson">
+        <link rel="prefetch" href="https://storage.googleapis.com/location-grid-mirror-v2/tiles/world/saturation/45.geojson">
+        <style>
+            #initialize-screen {
+                background-image: url("<?php echo esc_url( plugin_dir_url( __FILE__ ) ) ?>initialize-background.jpg");
+                background-size:cover;
+            }
+        </style>
+        <?php
+        wp_head();
+    }
+
+    public static function wp_enqueue_scripts(){
+        wp_enqueue_script( 'lodash' );
+        wp_enqueue_script( 'jquery-ui' );
+        wp_enqueue_script( 'jquery-touch-punch' );
+
+        wp_enqueue_script( 'heatmap-js', trailingslashit( plugin_dir_url( __FILE__ ) ) . 'heatmap.js', [
+            'jquery',
+        ], filemtime( plugin_dir_path( __FILE__ ) .'heatmap.js' ), true );
+
+        wp_enqueue_style( 'heatmap-css', trailingslashit( plugin_dir_url( __FILE__ ) ) . 'heatmap.css', [], filemtime( plugin_dir_path( __FILE__ ) .'heatmap.css' ) );
+    }
+
+    /**
+     * Grid list build initial map list of elements and drives sidebar
+     * @return array
+     */
+    public static function _initial_polygon_value_list( $grid_totals, $global_div, $us_div ){
+        $flat_grid = self::query_saturation_list();
+
+        $data = [];
+        $highest_value = 1;
+        foreach ( $flat_grid as $i => $v ){
+            $data[$i] = [
+                'grid_id' => $i,
+                'population' => number_format_i18n( $v['population'] ),
+                'needed' => 1,
+                'reported' => 0,
+                'percent' => 0,
+            ];
+
+            $population_division = self::get_population_division( $v['country_code'], $global_div, $us_div );
+
+            $needed = round( $v['population'] / ( $population_division / 2 )  );
+            if ( $needed < 1 ){
+                $needed = 1;
+            }
+
+            if ( isset( $grid_totals[$v['grid_id']] ) && ! empty( $grid_totals[$v['grid_id']] ) ){
+                $reported = $grid_totals[$v['grid_id']];
+                if ( ! empty( $reported ) && ! empty( $needed ) ){
+                    $data[$v['grid_id']]['needed'] = $needed;
+
+//                    if ( $reported > $needed ) {
+//                        $reported = $needed;
+//                    }
+                    $data[$v['grid_id']]['reported'] = $reported;
+
+                    $percent = round( $reported / $needed * 100 );
+                    if ( 100 < $percent ) {
+                        $percent = 100;
+                    } else {
+                        $percent = number_format_i18n( $percent, 2 );
+                    }
+                    $data[$v['grid_id']]['percent'] = $percent;
+                }
+            }
+            else {
+                $data[$v['grid_id']]['percent'] = 0;
+                $data[$v['grid_id']]['reported'] = 0;
+                $data[$v['grid_id']]['needed'] = $needed;
+            }
+
+            if ( $highest_value < $data[$v['grid_id']]['reported'] ){
+                $highest_value = $data[$v['grid_id']]['reported'];
+            }
+        }
+
+        return [
+            'highest_value' => (int) $highest_value,
+            'data' => $data
+        ];
+    }
+
+    public static function get_self( $grid_id, $global_div, $us_div ) {
+        global $wpdb;
+
+        // get grid elements for design
+        $grid = $wpdb->get_row( $wpdb->prepare( "
+            SELECT
+              g.grid_id,
+              g.level,
+              g.alt_name as name,
+              gn.alt_name as parent_name,
+              g.country_code,
+              g.population,
+              IF(ROUND(g.population / IF(g.country_code = 'US', %d, %d)) < 1, 1,
+                 ROUND(g.population / IF(g.country_code = 'US', %d, %d))) as needed,
+              (SELECT COUNT(prs.grid_id) FROM $wpdb->dt_location_grid as prs WHERE prs.parent_id = g.parent_id ) as peers
+            FROM $wpdb->dt_location_grid as g
+            LEFT JOIN $wpdb->dt_location_grid as gn ON g.parent_id=gn.grid_id
+            WHERE g.grid_id = %s
+        ", $us_div, $global_div, $us_div, $global_div, $grid_id ), ARRAY_A );
+
+        // set array
+        $population_division = self::get_population_division( $grid['country_code'], $global_div, $us_div );
+        $data = [
+            'level' => $grid['level'],
+            'parent_level' => $grid['level'] - 1, // one level higher than current
+            'population_division' => number_format_i18n( $population_division ), // label for content not calculation
+            'name' => $grid['name'],
+            'parent_name' => $grid['parent_name'],
+            'peers' => number_format_i18n( $grid['peers'] ),
+            'population' => number_format_i18n( $grid['population'] ),
+            'needed' => number_format_i18n( $grid['needed'] ),
+        ];
+
+        return $data;
+    }
+
+    public static function endpoint_get_level( $grid_id, $administrative_level, $list, $global_div, $us_div ) {
+        // add levels
+        $flat_grid = self::query_flat_grid_by_level( $administrative_level, $us_div, $global_div );
+        $flat_grid_limited = self::_limit_counts( $flat_grid, $list ); // limit counts to no larger than needed per location.
+
+        $grid = self::query_grid_elements( $grid_id ); // get level ids for grid_id
+
+        if ( isset( $flat_grid_limited[$grid[$administrative_level]] ) && ! empty( $flat_grid_limited[$grid[$administrative_level]] ) ) {
+            $level = $flat_grid_limited[$grid[$administrative_level]];
+        }
+        else {
+            return false;
+        }
+
+        $percent = ceil( $level['reported'] / $level['needed'] * 100 );
+        if ( 100 < $percent ) {
+            $percent = 100;
+        } else {
+            $percent = number_format_i18n( $percent, 2 );
+        }
+
+        if ( isset( $flat_grid[$grid[$administrative_level]] ) && ! empty( $flat_grid[$grid[$administrative_level]] ) ) {
+            $raw_level = $flat_grid[$grid[$administrative_level]];
+            $raw_reported = $raw_level['reported'];
+        } else {
+            $raw_reported = $level['reported'];
+        }
+
+        /**
+         * @todo temp cover for populations
+         */
+        if ( isset( $grid[$administrative_level . '_population'] )
+            && ! empty( $grid[$administrative_level . '_population'] )
+            && in_array( $administrative_level, [ 'a0', 'world' ] ) ) {
+            $level['population'] = $grid[$administrative_level . '_population'];
+
+            $population_division = self::get_population_division( $grid['country_code'], $global_div, $us_div );
+            $needed = round( $level['population'] / ( $population_division / 2 ) );
+            if ( $needed < 1 ){
+                $needed = 1;
+            }
+            $level['needed'] = $needed;
+            if ( $administrative_level === 'world' ) {
+                $world_population = 7860000000;
+                $us_population = 331000000;
+                $global_pop_block = $global_div;
+                $us_pop_block = $us_div;
+                $world_population_without_us = $world_population - $us_population;
+                $needed_without_us = $world_population_without_us / $global_pop_block;
+                $needed_in_the_us = $us_population / $us_pop_block;
+                $level['needed'] = $needed_without_us + $needed_in_the_us;
+            }
+        }
+        // @todo end temp cover for populations
+
+        if ( empty( $level['name'] ) ) {
+            return false;
+        }
+
+        $data = [
+            'name' => $level['name'],
+            'grid_id' => (int) $level['grid_id'],
+            'population' => number_format_i18n( $level['population'] ),
+            'needed' => number_format_i18n( $level['needed'] ),
+            'reported' => number_format_i18n( $raw_reported ),
+            'percent' => $percent,
+        ];
+
+        return $data;
+    }
+
+    public static function endpoint_get_activity_level( $grid_id, $administrative_level, $global_div, $us_div ) {
+
+        // add levels
+        $list = self::query_activity_grid_totals( $administrative_level ); // get list of training counts
+        $flat_grid = self::query_flat_grid_by_level( $administrative_level, $us_div, $global_div );
+
+        $flat_grid_limited = self::_limit_counts( $flat_grid, $list ); // limit counts to no larger than needed per location.
+
+        $grid = self::query_grid_elements( $grid_id ); // get level ids for grid_id
+
+        if ( isset( $flat_grid_limited[$grid[$administrative_level]] ) && ! empty( $flat_grid_limited[$grid[$administrative_level]] ) ) {
+            $level = $flat_grid_limited[$grid[$administrative_level]];
+        }
+        else {
+            return false;
+        }
+
+        $percent = ceil( $level['reported'] / $level['needed'] * 100 );
+
+        if ( isset( $flat_grid[$grid[$administrative_level]] ) && ! empty( $flat_grid[$grid[$administrative_level]] ) ) {
+            $raw_level = $flat_grid[$grid[$administrative_level]];
+            $raw_reported = $raw_level['reported'];
+        } else {
+            $raw_reported = $level['reported'];
+        }
+
+
+        /**
+         * @todo temp cover for populations
+         */
+        if ( isset( $grid[$administrative_level . '_population'] )
+            && ! empty( $grid[$administrative_level . '_population'] )
+            && in_array( $administrative_level, [ 'a0', 'world' ] ) ) {
+            $level['population'] = $grid[$administrative_level . '_population'];
+
+            $population_division = self::get_population_division( $grid['country_code'], $global_div, $us_div );
+            $needed = round( $level['population'] / ( $population_division / 2 ) );
+            if ( $needed < 1 ){
+                $needed = 1;
+            }
+            $level['needed'] = $needed;
+            if ( $administrative_level === 'world' ) {
+                $world_population = 7860000000;
+                $us_population = 331000000;
+                $global_pop_block = $global_div;
+                $us_pop_block = $us_div;
+                $world_population_without_us = $world_population - $us_population;
+                $needed_without_us = $world_population_without_us / $global_pop_block;
+                $needed_in_the_us = $us_population / $us_pop_block;
+                $level['needed'] = $needed_without_us + $needed_in_the_us;
+            }
+        }
+        // @todo end temp cover for populations
+
+        if ( empty( $level['name'] ) ) {
+            return false;
+        }
+
+        $data = [
+            'name' => $level['name'],
+            'grid_id' => (int) $level['grid_id'],
+            'population' => number_format_i18n( $level['population'] ),
+            'needed' => number_format_i18n( $level['needed'] ),
+            'reported' => number_format_i18n( $raw_reported ),
+            'percent' => $percent,
+        ];
+
+        return $data;
+    }
+
+    /**
+     * Function limits counts to no higher than the location need. This keeps from inflating the counts up the levels.
+     * @param $flat_grid
+     * @param $list
+     * @return array
+     */
+    public static function _limit_counts( $flat_grid, $list ) {
+        $flat_grid_limited = [];
+        foreach ( $flat_grid as $value ) {
+            $flat_grid_limited[$value['grid_id']] = $value;
+
+            if ( isset( $list[$value['grid_id']] ) && ! empty( $list[$value['grid_id']] ) ) {
+                if ( $list[$value['grid_id']] <= $value['needed'] ) {
+                    $flat_grid_limited[$value['grid_id']]['reported'] = $list[$value['grid_id']];
+                } else {
+                    $flat_grid_limited[$value['grid_id']]['reported'] = $value['needed'];
+                }
+            }
+        }
+        return $flat_grid_limited;
+    }
+
+    public static function get_population_division( $country_code, $global_div, $us_div ){
+        $population_division = $global_div * 2;
+        if ( $country_code === 'US' ){
+            $population_division = $us_div * 2;
+        }
+        return $population_division;
+    }
+
+
+    public static function query_activity_data( $grid_id, $offset ) {
+        global $wpdb;
+        $ids = [];
+        $ids[] = $grid_id;
+        $children = Disciple_Tools_Mapping_Queries::get_children_by_grid_id( $grid_id );
+        if ( ! empty( $children ) ) {
+            foreach ( $children as $child ){
+                $ids[] = $child['grid_id'];
+            }
+        }
+        $prepared_list = dt_array_to_sql( $ids );
+        // phpcs:disable
+        $list = $wpdb->get_results("
+                SELECT
+                       id,
+                       action,
+                       category,
+                       lng,
+                       lat,
+                       label,
+                       grid_id,
+                       payload,
+                       timestamp,
+                       'A Zúme partner' as site_name
+                FROM $wpdb->dt_movement_log
+                WHERE grid_id IN ($prepared_list)
+                ORDER BY timestamp DESC", ARRAY_A);
+        // phpcs:enable
+        if ( empty( $list ) ){
+            return [];
+        }
+
+        foreach ( $list as $index => $item ){
+            $list[$index]['payload'] = maybe_unserialize( $item['payload'] );
+            $list[$index]['formatted_time'] = gmdate( 'M, d Y, g:i a', $item['timestamp'] + $offset );
+        }
+
+        if ( function_exists( 'zume_log_actions' ) ) {
+            $list = zume_log_actions( $list );
+        }
+        if ( function_exists( 'dt_network_dashboard_translate_log_generations' ) ) {
+            $list = dt_network_dashboard_translate_log_generations( $list );
+        }
+        if ( function_exists( 'dt_network_dashboard_translate_log_new_posts' ) ) {
+            $list = dt_network_dashboard_translate_log_new_posts( $list );
+        }
+
+        foreach ( $list as $index => $item ){
+            if ( ! isset( $item['message'] ) ) {
+                $list[$index]['message'] = 'Non-public movement event reported.';
+            }
+        }
+
+        return $list;
     }
 
 }

@@ -3,9 +3,9 @@ if ( !defined( 'ABSPATH' ) ) { exit; } // Exit if accessed directly.
 
 
 /**
- * Class Zume_App_Portal_Group_Builder
+ * Class Zume_App_Portal
  */
-class Zume_App_Portal_Group_Builder extends DT_Magic_Url_Base {
+class Zume_App_Portal extends DT_Magic_Url_Base {
 
     public $magic = false;
     public $parts = false;
@@ -78,14 +78,16 @@ class Zume_App_Portal_Group_Builder extends DT_Magic_Url_Base {
 
         $allowed_js[] = 'jquery-touch-punch';
         $allowed_js[] = 'mapbox-gl';
+        $allowed_js[] = 'lodash';
         $allowed_js[] = 'introjs-js';
         $allowed_js[] = 'jquery-cookie';
+        $allowed_js[] = 'portal-app-js';
 
         if ( 'map' === $this->parts['action'] ) {
             $allowed_js[] = 'heatmap-js';
+            $allowed_js[] = 'mapbox-cookie';
         }
         else if ( '' === $this->parts['action'] || 'groups' === $this->parts['action'] ) {
-            $allowed_js[] = 'portal-app-group-gen-js';
             $allowed_js[] = 'portal-app-domenu-js';
         }
 
@@ -96,12 +98,12 @@ class Zume_App_Portal_Group_Builder extends DT_Magic_Url_Base {
 
         $allowed_css[] = 'mapbox-gl-css';
         $allowed_css[] = 'introjs-css';
+        $allowed_css[] = 'portal-app-css';
 
         if ( 'map' === $this->parts['action'] ) {
             $allowed_css[] = 'heatmap-css';
         }
         else if ( '' === $this->parts['action'] || 'groups' === $this->parts['action'] ) {
-            $allowed_css[] = 'portal-app-group-gen-css';
             $allowed_css[] = 'portal-app-domenu-css';
         }
 
@@ -109,41 +111,46 @@ class Zume_App_Portal_Group_Builder extends DT_Magic_Url_Base {
     }
 
     public function scripts() {
+        wp_enqueue_script( 'lodash' );
         wp_register_script( 'jquery-touch-punch', '/wp-includes/js/jquery/jquery.ui.touch-punch.js' ); // @phpcs:ignore
 
         /* intro js */
-        wp_enqueue_script( 'introjs-js', trailingslashit( plugin_dir_url( __FILE__ ) ) . 'intro.min.js', [ ],
-            filemtime( trailingslashit( plugin_dir_path( __FILE__ ) ) .'intro.min.js' ), true );
+        wp_enqueue_script( 'introjs-js', trailingslashit( plugin_dir_url( __FILE__ ) ) . 'intro.min.js', [],
+        filemtime( trailingslashit( plugin_dir_path( __FILE__ ) ) .'intro.min.js' ), true );
 
         wp_enqueue_style( 'introjs-css', trailingslashit( plugin_dir_url( __FILE__ ) ) . 'introjs.min.css', [],
-            filemtime( trailingslashit( plugin_dir_path( __FILE__ ) ) .'introjs.min.css' ) );
+        filemtime( trailingslashit( plugin_dir_path( __FILE__ ) ) .'introjs.min.css' ) );
 
         /* jquery cookie */
         wp_enqueue_script( 'jquery-cookie', trailingslashit( plugin_dir_url( __FILE__ ) ) . 'js.cookie.min.js', [ 'jquery' ],
-            filemtime( trailingslashit( plugin_dir_path( __FILE__ ) ) .'js.cookie.min.js' ), true );
+        filemtime( trailingslashit( plugin_dir_path( __FILE__ ) ) .'js.cookie.min.js' ), true );
+
+        /* group-gen */
+        wp_enqueue_script( 'portal-app-js', trailingslashit( plugin_dir_url( __FILE__ ) ) . 'portal-app.js', [ 'jquery' ],
+        filemtime( trailingslashit( plugin_dir_path( __FILE__ ) ) .'portal-app.js' ), true );
+
+        wp_enqueue_style( 'portal-app-css', trailingslashit( plugin_dir_url( __FILE__ ) ) . 'portal-app.css', [],
+        filemtime( trailingslashit( plugin_dir_path( __FILE__ ) ) .'portal-app.css' ) );
 
         if ( 'map' === $this->parts['action'] ) {
 
             /* heatmap */
-            wp_enqueue_script( 'heatmap-js', trailingslashit( plugin_dir_url( __FILE__ ) ) . 'heatmap.js', [ ],
-                filemtime( trailingslashit( plugin_dir_path( __FILE__ ) ) .'heatmap.js' ), true );
+            wp_enqueue_script( 'heatmap-js', trailingslashit( plugin_dir_url( __FILE__ ) ) . 'heatmap.js', [],
+            filemtime( trailingslashit( plugin_dir_path( __FILE__ ) ) .'heatmap.js' ), true );
 
             wp_enqueue_style( 'heatmap-css', trailingslashit( plugin_dir_url( __FILE__ ) ) . 'heatmap.css', [],
-                filemtime( trailingslashit( plugin_dir_path( __FILE__ ) ) .'heatmap.css' ) );
+            filemtime( trailingslashit( plugin_dir_path( __FILE__ ) ) .'heatmap.css' ) );
+
+            wp_enqueue_script( 'mapbox-cookie', trailingslashit( get_stylesheet_directory_uri() ) . 'dt-mapping/geocode-api/mapbox-cookie.js', [ 'jquery', 'jquery-cookie' ], '3.0.0' );
         }
         else if ( '' === $this->parts['action'] || 'groups' === $this->parts['action'] ) {
-            /* group-gen */
-            wp_enqueue_script( 'portal-app-group-gen-js', trailingslashit( plugin_dir_url( __FILE__ ) ) . 'portal-app.js', [ 'jquery' ],
-                filemtime( trailingslashit( plugin_dir_path( __FILE__ ) ) .'portal-app.js' ), true );
 
-            wp_enqueue_style( 'portal-app-group-gen-css', trailingslashit( plugin_dir_url( __FILE__ ) ) . 'portal-app.css', [],
-                filemtime( trailingslashit( plugin_dir_path( __FILE__ ) ) .'portal-app.css' ) );
             /* domenu */
             wp_enqueue_script( 'portal-app-domenu-js', trailingslashit( plugin_dir_url( __FILE__ ) ) . 'jquery.domenu-0.100.77.min.js', [ 'jquery' ],
-                filemtime( trailingslashit( plugin_dir_path( __FILE__ ) ) .'jquery.domenu-0.100.77.min.js' ), true );
+            filemtime( trailingslashit( plugin_dir_path( __FILE__ ) ) .'jquery.domenu-0.100.77.min.js' ), true );
 
             wp_enqueue_style( 'portal-app-domenu-css', trailingslashit( plugin_dir_url( __FILE__ ) ) . 'jquery.domenu-0.100.77.css', [],
-                filemtime( trailingslashit( plugin_dir_path( __FILE__ ) ) .'jquery.domenu-0.100.77.css' ) );
+            filemtime( trailingslashit( plugin_dir_path( __FILE__ ) ) .'jquery.domenu-0.100.77.css' ) );
         }
 
     }
@@ -154,29 +161,53 @@ class Zume_App_Portal_Group_Builder extends DT_Magic_Url_Base {
      * @see DT_Magic_Url_Base()->footer_javascript() for default state
      */
     public function footer_javascript(){
-        $post_id = $this->parts["post_id"];
-        $post = DT_Posts::get_post( $this->post_type, $post_id, true, false );
-        if ( is_wp_error( $post ) ){
-            return;
+        if ( 'map' === $this->parts['action'] ) {
+            ?>
+            <script>
+                let jsObject = [<?php echo json_encode([
+                    'map_key' => DT_Mapbox_API::get_key(),
+                    'mirror_url' => dt_get_location_grid_mirror( true ),
+                    'theme_uri' => trailingslashit( get_stylesheet_directory_uri() ),
+                    'root' => esc_url_raw( rest_url() ),
+                    'nonce' => wp_create_nonce( 'wp_rest' ),
+                    'parts' => $this->parts,
+                    'post_type' => 'groups',
+                    'trans' => [
+                        'add' => __( 'Add Magic', 'disciple_tools' ),
+                    ],
+                    'grid_data' => ['data' => [], 'highest_value' => 1 ],
+                    'custom_marks' => $this->get_custom_map_markers( $this->parts['post_id'] )
+                ]) ?>][0]
+            </script>
+            <?php
+
+            $this->customized_welcome_script();
         }
-        ?>
-        <script>
-            let jsObject = [<?php echo json_encode([
-                'map_key' => DT_Mapbox_API::get_key(),
-                'mirror_url' => dt_get_location_grid_mirror( true ),
-                'root' => esc_url_raw( rest_url() ),
-                'nonce' => wp_create_nonce( 'wp_rest' ),
-                'intro_images' => trailingslashit( plugin_dir_url( __FILE__ ) ) . 'images/',
-                'parts' => $this->parts,
-                'post' => $post,
-                'translations' => [
-                    'add' => __( 'Add Magic', 'disciple-tools-contact-portal' ),
-                ],
-                'grid_data' => ['data' => [], 'highest_value' => 1 ],
-            ]) ?>][0]
-        </script>
-        <?php
-        $this->customized_welcome_script();
+        else if ( '' === $this->parts['action'] || 'groups' === $this->parts['action'] ) {
+            $post_id = $this->parts["post_id"];
+            $post = DT_Posts::get_post( $this->post_type, $post_id, true, false );
+            if ( is_wp_error( $post ) ){
+                return;
+            }
+            ?>
+            <script>
+                let jsObject = [<?php echo json_encode([
+                    'map_key' => DT_Mapbox_API::get_key(),
+                    'mirror_url' => dt_get_location_grid_mirror( true ),
+                    'root' => esc_url_raw( rest_url() ),
+                    'nonce' => wp_create_nonce( 'wp_rest' ),
+                    'intro_images' => trailingslashit( plugin_dir_url( __FILE__ ) ) . 'images/',
+                    'parts' => $this->parts,
+                    'post' => $post,
+                    'translations' => [
+                        'add' => __( 'Add Magic', 'disciple-tools-contact-portal' ),
+                    ],
+                    'grid_data' => ['data' => [], 'highest_value' => 1 ],
+                ]) ?>][0]
+            </script>
+            <?php
+        }
+
     }
 
     /**
@@ -186,7 +217,7 @@ class Zume_App_Portal_Group_Builder extends DT_Magic_Url_Base {
         ?>
         <script>
             jQuery(document).ready(function($){
-                let asset_url = '<?php echo esc_url( trailingslashit( plugin_dir_url( __DIR__ ) ) . 'images/' ) ?>'
+                let asset_url = '<?php echo esc_url( trailingslashit( plugin_dir_url( __FILE__ ) ) . 'images/' ) ?>'
                 $('.training-content').append(`
                 <div class="grid-x grid-padding-x" >
                     <div class="cell center">
@@ -262,17 +293,17 @@ class Zume_App_Portal_Group_Builder extends DT_Magic_Url_Base {
 
     public function groups_body(){
         DT_Mapbox_API::geocoder_scripts();
-        require_once('portal.html');
+        require_once( 'portal.html' );
     }
 
     public function map_body(){
         DT_Mapbox_API::geocoder_scripts();
-        require_once('portal-map.html');
+        require_once( 'portal-map.html' );
     }
 
     public function help_body(){
         DT_Mapbox_API::geocoder_scripts();
-        require_once('portal-help-html.php');
+        require_once( 'portal-help-html.php' );
     }
 
     /**
@@ -286,25 +317,70 @@ class Zume_App_Portal_Group_Builder extends DT_Magic_Url_Base {
                 [
                     'methods'  => "GET",
                     'callback' => [ $this, 'endpoint_get' ],
-                    'permission_callback' => function( WP_REST_Request $request ){
-                        $magic = new DT_Magic_URL( $this->root );
-                        return $magic->verify_rest_endpoint_permissions_on_post( $request );
-                    },
+            //                    'permission_callback' => function( WP_REST_Request $request ){
+            //                        $magic = new DT_Magic_URL( $this->root );
+            //                        return $magic->verify_rest_endpoint_permissions_on_post( $request );
+            //                    },
+                    'permission_callback' => '__return_true',
                 ],
             ]
         );
         register_rest_route(
-            $namespace, '/'.$this->type, [
+            $namespace, '/'.$this->type . '_update', [
                 [
                     'methods'  => "POST",
                     'callback' => [ $this, 'update_record' ],
-                    'permission_callback' => function( WP_REST_Request $request ){
-                        $magic = new DT_Magic_URL( $this->root );
-                        return $magic->verify_rest_endpoint_permissions_on_post( $request );
-                    },
+            //                    'permission_callback' => function( WP_REST_Request $request ){
+            //                        $magic = new DT_Magic_URL( $this->root );
+            //                        return $magic->verify_rest_endpoint_permissions_on_post( $request );
+            //                    },
+                    'permission_callback' => '__return_true',
                 ],
             ]
         );
+        register_rest_route(
+            $namespace,
+            '/'.$this->type,
+            [
+                [
+                    'methods'  => WP_REST_Server::CREATABLE,
+                    'callback' => [ $this, 'map_endpoint' ],
+                    'permission_callback' => '__return_true',
+                ],
+            ]
+        );
+    }
+
+    public function map_endpoint( WP_REST_Request $request ) {
+        $params = $request->get_params();
+
+        if ( ! isset( $params['parts'], $params['action'] ) ) {
+            return new WP_Error( __METHOD__, "Missing parameters", [ 'status' => 400 ] );
+        }
+
+        $params = dt_recursive_sanitize_array( $params );
+        $action = sanitize_text_field( wp_unslash( $params['action'] ) );
+
+        switch ( $action ) {
+            case 'self':
+                return Zume_App_Heatmap::get_self( $params['grid_id'], $this->global_div, $this->us_div );
+            case 'a3':
+            case 'a2':
+            case 'a1':
+            case 'a0':
+            case 'world':
+                $list = Zume_App_Heatmap::query_church_grid_totals( $action );
+                return Zume_App_Heatmap::endpoint_get_level( $params['grid_id'], $action, $list, $this->global_div, $this->us_div );
+            case 'activity_data':
+                $grid_id = sanitize_text_field( wp_unslash( $params['grid_id'] ) );
+                $offset = sanitize_text_field( wp_unslash( $params['offset'] ) );
+                return Zume_App_Heatmap::query_activity_data( $grid_id, $offset );
+            case 'grid_data':
+                $grid_totals = Zume_App_Heatmap::query_church_grid_totals();
+                return Zume_App_Heatmap::_initial_polygon_value_list( $grid_totals, $this->global_div, $this->us_div );
+            default:
+                return new WP_Error( __METHOD__, "Missing valid action", [ 'status' => 400 ] );
+        }
     }
 
     public function endpoint_get( WP_REST_Request $request ) {
@@ -318,26 +394,26 @@ class Zume_App_Portal_Group_Builder extends DT_Magic_Url_Base {
         $pre_tree = [];
         $post_id = $params["parts"]["post_id"];
         $list = DT_Posts::list_posts('groups', [
-            'fields_to_return' => [  ],
+            'fields_to_return' => [],
             'coaches' => [ $post_id ]
         ], false );
 
         if ( ! empty( $list['posts'] ) ) {
-            foreach( $list['posts'] as $p ) {
+            foreach ( $list['posts'] as $p ) {
                 if ( isset( $p['child_groups'] ) && ! empty( $p['child_groups'] ) ) {
-                    foreach( $p['child_groups'] as $children ) {
+                    foreach ( $p['child_groups'] as $children ) {
                         $pre_tree[$children['ID']] = $p['ID'];
                     }
                 }
-                if (  empty( $p['parent_groups'] ) ) {
+                if ( empty( $p['parent_groups'] ) ) {
                     $pre_tree[$p['ID']] = null;
                 }
                 $title_list[$p['ID']] = $p['name'];
             }
-            $tree = $this->parse_tree($pre_tree, $title_list);
+            $tree = $this->parse_tree( $pre_tree, $title_list );
         }
 
-        if ( is_null( $tree) ) {
+        if ( is_null( $tree ) ) {
             $tree = [];
         }
 
@@ -348,6 +424,25 @@ class Zume_App_Portal_Group_Builder extends DT_Magic_Url_Base {
         ];
     }
 
+    public function get_custom_map_markers( $post_id ) {
+        global $wpdb;
+        $list = $wpdb->get_results($wpdb->prepare( "
+            SELECT lgm.lng, lgm.lat, p.post_title
+            FROM $wpdb->p2p as p2p
+            LEFT JOIN $wpdb->dt_location_grid_meta as lgm ON lgm.post_id = p2p.p2p_from
+            LEFT JOIN $wpdb->posts as p ON p.ID = p2p.p2p_from
+            WHERE p2p.p2p_to = %s
+        ", $post_id), ARRAY_A );
+
+        if ( ! empty( $list ) ) {
+            foreach( $list as $index => $item ) {
+                $list[$index]['lng'] = (float) $item['lng'];
+                $list[$index]['lat'] = (float) $item['lat'];
+            }
+        }
+        return $list;
+    }
+
     /**
      * @see https://stackoverflow.com/questions/2915748/convert-a-series-of-parent-child-relationships-into-a-hierarchical-tree
      *
@@ -355,25 +450,25 @@ class Zume_App_Portal_Group_Builder extends DT_Magic_Url_Base {
      * @param null $root
      * @return array|null
      */
-    public function parse_tree($tree, $title_list, $root = null) {
+    public function parse_tree( $tree, $title_list, $root = null) {
         $return = array();
         # Traverse the tree and search for direct children of the root
-        foreach($tree as $child => $parent) {
+        foreach ($tree as $child => $parent) {
             # A direct child is found
-            if($parent == $root) {
+            if ($parent == $root) {
                 # Remove item from tree (we don't need to traverse this again)
-                unset($tree[$child]);
+                unset( $tree[$child] );
                 # Append the child into result array and parse its children
                 $return[] = array(
                     'id' => $child,
                     'title' => $child,
                     'name' => $title_list[$child] ?? 'No Name',
-                    'children' => $this->parse_tree($tree, $title_list, $child),
+                    'children' => $this->parse_tree( $tree, $title_list, $child ),
                     '__domenu_params' => []
                 );
             }
         }
-        return empty($return) ? null : $return;
+        return empty( $return ) ? null : $return;
     }
 
 
@@ -396,18 +491,16 @@ class Zume_App_Portal_Group_Builder extends DT_Magic_Url_Base {
             $current_user->display_name = $post['name'];
         }
 
-        switch( $params['action'] ) {
+        switch ( $params['action'] ) {
             case 'create_group':
-                dt_write_log('create_group');
+                dt_write_log( 'create_group' );
 
                 $inc = $params['data']['inc'];
                 $temp_id = $params['data']['temp_id'];
                 $parent_id = $params['data']['parent_id'];
 
-
-
                 $fields = [
-                    "title" => $post['name'] . ' Group ' . $inc,
+                    "title" => $post['name'] . ' Church ' . $inc,
                     "group_status" => "active",
                     "group_type" => "church",
                     "coaches" => [
@@ -425,26 +518,74 @@ class Zume_App_Portal_Group_Builder extends DT_Magic_Url_Base {
                     ];
                 }
 
-
-                $new_post = DT_Posts::create_post('groups', $fields, true, false );
+                $new_post = DT_Posts::create_post( 'groups', $fields, true, false );
                 if ( ! is_wp_error( $new_post ) ) {
+                    // clear cash on church grid totals
+                    Zume_App_Heatmap::clear_church_grid_totals();
+
                     return [
                         'id' => $new_post['ID'],
                         'title' => $new_post['name'],
                         'prev_parent' => $parent_id,
                         'temp_id' => $temp_id,
                         'post' => $new_post,
-                        'post_fields' => DT_Posts::get_post_field_settings('groups', true, false )
+                        'post_fields' => DT_Posts::get_post_field_settings( 'groups', true, false )
                     ];
                 }
                 else {
-                    dt_write_log($new_post);
+                    dt_write_log( $new_post );
+                    return false;
+                }
+
+            case 'create_group_by_map':
+                dt_write_log( 'create_group_by_map' );
+
+                $inc = $params['data']['inc'];
+                $grid_id = $params['data']['grid_id'];
+                $title = $params['data']['title'];
+
+                $fields = [
+                    "title" => $title . ' Church ' .$inc,
+                    "group_status" => "active",
+                    "group_type" => "church",
+                    "coaches" => [
+                        "values" => [
+                            [ "value" => $post_id ]
+                        ]
+                    ],
+                    "location_grid_meta" => [
+                        "values" => [
+                            [
+                                "grid_id" => $grid_id
+                            ]
+                        ]
+                    ]
+                ];
+
+
+                $new_post = DT_Posts::create_post( 'groups', $fields, true, false );
+                if ( ! is_wp_error( $new_post ) ) {
+                    // clear cash on church grid totals
+                    Zume_App_Heatmap::clear_church_grid_totals();
+
+                    return [
+                        'id' => $new_post['ID'],
+                        'title' => $new_post['name'],
+                        'post' => $new_post,
+                        'post_fields' => DT_Posts::get_post_field_settings( 'groups', true, false )
+                    ];
+                }
+                else {
+                    dt_write_log( $new_post );
                     return false;
                 }
 
             case 'onItemRemoved':
-                dt_write_log('onItemRemoved');
+                dt_write_log( 'onItemRemoved' );
                 $deleted_post = Disciple_Tools_Posts::delete_post( 'groups', $params['data']['id'], false );
+
+                Zume_App_Heatmap::clear_church_grid_totals();
+
                 if ( ! is_wp_error( $deleted_post ) ) {
                     return true;
                 }
@@ -452,9 +593,9 @@ class Zume_App_Portal_Group_Builder extends DT_Magic_Url_Base {
                     return false;
                 }
             case 'onItemDrop':
-                dt_write_log('onItemDrop');
-                if( ! isset( $params['data']['new_parent'], $params['data']['self'], $params['data']['previous_parent'] ) ) {
-                    dt_write_log('Defaults not found');
+                dt_write_log( 'onItemDrop' );
+                if ( ! isset( $params['data']['new_parent'], $params['data']['self'], $params['data']['previous_parent'] ) ) {
+                    dt_write_log( 'Defaults not found' );
                     return false;
                 }
 
@@ -477,68 +618,84 @@ class Zume_App_Portal_Group_Builder extends DT_Magic_Url_Base {
             case 'get_group':
                 $id = $params['data']['id'];
 
-                $group = DT_Posts::get_post('groups', $id, true, false );
+                $group = DT_Posts::get_post( 'groups', $id, true, false );
                 if ( empty( $group ) || is_wp_error( $group ) ) {
-                    return new WP_Error(__METHOD__, 'no group found with that id' );
+                    return new WP_Error( __METHOD__, 'no group found with that id' );
                 }
 
                 // custom permission check. Contact must be coaching group to retrieve group
                 if ( ! isset( $group['coaches'] ) || empty( $group['coaches'] ) ) {
-                    return new WP_Error(__METHOD__, 'no coaching found for group' );
+                    return new WP_Error( __METHOD__, 'no coaching found for group' );
                 }
                 $found = false;
-                foreach( $group['coaches'] as $coach ) {
-                    if( (int) $coach['ID'] === (int) $post_id ) {
+                foreach ( $group['coaches'] as $coach ) {
+                    if ( (int) $coach['ID'] === (int) $post_id ) {
                         $found = true;
                     }
                 }
 
                 if ( $found ) {
-                    $group_fields = DT_Posts::get_post_field_settings('groups', true, false );
+                    $group_fields = DT_Posts::get_post_field_settings( 'groups', true, false );
                     return [
                         'post_fields' => $group_fields,
                         'post' => $group,
                     ];
                 } else {
-                    return new WP_Error(__METHOD__, 'no coaching connection found' );
+                    return new WP_Error( __METHOD__, 'no coaching connection found' );
                 }
 
             case 'update_group_title':
                 $post_id = $params['data']['post_id'];
                 $new_value = $params['data']['new_value'];
 
-                return DT_Posts::update_post('groups', $post_id, [ 'title' => trim( $new_value ) ], false, false );
+                return DT_Posts::update_post( 'groups', $post_id, [ 'title' => trim( $new_value ) ], false, false );
 
             case 'update_group_member_count':
                 $post_id = $params['data']['post_id'];
                 $new_value = $params['data']['new_value'];
 
-                return DT_Posts::update_post('groups', $post_id, [ 'member_count' => trim( $new_value ) ], false, false );
+                return DT_Posts::update_post( 'groups', $post_id, [ 'member_count' => trim( $new_value ) ], false, false );
 
-            case 'update_group_type':
+            case 'update_group_start_date':
                 $post_id = $params['data']['post_id'];
                 $new_value = $params['data']['new_value'];
 
-                return DT_Posts::update_post('groups', $post_id, [ 'group_type' => trim( $new_value ) ], false, false );
+                return DT_Posts::update_post( 'groups', $post_id, [ 'church_start_date' => trim( $new_value ) ], false, false );
+
+            case 'update_group_status':
+                $post_id = $params['data']['post_id'];
+                $new_value = $params['data']['new_value'];
+
+                return DT_Posts::update_post( 'groups', $post_id, [ 'group_status' => trim( $new_value ) ], false, false );
 
             case 'update_group_location':
+
                 $post_id = $params['data']['post_id'];
                 $location_data = $params['data']['location_data'];
+                $delete = $params['data']['delete'];
 
-                return DT_Posts::update_post('groups', $post_id, $location_data, false, false );
+                if ( $delete ) {
+                    delete_post_meta( $post_id, 'location_grid' );
+                    delete_post_meta( $post_id, 'location_grid_meta' );
+                    Location_Grid_Meta::delete_location_grid_meta( $post_id, 'all', 0 );
+                }
+
+                $result = DT_Posts::update_post( 'groups', $post_id, $location_data, false, false );
+
+                Zume_App_Heatmap::clear_church_grid_totals();
+
+                return $result;
 
             case 'delete_group_location':
                 $post_id = $params['data']['post_id'];
                 delete_post_meta( $post_id, 'location_grid' );
                 delete_post_meta( $post_id, 'location_grid_meta' );
+
+                Zume_App_Heatmap::clear_church_grid_totals();
+
                 return Location_Grid_Meta::delete_location_grid_meta( $post_id, 'all', 0 );
 
-            case 'intro_seen':
-                $fields = [
-                    "intro_seen" => true,
-                ];
 
-                DT_Posts::update_post('contacts', $post_id, $fields, true, false);
 
         }
         return false;
@@ -547,11 +704,11 @@ class Zume_App_Portal_Group_Builder extends DT_Magic_Url_Base {
     /* map section */
 
     public function get_grid_totals(){
-        return Zume_Public_Heatmap_Queries::query_church_grid_totals();
+        return Zume_App_Heatmap::query_church_grid_totals();
     }
 
     public function get_grid_totals_by_level( $administrative_level ) {
-        return Zume_Public_Heatmap_Queries::query_church_grid_totals( $administrative_level );
+        return Zume_App_Heatmap::query_church_grid_totals( $administrative_level );
     }
 
     /**
@@ -571,4 +728,4 @@ class Zume_App_Portal_Group_Builder extends DT_Magic_Url_Base {
         return __( "Zúme Churches Map", 'disciple_tools' );
     }
 }
-Zume_App_Portal_Group_Builder::instance();
+Zume_App_Portal::instance();
