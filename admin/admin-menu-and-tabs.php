@@ -44,7 +44,7 @@ class Zume_Public_Heatmaps_Menu {
      * @since 0.1
      */
     public function register_menu() {
-        add_submenu_page( 'dt_extensions', 'Zume HeatMap', 'Zume Heatmap', 'manage_dt', $this->token, [ $this, 'content' ] );
+        add_submenu_page( 'dt_extensions', 'Zume Map/Report', 'Zume Map/Report', 'manage_dt', $this->token, [ $this, 'content' ] );
     }
 
     /**
@@ -72,7 +72,7 @@ class Zume_Public_Heatmaps_Menu {
 
         ?>
         <div class="wrap">
-            <h2>Zume Public Heatmap</h2>
+            <h2>Zume Map/Report</h2>
             <h2 class="nav-tab-wrapper">
                 <a href="<?php echo esc_attr( $link ) . 'general' ?>"
                    class="nav-tab <?php echo esc_html( ( $tab == 'general' || !isset( $tab ) ) ? 'nav-tab-active' : '' ); ?>">General</a>
@@ -109,6 +109,7 @@ class Zume_Public_Heatmaps_Tab_General {
                     <div id="post-body-content">
                         <!-- Main Column -->
 
+                        <?php DT_Ipstack_API::metabox_for_admin(); ?>
                         <?php $this->main_column() ?>
 
                         <!-- End Main Column -->
@@ -129,7 +130,54 @@ class Zume_Public_Heatmaps_Tab_General {
     }
 
     public function main_column() {
-        DT_Ipstack_API::metabox_for_admin();
+        if ( isset( $_POST['heatmap_settings'] ) && wp_verify_nonce( sanitize_text_field( wp_unslash( $_POST['heatmap_settings'] ) ), 'heatmap_settings_nonce' ) ) {
+            $globe_div = sanitize_text_field( wp_unslash( str_replace( ',', '', trim( $_POST['globe_div'] ?? '' ) ) ) );
+            update_option( 'heatmap_global_div', $globe_div, true );
+
+            $us_div = sanitize_text_field( wp_unslash( str_replace( ',', '', trim( $_POST['us_div'] ?? '' ) ) ) );
+            update_option( 'heatmap_us_div', $us_div, true );
+        }
+        $globe_div = get_option( 'heatmap_global_div', 25000 );
+        $us_div = get_option( 'heatmap_us_div', 2500 );
+        ?>
+        <form method="post">
+            <?php wp_nonce_field( 'heatmap_settings_nonce', 'heatmap_settings' )?>
+        <!-- Box -->
+        <table class="widefat striped">
+            <thead>
+            <tr>
+                <th>Heatmap Goals</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr>
+                <td>
+                    Global Division <br>
+                    <input type="text" name="globe_div" value="<?php echo $globe_div ?>" />
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    US Division <br>
+                    <input type="text" name="us_div" value="<?php echo $us_div ?>" />
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    The division about calculates the number of units per population division. Example: To get 2 churches for every 50k people. You must count one unit for every 25k, which results in 2 for every 50k.
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    <button type="submit">Update</button>
+                </td>
+            </tr>
+            </tbody>
+        </table>
+        <br>
+        <!-- End Box -->
+        </form>
+        <?php
     }
 
     public function right_column() {

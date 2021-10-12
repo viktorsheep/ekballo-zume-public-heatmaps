@@ -56,6 +56,7 @@ window.new_report = ( action, form_data ) => {
 
 /* Document Ready && Precache */
 jQuery(document).ready(function($){
+
   clearInterval(window.fiveMinuteTimer)
 
   let slider_width = window.innerWidth * .70
@@ -75,7 +76,7 @@ jQuery(document).ready(function($){
         #map {
             height: ${window.innerHeight}px !important;
         }
-        .off-canvas {
+        .off-canvas.position-right {
             width:${slider_width}px;
             background-color:white;
         }
@@ -226,6 +227,13 @@ function load_map() {
   map.touchZoomRotate.disableRotation();
 
 
+  if ( get_map_start( 'heatmap_zoom_memory' ) ) {
+    map.fitBounds(get_map_start( 'heatmap_zoom_memory' ))
+  }
+  map.on('zoomend', function(){
+    set_map_start( 'heatmap_zoom_memory', map.getBounds() )
+  })
+
   window.previous_hover = false
 
   let asset_list = []
@@ -314,6 +322,17 @@ function load_map() {
           /* end fill map */
           /**********/
 
+          if ( jsObject.custom_marks.length > 0 ) {
+            let lnglat
+            jQuery.each( jsObject.custom_marks, function(i,v) {
+              // lnglat = new mapboxgl.LngLat( v.lng, v.lat )
+              // console.log(lnglat)
+              new mapboxgl.Marker()
+                .setLngLat([v.lng, v.lat])
+                .addTo(map);
+            })
+          }
+
           map.on('mousemove', i.toString()+'fills', function (e) {
             if ( window.previous_hover ) {
               map.setFeatureState(
@@ -335,7 +354,7 @@ function load_map() {
               $('#population').html(jsObject.grid_data.data[e.features[0].properties.grid_id].population)
 
               //report
-              $('#report-modal-title').html(e.features[0].properties.full_name)
+              $('#report-modal-title').val(e.features[0].properties.full_name)
               $('#report-grid-id').val(e.features[0].properties.grid_id)
 
               let reported = jsObject.grid_data.data[e.features[0].properties.grid_id].reported
@@ -394,6 +413,9 @@ function load_map() {
 
             $('#offCanvasNestedPush').foundation('toggle', e);
           });
+
+
+
 
         })
 
@@ -570,7 +592,7 @@ function load_self_content( data ) {
     jQuery('#custom-paragraph').html(`
       <span class="self_name ucwords temp-spinner bold">${data.name}</span> is one of <span class="self_peers  bold">${data.peers}</span>
       administrative divisions in <span class="parent_name ucwords bold">${data.parent_name}</span> and it has a population of
-      <span class="self_population  bold">${data.population}</span>.
+      <span class="self_population bold">${data.population}</span>.
     `)
   }
 }
@@ -584,7 +606,7 @@ function load_level_content( data, level ) {
           <strong>${data.name}</strong><br>
           Population: <span>${data.population}</span><br>
           Churches Needed: <span>${data.needed}</span><br>
-          Churches Reported: <span>${data.reported}</span><br>
+          Churches Reported: <span class="reported_number">${data.reported}</span><br>
           Goal Reached: <span>${data.percent}</span>%
           <meter class="meter" value="${data.percent}" min="0" low="33" high="66" optimum="100" max="100"></meter>
       </div>
@@ -601,7 +623,7 @@ function load_level_content( data, level ) {
           <strong>${data.name}</strong><br>
           Population: <span>${data.population}</span><br>
           Trainings Needed: <span>${data.needed}</span><br>
-          Trainings Reported: <span>${data.reported}</span><br>
+          Trainings Reported: <span class="reported_number">${data.reported}</span><br>
           Goal Reached: <span>${data.percent}</span>%
           <meter class="meter" value="${data.percent}" min="0" low="33" high="66" optimum="100" max="100"></meter>
       </div>

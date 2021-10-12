@@ -49,3 +49,6 @@ body {
 .input-group-button {
     padding:8px 0 0 5px !important;
 }
+#map-edit, #map-wrapper-edit  {
+    height: 300px !important;
+}

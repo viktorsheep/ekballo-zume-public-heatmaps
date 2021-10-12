@@ -8,6 +8,6 @@
 </div>
 
 <!-- nav -->
-<?php require_once ( 'portal-nav.php' ) ?>
+<?php require_once( 'portal-nav.php' ) ?>
 
 
