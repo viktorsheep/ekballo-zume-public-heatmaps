@@ -443,16 +443,12 @@ window.load_modal_content = ( post, post_fields ) => {
   );
 
   // if on map page, do not show map selection section
-  if ( 'map' !== jsObject.parts.action ) {
-    let lng,lat
-    if( post.location_grid_meta ) {
-      lng = post.location_grid_meta[0].lng
-      lat = post.location_grid_meta[0].lat
-    }
-    load_mapbox(lng, lat, post.ID )
-  } else {
-    jQuery('#mapbox-select').hide()
+  let lng,lat
+  if( post.location_grid_meta ) {
+    lng = post.location_grid_meta[0].lng
+    lat = post.location_grid_meta[0].lat
   }
+  load_mapbox(lng, lat, post.ID )
 
   jQuery('.loading-spinner').removeClass('active')
 }

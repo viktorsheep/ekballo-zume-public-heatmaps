@@ -38,21 +38,6 @@ window.get_activity_data = (grid_id) => {
     })
 }
 
-window.new_report = ( action, form_data ) => {
-  return jQuery.ajax({
-    type: "POST",
-    data: JSON.stringify({ action: action, parts: jsObject.parts, data: form_data }),
-    contentType: "application/json; charset=utf-8",
-    dataType: "json",
-    url: jsObject.root + jsObject.parts.root + '/v1/' + jsObject.parts.type,
-    beforeSend: function (xhr) {
-      xhr.setRequestHeader('X-WP-Nonce', jsObject.nonce )
-    }
-  })
-    .fail(function(e) {
-      jQuery('#error').html(e)
-    })
-}
 
 /* Document Ready && Precache */
 jQuery(document).ready(function($){
@@ -414,145 +399,11 @@ function load_map() {
             $('#offCanvasNestedPush').foundation('toggle', e);
           });
 
-
-
-
         })
 
       }) /* ajax call */
   }) /* for each loop */
 
-
-  $('#add-report').on('click', function(e){
-    $('#church-list').empty()
-    append_report_row()
-
-    jQuery('#report-modal').foundation('open')
-  })
-  $('#add-another').on('click', function(e){
-    append_report_row()
-  })
-  let submit_button = $('#submit-report')
-  function check_inputs(){
-    submit_button.prop('disabled', false)
-    $.each($('.required'), function(){
-      if ( $(this).val() === '' ) {
-        $(this).addClass('redborder')
-        submit_button.prop('disabled', true)
-      }
-      else {
-        $(this).removeClass('redborder')
-      }
-    })
-
-  }
-  function append_report_row(){
-    let id = Date.now()
-    $('#church-list').append(`
-          <div class="grid-x row-${id} list-row" data-id="${id}">
-              <div class="cell small-5">
-                  <input type="text" name="${id}[name]" class="${id} name-${id} required" placeholder="Name of Simple Church" data-name="name" data-group-id="${id}" />
-              </div>
-              <div class="cell small-2">
-                  <input type="number" name="${id}[members]" class="${id} members-${id} required" placeholder="#" data-name="members" data-group-id="${id}" />
-              </div>
-              <div class="cell small-4">
-                  <input type="date" name="${id}[start]" class="${id} start-${id} required" placeholder="Started" data-name="start" data-group-id="${id}" />
-              </div>
-              <div class="cell small-1">
-                  <button class="button expanded alert" style="border-radius: 0;" onclick="remove_row(${id})">X</button>
-              </div>
-          </div>
-        `)
-
-    $('.required').focusout(function(){
-      check_inputs()
-    })
-    check_inputs()
-  }
-  submit_button.on('click', function(){
-    let spinner = jQuery('.loading-spinner')
-    spinner.addClass('active')
-
-    let submit_button = jQuery('#submit-report')
-    submit_button.prop('disabled', true)
-
-    let honey = jQuery('#email').val()
-    if ( honey ) {
-      submit_button.html('Shame, shame, shame. We know your name ... ROBOT!').prop('disabled', true )
-      spinner.removeClass('active')
-      return;
-    }
-
-    let name_input = jQuery('#name')
-    let name = name_input.val()
-    if ( ! name ) {
-      jQuery('#name-error').show()
-      submit_button.removeClass('loading')
-      name_input.focus(function(){
-        jQuery('#name-error').hide()
-      })
-      submit_button.prop('disabled', false)
-      spinner.removeClass('active')
-      return;
-    }
-
-    let email_input = jQuery('#e2')
-    let email = email_input.val()
-    if ( ! email ) {
-      jQuery('#email-error').show()
-      submit_button.removeClass('loading')
-      email_input.focus(function(){
-        jQuery('#email-error').hide()
-      })
-      submit_button.prop('disabled', false)
-      spinner.removeClass('active')
-      return;
-    }
-
-    let phone_input = jQuery('#phone')
-    let phone = phone_input.val()
-    if ( ! phone ) {
-      jQuery('#phone-error').show()
-      submit_button.removeClass('loading')
-      email_input.focus(function(){
-        jQuery('#phone-error').hide()
-      })
-      submit_button.prop('disabled', false)
-      spinner.removeClass('active')
-      return;
-    }
-
-    let grid_id = jQuery('#report-grid-id').val()
-    let return_reporter = jQuery('#return-reporter').is(':checked');
-
-    // if cookie contact_id
-    // if window contact_id
-    let contact_id = ''
-    if ( typeof window.contact_id !== 'undefined' && typeof window.contact_email !== 'undefined' ) {
-      if ( email === window.contact_email ) {
-        contact_id = window.contact_id
-      }
-    }
-
-    let form_data = {
-      name: name,
-      email: email,
-      phone: phone,
-      grid_id: grid_id,
-      contact_id: contact_id,
-      return_reporter: return_reporter
-    }
-
-    window.new_report( 'new_report', form_data )
-      .done(function(response){
-        jQuery('.loading-spinner').removeClass('active')
-
-        window.contact_id = response.contact.ID
-        window.contact_email = email
-
-      })
-  })
 } /* .preCache */
 
 

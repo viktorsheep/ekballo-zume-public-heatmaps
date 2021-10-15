@@ -2243,6 +2243,10 @@ class Zume_App_Heatmap {
             'jquery-cookie'
         ], filemtime( plugin_dir_path( __FILE__ ) .'heatmap.js' ), true );
 
+        wp_enqueue_script( 'heatmap-join-js', trailingslashit( plugin_dir_url( __FILE__ ) ) . 'heatmap-join.js', [
+            'heatmap-js',
+        ], filemtime( plugin_dir_path( __FILE__ ) .'heatmap-join.js' ), true );
+
         wp_enqueue_style( 'heatmap-css', trailingslashit( plugin_dir_url( __FILE__ ) ) . 'heatmap.css', [], filemtime( plugin_dir_path( __FILE__ ) .'heatmap.css' ) );
 
         wp_enqueue_script( 'jquery-cookie', trailingslashit( plugin_dir_url( __FILE__ ) ) . 'js.cookie.min.js', [ 'jquery' ],

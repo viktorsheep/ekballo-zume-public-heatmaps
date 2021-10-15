@@ -80,13 +80,11 @@
     <div class="grid-x" id="canvas_panel">
         <div class="cell">
             <div class="grid-x">
-                <div class="cell medium-8">
+                <div class="cell">
                     <h1 id="modal_tile"></h1>
                     <h3>Population: <span id="modal_population">0</span></h3>
+                    <button class="button hollow" onclick="jQuery('#report-modal').foundation('open');">Report New Simple Church</button>
                 </div>
-<!--                <div class="cell medium-4">-->
-<!--                    <div class="center"><button class="button hollow" onclick="jQuery('#report-modal').foundation('open');">Add New Report</button></div>-->
-<!--                </div>-->
             </div>
 
             <hr>
@@ -179,34 +177,81 @@
         <h3 id="report-modal-title"></h3>
     </div>
     <div id="report-modal-content">
-        <div class="grid-x">
-            <div class="cell">
-                <label for="name">Name</label>
-                <input type="text" id="name" class="required" placeholder="Name" />
-                <span id="name-error" class="form-error">You're name is required.</span>
-            </div>
-            <div class="cell">
-                <label for="email">Email</label>
-                <input type="email" id="email" name="email" placeholder="Email" />
-                <input type="email" id="e2" name="email" class="required" placeholder="Email" />
-                <span id="email-error" class="form-error">You're email is required.</span>
-            </div>
-            <div class="cell">
-                <label for="phone">Phone</label>
-                <input type="tel" id="phone" name="phone" class="required" placeholder="Phone" />
-                <span id="phone-error" class="form-error">You're phone is required.</span>
-            </div>
+        <input type="hidden" id="first report-grid-id" />
 
-            <div class="cell center">
-                <p><input type="checkbox" class="required" id="return-reporter" /> I have submitted a report before.</p>
-            </div>
-            <div class="cell center">
-                <input type="hidden" id="report-grid-id" />
-                <button class="button" id="submit-report">Add Report</button> <span class="loading-spinner"></span>
+        <div id="panel1" class="not-new not-send">
+            <button type="button" class="button" id="show-new">I'm reporting for the first time</button><br>
+            <button type="button" class="button" id="show-send">Already have reported churches</button><br>
+        </div>
+
+        <div id="new-panel" class="new not-first not-send" style="display:none;">
+            <div class="grid-x">
+                <div class="cell">
+                    <label for="name">Name</label>
+                    <input type="text" id="name" class="required" placeholder="Name" />
+                    <span id="name-error" class="form-error">You're name is required.</span>
+                </div>
+                <div class="cell">
+                    <label for="email">Email</label>
+                    <input type="email" id="email" name="email" placeholder="Email" />
+                    <input type="email" id="e2" name="email" class="required" placeholder="Email" />
+                    <span id="email-error" class="form-error">You're email is required.</span>
+                </div>
+                <div class="cell">
+                    <label for="phone">Phone</label>
+                    <input type="tel" id="phone" name="phone" class="required" placeholder="Phone" />
+                    <span id="phone-error" class="form-error">You're phone is required.</span>
+                </div>
+
+                <div class="cell center">
+                    <p><input type="checkbox" class="required" id="can-be-connected" />I'm willing to be contacted by the community about my data.</p>
+                </div>
+                <div class="cell center">
+                    <button class="button" id="submit-new">Register</button> <span class="loading-spinner"></span>
+                </div>
             </div>
         </div>
+
+        <div id="send-panel" class="send not-new not-first" style="display:none;">
+            <div class="grid-x">
+                <div class="cell">
+                    <label for="email">Email</label>
+                    <input type="email" id="email-send" name="email" placeholder="Email" />
+                    <input type="email" id="e2-send" name="email" class="required" placeholder="Email" />
+                    <span id="email-error-send" class="form-error">You're email is required.</span>
+                </div>
+
+                <div class="cell center">
+                    <button class="button" id="submit-send-link">Email me access link</button> <span class="loading-spinner"></span>
+                </div>
+            </div>
+        </div>
+
     </div>
     <button class="close-button" data-close aria-label="Close modal" type="button">
         <span aria-hidden="true">&times;</span>
     </button>
 </div>
+<script>
+    jQuery(document).ready(function(){
+        let send = jQuery('.send')
+        let not_send = jQuery('.not-send')
+        let new_input = jQuery('.new')
+        let not_new = jQuery('.not-new')
+        let first = jQuery('.first')
+        let not_first = jQuery('.not-first')
+
+        jQuery('#show-new').on('click', function() {
+            new_input.show()
+            not_new.hide()
+        })
+        jQuery('#show-send').on('click', function() {
+            send.show()
+            not_send.hide()
+        })
+        jQuery('#show-first').on('click', function() {
+            first.show()
+            not_first.hide()
+        })
+    })
+</script>

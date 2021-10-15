@@ -5,6 +5,9 @@ body {
 #email {
     display:none;
 }
+#email-send {
+    display:none;
+}
 .redborder {
     border: 1px solid red;
 }
