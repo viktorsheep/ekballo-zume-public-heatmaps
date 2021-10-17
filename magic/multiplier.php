@@ -290,18 +290,8 @@ class Zume_App_Multiplier extends DT_Magic_Url_Base {
                 $link = DT_Magic_URL::get_link_url( $this->root, $this->type, $key )
                 ?>
                 <p>
-                <a class="button" href="<?php echo esc_html( $link ); ?>" target="_blank">Open Practitioner Link</a>
+                <a class="button" href="<?php echo esc_html( $link ); ?>" target="_blank">Multiplier Reporting</a>
                 </p>
-                <script>
-                    jQuery(document).ready(function(){
-                        jQuery('#open-portal-activity').on('click', function(e){
-                            jQuery('#modal-full-title').empty().html(`Portal Activity`)
-                            jQuery('#modal-full-content').empty().html(`content`) // @todo add content logic
-
-                            jQuery('#modal-full').foundation('open')
-                        })
-                    })
-                </script>
                 <?php
             }
         }

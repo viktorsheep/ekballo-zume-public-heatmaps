@@ -254,7 +254,7 @@ class Zume_App_Portal extends DT_Magic_Url_Base {
     public function dt_details_additional_tiles( $tiles, $post_type = "" ) {
         if ( $post_type === $this->post_type ){
             $tiles["dt_contact_portal"] = [
-                "label" => __( "Portal", 'disciple-tools-contact-portal' ),
+                "label" => __( "Personal Portals", 'disciple-tools-contact-portal' ),
                 "description" => "The Portal sets up a page accessible without authentication, only the link is needed. Useful for small applications liked to this record, like quick surveys or updates."
             ];
         }
@@ -274,8 +274,8 @@ class Zume_App_Portal extends DT_Magic_Url_Base {
                 }
                 $link = DT_Magic_URL::get_link_url( $this->root, $this->type, $key )
                 ?>
-                <a class="button" href="<?php echo esc_html( $link ); ?>" target="_blank">Open Link</a>
-                <a class="button" id="open-portal-activity" style="cursor:pointer;">Open Activity</a>
+                <a class="button" href="<?php echo esc_html( $link ); ?>" target="_blank">Church Reporting</a>
+<!--                <a class="button" id="open-portal-activity" style="cursor:pointer;">Open Activity</a>-->
                 <script>
                     jQuery(document).ready(function(){
                         jQuery('#open-portal-activity').on('click', function(e){
