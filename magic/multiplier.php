@@ -77,7 +77,7 @@ class Zume_App_Multiplier extends DT_Magic_Url_Base {
 
     public function dt_custom_fields_settings( $fields, $post_type ){
         if ( $post_type === $this->post_type ){
-            $fields['description'] = [
+            $fields['multiplier_description'] = [
                 'name'        => __( 'Description', 'disciple-tools' ),
                 'description' => '',
                 'type'        => 'text',
@@ -689,7 +689,7 @@ class Zume_App_Multiplier extends DT_Magic_Url_Base {
                 $post_id = $params['data']['post_id'];
                 $new_value = $params['data']['new_value'];
 
-                return DT_Posts::update_post( 'contacts', $post_id, [ 'description' => trim( $new_value ) ], false, false );
+                return DT_Posts::update_post( 'contacts', $post_id, [ 'multiplier_description' => trim( $new_value ) ], false, false );
 
 
             case 'update_group_location':
