@@ -380,7 +380,7 @@ window.load_modal_content = ( post, post_fields ) => {
         .done(function(result) {
           console.log(result)
           if ( typeof result.errors === 'undefined') {
-            jQuery('#group_description').attr('value', result.description)
+            jQuery('#group_description').attr('value', result.multiplier_description)
           }
           else {
             console.log(result)
