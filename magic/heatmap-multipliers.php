@@ -2,19 +2,19 @@
 if ( !defined( 'ABSPATH' ) ) { exit; } // Exit if accessed directly.
 
 if ( strpos( dt_get_url_path(), 'zume_app' ) !== false || dt_is_rest() ){
-    Zume_Public_Heatmap_Churches::instance();
+    Zume_Public_Heatmap_Multipliers::instance();
 }
 
-class Zume_Public_Heatmap_Churches extends DT_Magic_Url_Base
+class Zume_Public_Heatmap_Multipliers extends DT_Magic_Url_Base
 {
-    public $page_title = 'Zúme Churches Map';
+    public $page_title = 'Zúme Multipliers Map';
     public $root = "zume_app";
-    public $type = 'heatmap_churches';
+    public $type = 'heatmap_multipliers';
     public $type_name = '';
-    public $post_type = 'groups';
+    public $post_type = 'contacts';
     private $meta_key = '';
-    public $us_div = 2500; // this is 2 for every 5000
-    public $global_div = 25000; // this equals 2 for every 50000
+    public $us_div = 10000; // this is 2 for every 5000
+    public $global_div = 10000; // this equals 2 for every 50000
 
     private static $_instance = null;
     public static function instance() {
@@ -76,7 +76,7 @@ class Zume_Public_Heatmap_Churches extends DT_Magic_Url_Base
 
     public function body(){
         DT_Mapbox_API::geocoder_scripts();
-        include( 'heatmap.html' );
+        include( 'heatmap-multipliers.html' );
     }
 
     public function footer_javascript(){
@@ -176,18 +176,20 @@ class Zume_Public_Heatmap_Churches extends DT_Magic_Url_Base
             case 'a1':
             case 'a0':
             case 'world':
-                $list = Zume_App_Heatmap::query_church_grid_totals( $action );
+                $list = Zume_App_Heatmap::query_multiplier_grid_totals( $action );
                 return Zume_App_Heatmap::endpoint_get_level( $params['grid_id'], $action, $list, $this->global_div, $this->us_div );
             case 'activity_data':
                 $grid_id = sanitize_text_field( wp_unslash( $params['grid_id'] ) );
                 $offset = sanitize_text_field( wp_unslash( $params['offset'] ) );
                 return Zume_App_Heatmap::query_activity_data( $grid_id, $offset );
             case 'grid_data':
-                $grid_totals = Zume_App_Heatmap::query_church_grid_totals();
+                $grid_totals = Zume_App_Heatmap::query_multiplier_grid_totals();
                 return Zume_App_Heatmap::_initial_polygon_value_list( $grid_totals, $this->global_div, $this->us_div );
+            case 'get_list':
+                return Zume_App_Heatmap::query_multiplier_list_data( $params['grid_id'] );
             case 'new_registration':
-                // @todo add registration process
-                return $params;
+
+                return Zume_App_Heatmap::create_new_reporter( 'zume_app', 'multiplier', $params['data'] );
             default:
                 return new WP_Error( __METHOD__, "Missing valid action", [ 'status' => 400 ] );
         }

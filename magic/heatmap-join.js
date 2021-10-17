@@ -105,7 +105,8 @@ jQuery(document).ready(function($){
         jQuery('.loading-spinner').removeClass('active')
 
         jQuery('#new-panel').empty().html(`
-        Excellent! Go to you email inbox and find your personal link.<br>
+        Excellent! You've been sent an email with your personal reporting link.<br><br>
+        <a class="button" href="${response}">Open Personal Reporting Portal</a>
         `)
 
       })
@@ -150,6 +151,8 @@ jQuery(document).ready(function($){
 
         jQuery('#send-panel').empty().html(`
         Excellent! Go to you email inbox and find your personal link.<br>
+        Use this link!<br>
+        <a href="${response}">${response}</a>
         `)
 
       })

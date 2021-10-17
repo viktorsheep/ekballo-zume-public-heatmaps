@@ -3,24 +3,24 @@ if ( !defined( 'ABSPATH' ) ) { exit; } // Exit if accessed directly.
 
 
 /**
- * Class Zume_App_Portal
+ * Class Zume_App_Multiplier
  */
-class Zume_App_Portal extends DT_Magic_Url_Base {
+class Zume_App_Multiplier extends DT_Magic_Url_Base {
 
     public $magic = false;
     public $parts = false;
     public $page_title = 'Zume Portal';
     public $root = "zume_app";
-    public $type = 'portal';
+    public $type = 'multiplier';
     public $post_type = 'contacts';
     private $meta_key = '';
     public $type_actions = [
-        '' => "Groups",
+        '' => "Practitioner",
         'map' => "Map",
         'help' => "Help",
     ];
-    public $us_div = 2500; // this is 2 for every 5000
-    public $global_div = 25000; // this equals 2 for every 50000
+    public $us_div = 10000; // this is 2 for every 5000
+    public $global_div = 10000; // this equals 2 for every 50000
 
     private static $_instance = null;
     public static function instance() {
@@ -39,6 +39,7 @@ class Zume_App_Portal extends DT_Magic_Url_Base {
          */
         add_action( 'dt_details_additional_section', [ $this, 'dt_details_additional_section' ], 30, 2 );
         add_filter( 'dt_details_additional_tiles', [ $this, 'dt_details_additional_tiles' ], 10, 2 );
+        add_filter( 'dt_custom_fields_settings', [ $this, 'dt_custom_fields_settings' ], 10, 2 );
         add_action( 'rest_api_init', [ $this, 'add_endpoints' ] );
 
         /**
@@ -74,6 +75,20 @@ class Zume_App_Portal extends DT_Magic_Url_Base {
         add_action( 'wp_enqueue_scripts', [ $this, 'scripts' ], 99 );
     }
 
+    public function dt_custom_fields_settings( $fields, $post_type ){
+        if ( $post_type === $this->post_type ){
+            $fields['description'] = [
+                'name'        => __( 'Description', 'disciple-tools' ),
+                'description' => '',
+                'type'        => 'text',
+                'default'     => '',
+                'tile' => 'details',
+                'icon' => get_template_directory_uri() . '/dt-assets/images/assigned-to.svg',
+            ];
+        }
+        return $fields;
+    }
+
     public function dt_magic_url_base_allowed_js( $allowed_js ) {
 
         $allowed_js[] = 'jquery-touch-punch';
@@ -82,6 +97,7 @@ class Zume_App_Portal extends DT_Magic_Url_Base {
         $allowed_js[] = 'introjs-js';
         $allowed_js[] = 'jquery-cookie';
         $allowed_js[] = 'portal-app-js';
+        $allowed_js[] = 'multiplier-js';
 
         if ( 'map' === $this->parts['action'] ) {
             $allowed_js[] = 'heatmap-js';
@@ -116,30 +132,30 @@ class Zume_App_Portal extends DT_Magic_Url_Base {
 
         /* intro js */
         wp_enqueue_script( 'introjs-js', trailingslashit( plugin_dir_url( __FILE__ ) ) . 'intro.min.js', [],
-        filemtime( trailingslashit( plugin_dir_path( __FILE__ ) ) .'intro.min.js' ), true );
+            filemtime( trailingslashit( plugin_dir_path( __FILE__ ) ) .'intro.min.js' ), true );
 
         wp_enqueue_style( 'introjs-css', trailingslashit( plugin_dir_url( __FILE__ ) ) . 'introjs.min.css', [],
-        filemtime( trailingslashit( plugin_dir_path( __FILE__ ) ) .'introjs.min.css' ) );
+            filemtime( trailingslashit( plugin_dir_path( __FILE__ ) ) .'introjs.min.css' ) );
 
         /* jquery cookie */
         wp_enqueue_script( 'jquery-cookie', trailingslashit( plugin_dir_url( __FILE__ ) ) . 'js.cookie.min.js', [ 'jquery' ],
-        filemtime( trailingslashit( plugin_dir_path( __FILE__ ) ) .'js.cookie.min.js' ), true );
+            filemtime( trailingslashit( plugin_dir_path( __FILE__ ) ) .'js.cookie.min.js' ), true );
 
         /* group-gen */
-        wp_enqueue_script( 'portal-app-js', trailingslashit( plugin_dir_url( __FILE__ ) ) . 'portal-app.js', [ 'jquery' ],
-        filemtime( trailingslashit( plugin_dir_path( __FILE__ ) ) .'portal-app.js' ), true );
+        wp_enqueue_script( 'multiplier-js', trailingslashit( plugin_dir_url( __FILE__ ) ) . 'multiplier.js', [ 'jquery' ],
+            filemtime( trailingslashit( plugin_dir_path( __FILE__ ) ) .'multiplier.js' ), true );
 
         wp_enqueue_style( 'portal-app-css', trailingslashit( plugin_dir_url( __FILE__ ) ) . 'portal-app.css', [],
-        filemtime( trailingslashit( plugin_dir_path( __FILE__ ) ) .'portal-app.css' ) );
+            filemtime( trailingslashit( plugin_dir_path( __FILE__ ) ) .'portal-app.css' ) );
 
         if ( 'map' === $this->parts['action'] ) {
 
             /* heatmap */
             wp_enqueue_script( 'heatmap-js', trailingslashit( plugin_dir_url( __FILE__ ) ) . 'heatmap.js', [],
-            filemtime( trailingslashit( plugin_dir_path( __FILE__ ) ) .'heatmap.js' ), true );
+                filemtime( trailingslashit( plugin_dir_path( __FILE__ ) ) .'heatmap.js' ), true );
 
             wp_enqueue_style( 'heatmap-css', trailingslashit( plugin_dir_url( __FILE__ ) ) . 'heatmap.css', [],
-            filemtime( trailingslashit( plugin_dir_path( __FILE__ ) ) .'heatmap.css' ) );
+                filemtime( trailingslashit( plugin_dir_path( __FILE__ ) ) .'heatmap.css' ) );
 
             wp_enqueue_script( 'mapbox-cookie', trailingslashit( get_stylesheet_directory_uri() ) . 'dt-mapping/geocode-api/mapbox-cookie.js', [ 'jquery', 'jquery-cookie' ], '3.0.0' );
         }
@@ -147,10 +163,10 @@ class Zume_App_Portal extends DT_Magic_Url_Base {
 
             /* domenu */
             wp_enqueue_script( 'portal-app-domenu-js', trailingslashit( plugin_dir_url( __FILE__ ) ) . 'jquery.domenu-0.100.77.min.js', [ 'jquery' ],
-            filemtime( trailingslashit( plugin_dir_path( __FILE__ ) ) .'jquery.domenu-0.100.77.min.js' ), true );
+                filemtime( trailingslashit( plugin_dir_path( __FILE__ ) ) .'jquery.domenu-0.100.77.min.js' ), true );
 
             wp_enqueue_style( 'portal-app-domenu-css', trailingslashit( plugin_dir_url( __FILE__ ) ) . 'jquery.domenu-0.100.77.css', [],
-            filemtime( trailingslashit( plugin_dir_path( __FILE__ ) ) .'jquery.domenu-0.100.77.css' ) );
+                filemtime( trailingslashit( plugin_dir_path( __FILE__ ) ) .'jquery.domenu-0.100.77.css' ) );
         }
 
     }
@@ -171,7 +187,7 @@ class Zume_App_Portal extends DT_Magic_Url_Base {
                     'root' => esc_url_raw( rest_url() ),
                     'nonce' => wp_create_nonce( 'wp_rest' ),
                     'parts' => $this->parts,
-                    'post_type' => 'groups',
+                    'post_type' => 'contacts',
                     'trans' => [
                         'add' => __( 'Add Magic', 'disciple_tools' ),
                     ],
@@ -207,7 +223,6 @@ class Zume_App_Portal extends DT_Magic_Url_Base {
             </script>
             <?php
         }
-
     }
 
     /**
@@ -254,7 +269,7 @@ class Zume_App_Portal extends DT_Magic_Url_Base {
     public function dt_details_additional_tiles( $tiles, $post_type = "" ) {
         if ( $post_type === $this->post_type ){
             $tiles["dt_contact_portal"] = [
-                "label" => __( "Personal Portals", 'disciple-tools-contact-portal' ),
+                "label" => __( "Portal", 'disciple-tools-contact-portal' ),
                 "description" => "The Portal sets up a page accessible without authentication, only the link is needed. Useful for small applications liked to this record, like quick surveys or updates."
             ];
         }
@@ -274,18 +289,9 @@ class Zume_App_Portal extends DT_Magic_Url_Base {
                 }
                 $link = DT_Magic_URL::get_link_url( $this->root, $this->type, $key )
                 ?>
-                <a class="button" href="<?php echo esc_html( $link ); ?>" target="_blank">Church Reporting</a>
-<!--                <a class="button" id="open-portal-activity" style="cursor:pointer;">Open Activity</a>-->
-                <script>
-                    jQuery(document).ready(function(){
-                        jQuery('#open-portal-activity').on('click', function(e){
-                            jQuery('#modal-full-title').empty().html(`Portal Activity`)
-                            jQuery('#modal-full-content').empty().html(`content`) // @todo add content logic
-
-                            jQuery('#modal-full').foundation('open')
-                        })
-                    })
-                </script>
+                <p>
+                <a class="button" href="<?php echo esc_html( $link ); ?>" target="_blank">Multiplier Reporting</a>
+                </p>
                 <?php
             }
         }
@@ -293,26 +299,38 @@ class Zume_App_Portal extends DT_Magic_Url_Base {
 
     public function groups_body(){
         DT_Mapbox_API::geocoder_scripts();
-       ?>
+        ?>
         <!-- title -->
         <div class="grid-x">
             <div class="cell padding-1" >
                 <button type="button" style="margin:1em;" id="menu-icon" data-open="offCanvasLeft"><i class="fi-list" style="font-size:2em;"></i></button>
-                <span style="font-size:1.5rem;font-weight: bold;">Report Churches by Generation</span>
+                <span style="font-size:1.5rem;font-weight: bold;">Report Multipliers via List</span>
                 <span class="loading-spinner active" style="float:right;margin:10px;"></span><!-- javascript container -->
             </div>
         </div>
 
         <!-- nav -->
         <?php
-        require_once ( 'portal-nav.php' );
-        require_once ( 'portal.html' );
-
+        require_once ( 'multiplier-nav.php' );
+        require_once( 'multiplier.html' );
     }
 
     public function map_body(){
         DT_Mapbox_API::geocoder_scripts();
-        require_once( 'portal-map.html' );
+        ?>
+        <!-- title -->
+        <div class="grid-x">
+            <div class="cell padding-1" >
+                <button type="button" style="margin:1em;" id="menu-icon" data-open="offCanvasLeft"><i class="fi-list" style="font-size:2em;"></i></button>
+                <span style="font-size:1.5rem;font-weight: bold;">Report Multipliers via Map</span>
+                <span class="loading-spinner active" style="float:right;margin:10px;"></span><!-- javascript container -->
+            </div>
+        </div>
+
+        <!-- nav -->
+        <?php
+        require_once ( 'multiplier-nav.php' );
+        require_once( 'multiplier-map.html' );
     }
 
     public function help_body(){
@@ -330,11 +348,7 @@ class Zume_App_Portal extends DT_Magic_Url_Base {
             $namespace, '/'.$this->type, [
                 [
                     'methods'  => "GET",
-                    'callback' => [ $this, 'endpoint_get' ],
-            //                    'permission_callback' => function( WP_REST_Request $request ){
-            //                        $magic = new DT_Magic_URL( $this->root );
-            //                        return $magic->verify_rest_endpoint_permissions_on_post( $request );
-            //                    },
+                    'callback' => [ $this, 'endpoint_get_grid_tree' ],
                     'permission_callback' => '__return_true',
                 ],
             ]
@@ -343,11 +357,7 @@ class Zume_App_Portal extends DT_Magic_Url_Base {
             $namespace, '/'.$this->type . '_update', [
                 [
                     'methods'  => "POST",
-                    'callback' => [ $this, 'update_record' ],
-            //                    'permission_callback' => function( WP_REST_Request $request ){
-            //                        $magic = new DT_Magic_URL( $this->root );
-            //                        return $magic->verify_rest_endpoint_permissions_on_post( $request );
-            //                    },
+                    'callback' => [ $this, 'endpoint_update' ],
                     'permission_callback' => '__return_true',
                 ],
             ]
@@ -357,15 +367,15 @@ class Zume_App_Portal extends DT_Magic_Url_Base {
             '/'.$this->type,
             [
                 [
-                    'methods'  => WP_REST_Server::CREATABLE,
-                    'callback' => [ $this, 'map_endpoint' ],
+                    'methods'  => "POST",
+                    'callback' => [ $this, 'endpoint_map' ],
                     'permission_callback' => '__return_true',
                 ],
             ]
         );
     }
 
-    public function map_endpoint( WP_REST_Request $request ) {
+    public function endpoint_map( WP_REST_Request $request ) {
         $params = $request->get_params();
 
         if ( ! isset( $params['parts'], $params['action'] ) ) {
@@ -383,21 +393,23 @@ class Zume_App_Portal extends DT_Magic_Url_Base {
             case 'a1':
             case 'a0':
             case 'world':
-                $list = Zume_App_Heatmap::query_church_grid_totals( $action );
+                $list = Zume_App_Heatmap::query_multiplier_grid_totals( $action );
                 return Zume_App_Heatmap::endpoint_get_level( $params['grid_id'], $action, $list, $this->global_div, $this->us_div );
             case 'activity_data':
                 $grid_id = sanitize_text_field( wp_unslash( $params['grid_id'] ) );
                 $offset = sanitize_text_field( wp_unslash( $params['offset'] ) );
                 return Zume_App_Heatmap::query_activity_data( $grid_id, $offset );
             case 'grid_data':
-                $grid_totals = Zume_App_Heatmap::query_church_grid_totals();
+                $grid_totals = Zume_App_Heatmap::query_multiplier_grid_totals();
                 return Zume_App_Heatmap::_initial_polygon_value_list( $grid_totals, $this->global_div, $this->us_div );
+            case 'get_list':
+                return Zume_App_Heatmap::query_multiplier_list_data( $params['grid_id'] );
             default:
                 return new WP_Error( __METHOD__, "Missing valid action", [ 'status' => 400 ] );
         }
     }
 
-    public function endpoint_get( WP_REST_Request $request ) {
+    public function endpoint_get_grid_tree( WP_REST_Request $request ) {
         $params = $request->get_params();
         if ( ! isset( $params['parts'], $params['action'] ) ) {
             return new WP_Error( __METHOD__, "Missing parameters", [ 'status' => 400 ] );
@@ -407,19 +419,19 @@ class Zume_App_Portal extends DT_Magic_Url_Base {
         $title_list = [];
         $pre_tree = [];
         $post_id = $params["parts"]["post_id"];
-        $list = DT_Posts::list_posts('groups', [
+        $list = DT_Posts::list_posts('contacts', [
             'fields_to_return' => [],
-            'coaches' => [ $post_id ]
+            'subassigned' => [ $post_id ]
         ], false );
 
         if ( ! empty( $list['posts'] ) ) {
             foreach ( $list['posts'] as $p ) {
-                if ( isset( $p['child_groups'] ) && ! empty( $p['child_groups'] ) ) {
-                    foreach ( $p['child_groups'] as $children ) {
+                if ( isset( $p['coaching'] ) && ! empty( $p['coaching'] ) ) {
+                    foreach ( $p['coaching'] as $children ) {
                         $pre_tree[$children['ID']] = $p['ID'];
                     }
                 }
-                if ( empty( $p['parent_groups'] ) ) {
+                if ( empty( $p['coached_by'] ) ) {
                     $pre_tree[$p['ID']] = null;
                 }
                 $title_list[$p['ID']] = $p['name'];
@@ -441,17 +453,16 @@ class Zume_App_Portal extends DT_Magic_Url_Base {
     public function get_custom_map_markers( $post_id ) {
         global $wpdb;
         $list = $wpdb->get_results($wpdb->prepare( "
-            SELECT lgm.lng, lgm.lat, p.post_title
-            FROM $wpdb->p2p as p2p
-            LEFT JOIN $wpdb->dt_location_grid_meta as lgm ON lgm.post_id = p2p.p2p_from
-            LEFT JOIN $wpdb->posts as p ON p.ID = p2p.p2p_from
-            WHERE p2p.p2p_to = %s
-        ", $post_id), ARRAY_A );
-
+            SELECT lgm.lng, lgm.lat
+            FROM $wpdb->p2p p2p
+            LEFT JOIN $wpdb->dt_location_grid_meta lgm ON lgm.post_id = p2p.p2p_to
+            WHERE p2p.p2p_from = %s AND p2p.p2p_type = 'contacts_to_subassigned'
+            AND lng IS NOT NULL
+            ", $post_id), ARRAY_A );
         if ( ! empty( $list ) ) {
-            foreach( $list as $index => $item ) {
-                $list[$index]['lng'] = (float) $item['lng'];
-                $list[$index]['lat'] = (float) $item['lat'];
+            foreach ( $list as $i => $p ) {
+                $list[$i]['lng'] = (float) $p['lng'];
+                $list[$i]['lat'] = (float) $p['lat'];
             }
         }
         return $list;
@@ -486,7 +497,7 @@ class Zume_App_Portal extends DT_Magic_Url_Base {
     }
 
 
-    public function update_record( WP_REST_Request $request ) {
+    public function endpoint_update( WP_REST_Request $request ) {
         $params = $request->get_params();
         if ( ! isset( $params['parts'], $params['action'] ) ) {
             return new WP_Error( __METHOD__, "Missing parameters", [ 'status' => 400 ] );
@@ -514,10 +525,15 @@ class Zume_App_Portal extends DT_Magic_Url_Base {
                 $parent_id = $params['data']['parent_id'];
 
                 $fields = [
-                    "title" => $post['name'] . ' Church ' . $inc,
-                    "group_status" => "active",
-                    "group_type" => "church",
-                    "coaches" => [
+                    "title" => 'Practitioner ' . $inc,
+                    "overall_status" => "active",
+                    "type" => "access",
+                    "tags" => [
+                        "values" => [
+                            [ "value" => "multiplier" ],
+                        ]
+                    ],
+                    "subassigned" => [
                         "values" => [
                             [ "value" => $post_id ]
                         ]
@@ -525,17 +541,17 @@ class Zume_App_Portal extends DT_Magic_Url_Base {
                 ];
 
                 if ( 'domenu-0' !== $parent_id && is_numeric( $parent_id ) ) {
-                    $fields["parent_groups"] = [
+                    $fields["coached_by"] = [
                         "values" => [
                             [ "value" => $parent_id ]
                         ]
                     ];
                 }
 
-                $new_post = DT_Posts::create_post( 'groups', $fields, true, false );
+                $new_post = DT_Posts::create_post( 'contacts', $fields, true, false );
                 if ( ! is_wp_error( $new_post ) ) {
                     // clear cash on church grid totals
-                    Zume_App_Heatmap::clear_church_grid_totals();
+                    Zume_App_Heatmap::clear_multiplier_grid_totals();
 
                     return [
                         'id' => $new_post['ID'],
@@ -543,7 +559,7 @@ class Zume_App_Portal extends DT_Magic_Url_Base {
                         'prev_parent' => $parent_id,
                         'temp_id' => $temp_id,
                         'post' => $new_post,
-                        'post_fields' => DT_Posts::get_post_field_settings( 'groups', true, false )
+                        'post_fields' => DT_Posts::get_post_field_settings( 'contacts', true, false )
                     ];
                 }
                 else {
@@ -559,10 +575,15 @@ class Zume_App_Portal extends DT_Magic_Url_Base {
                 $title = $params['data']['title'];
 
                 $fields = [
-                    "title" => $title . ' Church ' .$inc,
-                    "group_status" => "active",
-                    "group_type" => "church",
-                    "coaches" => [
+                    "title" => $title . ' Practitioner ' .$inc,
+                    "overall_status" => "active",
+                    "type" => 'access',
+                    "tags" => [
+                        "values" => [
+                            [ "value" => "multiplier" ],
+                        ]
+                    ],
+                    "subassigned" => [
                         "values" => [
                             [ "value" => $post_id ]
                         ]
@@ -577,16 +598,16 @@ class Zume_App_Portal extends DT_Magic_Url_Base {
                 ];
 
 
-                $new_post = DT_Posts::create_post( 'groups', $fields, true, false );
+                $new_post = DT_Posts::create_post( 'contacts', $fields, true, false );
                 if ( ! is_wp_error( $new_post ) ) {
                     // clear cash on church grid totals
-                    Zume_App_Heatmap::clear_church_grid_totals();
+                    Zume_App_Heatmap::clear_multiplier_grid_totals();
 
                     return [
                         'id' => $new_post['ID'],
                         'title' => $new_post['name'],
                         'post' => $new_post,
-                        'post_fields' => DT_Posts::get_post_field_settings( 'groups', true, false )
+                        'post_fields' => DT_Posts::get_post_field_settings( 'contacts', true, false )
                     ];
                 }
                 else {
@@ -596,9 +617,9 @@ class Zume_App_Portal extends DT_Magic_Url_Base {
 
             case 'onItemRemoved':
                 dt_write_log( 'onItemRemoved' );
-                $deleted_post = Disciple_Tools_Posts::delete_post( 'groups', $params['data']['id'], false );
+                $deleted_post = Disciple_Tools_Posts::delete_post( 'contacts', $params['data']['id'], false );
 
-                Zume_App_Heatmap::clear_church_grid_totals();
+                Zume_App_Heatmap::clear_multiplier_grid_totals(); // @todo
 
                 if ( ! is_wp_error( $deleted_post ) ) {
                     return true;
@@ -620,36 +641,36 @@ class Zume_App_Portal extends DT_Magic_Url_Base {
                                 FROM $wpdb->p2p
                                 WHERE p2p_from = %s
                                   AND p2p_to = %s
-                                  AND p2p_type = 'groups_to_groups'", $params['data']['self'], $params['data']['previous_parent'] ) );
+                                  AND p2p_type = 'contacts_to_contacts'", $params['data']['self'], $params['data']['previous_parent'] ) );
                 }
                 // add parent child
                 $wpdb->query( $wpdb->prepare(
                     "INSERT INTO $wpdb->p2p (p2p_from, p2p_to, p2p_type)
-                            VALUES (%s, %s, 'groups_to_groups');
+                            VALUES (%s, %s, 'contacts_to_contacts');
                     ", $params['data']['self'], $params['data']['new_parent'] ) );
                 return true;
 
             case 'get_group':
                 $id = $params['data']['id'];
 
-                $group = DT_Posts::get_post( 'groups', $id, true, false );
+                $group = DT_Posts::get_post( 'contacts', $id, true, false );
                 if ( empty( $group ) || is_wp_error( $group ) ) {
-                    return new WP_Error( __METHOD__, 'no group found with that id' );
+                    return new WP_Error( __METHOD__, 'no contact found with that id' );
                 }
 
                 // custom permission check. Contact must be coaching group to retrieve group
-                if ( ! isset( $group['coaches'] ) || empty( $group['coaches'] ) ) {
-                    return new WP_Error( __METHOD__, 'no coaching found for group' );
+                if ( ! isset( $group['subassigned'] ) || empty( $group['subassigned'] ) ) {
+                    return new WP_Error( __METHOD__, 'no coaching found for contact' );
                 }
                 $found = false;
-                foreach ( $group['coaches'] as $coach ) {
+                foreach ( $group['subassigned'] as $coach ) {
                     if ( (int) $coach['ID'] === (int) $post_id ) {
                         $found = true;
                     }
                 }
 
                 if ( $found ) {
-                    $group_fields = DT_Posts::get_post_field_settings( 'groups', true, false );
+                    $group_fields = DT_Posts::get_post_field_settings( 'contacts', true, false );
                     return [
                         'post_fields' => $group_fields,
                         'post' => $group,
@@ -662,25 +683,14 @@ class Zume_App_Portal extends DT_Magic_Url_Base {
                 $post_id = $params['data']['post_id'];
                 $new_value = $params['data']['new_value'];
 
-                return DT_Posts::update_post( 'groups', $post_id, [ 'title' => trim( $new_value ) ], false, false );
+                return DT_Posts::update_post( 'contacts', $post_id, [ 'title' => trim( $new_value ) ], false, false );
 
-            case 'update_group_member_count':
+            case 'update_description':
                 $post_id = $params['data']['post_id'];
                 $new_value = $params['data']['new_value'];
 
-                return DT_Posts::update_post( 'groups', $post_id, [ 'member_count' => trim( $new_value ) ], false, false );
+                return DT_Posts::update_post( 'contacts', $post_id, [ 'description' => trim( $new_value ) ], false, false );
 
-            case 'update_group_start_date':
-                $post_id = $params['data']['post_id'];
-                $new_value = $params['data']['new_value'];
-
-                return DT_Posts::update_post( 'groups', $post_id, [ 'church_start_date' => trim( $new_value ) ], false, false );
-
-            case 'update_group_status':
-                $post_id = $params['data']['post_id'];
-                $new_value = $params['data']['new_value'];
-
-                return DT_Posts::update_post( 'groups', $post_id, [ 'group_status' => trim( $new_value ) ], false, false );
 
             case 'update_group_location':
 
@@ -694,9 +704,9 @@ class Zume_App_Portal extends DT_Magic_Url_Base {
                     Location_Grid_Meta::delete_location_grid_meta( $post_id, 'all', 0 );
                 }
 
-                $result = DT_Posts::update_post( 'groups', $post_id, $location_data, false, false );
+                $result = DT_Posts::update_post( 'contacts', $post_id, $location_data, false, false );
 
-                Zume_App_Heatmap::clear_church_grid_totals();
+                Zume_App_Heatmap::clear_multiplier_grid_totals();
 
                 return $result;
 
@@ -705,41 +715,12 @@ class Zume_App_Portal extends DT_Magic_Url_Base {
                 delete_post_meta( $post_id, 'location_grid' );
                 delete_post_meta( $post_id, 'location_grid_meta' );
 
-                Zume_App_Heatmap::clear_church_grid_totals();
+                Zume_App_Heatmap::clear_multiplier_grid_totals();
 
                 return Location_Grid_Meta::delete_location_grid_meta( $post_id, 'all', 0 );
-
-
 
         }
         return false;
     }
-
-    /* map section */
-
-    public function get_grid_totals(){
-        return Zume_App_Heatmap::query_church_grid_totals();
-    }
-
-    public function get_grid_totals_by_level( $administrative_level ) {
-        return Zume_App_Heatmap::query_church_grid_totals( $administrative_level );
-    }
-
-    /**
-     * Can be customized with class extension
-     * @param $country_code
-     * @return float|int
-     */
-    public function get_population_division( $country_code ){
-        $population_division = $this->global_div * 2;
-        if ( $country_code === 'US' ){
-            $population_division = $this->us_div * 2;
-        }
-        return $population_division;
-    }
-
-    public function _browser_tab_title( $title ){
-        return __( "Zúme Churches Map", 'disciple_tools' );
-    }
 }
-Zume_App_Portal::instance();
+Zume_App_Multiplier::instance();

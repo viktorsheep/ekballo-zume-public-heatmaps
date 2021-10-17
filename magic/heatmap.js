@@ -38,7 +38,6 @@ window.get_activity_data = (grid_id) => {
     })
 }
 
-
 /* Document Ready && Precache */
 jQuery(document).ready(function($){
 
@@ -48,7 +47,6 @@ jQuery(document).ready(function($){
   if ( isMobile ) {
     slider_width = window.innerWidth * .95
   }
-
 
   /* set vertical size the form column*/
   $('#custom-style').empty().append(`
@@ -162,8 +160,9 @@ function load_map() {
     ptt = 'Trained People'
   } else if ( 'activity' === jsObject.post_type ) {
     ptt = 'Activity'
-  }
-  else if ( 'registrations' === jsObject.post_type ) {
+  } else if ( 'contacts' === jsObject.post_type ) {
+   ptt = 'Multipliers'
+  } else if ( 'registrations' === jsObject.post_type ) {
     ptt = 'Registrations'
   }
   $('#panel-type-title').html(ptt)
@@ -171,16 +170,18 @@ function load_map() {
   $('.loading-spinner').removeClass('active')
 
   let center = [-98, 38.88]
-  // if ( typeof jsObject.ipstack.latitude !== 'undefined' ) {
-  //   center = [jsObject.ipstack.longitude, jsObject.ipstack.latitude]
-  // }
+  let maxzoom = 8
+  if ( 'contacts' === jsObject.post_type ) {
+    maxzoom = 13
+  }
+
   mapboxgl.accessToken = jsObject.map_key;
   let map = new mapboxgl.Map({
     container: 'map',
     style: 'mapbox://styles/mapbox/light-v10',
     center: center,
     minZoom: 2,
-    maxZoom: 8,
+    maxZoom: maxzoom,
     zoom: 3
   });
   if ( ! isMobile ) {
@@ -396,6 +397,26 @@ function load_map() {
                 }
               })
 
+
+            /* @todo this supports custom list inclusion. review strategy. */
+            if ( 'contacts' === jsObject.post_type ) {
+              let lc = $('#list-content')
+              lc.html('<span class="loading-spinner active"></span>')
+              window.get_grid_data('get_list', e.features[0].properties.grid_id )
+                .done(function(data){
+                  lc.empty()
+                  if ( data.length < 1 ) {
+                    lc.append(`<div>No Multipliers</div>`)
+                  } else {
+                    jQuery.each(data, function(i,v){
+                      if ( typeof v.post_title !== 'undefined' ){
+                        lc.append(`<div> <span>${v.post_title}</span></div>`)
+                      }
+                    })
+                  }
+                })
+            }
+
             $('#offCanvasNestedPush').foundation('toggle', e);
           });
 
@@ -421,7 +442,7 @@ function hide_details_panel(){
 }
 
 function load_self_content( data ) {
-  if ('groups' === jsObject.post_type) {
+  if ('groups' === jsObject.post_type ) {
     jQuery('#custom-paragraph').html(`
       <span class="self_name ucwords temp-spinner bold">${data.name}</span> is one of <span class="self_peers  bold">${data.peers}</span>
       administrative divisions in <span class="parent_name ucwords bold">${data.parent_name}</span> and it has a population of
@@ -445,6 +466,15 @@ function load_self_content( data ) {
       administrative divisions in <span class="parent_name ucwords bold">${data.parent_name}</span> and it has a population of
       <span class="self_population bold">${data.population}</span>.
     `)
+  } else if ( 'contacts' === jsObject.post_type ) {
+    jQuery('#custom-paragraph').html(`
+      <span class="self_name ucwords temp-spinner bold">${data.name}</span> is one of <span class="self_peers  bold">${data.peers}</span>
+      administrative divisions in <span class="parent_name ucwords bold">${data.parent_name}</span> and it has a population of
+      <span class="self_population  bold">${data.population}</span>.
+      In order to reach the community goal of 1 multiplier for every <span class="population_division  bold">${data.population_division}</span> people,
+      <span class="self_name ucwords  bold">${data.name}</span> needs
+      <span class="self_needed bold">${data.needed}</span> multipliers.
+    `)
   }
 }
 function load_level_content( data, level ) {
@@ -463,7 +493,6 @@ function load_level_content( data, level ) {
       </div>
       `)
     }
-
   }
   else if ( 'trainings' === jsObject.post_type || 'trained_people' === jsObject.post_type  ) {
     let gl = jQuery('#'+level+'-list-item')
@@ -495,6 +524,22 @@ function load_level_content( data, level ) {
       `)
     }
   }
+  else if ( 'contacts' === jsObject.post_type ) {
+    let gl = jQuery('#'+level+'-list-item')
+    gl.empty()
+    if ( false !== data ) {
+      gl.append(`
+      <div class="cell">
+          <strong>${data.name}</strong><br>
+          Population: <span>${data.population}</span><br>
+          Multipliers Needed: <span>${data.needed}</span><br>
+          Multipliers Reported: <span class="reported_number">${data.reported}</span><br>
+          Goal Reached: <span>${data.percent}</span>%
+          <meter class="meter" value="${data.percent}" min="0" low="33" high="66" optimum="100" max="100"></meter>
+      </div>
+      `)
+    }
+  }
   else if ( 'activity' === jsObject.post_type ) {
     let gl = jQuery('#'+level+'-list-item')
     gl.empty()
@@ -511,12 +556,4 @@ function load_level_content( data, level ) {
   }
 
 }
-function remove_row( id ) {
-  let submit_button = $('#submit-report')
-  jQuery('.row-'+id).remove();
-  submit_button.prop('disabled', true)
-}
-if (document.readyState === 'complete') {
-  window.contact_id = Cookie.get('contact_id')
-  window.contact_email = Cookie.get('contact_email')
-}
+
