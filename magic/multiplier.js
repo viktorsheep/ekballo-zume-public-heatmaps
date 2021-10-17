@@ -301,8 +301,8 @@ window.load_modal_content = ( post, post_fields ) => {
   })
 
   let description = ''
-  if ( typeof post.description !== 'undefined' ) {
-    description = post.description
+  if ( typeof post.multiplier_description !== 'undefined' ) {
+    description = post.multiplier_description
   }
 
   // template
