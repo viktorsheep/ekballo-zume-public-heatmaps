@@ -27,66 +27,62 @@
 </div>
 
 
-<div id="wrapper">
-    <div class="grid-x">
-        <div class="cell medium-9" id="map-container">
-            <div id="map-wrapper">
-                <span class="loading-spinner active"></span>
-                <div id='map'></div>
-            </div>
+<div class="grid-x">
+    <div class="cell medium-9" >
+        <div id="map-wrapper">
+            <span class="loading-spinner active"></span>
+            <div id='map'></div>
         </div>
-        <div class="cell medium-3" id="map-sidebar-wrapper">
-            <!-- details panel -->
-            <div id="details-panel">
-                <div class="grid-x grid-padding-x" >
-                    <div class="cell">
-                        <h1 id="title"></h1>
-                        <h3>Population: <span id="population">0</span></h3>
-                        <hr>
-                    </div>
-                    <div class="cell">
-                        <h2 id="panel-type-title">Churches</h2>
-                    </div>
-                    <div class="cell" id="needed-row">
-                        <h3>Needed: <span id="needed">0</span></h3>
-                    </div>
-                    <div class="cell">
-                        <h3>Reported: <span id="reported">0</span></h3>
-                    </div>
-                    <div class="cell">
-                        <hr>
-                    </div>
-                    <div class="cell" id="goal-row">
-                        <h2>Goal: <span id="saturation-goal">0</span>%</h2>
-                        <meter id="meter" class="meter" value="30" min="0" low="33" high="66" optimum="100" max="100"></meter>
-                    </div>
-                    <div class="cell">
-                        Our community vision is to see 1 training and 2 new churches for every 5000 people in the United States and 50,000 people globally.
-                    </div>
+    </div>
+    <div class="cell medium-3" id="map-sidebar-wrapper">
+        <!-- details panel -->
+        <div id="details-panel">
+            <div class="grid-x grid-padding-x" >
+                <div class="cell">
+                    <h1 id="title"></h1>
+                    <h3>Population: <span id="population">0</span></h3>
+                    <hr>
+                </div>
+                <div class="cell">
+                    <h2 id="panel-type-title">Multipliers</h2>
+                </div>
+                <div class="cell" id="needed-row">
+                    <h3>Needed: <span id="needed">0</span></h3>
+                </div>
+                <div class="cell">
+                    <h3>Reported: <span id="reported">0</span></h3>
+                </div>
+                <div class="cell">
+                    <hr>
+                </div>
+                <div class="cell" id="goal-row">
+                    <h2>Goal: <span id="saturation-goal">0</span>%</h2>
+                    <meter id="meter" class="meter" value="30" min="0" low="33" high="66" optimum="100" max="100"></meter>
                 </div>
             </div>
-
-            <!-- start screen training-->
-            <div id="training-start-screen" class="training-content"></div>
-            <div id="training-help-screen" class="training-content" style="display:none;"><hr></div>
-            <div class="center"><i class="fi-info" id="help-toggle-icon" onclick="jQuery('#training-help-screen').toggle()"></i></div>
         </div>
+
+        <!-- start screen training-->
+        <div id="training-start-screen" class="training-content"></div>
+        <div id="training-help-screen" class="training-content" style="display:none;"><hr></div>
+        <div class="center"><i class="fi-info" id="help-toggle-icon" onclick="jQuery('#training-help-screen').toggle()"></i></div>
     </div>
 </div>
 
 
 <!-- modal -->
 <div class="off-canvas position-right is-closed" id="offCanvasNestedPush" data-transition-time=".3s" data-off-canvas>
+    <input type="hidden" id="report-modal-title" />
+    <input type="hidden" id="report-grid-id" />
     <div class="grid-x" id="canvas_panel">
         <div class="cell">
             <div class="grid-x">
                 <div class="cell">
                     <h1 id="modal_tile"></h1>
                     <h3>Population: <span id="modal_population">0</span></h3>
-                    <button class="button hollow" id="report-modal-button" style="display:none;" onclick="jQuery('#report-modal').foundation('open');">Report New Simple Church</button>
+                    <button class="button" onclick="window.create_group_by_map()">Report New Multiplier</button>
                 </div>
             </div>
-
             <hr>
         </div>
         <div class="cell" id="slider-content">
@@ -99,10 +95,6 @@
                         <div class="cell" id="progress-content">
                             <div class="grid-x">
                                 <div class="cell">
-                                    <p>
-                                        Our community vision is to see 1 training and 2 new churches for every 5000 people
-                                        in the United States and 50,000 people globally.
-                                    </p>
                                     <p id="custom-paragraph" class="temp-spinner"></p>
                                 </div>
                                 <div class="cell"><hr></div>
@@ -117,6 +109,14 @@
                     </div>
                 </div>
                 <div class="cell medium-6">
+                    <div class="grid-x">
+                        <div class="cell">
+                            <h3>MULTIPLIERS</h3>
+                        </div>
+                        <div class="cell"><hr></div>
+                        <div class="cell temp-spinner" id="list-content"></div>
+                    </div>
+                    <br><br>
                     <div class="grid-x">
                         <div class="cell">
                             <h3>ACTIVITY</h3>
@@ -169,89 +169,11 @@
     </button>
 </div>
 
-
-<!-- report modal -->
-<div class="reveal" id="report-modal" data-v-offset="10px" data-reveal>
-    <div>
-        <h1>Report New Simple Church <i class="fi-info primary-color small"></i></h1>
-        <h3 id="report-modal-title"></h3>
-    </div>
-    <div id="report-modal-content">
-        <input type="hidden" id="first report-grid-id" />
-
-        <div id="panel1" class="not-new not-send">
-            <button type="button" class="button" id="show-new">I'm reporting for the first time</button><br>
-            <button type="button" class="button" id="show-send">Already have reported churches</button><br>
-        </div>
-
-        <div id="new-panel" class="new not-first not-send" style="display:none;">
-            <div class="grid-x">
-                <div class="cell">
-                    <label for="name">Name</label>
-                    <input type="text" id="name" class="required" placeholder="Name" />
-                    <span id="name-error" class="form-error">You're name is required.</span>
-                </div>
-                <div class="cell">
-                    <label for="email">Email</label>
-                    <input type="email" id="email" name="email" placeholder="Email" />
-                    <input type="email" id="e2" name="email" class="required" placeholder="Email" />
-                    <span id="email-error" class="form-error">You're email is required.</span>
-                </div>
-                <div class="cell">
-                    <label for="phone">Phone</label>
-                    <input type="tel" id="phone" name="phone" class="required" placeholder="Phone" />
-                    <span id="phone-error" class="form-error">You're phone is required.</span>
-                </div>
-
-                <div class="cell center">
-                    <p><input type="checkbox" class="required" id="can-be-connected" />I'm willing to be contacted by the community about my data.</p>
-                </div>
-                <div class="cell center">
-                    <button class="button" id="submit-new">Register</button> <span class="loading-spinner"></span>
-                </div>
-            </div>
-        </div>
-
-        <div id="send-panel" class="send not-new not-first" style="display:none;">
-            <div class="grid-x">
-                <div class="cell">
-                    <label for="email">Email</label>
-                    <input type="email" id="email-send" name="email" placeholder="Email" />
-                    <input type="email" id="e2-send" name="email" class="required" placeholder="Email" />
-                    <span id="email-error-send" class="form-error">You're email is required.</span>
-                </div>
-
-                <div class="cell center">
-                    <button class="button" id="submit-send-link">Email me access link</button> <span class="loading-spinner"></span>
-                </div>
-            </div>
-        </div>
-
-    </div>
+<div class="reveal large" id="edit-modal" data-v-offset="0" data-close-on-click="false" data-reveal>
+    <div id="modal-title"></div>
+    <div id="modal-content"></div>
     <button class="close-button" data-close aria-label="Close modal" type="button">
-        <span aria-hidden="true">&times;</span>
+        <span aria-hidden="true">Close &times;</span>
     </button>
 </div>
-<script>
-    jQuery(document).ready(function(){
-        let send = jQuery('.send')
-        let not_send = jQuery('.not-send')
-        let new_input = jQuery('.new')
-        let not_new = jQuery('.not-new')
-        let first = jQuery('.first')
-        let not_first = jQuery('.not-first')
 
-        jQuery('#show-new').on('click', function() {
-            new_input.show()
-            not_new.hide()
-        })
-        jQuery('#show-send').on('click', function() {
-            send.show()
-            not_send.hide()
-        })
-        jQuery('#show-first').on('click', function() {
-            first.show()
-            not_first.hide()
-        })
-    })
-</script>

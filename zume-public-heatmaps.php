@@ -91,9 +91,10 @@ class Zume_Public_Heatmaps {
         require_once( 'magic/heatmap-registrations.php' );
         require_once( 'magic/heatmap-trained-people.php' );
         require_once( 'magic/heatmap-last100-hours.php' );
-
+        require_once( 'magic/heatmap-multipliers.php' );
 
         require_once( 'magic/portal.php' );
+        require_once( 'magic/multiplier.php' );
 
 
         if ( is_admin() ) {

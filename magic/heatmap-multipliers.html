@@ -60,9 +60,6 @@
                         <h2>Goal: <span id="saturation-goal">0</span>%</h2>
                         <meter id="meter" class="meter" value="30" min="0" low="33" high="66" optimum="100" max="100"></meter>
                     </div>
-                    <div class="cell">
-                        Our community vision is to see 1 training and 2 new churches for every 5000 people in the United States and 50,000 people globally.
-                    </div>
                 </div>
             </div>
 
@@ -83,7 +80,7 @@
                 <div class="cell">
                     <h1 id="modal_tile"></h1>
                     <h3>Population: <span id="modal_population">0</span></h3>
-                    <button class="button hollow" id="report-modal-button" style="display:none;" onclick="jQuery('#report-modal').foundation('open');">Report New Simple Church</button>
+                    <button class="button hollow" id="report-modal-button" style="display:none;" onclick="jQuery('#report-modal').foundation('open');">Add a Multiplier</button>
                 </div>
             </div>
 
@@ -99,10 +96,6 @@
                         <div class="cell" id="progress-content">
                             <div class="grid-x">
                                 <div class="cell">
-                                    <p>
-                                        Our community vision is to see 1 training and 2 new churches for every 5000 people
-                                        in the United States and 50,000 people globally.
-                                    </p>
                                     <p id="custom-paragraph" class="temp-spinner"></p>
                                 </div>
                                 <div class="cell"><hr></div>
@@ -117,6 +110,14 @@
                     </div>
                 </div>
                 <div class="cell medium-6">
+                    <div class="grid-x">
+                        <div class="cell">
+                            <h3>MULTIPLIERS</h3>
+                        </div>
+                        <div class="cell"><hr></div>
+                        <div class="cell temp-spinner" id="list-content"></div>
+                    </div>
+                    <br><br>
                     <div class="grid-x">
                         <div class="cell">
                             <h3>ACTIVITY</h3>
@@ -173,15 +174,15 @@
 <!-- report modal -->
 <div class="reveal" id="report-modal" data-v-offset="10px" data-reveal>
     <div>
-        <h1>Report New Simple Church <i class="fi-info primary-color small"></i></h1>
+        <h1>Report New Multiplier <i class="fi-info primary-color small"></i></h1>
         <h3 id="report-modal-title"></h3>
     </div>
     <div id="report-modal-content">
         <input type="hidden" id="first report-grid-id" />
 
-        <div id="panel1" class="not-new not-send">
+        <div id="panel1" class="not-new not-send center">
             <button type="button" class="button" id="show-new">I'm reporting for the first time</button><br>
-            <button type="button" class="button" id="show-send">Already have reported churches</button><br>
+            <button type="button" class="button" id="show-send">Already have reported</button><br>
         </div>
 
         <div id="new-panel" class="new not-first not-send" style="display:none;">
@@ -204,10 +205,10 @@
                 </div>
 
                 <div class="cell center">
-                    <p><input type="checkbox" class="required" id="can-be-connected" />I'm willing to be contacted by the community about my data.</p>
+                    <p><input type="checkbox" class="required" id="can-be-connected" /> I'm willing to be contacted by the community about my data.</p>
                 </div>
                 <div class="cell center">
-                    <button class="button" id="submit-new">Register</button> <span class="loading-spinner"></span>
+                    <button class="button" id="submit-new">Get My Private Link</button> <span class="loading-spinner"></span>
                 </div>
             </div>
         </div>

@@ -1327,6 +1327,408 @@ class Zume_App_Heatmap {
         return $list;
     }
 
+    public static function clear_multiplier_grid_totals() {
+        delete_transient('Zume_App_Heatmap::query_multiplier_grid_totals' );
+        delete_transient('Zume_App_Heatmap::query_multiplier_grid_totalsa0' );
+        delete_transient('Zume_App_Heatmap::query_multiplier_grid_totalsa1' );
+        delete_transient('Zume_App_Heatmap::query_multiplier_grid_totalsa2' );
+        delete_transient('Zume_App_Heatmap::query_multiplier_grid_totalsa3' );
+        delete_transient('Zume_App_Heatmap::query_multiplier_grid_totalsa4' );
+        delete_transient('Zume_App_Heatmap::query_multiplier_grid_totalsworld' );
+        delete_transient('Zume_App_Heatmap::query_multiplier_grid_totalsfull' );
+    }
+
+    public static function query_multiplier_grid_totals( $administrative_level = null ) {
+
+        if ( false !== ( $value = get_transient( __METHOD__ . $administrative_level ) ) ) { // phpcs:ignore
+            return $value;
+        }
+
+        global $wpdb;
+
+        switch ( $administrative_level ) {
+            case 'a0':
+                $results = $wpdb->get_results( "
+                    SELECT t0.admin0_grid_id as grid_id, count(t0.admin0_grid_id) as count
+                    FROM (
+                     SELECT lg.admin0_grid_id, lg.admin1_grid_id, lg.admin2_grid_id, lg.admin3_grid_id, lg.admin4_grid_id, lg.admin5_grid_id
+                        FROM $wpdb->postmeta as pm
+                        JOIN $wpdb->posts as p ON p.ID=pm.post_id AND p.post_type = 'contacts'
+                        JOIN $wpdb->postmeta as pmm ON pmm.post_id=pm.post_id AND pmm.meta_key = 'tags' AND pmm.meta_value = 'multiplier'
+                        LEFT JOIN $wpdb->dt_location_grid as lg ON pm.meta_value=lg.grid_id
+                        WHERE pm.meta_key = 'location_grid'
+                        AND pm.post_id NOT IN (SELECT DISTINCT(p.post_id) FROM $wpdb->postmeta as p WHERE ( p.meta_key = 'corresponds_to_user' AND p.meta_value != '') OR ( p.meta_key = 'overall_status' AND p.meta_value = 'closed'))
+                                ) as t0
+                    GROUP BY t0.admin0_grid_id
+                    ", ARRAY_A );
+                break;
+            case 'a1':
+                $results = $wpdb->get_results( "
+                    SELECT t1.admin1_grid_id as grid_id, count(t1.admin1_grid_id) as count
+                    FROM (
+                        SELECT lg.admin0_grid_id, lg.admin1_grid_id, lg.admin2_grid_id, lg.admin3_grid_id, lg.admin4_grid_id, lg.admin5_grid_id
+                        FROM $wpdb->postmeta as pm
+                        JOIN $wpdb->posts as p ON p.ID=pm.post_id AND p.post_type = 'contacts'
+                        JOIN $wpdb->postmeta as pmm ON pmm.post_id=pm.post_id AND pmm.meta_key = 'tags' AND pmm.meta_value = 'multiplier'
+                        LEFT JOIN $wpdb->dt_location_grid as lg ON pm.meta_value=lg.grid_id
+                        WHERE pm.meta_key = 'location_grid'
+                        AND pm.post_id NOT IN (SELECT DISTINCT(p.post_id) FROM $wpdb->postmeta as p WHERE ( p.meta_key = 'corresponds_to_user' AND p.meta_value != '') OR ( p.meta_key = 'overall_status' AND p.meta_value = 'closed'))
+                                ) as t1
+                    GROUP BY t1.admin1_grid_id
+                    ", ARRAY_A );
+                break;
+            case 'a2':
+                $results = $wpdb->get_results( "
+                    SELECT t2.admin2_grid_id as grid_id, count(t2.admin2_grid_id) as count
+                    FROM (
+                       SELECT lg.admin0_grid_id, lg.admin1_grid_id, lg.admin2_grid_id, lg.admin3_grid_id, lg.admin4_grid_id, lg.admin5_grid_id
+                        FROM $wpdb->postmeta as pm
+                        JOIN $wpdb->posts as p ON p.ID=pm.post_id AND p.post_type = 'contacts'
+                        JOIN $wpdb->postmeta as pmm ON pmm.post_id=pm.post_id AND pmm.meta_key = 'tags' AND pmm.meta_value = 'multiplier'
+                        LEFT JOIN $wpdb->dt_location_grid as lg ON pm.meta_value=lg.grid_id
+                        WHERE pm.meta_key = 'location_grid'
+                        AND pm.post_id NOT IN (SELECT DISTINCT(p.post_id) FROM $wpdb->postmeta as p WHERE ( p.meta_key = 'corresponds_to_user' AND p.meta_value != '') OR ( p.meta_key = 'overall_status' AND p.meta_value = 'closed'))
+                                ) as t2
+                    GROUP BY t2.admin2_grid_id
+                    ", ARRAY_A );
+                break;
+            case 'a3':
+                $results = $wpdb->get_results( "
+                    SELECT t3.admin3_grid_id as grid_id, count(t3.admin3_grid_id) as count
+                    FROM (
+                        SELECT lg.admin0_grid_id, lg.admin1_grid_id, lg.admin2_grid_id, lg.admin3_grid_id, lg.admin4_grid_id, lg.admin5_grid_id
+                        FROM $wpdb->postmeta as pm
+                        JOIN $wpdb->posts as p ON p.ID=pm.post_id AND p.post_type = 'contacts'
+                        JOIN $wpdb->postmeta as pmm ON pmm.post_id=pm.post_id AND pmm.meta_key = 'tags' AND pmm.meta_value = 'multiplier'
+                        LEFT JOIN $wpdb->dt_location_grid as lg ON pm.meta_value=lg.grid_id
+                        WHERE pm.meta_key = 'location_grid'
+                        AND pm.post_id NOT IN (SELECT DISTINCT(p.post_id) FROM $wpdb->postmeta as p WHERE ( p.meta_key = 'corresponds_to_user' AND p.meta_value != '') OR ( p.meta_key = 'overall_status' AND p.meta_value = 'closed'))
+                                ) as t3
+                    GROUP BY t3.admin3_grid_id
+                    ", ARRAY_A );
+                break;
+            case 'world':
+                $results = $wpdb->get_results( "
+                    SELECT 1 as grid_id, count('World') as count
+                    FROM (
+                        SELECT lg.admin0_grid_id, lg.admin1_grid_id, lg.admin2_grid_id, lg.admin3_grid_id, lg.admin4_grid_id, lg.admin5_grid_id
+                        FROM $wpdb->postmeta as pm
+                        JOIN $wpdb->posts as p ON p.ID=pm.post_id AND p.post_type = 'contacts'
+                        JOIN $wpdb->postmeta as pmm ON pmm.post_id=pm.post_id AND pmm.meta_key = 'tags' AND pmm.meta_value = 'multiplier'
+                        LEFT JOIN $wpdb->dt_location_grid as lg ON pm.meta_value=lg.grid_id
+                        WHERE pm.meta_key = 'location_grid'
+                        AND pm.post_id NOT IN (SELECT DISTINCT(p.post_id) FROM $wpdb->postmeta as p WHERE ( p.meta_key = 'corresponds_to_user' AND p.meta_value != '') OR ( p.meta_key = 'overall_status' AND p.meta_value = 'closed'))
+                    ) as tw
+                    GROUP BY 'World'
+                    ", ARRAY_A );
+                break;
+            case 'full':
+                $results = $wpdb->get_results( "
+                    SELECT t0.admin0_grid_id as grid_id, count(t0.admin0_grid_id) as count
+                    FROM (
+                     SELECT lg.admin0_grid_id, lg.admin1_grid_id, lg.admin2_grid_id, lg.admin3_grid_id, lg.admin4_grid_id, lg.admin5_grid_id
+                        FROM $wpdb->postmeta as pm
+                        JOIN $wpdb->posts as p ON p.ID=pm.post_id AND p.post_type = 'contacts'
+                        JOIN $wpdb->postmeta as pmm ON pmm.post_id=pm.post_id AND pmm.meta_key = 'tags' AND pmm.meta_value = 'multiplier'
+                        LEFT JOIN $wpdb->dt_location_grid as lg ON pm.meta_value=lg.grid_id
+                        WHERE pm.meta_key = 'location_grid'
+                        AND pm.post_id NOT IN (SELECT DISTINCT(p.post_id) FROM $wpdb->postmeta as p WHERE ( p.meta_key = 'corresponds_to_user' AND p.meta_value != '') OR ( p.meta_key = 'overall_status' AND p.meta_value = 'closed'))
+                                ) as t0
+                    GROUP BY t0.admin0_grid_id
+                    UNION ALL
+                    SELECT t1.admin1_grid_id as grid_id, count(t1.admin1_grid_id) as count
+                    FROM (
+                        SELECT lg.admin0_grid_id, lg.admin1_grid_id, lg.admin2_grid_id, lg.admin3_grid_id, lg.admin4_grid_id, lg.admin5_grid_id
+                        FROM $wpdb->postmeta as pm
+                        JOIN $wpdb->posts as p ON p.ID=pm.post_id AND p.post_type = 'contacts'
+                        JOIN $wpdb->postmeta as pmm ON pmm.post_id=pm.post_id AND pmm.meta_key = 'tags' AND pmm.meta_value = 'multiplier'
+                        LEFT JOIN $wpdb->dt_location_grid as lg ON pm.meta_value=lg.grid_id
+                        WHERE pm.meta_key = 'location_grid'
+                        AND pm.post_id NOT IN (SELECT DISTINCT(p.post_id) FROM $wpdb->postmeta as p WHERE ( p.meta_key = 'corresponds_to_user' AND p.meta_value != '') OR ( p.meta_key = 'overall_status' AND p.meta_value = 'closed'))
+                                ) as t1
+                    GROUP BY t1.admin1_grid_id
+                    UNION ALL
+                    SELECT t2.admin2_grid_id as grid_id, count(t2.admin2_grid_id) as count
+                    FROM (
+                        SELECT lg.admin0_grid_id, lg.admin1_grid_id, lg.admin2_grid_id, lg.admin3_grid_id, lg.admin4_grid_id, lg.admin5_grid_id
+                        FROM $wpdb->postmeta as pm
+                        JOIN $wpdb->posts as p ON p.ID=pm.post_id AND p.post_type = 'contacts'
+                        JOIN $wpdb->postmeta as pmm ON pmm.post_id=pm.post_id AND pmm.meta_key = 'tags' AND pmm.meta_value = 'multiplier'
+                        LEFT JOIN $wpdb->dt_location_grid as lg ON pm.meta_value=lg.grid_id
+                        WHERE pm.meta_key = 'location_grid'
+                        AND pm.post_id NOT IN (SELECT DISTINCT(p.post_id) FROM $wpdb->postmeta as p WHERE ( p.meta_key = 'corresponds_to_user' AND p.meta_value != '') OR ( p.meta_key = 'overall_status' AND p.meta_value = 'closed'))
+                                ) as t2
+                    GROUP BY t2.admin2_grid_id
+                    UNION ALL
+                    SELECT t3.admin3_grid_id as grid_id, count(t3.admin3_grid_id) as count
+                    FROM (
+                       SELECT lg.admin0_grid_id, lg.admin1_grid_id, lg.admin2_grid_id, lg.admin3_grid_id, lg.admin4_grid_id, lg.admin5_grid_id
+                        FROM $wpdb->postmeta as pm
+                        JOIN $wpdb->posts as p ON p.ID=pm.post_id AND p.post_type = 'contacts'
+                        JOIN $wpdb->postmeta as pmm ON pmm.post_id=pm.post_id AND pmm.meta_key = 'tags' AND pmm.meta_value = 'multiplier'
+                        LEFT JOIN $wpdb->dt_location_grid as lg ON pm.meta_value=lg.grid_id
+                        WHERE pm.meta_key = 'location_grid'
+                        AND pm.post_id NOT IN (SELECT DISTINCT(p.post_id) FROM $wpdb->postmeta as p WHERE ( p.meta_key = 'corresponds_to_user' AND p.meta_value != '') OR ( p.meta_key = 'overall_status' AND p.meta_value = 'closed'))
+                                ) as t3
+                    GROUP BY t3.admin3_grid_id
+                    UNION ALL
+                    SELECT 1 as grid_id, count('World') as count
+                    FROM (
+                        SELECT lg.admin0_grid_id, lg.admin1_grid_id, lg.admin2_grid_id, lg.admin3_grid_id, lg.admin4_grid_id, lg.admin5_grid_id
+                        FROM $wpdb->postmeta as pm
+                        JOIN $wpdb->posts as p ON p.ID=pm.post_id AND p.post_type = 'contacts'
+                        JOIN $wpdb->postmeta as pmm ON pmm.post_id=pm.post_id AND pmm.meta_key = 'tags' AND pmm.meta_value = 'multiplier'
+                        LEFT JOIN $wpdb->dt_location_grid as lg ON pm.meta_value=lg.grid_id
+                        WHERE pm.meta_key = 'location_grid'
+                        AND pm.post_id NOT IN (SELECT DISTINCT(p.post_id) FROM $wpdb->postmeta as p WHERE ( p.meta_key = 'corresponds_to_user' AND p.meta_value != '') OR ( p.meta_key = 'overall_status' AND p.meta_value = 'closed'))
+                                ) as tw
+                    GROUP BY 'World'
+                    ", ARRAY_A );
+                break;
+            default:
+                $results = $wpdb->get_results( "
+                    SELECT t0.admin0_grid_id as grid_id, count(t0.admin0_grid_id) as count
+                    FROM (
+                     SELECT lg.admin0_grid_id, lg.admin1_grid_id, lg.admin2_grid_id, lg.admin3_grid_id, lg.admin4_grid_id, lg.admin5_grid_id
+                        FROM $wpdb->postmeta as pm
+                        JOIN $wpdb->posts as p ON p.ID=pm.post_id AND p.post_type = 'contacts'
+                        JOIN $wpdb->postmeta as pmm ON pmm.post_id=pm.post_id AND pmm.meta_key = 'tags' AND pmm.meta_value = 'multiplier'
+                        LEFT JOIN $wpdb->dt_location_grid as lg ON pm.meta_value=lg.grid_id
+                        WHERE pm.meta_key = 'location_grid'
+                        AND pm.post_id NOT IN (SELECT DISTINCT(p.post_id) FROM $wpdb->postmeta as p WHERE ( p.meta_key = 'corresponds_to_user' AND p.meta_value != '') OR ( p.meta_key = 'overall_status' AND p.meta_value = 'closed'))
+                    ) as t0
+                    GROUP BY t0.admin0_grid_id
+                    UNION ALL
+                    SELECT t1.admin1_grid_id as grid_id, count(t1.admin1_grid_id) as count
+                    FROM (
+                        SELECT lg.admin0_grid_id, lg.admin1_grid_id, lg.admin2_grid_id, lg.admin3_grid_id, lg.admin4_grid_id, lg.admin5_grid_id
+                        FROM $wpdb->postmeta as pm
+                        JOIN $wpdb->posts as p ON p.ID=pm.post_id AND p.post_type = 'contacts'
+                        JOIN $wpdb->postmeta as pmm ON pmm.post_id=pm.post_id AND pmm.meta_key = 'tags' AND pmm.meta_value = 'multiplier'
+                        LEFT JOIN $wpdb->dt_location_grid as lg ON pm.meta_value=lg.grid_id
+                        WHERE pm.meta_key = 'location_grid'
+                        AND pm.post_id NOT IN (SELECT DISTINCT(p.post_id) FROM $wpdb->postmeta as p WHERE ( p.meta_key = 'corresponds_to_user' AND p.meta_value != '') OR ( p.meta_key = 'overall_status' AND p.meta_value = 'closed'))
+                    ) as t1
+                    GROUP BY t1.admin1_grid_id
+                    UNION ALL
+                    SELECT t2.admin2_grid_id as grid_id, count(t2.admin2_grid_id) as count
+                    FROM (
+                        SELECT lg.admin0_grid_id, lg.admin1_grid_id, lg.admin2_grid_id, lg.admin3_grid_id, lg.admin4_grid_id, lg.admin5_grid_id
+                        FROM $wpdb->postmeta as pm
+                        JOIN $wpdb->posts as p ON p.ID=pm.post_id AND p.post_type = 'contacts'
+                        JOIN $wpdb->postmeta as pmm ON pmm.post_id=pm.post_id AND pmm.meta_key = 'tags' AND pmm.meta_value = 'multiplier'
+                        LEFT JOIN $wpdb->dt_location_grid as lg ON pm.meta_value=lg.grid_id
+                        WHERE pm.meta_key = 'location_grid'
+                        AND pm.post_id NOT IN (SELECT DISTINCT(p.post_id) FROM $wpdb->postmeta as p WHERE ( p.meta_key = 'corresponds_to_user' AND p.meta_value != '') OR ( p.meta_key = 'overall_status' AND p.meta_value = 'closed'))
+                    ) as t2
+                    GROUP BY t2.admin2_grid_id
+                    UNION ALL
+                    SELECT t3.admin3_grid_id as grid_id, count(t3.admin3_grid_id) as count
+                    FROM (
+                       SELECT lg.admin0_grid_id, lg.admin1_grid_id, lg.admin2_grid_id, lg.admin3_grid_id, lg.admin4_grid_id, lg.admin5_grid_id
+                        FROM $wpdb->postmeta as pm
+                        JOIN $wpdb->posts as p ON p.ID=pm.post_id AND p.post_type = 'contacts'
+                        JOIN $wpdb->postmeta as pmm ON pmm.post_id=pm.post_id AND pmm.meta_key = 'tags' AND pmm.meta_value = 'multiplier'
+                        LEFT JOIN $wpdb->dt_location_grid as lg ON pm.meta_value=lg.grid_id
+                        WHERE pm.meta_key = 'location_grid'
+                        AND pm.post_id NOT IN (SELECT DISTINCT(p.post_id) FROM $wpdb->postmeta as p WHERE ( p.meta_key = 'corresponds_to_user' AND p.meta_value != '') OR ( p.meta_key = 'overall_status' AND p.meta_value = 'closed'))
+                    ) as t3
+                    GROUP BY t3.admin3_grid_id
+                    UNION ALL
+                    SELECT 1 as grid_id, count('World') as count
+                    FROM (
+                        SELECT lg.admin0_grid_id, lg.admin1_grid_id, lg.admin2_grid_id, lg.admin3_grid_id, lg.admin4_grid_id, lg.admin5_grid_id
+                        FROM $wpdb->postmeta as pm
+                        JOIN $wpdb->posts as p ON p.ID=pm.post_id AND p.post_type = 'contacts'
+                        JOIN $wpdb->postmeta as pmm ON pmm.post_id=pm.post_id AND pmm.meta_key = 'tags' AND pmm.meta_value = 'multiplier'
+                        LEFT JOIN $wpdb->dt_location_grid as lg ON pm.meta_value=lg.grid_id
+                        WHERE pm.meta_key = 'location_grid'
+                        AND pm.post_id NOT IN (SELECT DISTINCT(p.post_id) FROM $wpdb->postmeta as p WHERE ( p.meta_key = 'corresponds_to_user' AND p.meta_value != '') OR ( p.meta_key = 'overall_status' AND p.meta_value = 'closed'))
+                    ) as tw
+                    GROUP BY 'World'
+
+                    ", ARRAY_A );
+                break;
+        }
+
+        $list = [];
+        if ( is_array( $results ) ) {
+            foreach ( $results as $result ) {
+                if ( empty( $result['grid_id'] ) ) {
+                    continue;
+                }
+                if ( empty( $result['count'] ) ) {
+                    continue;
+                }
+                $list[$result['grid_id']] = $result['count'];
+            }
+        }
+
+        return $list;
+    }
+
+    /**
+     * Performance query for groups location_grid without dependency on location_grid_meta
+     * @param null $status
+     * @return array
+     */
+    public static function query_groups_location_grid_totals( $status = null ) {
+
+        global $wpdb;
+
+        if ( $status ) {
+            $results = $wpdb->get_results( $wpdb->prepare( "
+            SELECT t0.admin0_grid_id as grid_id, count(t0.admin0_grid_id) as count
+            FROM (
+                SELECT lg.admin0_grid_id, lg.admin1_grid_id, lg.admin2_grid_id, lg.admin3_grid_id, lg.admin4_grid_id, lg.admin5_grid_id
+                FROM $wpdb->postmeta as pm
+                JOIN $wpdb->posts as p ON p.ID=pm.post_id AND p.post_type = 'groups'
+                LEFT JOIN $wpdb->dt_location_grid as lg ON pm.meta_value=lg.grid_id
+                WHERE pm.meta_key = 'location_grid'
+                AND pm.post_id NOT IN (SELECT DISTINCT(p.post_id) FROM $wpdb->postmeta as p WHERE p.meta_key = 'group_status' AND p.meta_value = %s )
+            ) as t0
+            GROUP BY t0.admin0_grid_id
+            UNION
+            SELECT t1.admin1_grid_id as grid_id, count(t1.admin1_grid_id) as count
+            FROM (
+                SELECT lg.admin0_grid_id, lg.admin1_grid_id, lg.admin2_grid_id, lg.admin3_grid_id, lg.admin4_grid_id, lg.admin5_grid_id
+                FROM $wpdb->postmeta as pm
+                JOIN $wpdb->posts as p ON p.ID=pm.post_id AND p.post_type = 'groups'
+                LEFT JOIN $wpdb->dt_location_grid as lg ON pm.meta_value=lg.grid_id
+                WHERE pm.meta_key = 'location_grid'
+                AND pm.post_id NOT IN (SELECT DISTINCT(p.post_id) FROM $wpdb->postmeta as p WHERE p.meta_key = 'group_status' AND p.meta_value = %s )
+            ) as t1
+            GROUP BY t1.admin1_grid_id
+            UNION
+            SELECT t2.admin2_grid_id as grid_id, count(t2.admin2_grid_id) as count
+            FROM (
+                SELECT lg.admin0_grid_id, lg.admin1_grid_id, lg.admin2_grid_id, lg.admin3_grid_id, lg.admin4_grid_id, lg.admin5_grid_id
+                FROM $wpdb->postmeta as pm
+                JOIN $wpdb->posts as p ON p.ID=pm.post_id AND p.post_type = 'groups'
+                LEFT JOIN $wpdb->dt_location_grid as lg ON pm.meta_value=lg.grid_id
+                WHERE pm.meta_key = 'location_grid'
+                AND pm.post_id NOT IN (SELECT DISTINCT(p.post_id) FROM $wpdb->postmeta as p WHERE p.meta_key = 'group_status' AND p.meta_value = %s )
+            ) as t2
+            GROUP BY t2.admin2_grid_id
+            UNION
+            SELECT t3.admin3_grid_id as grid_id, count(t3.admin3_grid_id) as count
+            FROM (
+                SELECT lg.admin0_grid_id, lg.admin1_grid_id, lg.admin2_grid_id, lg.admin3_grid_id, lg.admin4_grid_id, lg.admin5_grid_id
+                FROM $wpdb->postmeta as pm
+                JOIN $wpdb->posts as p ON p.ID=pm.post_id AND p.post_type = 'groups'
+                LEFT JOIN $wpdb->dt_location_grid as lg ON pm.meta_value=lg.grid_id
+                WHERE pm.meta_key = 'location_grid'
+                AND pm.post_id NOT IN (SELECT DISTINCT(p.post_id) FROM $wpdb->postmeta as p WHERE p.meta_key = 'group_status' AND p.meta_value = %s )
+            ) as t3
+            GROUP BY t3.admin3_grid_id
+            UNION
+            SELECT t4.admin4_grid_id as grid_id, count(t4.admin4_grid_id) as count
+            FROM (
+                SELECT lg.admin0_grid_id, lg.admin1_grid_id, lg.admin2_grid_id, lg.admin3_grid_id, lg.admin4_grid_id, lg.admin5_grid_id
+                FROM $wpdb->postmeta as pm
+                JOIN $wpdb->posts as p ON p.ID=pm.post_id AND p.post_type = 'groups'
+                LEFT JOIN $wpdb->dt_location_grid as lg ON pm.meta_value=lg.grid_id
+                WHERE pm.meta_key = 'location_grid'
+                AND pm.post_id NOT IN (SELECT DISTINCT(p.post_id) FROM $wpdb->postmeta as p WHERE p.meta_key = 'group_status' AND p.meta_value = %s )
+            ) as t4
+            GROUP BY t4.admin4_grid_id
+            UNION
+            SELECT t5.admin5_grid_id as grid_id, count(t5.admin5_grid_id) as count
+            FROM (
+                SELECT lg.admin0_grid_id, lg.admin1_grid_id, lg.admin2_grid_id, lg.admin3_grid_id, lg.admin4_grid_id, lg.admin5_grid_id
+                FROM $wpdb->postmeta as pm
+                JOIN $wpdb->posts as p ON p.ID=pm.post_id AND p.post_type = 'groups'
+                LEFT JOIN $wpdb->dt_location_grid as lg ON pm.meta_value=lg.grid_id
+                WHERE pm.meta_key = 'location_grid'
+                AND pm.post_id NOT IN (SELECT DISTINCT(p.post_id) FROM $wpdb->postmeta as p WHERE p.meta_key = 'group_status' AND p.meta_value = %s )
+            ) as t5
+            GROUP BY t5.admin5_grid_id;
+            ", $status, $status, $status, $status, $status, $status
+            ), ARRAY_A );
+
+        } else {
+
+            $results = $wpdb->get_results( "
+            SELECT t0.admin0_grid_id as grid_id, count(t0.admin0_grid_id) as count
+            FROM (
+                SELECT lg.admin0_grid_id, lg.admin1_grid_id, lg.admin2_grid_id, lg.admin3_grid_id, lg.admin4_grid_id, lg.admin5_grid_id
+                FROM $wpdb->postmeta as pm
+                JOIN $wpdb->posts as p ON p.ID=pm.post_id AND p.post_type = 'groups'
+                LEFT JOIN $wpdb->dt_location_grid as lg ON pm.meta_value=lg.grid_id
+                WHERE pm.meta_key = 'location_grid'
+            ) as t0
+            GROUP BY t0.admin0_grid_id
+            UNION
+            SELECT t1.admin1_grid_id as grid_id, count(t1.admin1_grid_id) as count
+            FROM (
+            SELECT lg.admin0_grid_id, lg.admin1_grid_id, lg.admin2_grid_id, lg.admin3_grid_id, lg.admin4_grid_id, lg.admin5_grid_id
+                FROM $wpdb->postmeta as pm
+                JOIN $wpdb->posts as p ON p.ID=pm.post_id AND p.post_type = 'groups'
+                LEFT JOIN $wpdb->dt_location_grid as lg ON pm.meta_value=lg.grid_id
+                WHERE pm.meta_key = 'location_grid'
+            ) as t1
+            GROUP BY t1.admin1_grid_id
+            UNION
+            SELECT t2.admin2_grid_id as grid_id, count(t2.admin2_grid_id) as count
+            FROM (
+                SELECT lg.admin0_grid_id, lg.admin1_grid_id, lg.admin2_grid_id, lg.admin3_grid_id, lg.admin4_grid_id, lg.admin5_grid_id
+                FROM $wpdb->postmeta as pm
+                JOIN $wpdb->posts as p ON p.ID=pm.post_id AND p.post_type = 'groups'
+                LEFT JOIN $wpdb->dt_location_grid as lg ON pm.meta_value=lg.grid_id
+                WHERE pm.meta_key = 'location_grid'
+            ) as t2
+            GROUP BY t2.admin2_grid_id
+            UNION
+            SELECT t3.admin3_grid_id as grid_id, count(t3.admin3_grid_id) as count
+            FROM (
+                SELECT lg.admin0_grid_id, lg.admin1_grid_id, lg.admin2_grid_id, lg.admin3_grid_id, lg.admin4_grid_id, lg.admin5_grid_id
+                FROM $wpdb->postmeta as pm
+                JOIN $wpdb->posts as p ON p.ID=pm.post_id AND p.post_type = 'groups'
+                LEFT JOIN $wpdb->dt_location_grid as lg ON pm.meta_value=lg.grid_id
+                WHERE pm.meta_key = 'location_grid'
+            ) as t3
+            GROUP BY t3.admin3_grid_id
+            UNION
+            SELECT t4.admin4_grid_id as grid_id, count(t4.admin4_grid_id) as count
+            FROM (
+                SELECT lg.admin0_grid_id, lg.admin1_grid_id, lg.admin2_grid_id, lg.admin3_grid_id, lg.admin4_grid_id, lg.admin5_grid_id
+                FROM $wpdb->postmeta as pm
+                JOIN $wpdb->posts as p ON p.ID=pm.post_id AND p.post_type = 'groups'
+                LEFT JOIN $wpdb->dt_location_grid as lg ON pm.meta_value=lg.grid_id
+                WHERE pm.meta_key = 'location_grid'
+            ) as t4
+            GROUP BY t4.admin4_grid_id
+            UNION
+            SELECT t5.admin5_grid_id as grid_id, count(t5.admin5_grid_id) as count
+            FROM (
+                SELECT lg.admin0_grid_id, lg.admin1_grid_id, lg.admin2_grid_id, lg.admin3_grid_id, lg.admin4_grid_id, lg.admin5_grid_id
+                FROM $wpdb->postmeta as pm
+                JOIN $wpdb->posts as p ON p.ID=pm.post_id AND p.post_type = 'groups'
+                LEFT JOIN $wpdb->dt_location_grid as lg ON pm.meta_value=lg.grid_id
+                WHERE pm.meta_key = 'location_grid'
+            ) as t5
+            GROUP BY t5.admin5_grid_id;
+            ", ARRAY_A );
+        }
+
+        $list = [];
+        if ( is_array( $results ) ) {
+            foreach ( $results as $result ) {
+                if ( empty( $result['grid_id'] ) ) {
+                    continue;
+                }
+                if ( empty( $result['count'] ) ) {
+                    continue;
+                }
+                $list[$result['grid_id']] = $result['count'];
+            }
+        }
+
+        set_transient( __METHOD__ . $administrative_level, $list, HOUR_IN_SECONDS . 6 );
+
+        return $list;
+    }
+
     public static function query_training_grid_totals( $administrative_level = null ) {
         if ( false !== ( $value = get_transient( __METHOD__ . $administrative_level ) ) ) { // phpcs:ignore
             return $value;
@@ -2282,11 +2684,11 @@ class Zume_App_Heatmap {
 
             if ( isset( $grid_totals[$v['grid_id']] ) && ! empty( $grid_totals[$v['grid_id']] ) ){
                 $reported = $grid_totals[$v['grid_id']];
+
                 if ( ! empty( $reported ) && ! empty( $needed ) ){
                     $data[$v['grid_id']]['needed'] = $needed;
 
                     $data[$v['grid_id']]['reported'] = $reported;
-
                     $percent = ceil( $reported / $needed * 100 );
                     if ( 100 < $percent ) {
                         $percent = 100;
@@ -2583,4 +2985,75 @@ class Zume_App_Heatmap {
         return $list;
     }
 
+    public static function query_multiplier_list_data( $grid_id ) {
+        global $wpdb;
+
+        $ids = [];
+        $ids[] = $grid_id;
+        $children = Disciple_Tools_Mapping_Queries::get_children_by_grid_id( $grid_id );
+        if ( ! empty( $children ) ) {
+            foreach ( $children as $child ){
+                $ids[] = $child['grid_id'];
+            }
+        }
+        $prepared_list = dt_array_to_sql( $ids );
+        // phpcs:disable
+        $list = $wpdb->get_results("
+                SELECT p.post_title, lgm.*
+                FROM $wpdb->dt_location_grid_meta as lgm
+				JOIN $wpdb->postmeta as pm ON pm.post_id=lgm.post_id AND pm.meta_key = 'tags' AND pm.meta_value = 'multiplier'
+                LEFT JOIN $wpdb->posts as p ON p.ID=lgm.post_id
+                WHERE grid_id IN ($prepared_list)
+                AND lgm.post_type = 'contacts'
+                ORDER BY p.post_title DESC;
+        ", ARRAY_A);
+        // phpcs:enable
+        if ( empty( $list ) ){
+            return [];
+        }
+
+        return $list;
+    }
+
+    public static function create_new_reporter( $root, $type, $data ) {
+        // prepare contact for creation
+        $meta_key = $root . '_' . $type . '_magic_key';
+        $key = dt_create_unique_key();
+        $link = DT_Magic_URL::get_link_url( $root, $type, $key );
+
+        dt_write_log($link);
+
+        $fields = [
+            'title' => $data['name'],
+            "contact_phone" => [
+                [
+                    "value" => $data['phone']
+                ]
+            ],
+            "contact_email" => [
+                [
+                    "value" => $data['email']
+                ]
+            ],
+            $meta_key => $key
+        ];
+
+        // create contact
+        $new_post = DT_Posts::create_post('contacts', $fields, true, false );
+
+        dt_write_log($new_post);
+
+        // email contact new magic link
+        $to = $data['email'];
+        $subject = 'New Reporting Link';
+        $message = $link;
+        $headers[] = 'From: Disciple.Tools <no-reply@disciple.tools>';
+        $headers[] = 'Content-Type: text/html; charset=UTF-8';
+        mail( $to, $subject, $message, $headers );
+
+
+        // return success
+
+        return $link;
+    }
 }
