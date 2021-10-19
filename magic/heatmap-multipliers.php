@@ -98,7 +98,7 @@ class Zume_Public_Heatmap_Multipliers extends DT_Magic_Url_Base
             ]) ?>][0]
         </script>
         <style>
-            #report-modal-button {
+            .report-modal-button {
                 display:block !important;
             }
         </style>
