@@ -106,7 +106,7 @@ jQuery(document).ready(function($){
 
         jQuery('#new-panel').empty().html(`
         Excellent! You've been sent an email with your personal reporting link.<br><br>
-        <a class="button" href="${response}">Open Personal Reporting Portal</a>
+        <a class="button" href="${response}" target="_parent">Open Personal Reporting Portal</a>
         `)
 
       })
