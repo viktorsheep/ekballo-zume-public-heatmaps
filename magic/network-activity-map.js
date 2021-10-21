@@ -100,8 +100,6 @@ jQuery(document).ready(function(){
       }
     }
 
-
-
       mapboxgl.accessToken = network_base_script.map_key;
       var map = new mapboxgl.Map({
         container: 'map',

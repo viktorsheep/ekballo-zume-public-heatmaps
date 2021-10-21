@@ -3495,19 +3495,23 @@ class Zume_Public_Heatmap_100hours_Utilities {
     }
 
     public static function create_note_data( $category, $action, $initials, $in_language, $location_label, $payload ) : array {
+        // learning
+        // joining
+        // producing
+
         $data = [
             'note' => '',
-            'type' => 'blessing',
+            'type' => 'learning',
         ];
 
         switch ( $action ) {
             case 'starting_group':
                 $data['note'] = $initials . ' is starting a training group' . $in_language . '! ' . $location_label;
-                $data['type'] = 'greater_blessing';
+                $data['type'] = 'producing';
                 break;
             case 'building_group':
                 $data['note'] = $initials . ' is growing a training group' . $in_language . '! ' . $location_label;
-                $data['type'] = 'greater_blessing';
+                $data['type'] = 'producing';
                 break;
             case 'leading_1':
             case 'leading_2':
@@ -3524,19 +3528,19 @@ class Zume_Public_Heatmap_100hours_Utilities {
                 } else {
                     $data['note'] = $initials . ' is leading a group through session ' . str_replace( '_', '', substr( $action, -2, 2 ) ) . $in_language . '! ' . $location_label;
                 }
-                $data['type'] = 'greatest_blessing';
+                $data['type'] = 'producing';
                 break;
             case 'zume_training':
                 $data['note'] = $initials . ' is registering for Zúme training' . $in_language . '! ' . $location_label;
-                $data['type'] = 'great_blessing';
+                $data['type'] = 'joining';
                 break;
             case 'zume_vision':
                 $data['note'] = $initials . ' is joining the Zúme community to engage in Disciple Making Movements' . $in_language . '! ' . $location_label;
-                $data['type'] = 'greatest_blessing';
+                $data['type'] = 'joining';
                 break;
             case 'coaching':
                 $data['note'] = $initials . ' is requesting coaching from Zúme coaches' . $in_language . '! ' . $location_label;
-                $data['type'] = 'great_blessing';
+                $data['type'] = 'producing';
                 break;
             case 'studying_1':
             case 'studying_2':
@@ -3607,11 +3611,11 @@ class Zume_Public_Heatmap_100hours_Utilities {
                     $title = ' "' . $payload['title'] . '"';
                 }
                 $data['note'] = $initials . ' is studying' . $title . $in_language . '! ' . $location_label;
-                $data['type'] = 'blessing';
+                $data['type'] = 'learning';
                 break;
             case 'updated_3_month':
                 $data['note'] = $initials . '  made a three month plan to multiply disciples' . $in_language . '! ' . $location_label;
-                $data['type'] = 'great_blessing';
+                $data['type'] = 'producing';
                 break;
             default:
                 break;
@@ -3639,10 +3643,9 @@ class Zume_Public_Heatmap_100hours_Utilities {
          * Greatest Blessing - greatest_blessing - #FAEA38
          */
         $counts = [
-            'blessing' => 0,
-            'great_blessing' => 0,
-            'greater_blessing' => 0,
-            'greatest_blessing' => 0,
+            'learning' => 0,
+            'joining' => 0,
+            'producing' => 0,
         ];
         $countries = [];
         $languages = [];
