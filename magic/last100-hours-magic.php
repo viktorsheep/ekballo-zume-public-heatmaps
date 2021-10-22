@@ -276,7 +276,7 @@ class Zume_Public_Heatmap_100hours_V2 extends DT_Magic_Url_Base {
 
         switch ( $action ) {
             case 'activity_list':
-                return $this->points_geojson();
+                return Zume_Public_Heatmap_100hours_Utilities::activity_list( $params['data'] );
             case 'initial_load_geojson':
                 return $this->points_geojson();
             default:
@@ -309,7 +309,7 @@ class Zume_Public_Heatmap_100hours_V2 extends DT_Magic_Url_Base {
 
         $tz_name = 'America/Denver';
 
-        return Zume_Public_Heatmap_100hours_Utilities::query_contacts_points_geojson( $tz_name );
+        return Zume_Public_Heatmap_100hours_Utilities::query_activity_geojson( $tz_name );
     }
 
     public function filtered_geojson(  ){
@@ -360,136 +360,7 @@ class Zume_Public_Heatmap_100hours_V2 extends DT_Magic_Url_Base {
 
     }
 
-    public function activity_list() {
 
 
-        return true;
-
-    }
-    public static function get_activity_log( $filters = [] ){
-        global $wpdb;
-        $hash = hash( 'sha256', maybe_serialize( $filters ) );
-
-        if (wp_cache_get( __METHOD__, $hash )) {
-            return wp_cache_get( __METHOD__, $hash );
-        }
-
-        $sites = DT_Network_Dashboard_Site_Post_Type::all_visible_sites();
-        $sites_id_list = [];
-        foreach ( $sites as $site ){
-            $sites_id_list[] = $site['partner_id'];
-        }
-
-        $defaults = [
-            'start' => '-7 days',
-            'end' => time(),
-            'limit' => 2000,
-            'offset' => 0,
-            'boundary' => [], // n_lat, s_lat, e_lng, w_lng lnglat, sw lnglat
-            'actions' => array_keys( dt_network_dashboard_registered_actions() ),
-            'sites' => $sites_id_list,
-        ];
-
-        $filter = wp_parse_args( $filters, $defaults );
-        $additional_where = '';
-
-        /* process start time */
-        if ( isset( $filters['start'] ) && ! empty( $filters['start'] ) ){
-            if ( is_numeric( $filters['start'] ) ) {
-                $filter['start'] = sanitize_text_field( wp_unslash( $filters['start'] ) );
-            } else {
-                $filter['start'] = strtotime( sanitize_text_field( wp_unslash( $filters['start'] ) ) );
-            }
-        }
-        if ( empty( $filter['start'] ) || $filter['start'] > time() || $filter['start'] < strtotime( '30 years ago' ) ) {
-            $filter['start'] = strtotime( sanitize_text_field( wp_unslash( '- 7 days' ) ) );
-        }
-
-        /* process end time */
-        if ( isset( $filters['end'] ) && ! empty( $filters['end'] ) ){
-            $filter['end'] = strtotime( sanitize_text_field( wp_unslash( $filters['end'] ) ) );
-        }
-        if ( empty( $filter['end'] ) || $filter['end'] < strtotime( '30 years ago' ) ) {
-            $filter['end'] = time();
-        }
-
-        /**
-         * Action and Sites are negative filters. If the value is included in the filter, it is excluded from the query.
-         */
-        /* process actions */
-        if ( ! empty( $filter['actions'] ) && is_array( $filter['actions'] ) ) {
-            $string = dt_array_to_sql( $filter['actions'] );
-            $additional_where .= " AND action IN (".$string.")";
-        }
-        /* process sites */
-        if ( ! empty( $filter['sites'] ) && is_array( $filter['sites'] ) ) {
-            $string = dt_array_to_sql( $filter['sites'] );
-            $additional_where .= " AND site_id IN (".$string.")";
-        }
-
-        /* process boundary */
-        if ( ! empty( $filter['boundary'] ) && is_array( $filter['boundary'] ) ) {
-            if ( isset( $filter['boundary']['n_lat'] )
-                && isset( $filter['boundary']['s_lat'] )
-                && isset( $filter['boundary']['e_lng'] )
-                && isset( $filter['boundary']['w_lng'] )
-            ) {
-                $additional_where .= "
-                AND lng < ".$filter['boundary']['e_lng']."
-                AND lng > ".$filter['boundary']['w_lng']."
-                AND lat > ".$filter['boundary']['s_lat']."
-                AND lat < ".$filter['boundary']['n_lat']."
-                ";
-            }
-        }
-
-        /* handle local site */
-        // @phpcs:disable
-        $profile = dt_network_site_profile();
-        $results = $wpdb->get_results( $wpdb->prepare( "
-                SELECT ml.*,
-                       DATE_FORMAT(FROM_UNIXTIME(ml.timestamp), '%%Y-%%c-%%e') AS day,
-                       DATE_FORMAT(FROM_UNIXTIME(ml.timestamp), '%%H:%%i %%p') AS time,
-                       CASE
-                           WHEN pname.meta_value != '' THEN pname.meta_value
-                           WHEN ml.site_id = %s THEN %s
-                           ELSE ''
-                       END as site_name
-                FROM $wpdb->dt_movement_log as ml
-                LEFT JOIN $wpdb->posts as pid ON pid.post_title=ml.site_id
-                	AND pid.post_type = 'dt_network_dashboard'
-                LEFT JOIN $wpdb->postmeta as pname ON pid.ID=pname.post_id
-                	AND	pname.meta_key = 'name'
-                LEFT JOIN $wpdb->postmeta as pvisibility ON pid.ID=pvisibility.post_id
-                	AND	pvisibility.meta_key = 'visibility'
-                WHERE ml.timestamp > %s
-                  AND ml.timestamp < %s
-                  AND ( pvisibility.meta_value != 'hide' || ml.site_id = %s )
-                  $additional_where
-                ORDER BY ml.timestamp DESC
-                LIMIT %d
-                OFFSET %d
-                ",
-            $profile['partner_id'],
-            $profile['partner_name'],
-            $filter['start'],
-            $filter['end'],
-            $profile['partner_id'],
-            $filter['limit'],
-            $filter['offset']
-        ),
-            ARRAY_A );
-        // @phpcs:enable
-
-        foreach ( $results as $index => $result ){
-            $results[$index]['payload'] = maybe_unserialize( $result['payload'] );
-        }
-
-        wp_cache_set( __METHOD__, $results, __METHOD__, 10 );
-
-        self::$activity_filter = $filter; // define the current activity filter used for the query
-
-        return $results;
-    }
 
 }

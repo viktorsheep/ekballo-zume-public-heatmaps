@@ -3658,7 +3658,11 @@ class Zume_Public_Heatmap_100hours_Utilities {
 
             // make country list from results
             if ( isset( $payload['country'] ) && ! empty( $payload['country'] ) ) {
-                $countries[$payload['country']] = $payload['country'];
+                $key = str_replace(' ', '_', strtolower( $payload['country'] ) );
+                $countries[$key] = [
+                    'key' => $key,
+                    'label' => $payload['country']
+                ];
             }
 
             // make language list
@@ -3733,6 +3737,225 @@ class Zume_Public_Heatmap_100hours_Utilities {
             'hash' => hash( 'sha256', serialize( $hash ) ),
             'features' => $features,
         );
+
+        return $new_data;
+    }
+
+    public static function query_activity_geojson( $tz_name, $country = 'none', $language = 'none' ) {
+        global $wpdb;
+
+        $utc_time = new DateTime( 'now', new DateTimeZone( $tz_name ) );
+        $timezoneOffset = $utc_time->format( 'Z' );
+
+        $timestamp = strtotime( '-100 hours' );
+        $results = $wpdb->get_results( $wpdb->prepare( "
+                SELECT action, category, lng, lat, label, payload, timestamp FROM $wpdb->dt_movement_log WHERE timestamp > %s ORDER BY timestamp DESC
+                ", $timestamp ), ARRAY_A );
+
+        /**
+         * (none) - #0E172F
+         * Blessing - blessing- #21336A
+         * Great Blessing - great_blessing - #2CACE2
+         * Greater Blessing - greater_blessing - #90C741
+         * Greatest Blessing - greatest_blessing - #FAEA38
+         */
+        $counts = [
+            'learning' => 0,
+            'joining' => 0,
+            'producing' => 0,
+        ];
+        $countries = [];
+        $languages = [];
+        $hash = [];
+
+        $features = [];
+        foreach ( $results as $result ) {
+
+            $payload = maybe_unserialize( $result['payload'] );
+
+            // make country list from results
+            if ( isset( $payload['country'] ) && ! empty( $payload['country'] ) ) {
+                $countries[$payload['country']] = $payload['country'];
+            }
+
+            // make language list
+            if ( isset( $payload['language_name'] )
+                && ! empty( $payload['language_name'] )
+                && isset( $payload['language_code'] )
+                && ! empty( $payload['language_code'] )
+            ) {
+                $languages[$payload['language_code']] = $payload['language_name'];
+            }
+
+            // BUILD NOTE
+
+            // time string
+//            $time_string = self::create_time_string( $result['timestamp'], $timezoneOffset );
+
+            // language
+            $in_language = self::create_in_language_string( $payload );
+
+            // initials string
+            $initials = self::create_initials( $result['lng'], $result['lat'], $payload );
+
+            // location string
+            $location = self::create_location_precision( $result['lng'], $result['lat'], $result['label'], $payload );
+
+            // note and type data
+            $data = self::create_note_data( $result['category'], $result['action'], $initials, $in_language, $location['label'], $payload );
+
+            // filter out non selected country
+            if ( 'none' !== $country && $country !== $payload['country'] ?? '' ) {
+                continue;
+            }
+
+            // filter out non selected language
+            if ( 'none' !== $language && $language !== $payload['language_code'] ?? '' ) {
+                continue;
+            }
+
+            $hash[] = $data;
+
+            $counts[$data['type']]++;
+
+            $features[] = array(
+                'type' => 'Feature',
+                'properties' => array(
+                    "type" => esc_attr( $data['type'] ),
+                    "language" => esc_attr( $payload['language_code'] ?? '' ),
+                    "country" => esc_attr( $payload['country'] ?? '' )
+                ),
+                'geometry' => array(
+                    'type' => 'Point',
+                    'coordinates' => array(
+                        $location['lng'],
+                        $location['lat'],
+                        1
+                    ),
+                ),
+            );
+
+        } // end foreach loop
+
+        ksort( $countries );
+        ksort( $languages );
+
+        $new_data = array(
+            'type' => 'FeatureCollection',
+            'counts' => $counts,
+            'countries' => $countries,
+            'languages' => $languages,
+            'hash' => hash( 'sha256', serialize( $hash ) ),
+            'features' => $features,
+        );
+
+        return $new_data;
+    }
+
+    public static function activity_list( $data ) {
+        global $wpdb;
+
+        $bounds = $data['bounds'];
+        $tz_name = $data['timezone'];
+        $country = $data['country'];
+        $language = $data['language'];
+
+        $utc_time = new DateTime( 'now', new DateTimeZone( $tz_name ) );
+        $timezoneOffset = $utc_time->format( 'Z' );
+
+        $timestamp = strtotime( '-100 hours' );
+        $results = $wpdb->get_results( $wpdb->prepare( "
+                SELECT action, category, lng, lat, label, payload, timestamp
+                FROM $wpdb->dt_movement_log
+                WHERE timestamp > %s
+                AND lng < %s
+                AND lng > %s
+                AND lat > %s
+                AND lat < %s
+                ORDER BY timestamp DESC
+                LIMIT 250
+                ", $timestamp, $bounds['e_lng'],$bounds['w_lng'],$bounds['s_lat'],$bounds['n_lat'] ), ARRAY_A );
+
+        /**
+         * (none) - #0E172F
+         * Blessing - blessing- #21336A
+         * Great Blessing - great_blessing - #2CACE2
+         * Greater Blessing - greater_blessing - #90C741
+         * Greatest Blessing - greatest_blessing - #FAEA38
+         */
+        $counts = [
+            'learning' => 0,
+            'joining' => 0,
+            'producing' => 0,
+        ];
+        $countries = [];
+        $languages = [];
+        $hash = [];
+
+        $features = [];
+        foreach ( $results as $result ) {
+
+            $payload = maybe_unserialize( $result['payload'] );
+
+            // make country list from results
+            if ( isset( $payload['country'] ) && ! empty( $payload['country'] ) ) {
+                $countries[$payload['country']] = $payload['country'];
+            }
+
+            // make language list
+            if ( isset( $payload['language_name'] )
+                && ! empty( $payload['language_name'] )
+                && isset( $payload['language_code'] )
+                && ! empty( $payload['language_code'] )
+            ) {
+                $languages[$payload['language_code']] = $payload['language_name'];
+            }
+
+            // BUILD NOTE
+
+            // time string
+            $time_string = self::create_time_string( $result['timestamp'], $timezoneOffset );
+
+            // language
+            $in_language = self::create_in_language_string( $payload );
+
+            // initials string
+            $initials = self::create_initials( $result['lng'], $result['lat'], $payload );
+
+            // location string
+            $location = self::create_location_precision( $result['lng'], $result['lat'], $result['label'], $payload );
+
+            // note and type data
+            $data = self::create_note_data( $result['category'], $result['action'], $initials, $in_language, $location['label'], $payload );
+
+            // filter out non selected country
+            if ( 'none' !== $country && $country !== $payload['country'] ?? '' ) {
+                continue;
+            }
+
+            // filter out non selected language
+            if ( 'none' !== $language && $language !== $payload['language_code'] ?? '' ) {
+                continue;
+            }
+
+            $hash[] = $data;
+
+            $counts[$data['type']]++;
+
+            $features[] = array(
+                "note" => esc_html( $data['note'] ),
+                "type" => esc_attr( $data['type'] ),
+                "time" => esc_attr( $time_string ),
+                "language" => esc_attr( $payload['language_code'] ?? '' ),
+                "country" => esc_attr( str_replace( ' ', '_', strtolower( $payload['country'] ?? '' ) ) )
+            );
+
+        } // end foreach loop
+
+        ksort( $countries );
+        ksort( $languages );
+
+        $new_data = $features;
 
         return $new_data;
     }
