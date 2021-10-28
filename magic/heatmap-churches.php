@@ -99,7 +99,7 @@ class Zume_Public_Heatmap_Churches extends DT_Magic_Url_Base
         </script>
         <style>
             #report-modal-button {
-                display:block !important;
+                display:none !important;
             }
         </style>
         <?php

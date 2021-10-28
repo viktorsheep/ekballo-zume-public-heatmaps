@@ -11,15 +11,19 @@ jQuery(document).ready(function(){
   // Add html and map
   chartDiv.empty().html(`
       <style>
-          #activity-list-wrapper {
-              height: ${window.innerHeight - 270}px !important;
+          #activity-wrapper {
+              height: ${window.innerHeight - 200}px !important;
               overflow: scroll;
           }
-          #activity-list-wrapper li {
+          #activity-list{
+              height: ${window.innerHeight - 200}px !important;
+              overflow: scroll;
+          }
+          #activity-list li {
               font-size:.8em;
               list-style-type: none;
           }
-          #activity-list-wrapper h2 {
+          #activity-list h2 {
               font-size:1.2em;
               font-weight:bold;
           }
@@ -28,10 +32,6 @@ jQuery(document).ready(function(){
           }
           #map {
               height: ${window.innerHeight}px !important;
-          }
-          #activity-wrapper {
-              height: ${window.innerHeight}px !important;
-              overflow: scroll;
           }
       </style>
       <div class="grid-x">
@@ -47,29 +47,22 @@ jQuery(document).ready(function(){
                 </div>
                 <div class="cell">
                     <div>
-                        <select name="type" id="type-dropdown">
-                            <option value="none">Filter by Type</option>
-                            <option value="learning">Learning</option>
-                            <option value="joining">Joining</option>
-                            <option value="producing">Producing</option>
-
+                        <select name="type" id="type-dropdown" class="input-filter">
+                            <option value="none">All Types</option>
                         </select>
                     </div>
                     <div>
-                        <select name="country" id="country-dropdown">
-                            <option value="none">Filter by Country</option>
+                        <select name="country" id="country-dropdown" class="input-filter">
+                            <option value="none">All Countries</option>
                         </select>
                     </div>
                     <div>
-                        <select name="language" id="language-dropdown">
-                            <option value="none">Filter by Language</option>
+                        <select name="language" id="language-dropdown" class="input-filter">
+                            <option value="none">All Languages</option>
                         </select>
                     </div>
                 </div>
                 <div class="cell"><div class="loading-spinner active"></div></div>
-                <div class="cell">
-
-                </div>
             </div>
             <div id="activity-wrapper">
                 <ul id="activity-list"></ul>
@@ -86,7 +79,7 @@ jQuery(document).ready(function(){
     center: [-98, 38.88],
     minZoom: 1,
     maxZoom: 15,
-    zoom: 0
+    zoom: 1
   });
 
   // disable map rotation using right click + drag
@@ -96,6 +89,17 @@ jQuery(document).ready(function(){
   map.on('load', function() {
     initialize_cluster_map()
   });
+
+  map.on('zoomend', function(e){
+    load_map_activity()
+  })
+  map.on('dragend', function(e){
+    load_map_activity()
+  })
+
+  // #323a68
+  // #00aeff
+
   function initialize_cluster_map() {
     map.addSource('layer-source-contacts', {
       type: 'geojson',
@@ -113,11 +117,11 @@ jQuery(document).ready(function(){
         'circle-color': [
           'step',
           ['get', 'point_count'],
-          '#51bbd6',
-          100,
-          '#f1f075',
-          750,
-          '#f28cb1'
+          '#00d9ff',
+          20,
+          '#00aeff',
+          150,
+          '#90C741'
         ],
         'circle-radius': [
           'step',
@@ -147,7 +151,7 @@ jQuery(document).ready(function(){
       source: 'layer-source-contacts',
       filter: ['!', ['has', 'point_count']],
       paint: {
-        'circle-color': '#11b4da',
+        'circle-color': '#00d9ff',
         'circle-radius':12,
         'circle-stroke-width': 1,
         'circle-stroke-color': '#fff'
@@ -155,30 +159,30 @@ jQuery(document).ready(function(){
     });
   }
 
-  function initial_load_geojson(){
-    window.post_request('initial_load_geojson', {} )
+  function load_geojson(){
+    let data = get_filters()
+    window.post_request('load_geojson', data )
       .done( data => {
         console.log(data)
         "use strict";
         window.activity_geojson = data
-        update_cluster_map()
+
+        var mapSource= map.getSource('layer-source-contacts');
+        if( typeof mapSource !== 'undefined') {
+          map.getSource('layer-source-contacts').setData(window.activity_geojson);
+        }
+
+        load_countries_dropdown()
+        load_languages_dropdown()
+        load_type_dropdown()
       })
   }
+
   function load_map_activity() {
     container.empty()
     let spinner = jQuery('.loading-spinner')
     spinner.addClass('active')
-    window.current_bounds = map.getBounds()
-
-    let country = jQuery('#country-dropdown').val()
-    let language = jQuery('#language-dropdown').val()
-
-    let data = {
-      bounds: { 'n_lat': window.current_bounds._ne.lat, 's_lat': window.current_bounds._sw.lat, 'e_lng': window.current_bounds._ne.lng, 'w_lng': window.current_bounds._sw.lng},
-      timezone: 'America/Denver',
-      country: country,
-      language: language
-    }
+    let data = get_filters()
 
     window.post_request('activity_list', data )
       .done( data => {
@@ -190,44 +194,80 @@ jQuery(document).ready(function(){
         spinner.removeClass('active')
       })
   }
-  initial_load_geojson()
+  load_geojson()
   load_map_activity()
 
+  jQuery('.input-filter').on('change', function(e){
+    load_map_activity()
+    limit_cluster_to_filter()
+  })
 
-  function update_cluster_map() {
+  function get_filters() {
+    window.current_bounds = map.getBounds()
+    let country = jQuery('#country-dropdown').val()
+    let language = jQuery('#language-dropdown').val()
+    let type = jQuery('#type-dropdown').val()
+    return {
+      bounds: { 'n_lat': window.current_bounds._ne.lat, 's_lat': window.current_bounds._sw.lat, 'e_lng': window.current_bounds._ne.lng, 'w_lng': window.current_bounds._sw.lng},
+      timezone: 'America/Denver',
+      country: country,
+      language: language,
+      type: type,
+      zoom: map.getZoom()
+    }
+  }
+  function limit_cluster_to_filter() {
+    let data = get_filters()
+    console.log(data)
+
+    let geojson = {
+      "type": "FeatureCollection",
+      "features": []
+    }
+
+    jQuery.each( window.activity_geojson.features, function(i,v){
+      if ( data.type === v.properties.type ) {
+        geojson.features.push(v)
+      } else if ( data.language === v.properties.language ) {
+        geojson.features.push(v)
+      } else if ( data.country === v.properties.country ) {
+        geojson.features.push(v)
+      }
+
+      if ( 'none' === data.type && 'none' === data.language && 'none' === data.country ) {
+        geojson.features.push(v)
+      }
+
+    })
+
     var mapSource= map.getSource('layer-source-contacts');
     if(typeof mapSource === 'undefined') {
-      initial_load_geojson()
+      load_geojson()
     } else {
-      map.getSource('layer-source-contacts').setData(window.activity_geojson);
+      map.getSource('layer-source-contacts').setData(geojson);
     }
-    load_countries_dropdown()
-    load_languages_dropdown()
   }
 
   function update_activity_list(){
     container.empty()
     let spinner = jQuery('.loading-spinner')
-    jQuery.each( window.activity_list, function(i,v){
+    jQuery.each( window.activity_list.list, function(i,v){
       if ( '' === v.note ) {
         return
       }
       container.append(`<li class="${v.type} ${v.country} ${v.language}"><strong>(${v.time})</strong> ${v.note} </li>`)
     })
 
-    if ( window.activity_list.length < 1 ) {
+    if ( window.activity_list.list.length < 1 ) {
       container.append(`<li><strong>Results</strong> 0</li>`)
+    }
+
+    if ( window.activity_list.count > 250 ) {
+      container.append(`<li><strong>Additional Records</strong> ${window.activity_list.count - 250}</li>`)
     }
 
     spinner.removeClass('active')
   }
-
-  map.on('zoomend', function(e){
-    load_map_activity()
-  })
-  map.on('dragend', function(e){
-    load_map_activity()
-  })
 
   function load_countries_dropdown() {
     let country_dropdown = jQuery('#country-dropdown')
@@ -236,15 +276,14 @@ jQuery(document).ready(function(){
     country_dropdown.empty()
 
     let add_selected = ''
-    country_dropdown.append(`<option value="none">Filter by Country</option>`)
-    country_dropdown.append(`<option value="none">Clear</option>`)
+    country_dropdown.append(`<option value="none">All Countries</option>`)
     country_dropdown.append(`<option disabled>---</option>`)
     jQuery.each(points.countries, function(i,v){
       add_selected = ''
-      if ( i === window.selected_country ) {
+      if ( v.code === window.selected_country ) {
         add_selected = ' selected'
       }
-      country_dropdown.append(`<option value="${i}" ${add_selected}>${v}</option>`)
+      country_dropdown.append(`<option value="${v.code}" ${add_selected}>${v.name} (${v.count})</option>`)
     })
   }
   function load_languages_dropdown() {
@@ -254,15 +293,31 @@ jQuery(document).ready(function(){
     language_dropdown.empty()
 
     let add_selected = ''
-    language_dropdown.append(`<option value="none">Filter by Language</option>`)
-    language_dropdown.append(`<option value="none">Clear</option>`)
+    language_dropdown.append(`<option value="none">All Languages</option>`)
     language_dropdown.append(`<option disabled>---</option>`)
     jQuery.each(points.languages, function(i,v){
       add_selected = ''
-      if ( i === window.selected_language ) {
+      if ( v.code === window.selected_language ) {
         add_selected = ' selected'
       }
-      language_dropdown.append(`<option value="${i}" ${add_selected}>${v}</option>`)
+      language_dropdown.append(`<option value="${v.code}" ${add_selected}>${v.name} (${v.count})</option>`)
+    })
+  }
+  function load_type_dropdown() {
+    let type_dropdown = jQuery('#type-dropdown')
+    let points = window.activity_geojson
+    window.selected_language = type_dropdown.val()
+    type_dropdown.empty()
+
+    let add_selected = ''
+    type_dropdown.append(`<option value="none">All Types</option>`)
+    type_dropdown.append(`<option disabled>---</option>`)
+    jQuery.each(points.types, function(i,v){
+      add_selected = ''
+      if ( v.code === window.selected_language ) {
+        add_selected = ' selected'
+      }
+      type_dropdown.append(`<option value="${v.code}" ${add_selected}>${v.name} (${v.count})</option>`)
     })
   }
 })

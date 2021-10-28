@@ -132,30 +132,30 @@ class Zume_App_Multiplier extends DT_Magic_Url_Base {
 
         /* intro js */
         wp_enqueue_script( 'introjs-js', trailingslashit( plugin_dir_url( __FILE__ ) ) . 'intro.min.js', [],
-            filemtime( trailingslashit( plugin_dir_path( __FILE__ ) ) .'intro.min.js' ), true );
+        filemtime( trailingslashit( plugin_dir_path( __FILE__ ) ) .'intro.min.js' ), true );
 
         wp_enqueue_style( 'introjs-css', trailingslashit( plugin_dir_url( __FILE__ ) ) . 'introjs.min.css', [],
-            filemtime( trailingslashit( plugin_dir_path( __FILE__ ) ) .'introjs.min.css' ) );
+        filemtime( trailingslashit( plugin_dir_path( __FILE__ ) ) .'introjs.min.css' ) );
 
         /* jquery cookie */
         wp_enqueue_script( 'jquery-cookie', trailingslashit( plugin_dir_url( __FILE__ ) ) . 'js.cookie.min.js', [ 'jquery' ],
-            filemtime( trailingslashit( plugin_dir_path( __FILE__ ) ) .'js.cookie.min.js' ), true );
+        filemtime( trailingslashit( plugin_dir_path( __FILE__ ) ) .'js.cookie.min.js' ), true );
 
         /* group-gen */
         wp_enqueue_script( 'multiplier-js', trailingslashit( plugin_dir_url( __FILE__ ) ) . 'multiplier.js', [ 'jquery' ],
-            filemtime( trailingslashit( plugin_dir_path( __FILE__ ) ) .'multiplier.js' ), true );
+        filemtime( trailingslashit( plugin_dir_path( __FILE__ ) ) .'multiplier.js' ), true );
 
         wp_enqueue_style( 'portal-app-css', trailingslashit( plugin_dir_url( __FILE__ ) ) . 'portal-app.css', [],
-            filemtime( trailingslashit( plugin_dir_path( __FILE__ ) ) .'portal-app.css' ) );
+        filemtime( trailingslashit( plugin_dir_path( __FILE__ ) ) .'portal-app.css' ) );
 
         if ( 'map' === $this->parts['action'] ) {
 
             /* heatmap */
             wp_enqueue_script( 'heatmap-js', trailingslashit( plugin_dir_url( __FILE__ ) ) . 'heatmap.js', [],
-                filemtime( trailingslashit( plugin_dir_path( __FILE__ ) ) .'heatmap.js' ), true );
+            filemtime( trailingslashit( plugin_dir_path( __FILE__ ) ) .'heatmap.js' ), true );
 
             wp_enqueue_style( 'heatmap-css', trailingslashit( plugin_dir_url( __FILE__ ) ) . 'heatmap.css', [],
-                filemtime( trailingslashit( plugin_dir_path( __FILE__ ) ) .'heatmap.css' ) );
+            filemtime( trailingslashit( plugin_dir_path( __FILE__ ) ) .'heatmap.css' ) );
 
             wp_enqueue_script( 'mapbox-cookie', trailingslashit( get_stylesheet_directory_uri() ) . 'dt-mapping/geocode-api/mapbox-cookie.js', [ 'jquery', 'jquery-cookie' ], '3.0.0' );
         }
@@ -163,10 +163,10 @@ class Zume_App_Multiplier extends DT_Magic_Url_Base {
 
             /* domenu */
             wp_enqueue_script( 'portal-app-domenu-js', trailingslashit( plugin_dir_url( __FILE__ ) ) . 'jquery.domenu-0.100.77.min.js', [ 'jquery' ],
-                filemtime( trailingslashit( plugin_dir_path( __FILE__ ) ) .'jquery.domenu-0.100.77.min.js' ), true );
+            filemtime( trailingslashit( plugin_dir_path( __FILE__ ) ) .'jquery.domenu-0.100.77.min.js' ), true );
 
             wp_enqueue_style( 'portal-app-domenu-css', trailingslashit( plugin_dir_url( __FILE__ ) ) . 'jquery.domenu-0.100.77.css', [],
-                filemtime( trailingslashit( plugin_dir_path( __FILE__ ) ) .'jquery.domenu-0.100.77.css' ) );
+            filemtime( trailingslashit( plugin_dir_path( __FILE__ ) ) .'jquery.domenu-0.100.77.css' ) );
         }
 
     }
@@ -311,7 +311,7 @@ class Zume_App_Multiplier extends DT_Magic_Url_Base {
 
         <!-- nav -->
         <?php
-        require_once ( 'multiplier-nav.php' );
+        require_once( 'multiplier-nav.php' );
         require_once( 'multiplier.html' );
     }
 
@@ -329,7 +329,7 @@ class Zume_App_Multiplier extends DT_Magic_Url_Base {
 
         <!-- nav -->
         <?php
-        require_once ( 'multiplier-nav.php' );
+        require_once( 'multiplier-nav.php' );
         require_once( 'multiplier-map.html' );
     }
 
@@ -472,6 +472,7 @@ class Zume_App_Multiplier extends DT_Magic_Url_Base {
      * @see https://stackoverflow.com/questions/2915748/convert-a-series-of-parent-child-relationships-into-a-hierarchical-tree
      *
      * @param $tree
+     * @param $title_list
      * @param null $root
      * @return array|null
      */
