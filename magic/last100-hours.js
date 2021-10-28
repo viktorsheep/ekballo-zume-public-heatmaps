@@ -1,7 +1,6 @@
 jQuery(document).ready(function(){
   let chartDiv = jQuery('#chart')
 
-  window.activity_filter = {}
   window.activity_list = {}
   window.activity_geojson = {
     "type": "FeatureCollection",
@@ -33,17 +32,28 @@ jQuery(document).ready(function(){
           #map {
               height: ${window.innerHeight}px !important;
           }
+           #map-header {
+                position: absolute;
+                top:10px;
+                left:10px;
+                z-index: 20;
+                background-color: white;
+                padding:1em;
+                opacity: 0.8;
+                border-radius: 5px;
+            }
       </style>
       <div class="grid-x">
         <div class="medium-9 cell">
             <div id="map-wrapper">
                 <div id='map'></div>
+                <div id="map-header"><h3>Last 100 Hours of Movement Activity</h3></div>
             </div>
         </div>
         <div class="medium-3 cell">
             <div class="grid-x grid-padding-x">
                 <div class="cell">
-                    <h2>Activity List</h2>
+                    <h2 style="padding-top:.7rem;">Activity List</h2>
                 </div>
                 <div class="cell">
                     <div>
@@ -96,9 +106,6 @@ jQuery(document).ready(function(){
   map.on('dragend', function(e){
     load_map_activity()
   })
-
-  // #323a68
-  // #00aeff
 
   function initialize_cluster_map() {
     map.addSource('layer-source-contacts', {
@@ -237,7 +244,6 @@ jQuery(document).ready(function(){
       if ( 'none' === data.type && 'none' === data.language && 'none' === data.country ) {
         geojson.features.push(v)
       }
-
     })
 
     var mapSource= map.getSource('layer-source-contacts');
@@ -263,7 +269,7 @@ jQuery(document).ready(function(){
     }
 
     if ( window.activity_list.count > 250 ) {
-      container.append(`<li><strong>Additional Records</strong> ${window.activity_list.count - 250}</li>`)
+      container.append(`<hr><li><strong>${window.activity_list.count - 250} Additional Records. (Zoom or Filter map to focus results)</strong></li><br><br>`)
     }
 
     spinner.removeClass('active')

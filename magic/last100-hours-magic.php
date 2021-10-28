@@ -35,7 +35,6 @@ class Zume_Public_Heatmap_100hours_V2 extends DT_Magic_Url_Base {
          */
         add_action( 'rest_api_init', [ $this, 'add_endpoints' ] );
 
-
         /**
          * tests if other URL
          */
@@ -49,17 +48,6 @@ class Zume_Public_Heatmap_100hours_V2 extends DT_Magic_Url_Base {
         if ( !$this->check_parts_match( false ) ){
             return;
         }
-
-        // require classes
-        if ( ! class_exists( 'DT_Ipstack_API' ) ) {
-            require_once( trailingslashit( get_theme_file_path() ) . 'dt-mapping/geocode-api/ipstack-api.php' );
-        }
-        if ( ! class_exists( 'DT_Mapbox_API' ) ) {
-            require_once( trailingslashit( get_theme_file_path() ) . 'dt-mapping/geocode-api/mapbox-api.php' );
-        }
-
-        // remove header notification
-        remove_action( 'wp_head', 'dt_release_modal' );
 
         // load if valid url
         add_action( 'wp_enqueue_scripts', [ $this, 'scripts' ], 99 );
@@ -101,92 +89,6 @@ class Zume_Public_Heatmap_100hours_V2 extends DT_Magic_Url_Base {
                 background-color: white;
                 padding: 0;
             }
-            /**
-            Custom Styles
-             */
-            .blessing {
-                background-color: #21336A;
-                border: 1px solid white;
-                color: white;
-                font-weight: bold;
-                margin:0;
-            }
-            .great-blessing {
-                background-color: #2CACE2;
-                border: 1px solid white;
-                color: white;
-                font-weight: bold;
-                margin:0;
-            }
-            .greater-blessing {
-                background-color: #FAEA38;
-                border: 1px solid white;
-                color: #21336A;
-                font-weight: bold;
-                margin:0;
-            }
-            .greatest-blessing {
-                background-color: #90C741;
-                border: 1px solid white;
-                color: white;
-                font-weight: bold;
-                margin:0;
-            }
-            .blessing:hover {
-                border: 1px solid #21336A;
-            }
-            .great-blessing:hover {
-                border: 1px solid #21336A;
-                background-color: #2CACE2;
-            }
-            .greater-blessing:hover {
-                border: 1px solid #21336A;
-                background-color: #FAEA38;
-                color: #21336A;
-            }
-            .greatest-blessing:hover {
-                border: 1px solid #21336A;
-                background-color: #90C741;
-            }
-            .filtered {
-                background-color: lightgrey;
-                color: white;
-            }
-            .filtered:hover {
-                background-color: lightgrey;
-                border: 1px solid #21336A;
-                color: white;
-            }
-            #activity-list {
-                font-size:.7em;
-                list-style-type:none;
-            }
-            #map-loader {
-                position: absolute;
-                top:40%;
-                left:50%;
-                z-index: 20;
-            }
-            #map-header {
-                position: absolute;
-                top:10px;
-                left:10px;
-                z-index: 20;
-                background-color: white;
-                padding:1em;
-                opacity: 0.8;
-                border-radius: 5px;
-            }
-            .center-caption {
-                font-size:.8em;
-                text-align:center;
-                color:darkgray;
-            }
-            .caption {
-                font-size:.8em;
-                color:darkgray;
-                padding-bottom:1em;
-            }
         </style>
         <?php
     }
@@ -205,18 +107,6 @@ class Zume_Public_Heatmap_100hours_V2 extends DT_Magic_Url_Base {
                 'parts' => $this->parts
             ]) ?>][0]
             /* <![CDATA[ */
-
-            window.dt_mapbox_metrics = [<?php echo json_encode([
-                'translations' => [
-                    'title' => __( "Last 100 Hours", "disciple_tools" ),
-                ],
-                'settings' => [
-                    'map_key' => DT_Mapbox_API::get_key(),
-                    'points_rest_url' => '/'.$this->type,
-                    'points_rest_base_url' => $this->root . '/v1',
-                ]
-            ]) ?>][0]
-            /* ]]> */
 
             window.post_request = ( action, data ) => {
                 return jQuery.ajax({
@@ -284,27 +174,4 @@ class Zume_Public_Heatmap_100hours_V2 extends DT_Magic_Url_Base {
         }
     }
 
-//    public function geojson( $data ) {
-//        if ( isset( $data['timezone'] ) && ! empty( $data['timezone'] ) ) {
-//            $tz_name = sanitize_text_field( wp_unslash( $data['timezone'] ) );
-//        } else {
-//            $tz_name = 'America/Denver';
-//        }
-//        $country = 'none';
-//        if ( isset( $data['country'] ) && ! empty( $data['country'] )) {
-//            $country = sanitize_text_field( wp_unslash( $data['country'] ) );
-//        }
-//        $language = 'none';
-//        if ( isset( $data['language'] ) && ! empty( $data['language'] )) {
-//            $language = sanitize_text_field( wp_unslash( $data['language'] ) );
-//        }
-//        return Zume_Public_Heatmap_100hours_Utilities::get_activity_geojson( $tz_name, $country, $language );
-//    }
-//
-//    public function _empty_geojson() {
-//        return array(
-//            'type' => 'FeatureCollection',
-//            'features' => []
-//        );
-//    }
 }
