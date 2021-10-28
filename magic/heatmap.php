@@ -36,7 +36,7 @@ class Zume_App_Heatmap {
 
 			UNION ALL
             --
-            # admin 1 for countries that have no level 2 (768)
+            # admin 1 locations that have no level 2 (768)
             --
             SELECT
             lg2.grid_id, lg2.population, lg2.country_code
