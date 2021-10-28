@@ -293,7 +293,7 @@ class Zume_App_Portal extends DT_Magic_Url_Base {
 
     public function groups_body(){
         DT_Mapbox_API::geocoder_scripts();
-       ?>
+        ?>
         <!-- title -->
         <div class="grid-x">
             <div class="cell padding-1" >
@@ -305,8 +305,8 @@ class Zume_App_Portal extends DT_Magic_Url_Base {
 
         <!-- nav -->
         <?php
-        require_once ( 'portal-nav.php' );
-        require_once ( 'portal.html' );
+        require_once( 'portal-nav.php' );
+        require_once( 'portal.html' );
 
     }
 
@@ -449,7 +449,7 @@ class Zume_App_Portal extends DT_Magic_Url_Base {
         ", $post_id), ARRAY_A );
 
         if ( ! empty( $list ) ) {
-            foreach( $list as $index => $item ) {
+            foreach ( $list as $index => $item ) {
                 $list[$index]['lng'] = (float) $item['lng'];
                 $list[$index]['lat'] = (float) $item['lat'];
             }
@@ -461,6 +461,7 @@ class Zume_App_Portal extends DT_Magic_Url_Base {
      * @see https://stackoverflow.com/questions/2915748/convert-a-series-of-parent-child-relationships-into-a-hierarchical-tree
      *
      * @param $tree
+     * @param $title_list
      * @param null $root
      * @return array|null
      */

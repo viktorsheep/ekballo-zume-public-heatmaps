@@ -86,7 +86,7 @@ class Zume_Public_Heatmap_100hours_V2 extends DT_Magic_Url_Base {
     public function scripts() {
         wp_enqueue_script( 'lodash' );
         wp_enqueue_script( 'last100-hours-js', trailingslashit( plugin_dir_url( __FILE__ ) ) . 'last100-hours.js', [ 'jquery' ],
-            filemtime( trailingslashit( plugin_dir_path( __FILE__ ) ) .'last100-hours.js' ), true );
+        filemtime( trailingslashit( plugin_dir_path( __FILE__ ) ) .'last100-hours.js' ), true );
     }
 
     /**
@@ -275,92 +275,36 @@ class Zume_Public_Heatmap_100hours_V2 extends DT_Magic_Url_Base {
         $action = sanitize_text_field( wp_unslash( $params['action'] ) );
 
         switch ( $action ) {
+            case 'load_geojson':
+                return Zume_Public_Heatmap_100hours_Utilities::get_activity_geojson();
             case 'activity_list':
-                return Zume_Public_Heatmap_100hours_Utilities::activity_list( $params['data'] );
-            case 'initial_load_geojson':
-                return $this->points_geojson();
+                return Zume_Public_Heatmap_100hours_Utilities::get_activity_list( $params['data'], true );
             default:
                 return new WP_Error( __METHOD__, "Missing valid action", [ 'status' => 400 ] );
         }
     }
 
-    public function _empty_geojson() {
-        return array(
-            'type' => 'FeatureCollection',
-            'features' => []
-        );
-    }
-
-    public function points_geojson() {
-//        $params = $request->get_json_params() ?? $request->get_body_params();
-//        if ( isset( $params['timezone_offset'] ) && ! empty( $params['timezone_offset'] ) ) {
-//            $tz_name = sanitize_text_field( wp_unslash( $params['timezone_offset'] ) );
+//    public function geojson( $data ) {
+//        if ( isset( $data['timezone'] ) && ! empty( $data['timezone'] ) ) {
+//            $tz_name = sanitize_text_field( wp_unslash( $data['timezone'] ) );
 //        } else {
 //            $tz_name = 'America/Denver';
 //        }
 //        $country = 'none';
-//        if ( isset( $params['country'] ) && ! empty( $params['country'] )) {
-//            $country = sanitize_text_field( wp_unslash( $params['country'] ) );
+//        if ( isset( $data['country'] ) && ! empty( $data['country'] )) {
+//            $country = sanitize_text_field( wp_unslash( $data['country'] ) );
 //        }
 //        $language = 'none';
-//        if ( isset( $params['language'] ) && ! empty( $params['language'] )) {
-//            $language = sanitize_text_field( wp_unslash( $params['language'] ) );
+//        if ( isset( $data['language'] ) && ! empty( $data['language'] )) {
+//            $language = sanitize_text_field( wp_unslash( $data['language'] ) );
 //        }
-
-        $tz_name = 'America/Denver';
-
-        return Zume_Public_Heatmap_100hours_Utilities::query_activity_geojson( $tz_name );
-    }
-
-    public function filtered_geojson(  ){
-//        if ( !$this->has_permission() ) {
-//            return new WP_Error( __METHOD__, "Missing Permissions", array( 'status' => 400 ) );
-//        }
-
-        $feed = $this->get_activity_log();
-
-        /**
-         * Build GEOJSON
-         */
-        $features = array();
-        $no_location = 0;
-        $has_location = 0;
-        foreach ( $feed as $value ) {
-            if ( empty( $value['lng'] ) || empty( $value['lat'] ) ) {
-                $no_location++;
-                continue;
-            }
-            $has_location++;
-
-            $features[] = array(
-                'type' => 'Feature',
-                'properties' => array(
-                    "name" => $value['site_name'] ?? '',
-                    "action" => $value['action'],
-                ),
-                'geometry' => array(
-                    'type' => 'Point',
-                    'coordinates' => array(
-                        $value['lng'],
-                        $value['lat'],
-                        1
-                    ),
-                ),
-            );
-        }
-
-        $geojson = array(
-            'type' => 'FeatureCollection',
-            'no_location' => $no_location,
-            'has_location' => $has_location,
-            'features' => $features,
-        );
-
-        return $geojson;
-
-    }
-
-
-
-
+//        return Zume_Public_Heatmap_100hours_Utilities::get_activity_geojson( $tz_name, $country, $language );
+//    }
+//
+//    public function _empty_geojson() {
+//        return array(
+//            'type' => 'FeatureCollection',
+//            'features' => []
+//        );
+//    }
 }

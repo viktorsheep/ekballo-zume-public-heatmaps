@@ -247,7 +247,7 @@ class Zume_Public_Heatmap_100hours extends DT_Magic_Url_Base {
                 <div id="dynamic-styles"></div>
                 <div id="map-wrapper">
                     <div id='map'></div>
-                    <div id="map-loader" class="spinner-loader"><img src="<?php echo plugin_dir_url( __DIR__ ) ?>/spinner.svg" width="100px" /></div>
+                    <div id="map-loader" class="spinner-loader"><img src="<?php echo esc_url( plugin_dir_url( __DIR__ ) ) ?>/spinner.svg" width="100px" /></div>
                     <div id="map-header"><h3>Last 100 Hours of Zúme</h3></div>
                 </div>
             </div>
@@ -411,7 +411,7 @@ class Zume_Public_Heatmap_100hours extends DT_Magic_Url_Base {
                         <span aria-hidden="true">&times;</span>
                     </button>
                 </div>
-                <div id="list-loader" class="spinner-loader"><img src="<?php echo plugin_dir_url( __DIR__ ) ?>/spinner.svg" width="50px" /> </div>
+                <div id="list-loader" class="spinner-loader"><img src="<?php echo esc_url( plugin_dir_url( __DIR__ ) ) ?>/spinner.svg" width="50px" /> </div>
                 <!-- Activity List -->
                 <div id="activity-wrapper">
                     <ul id="activity-list"></ul>
@@ -912,12 +912,12 @@ class Zume_Public_Heatmap_100hours extends DT_Magic_Url_Base {
             $language = sanitize_text_field( wp_unslash( $params['language'] ) );
         }
 
-        return Zume_Public_Heatmap_100hours_v1_Utilities::query_contacts_points_geojson( $tz_name, $country, $language );
+        return Zume_Public_Heatmap_100hours_V1_Utilities::query_contacts_points_geojson( $tz_name, $country, $language );
     }
 
 }
 
-class Zume_Public_Heatmap_100hours_v1_Utilities {
+class Zume_Public_Heatmap_100hours_V1_Utilities {
 
     public static function create_initials( $longitude, $latitude, $payload ) : string {
         $letters = [
@@ -1483,7 +1483,7 @@ class Zume_Public_Heatmap_100hours_v1_Utilities {
         global $wpdb;
 
         $utc_time = new DateTime( 'now', new DateTimeZone( $tz_name ) );
-        $timezoneOffset = $utc_time->format( 'Z' );
+        $timezone_offset = $utc_time->format( 'Z' );
 
         $timestamp = strtotime( '-100 hours' );
         $results = $wpdb->get_results( $wpdb->prepare( "
@@ -1529,7 +1529,7 @@ class Zume_Public_Heatmap_100hours_v1_Utilities {
             // BUILD NOTE
 
             // time string
-            $time_string = self::create_time_string( $result['timestamp'], $timezoneOffset );
+            $time_string = self::create_time_string( $result['timestamp'], $timezone_offset );
 
             // language
             $in_language = self::create_in_language_string( $payload );
