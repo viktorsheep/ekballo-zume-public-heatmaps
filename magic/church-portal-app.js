@@ -206,7 +206,7 @@ window.create_group = () => {
         })
 
         response.post.title = ""
-
+        response.post.name = ""
         window.load_modal_content( response.post, response.post_fields )
 
       } else {

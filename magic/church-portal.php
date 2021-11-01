@@ -61,10 +61,7 @@ class Zume_App_Portal extends DT_Magic_Url_Base {
         if ( 'list' === $this->parts['action'] ) {
             add_action( 'dt_blank_body', [ $this, 'list_body' ] );
         }
-        else if ( 'map' === $this->parts['action'] ) {
-            add_action( 'dt_blank_body', [ $this, 'map_body' ] );
-        }
-        else if ( '' === $this->parts['action'] ) {
+        else if ( '' === $this->parts['action'] || 'map' === $this->parts['action'] ) {
             add_action( 'dt_blank_body', [ $this, 'map_body' ] );
         } else {
             return;
@@ -128,11 +125,11 @@ class Zume_App_Portal extends DT_Magic_Url_Base {
         filemtime( trailingslashit( plugin_dir_path( __FILE__ ) ) .'js.cookie.min.js' ), true );
 
         /* group-gen */
-        wp_enqueue_script( 'portal-app-js', trailingslashit( plugin_dir_url( __FILE__ ) ) . 'portal-app.js', [ 'jquery' ],
-        filemtime( trailingslashit( plugin_dir_path( __FILE__ ) ) .'portal-app.js' ), true );
+        wp_enqueue_script( 'portal-app-js', trailingslashit( plugin_dir_url( __FILE__ ) ) . 'church-portal-app.js', [ 'jquery' ],
+        filemtime( trailingslashit( plugin_dir_path( __FILE__ ) ) .'church-portal-app.js' ), true );
 
-        wp_enqueue_style( 'portal-app-css', trailingslashit( plugin_dir_url( __FILE__ ) ) . 'portal-app.css', [],
-        filemtime( trailingslashit( plugin_dir_path( __FILE__ ) ) .'portal-app.css' ) );
+        wp_enqueue_style( 'portal-app-css', trailingslashit( plugin_dir_url( __FILE__ ) ) . 'church-portal-app.css', [],
+        filemtime( trailingslashit( plugin_dir_path( __FILE__ ) ) .'church-portal-app.css' ) );
 
         if ( '' === $this->parts['action'] || 'map' === $this->parts['action'] ) {
 
@@ -393,13 +390,26 @@ class Zume_App_Portal extends DT_Magic_Url_Base {
 
         <!-- nav -->
         <?php
-        require_once( 'portal-nav.php' );
-        require_once( 'portal.html' );
+        require_once( 'church-portal-nav.php' );
+        require_once( 'church-portal.html' );
     }
 
     public function map_body(){
         DT_Mapbox_API::geocoder_scripts();
-        require_once( 'portal-map.html' );
+        ?>
+        <!-- title -->
+        <div class="grid-x">
+            <div class="cell padding-1" >
+                <button type="button" style="margin:1em;" id="menu-icon" data-open="offCanvasLeft"><i class="fi-list" style="font-size:2em;"></i></button>
+                <span style="font-size:1.5rem;font-weight: bold;">Report by Map</span>
+                <span class="loading-spinner active" style="float:right;margin:10px;"></span><!-- javascript container -->
+            </div>
+        </div>
+
+        <!-- nav -->
+        <?php
+        require_once( 'church-portal-nav.php' );
+        require_once( 'church-portal-map.html' );
     }
 
     /**
