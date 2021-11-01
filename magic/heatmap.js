@@ -443,11 +443,12 @@ function hide_details_panel(){
 
 function load_self_content( data ) {
   if ('groups' === jsObject.post_type ) {
+    let pop_div = data.population_division_int * 2
     jQuery('#custom-paragraph').html(`
       <span class="self_name ucwords temp-spinner bold">${data.name}</span> is one of <span class="self_peers  bold">${data.peers}</span>
       administrative divisions in <span class="parent_name ucwords bold">${data.parent_name}</span> and it has a population of
       <span class="self_population  bold">${data.population}</span>.
-      In order to reach the community goal of 2 churches for every <span class="population_division  bold">${data.population_division}</span> people,
+      In order to reach the community goal of 2 churches for every <span class="population_division  bold">${pop_div.toLocaleString("en-US")}</span> people,
       <span class="self_name ucwords  bold">${data.name}</span> needs
       <span class="self_needed bold">${data.needed}</span> new churches.
     `)

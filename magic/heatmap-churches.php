@@ -99,7 +99,7 @@ class Zume_Public_Heatmap_Churches extends DT_Magic_Url_Base
         </script>
         <style>
             #report-modal-button {
-                display:none !important;
+                display:block !important;
             }
         </style>
         <?php
@@ -186,8 +186,9 @@ class Zume_Public_Heatmap_Churches extends DT_Magic_Url_Base
                 $grid_totals = Zume_App_Heatmap::query_church_grid_totals();
                 return Zume_App_Heatmap::_initial_polygon_value_list( $grid_totals, $this->global_div, $this->us_div );
             case 'new_registration':
-                // @todo add registration process
-                return $params;
+                return Zume_App_Heatmap::create_new_reporter( 'zume_app', 'report_new_churches', $params['data'] );
+            case 'send_link':
+                return Zume_App_Heatmap::send_reporter_link( 'zume_app', 'report_new_churches', $params['data'] );
             default:
                 return new WP_Error( __METHOD__, "Missing valid action", [ 'status' => 400 ] );
         }

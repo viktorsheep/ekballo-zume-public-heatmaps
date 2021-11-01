@@ -11,13 +11,13 @@ class Zume_App_Portal extends DT_Magic_Url_Base {
     public $parts = false;
     public $page_title = 'Zume Portal';
     public $root = "zume_app";
-    public $type = 'portal';
+    public $type = 'report_new_churches';
     public $post_type = 'contacts';
     private $meta_key = '';
     public $type_actions = [
-        '' => "Groups",
-        'map' => "Map",
-        'help' => "Help",
+        '' => "Map",
+        'map' => "by Location",
+        'list' => "by Generation List",
     ];
     public $us_div = 2500; // this is 2 for every 5000
     public $global_div = 25000; // this equals 2 for every 50000
@@ -40,6 +40,7 @@ class Zume_App_Portal extends DT_Magic_Url_Base {
         add_action( 'dt_details_additional_section', [ $this, 'dt_details_additional_section' ], 30, 2 );
         add_filter( 'dt_details_additional_tiles', [ $this, 'dt_details_additional_tiles' ], 10, 2 );
         add_action( 'rest_api_init', [ $this, 'add_endpoints' ] );
+        add_filter( 'dt_custom_fields_settings', [ $this, 'add_active_reporter_status' ], 50, 2 );
 
         /**
          * tests if other URL
@@ -56,16 +57,17 @@ class Zume_App_Portal extends DT_Magic_Url_Base {
         }
 
         // load if valid url
-        if ( 'map' === $this->parts['action'] ) {
+
+        if ( 'list' === $this->parts['action'] ) {
+            add_action( 'dt_blank_body', [ $this, 'list_body' ] );
+        }
+        else if ( 'map' === $this->parts['action'] ) {
             add_action( 'dt_blank_body', [ $this, 'map_body' ] );
         }
-        else if ( 'help' === $this->parts['action'] ) {
-            add_action( 'dt_blank_body', [ $this, 'help_body' ] );
-        }
         else if ( '' === $this->parts['action'] ) {
-            add_action( 'dt_blank_body', [ $this, 'groups_body' ] );
+            add_action( 'dt_blank_body', [ $this, 'map_body' ] );
         } else {
-            add_action( 'dt_blank_body', [ $this, 'groups_body' ] );
+            return;
         }
 
         // load if valid url
@@ -83,11 +85,11 @@ class Zume_App_Portal extends DT_Magic_Url_Base {
         $allowed_js[] = 'jquery-cookie';
         $allowed_js[] = 'portal-app-js';
 
-        if ( 'map' === $this->parts['action'] ) {
+        if ( '' === $this->parts['action'] || 'map' === $this->parts['action'] ) {
             $allowed_js[] = 'heatmap-js';
             $allowed_js[] = 'mapbox-cookie';
         }
-        else if ( '' === $this->parts['action'] || 'groups' === $this->parts['action'] ) {
+        else if ( 'list' === $this->parts['action'] ) {
             $allowed_js[] = 'portal-app-domenu-js';
         }
 
@@ -100,10 +102,10 @@ class Zume_App_Portal extends DT_Magic_Url_Base {
         $allowed_css[] = 'introjs-css';
         $allowed_css[] = 'portal-app-css';
 
-        if ( 'map' === $this->parts['action'] ) {
+        if ( '' === $this->parts['action'] || 'map' === $this->parts['action'] ) {
             $allowed_css[] = 'heatmap-css';
         }
-        else if ( '' === $this->parts['action'] || 'groups' === $this->parts['action'] ) {
+        else if ( 'list' === $this->parts['action'] ) {
             $allowed_css[] = 'portal-app-domenu-css';
         }
 
@@ -115,7 +117,7 @@ class Zume_App_Portal extends DT_Magic_Url_Base {
         wp_register_script( 'jquery-touch-punch', '/wp-includes/js/jquery/jquery.ui.touch-punch.js' ); // @phpcs:ignore
 
         /* intro js */
-        wp_enqueue_script( 'introjs-js', trailingslashit( plugin_dir_url( __FILE__ ) ) . 'intro.min.js', [],
+        wp_enqueue_script( 'introjs-js', trailingslashit( plugin_dir_url( __FILE__ ) ) . 'intro.min.js', ['jquery'],
         filemtime( trailingslashit( plugin_dir_path( __FILE__ ) ) .'intro.min.js' ), true );
 
         wp_enqueue_style( 'introjs-css', trailingslashit( plugin_dir_url( __FILE__ ) ) . 'introjs.min.css', [],
@@ -132,7 +134,7 @@ class Zume_App_Portal extends DT_Magic_Url_Base {
         wp_enqueue_style( 'portal-app-css', trailingslashit( plugin_dir_url( __FILE__ ) ) . 'portal-app.css', [],
         filemtime( trailingslashit( plugin_dir_path( __FILE__ ) ) .'portal-app.css' ) );
 
-        if ( 'map' === $this->parts['action'] ) {
+        if ( '' === $this->parts['action'] || 'map' === $this->parts['action'] ) {
 
             /* heatmap */
             wp_enqueue_script( 'heatmap-js', trailingslashit( plugin_dir_url( __FILE__ ) ) . 'heatmap.js', [],
@@ -143,7 +145,7 @@ class Zume_App_Portal extends DT_Magic_Url_Base {
 
             wp_enqueue_script( 'mapbox-cookie', trailingslashit( get_stylesheet_directory_uri() ) . 'dt-mapping/geocode-api/mapbox-cookie.js', [ 'jquery', 'jquery-cookie' ], '3.0.0' );
         }
-        else if ( '' === $this->parts['action'] || 'groups' === $this->parts['action'] ) {
+        else if ( 'list' === $this->parts['action'] ) {
 
             /* domenu */
             wp_enqueue_script( 'portal-app-domenu-js', trailingslashit( plugin_dir_url( __FILE__ ) ) . 'jquery.domenu-0.100.77.min.js', [ 'jquery' ],
@@ -155,13 +157,53 @@ class Zume_App_Portal extends DT_Magic_Url_Base {
 
     }
 
+    public function add_active_reporter_status( array $fields, string $post_type = "" ) {
+        //check if we are dealing with a contact
+        if ( $post_type === "contacts" ) {
+            if ( isset( $fields["overall_status"] ) && !isset( $fields["overall_status"]["default"]["active_reporter"] ) ) {
+                $fields["overall_status"]["default"]["active_reporter"] = __( "Active Reporter", 'disciple-tools-facebook' );
+            }
+            $fields['inquiry_permission'] = [
+                'name'   => 'Community Inquiry Permission',
+                'type'   => 'text',
+                'hidden' => true,
+            ];
+        }
+        return $fields;
+    }
+
+    public static function dt_user_list_filters( $filters, $post_type )
+    {
+        if ($post_type === 'contacts') {
+            $filters["filters"][] = [
+                'ID' => 'active_reporter',
+                'visible' => "1",
+                'type' => 'default',
+                'tab' => 'default',
+                'name' => __( 'Active Reporter', 'disciple_tools' ),
+                'count' => 0,
+                'query' => [
+                    "overall_status" => [ "active_reporter" ]
+                ],
+                'labels' => [
+                    [
+                        'id' => 'active_reporter',
+                        'name' => __( 'Active Reporter', 'disciple_tools' ),
+                        'field' => 'overall_status',
+                    ],
+                ],
+            ];
+        }
+        return $filters;
+    }
+
     /**
      * Writes javascript to the footer
      *
      * @see DT_Magic_Url_Base()->footer_javascript() for default state
      */
     public function footer_javascript(){
-        if ( 'map' === $this->parts['action'] ) {
+        if ( '' === $this->parts['action'] || 'map' === $this->parts['action'] ) {
             ?>
             <script>
                 let jsObject = [<?php echo json_encode([
@@ -170,6 +212,7 @@ class Zume_App_Portal extends DT_Magic_Url_Base {
                     'theme_uri' => trailingslashit( get_stylesheet_directory_uri() ),
                     'root' => esc_url_raw( rest_url() ),
                     'nonce' => wp_create_nonce( 'wp_rest' ),
+                    'intro_images' => trailingslashit( plugin_dir_url( __FILE__ ) ) . 'images/',
                     'parts' => $this->parts,
                     'post_type' => 'groups',
                     'trans' => [
@@ -178,12 +221,35 @@ class Zume_App_Portal extends DT_Magic_Url_Base {
                     'grid_data' => ['data' => [], 'highest_value' => 1 ],
                     'custom_marks' => $this->get_custom_map_markers( $this->parts['post_id'] )
                 ]) ?>][0]
+
+                jQuery(document).ready(function() {
+                    if ( ! Cookies.get('portal_app_maps_intro') ) {
+                        introJs().setOptions({
+                            steps: [
+                                {
+                                    element: document.querySelector('#menu-icon'),
+                                    intro: `<h1>Menu</h1>Access the side menu for help and other views.<br><br><img src="${jsObject.intro_images}open-menu.gif" />`
+                                },
+                                {
+                                    element: document.querySelector('.dd-new-item'),
+                                    intro: `<h1>Add New Groups</h1>Add new groups by clicking here.<br><br><img src="${jsObject.intro_images}create-new-item.gif" />`
+                                },
+                                {
+                                    intro: `<h1>Set Generations</h1>You can arrange groups according to generation by just dragging them under their parent church.<br><br><img src="${jsObject.intro_images}nesting-generations.gif" /><br>`
+                                }
+                            ]
+                        }).start();
+
+                        Cookies.set('portal_app_maps_intro', true )
+                    }
+                })
+
             </script>
             <?php
 
             $this->customized_welcome_script();
         }
-        else if ( '' === $this->parts['action'] || 'groups' === $this->parts['action'] ) {
+        else if ( 'list' === $this->parts['action'] ) {
             $post_id = $this->parts["post_id"];
             $post = DT_Posts::get_post( $this->post_type, $post_id, true, false );
             if ( is_wp_error( $post ) ){
@@ -204,6 +270,28 @@ class Zume_App_Portal extends DT_Magic_Url_Base {
                     ],
                     'grid_data' => ['data' => [], 'highest_value' => 1 ],
                 ]) ?>][0]
+
+                jQuery(document).ready(function() {
+                    if ( ! Cookies.get('portal_app_list_intro') ) {
+                        introJs().setOptions({
+                            steps: [
+                                {
+                                    element: document.querySelector('#menu-icon'),
+                                    intro: `<h1>Menu</h1>Access the side menu for help and other views.<br><br><img src="${jsObject.intro_images}open-menu.gif" />`
+                                },
+                                {
+                                    element: document.querySelector('.dd-new-item'),
+                                    intro: `<h1>Add New Groups</h1>Add new groups by clicking here.<br><br><img src="${jsObject.intro_images}create-new-item.gif" />`
+                                },
+                                {
+                                    intro: `<h1>Set Generations</h1>You can arrange groups according to generation by just dragging them under their parent church.<br><br><img src="${jsObject.intro_images}nesting-generations.gif" /><br>`
+                                }
+                            ]
+                        }).start();
+
+                        Cookies.set('portal_app_list_intro', true )
+                    }
+                })
             </script>
             <?php
         }
@@ -291,14 +379,14 @@ class Zume_App_Portal extends DT_Magic_Url_Base {
         }
     }
 
-    public function groups_body(){
+    public function list_body(){
         DT_Mapbox_API::geocoder_scripts();
         ?>
         <!-- title -->
         <div class="grid-x">
             <div class="cell padding-1" >
                 <button type="button" style="margin:1em;" id="menu-icon" data-open="offCanvasLeft"><i class="fi-list" style="font-size:2em;"></i></button>
-                <span style="font-size:1.5rem;font-weight: bold;">Report Churches by Generation</span>
+                <span style="font-size:1.5rem;font-weight: bold;">Report by Generation List</span>
                 <span class="loading-spinner active" style="float:right;margin:10px;"></span><!-- javascript container -->
             </div>
         </div>
@@ -307,17 +395,11 @@ class Zume_App_Portal extends DT_Magic_Url_Base {
         <?php
         require_once( 'portal-nav.php' );
         require_once( 'portal.html' );
-
     }
 
     public function map_body(){
         DT_Mapbox_API::geocoder_scripts();
         require_once( 'portal-map.html' );
-    }
-
-    public function help_body(){
-        DT_Mapbox_API::geocoder_scripts();
-        require_once( 'portal-help-html.php' );
     }
 
     /**
@@ -544,7 +626,8 @@ class Zume_App_Portal extends DT_Magic_Url_Base {
                         'prev_parent' => $parent_id,
                         'temp_id' => $temp_id,
                         'post' => $new_post,
-                        'post_fields' => DT_Posts::get_post_field_settings( 'groups', true, false )
+                        'post_fields' => DT_Posts::get_post_field_settings( 'groups', true, false ),
+                        'custom_marks' => self::get_custom_map_markers( $post_id ),
                     ];
                 }
                 else {
@@ -587,7 +670,8 @@ class Zume_App_Portal extends DT_Magic_Url_Base {
                         'id' => $new_post['ID'],
                         'title' => $new_post['name'],
                         'post' => $new_post,
-                        'post_fields' => DT_Posts::get_post_field_settings( 'groups', true, false )
+                        'post_fields' => DT_Posts::get_post_field_settings( 'groups', true, false ),
+                        'custom_marks' => self::get_custom_map_markers( $post_id ),
                     ];
                 }
                 else {

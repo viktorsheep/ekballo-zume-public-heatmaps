@@ -2742,6 +2742,7 @@ class Zume_App_Heatmap {
             'level' => $grid['level'],
             'parent_level' => $grid['level'] - 1, // one level higher than current
             'population_division' => number_format_i18n( $population_division ), // label for content not calculation
+            'population_division_int' => $population_division, // label for content not calculation
             'name' => $grid['name'],
             'parent_name' => $grid['parent_name'],
             'peers' => number_format_i18n( $grid['peers'] ),
@@ -3016,15 +3017,40 @@ class Zume_App_Heatmap {
     }
 
     public static function create_new_reporter( $root, $type, $data ) {
+
+        if ( ! isset( $data['name'], $data['phone'], $data['email'], $data['inquiry_permission'] ) ) {
+            return [
+                'status' => 'FAIL',
+                'error' => new WP_Error(__METHOD__, 'Missing parameter',  [ 'status' => 400 ] )
+            ];
+        }
+
+        $data['email'] = sanitize_email( wp_unslash( $data['email'] ) );
+
+        // search for email address
+        $record_post_id = self::_search_for_email( $root, $type, $data['email'] );
+        if ( $record_post_id ) {
+            $link = DT_Magic_URL::get_link_url( $root, $type, $record_post_id['magic_key'] );
+            $subject = 'Personal Reporting Link';
+            $message_plain_text = 'Follow this link to access your personal portal
+
+'           . $link;
+            dt_send_email( $data['email'], $subject, $message_plain_text );
+
+            return [
+                'status' => 'EMAILED'
+            ];
+        }
+
         // prepare contact for creation
         $meta_key = $root . '_' . $type . '_magic_key';
         $key = dt_create_unique_key();
         $link = DT_Magic_URL::get_link_url( $root, $type, $key );
 
-        dt_write_log( $link );
-
         $fields = [
             'title' => $data['name'],
+            'overall_status' => 'active_reporter',
+            'type' => 'placeholder',
             "contact_phone" => [
                 [
                     "value" => $data['phone']
@@ -3035,26 +3061,108 @@ class Zume_App_Heatmap {
                     "value" => $data['email']
                 ]
             ],
+            "sources" => [
+                "values" => [
+                    [ "value" => 'active_reporter'],  //set a value, the value must be predefined in the field options
+                ]
+            ],
+            "tags" => [
+                "values" => [
+                    [ "value" => 'active_reporter'],  //set a value, the value must be predefined in the field options
+                ]
+            ],
+            "inquiry_permission" => $data['inquiry_permission'],
+            "notes" => [
+                "Source" => "This contact was self-registered as a reporter."
+            ],
             $meta_key => $key
         ];
 
         // create contact
         $new_post = DT_Posts::create_post( 'contacts', $fields, true, false );
-
-        dt_write_log( $new_post );
+        if ( is_wp_error( $new_post ) ) {
+            return [
+                'status' => 'FAIL',
+                'error' => $new_post
+            ];
+        }
 
         // email contact new magic link
-        $to = $data['email'];
         $subject = 'New Reporting Link';
-        $message = $link;
-        $headers[] = 'From: Disciple.Tools <no-reply@disciple.tools>';
-        $headers[] = 'Content-Type: text/html; charset=UTF-8';
-        mail( $to, $subject, $message, $headers );
+        $message_plain_text = 'Follow this link to access your personal portal
 
+'      . $link;
+        dt_send_email( $data['email'], $subject, $message_plain_text );
 
-        // return success
+        return [
+            'status' => 'CREATED',
+            'link' => $link
+        ];
+    }
 
-        return $link;
+    public static function send_reporter_link( $root, $type, $data ) {
+        // test if valid email
+        if ( ! isset( $data['email'] ) || empty( $data['email'] ) ) {
+            return new WP_Error(__METHOD__, 'email not set', [ 'status' => 400 ] );
+        }
+
+        // sanitize
+        $email = sanitize_email( wp_unslash( $data['email'] ) );
+
+        // search for email address
+        $record_post_id = self::_search_for_email( $root, $type, $email );
+
+        // generate link url
+        if ( ! $record_post_id ) {
+            return false;
+        }
+        else {
+            $link = DT_Magic_URL::get_link_url( $root, $type, $record_post_id['magic_key'] );
+            $subject = 'Personal Reporting Link';
+            $message_plain_text =
+'Follow this link to access your personal portal:
+
+' . $link;
+            dt_send_email( $email, $subject, $message_plain_text );
+
+            return true;
+        }
+    }
+
+    /**
+     * @param $root
+     * @param $type
+     * @param $email
+     * @return false|array
+     */
+    public static function _search_for_email( $root, $type, $email ) {
+        global $wpdb;
+        $record_post_id = $wpdb->get_results($wpdb->prepare( "
+            SELECT pm.post_id, pm1.meta_value as status, pm2.meta_value as magic_key
+            FROM $wpdb->postmeta pm
+            JOIN $wpdb->posts p ON p.ID=pm.post_id AND p.post_type = 'contacts'
+            LEFT JOIN $wpdb->postmeta pm1 ON pm.post_id = pm1.post_id AND pm1.meta_key = 'overall_status'
+            LEFT JOIN $wpdb->postmeta pm2 ON pm.post_id = pm2.post_id AND pm2.meta_key = %s
+            WHERE  pm.meta_value = %s
+        ", $root . '_' . $type . '_magic_key', $email ), ARRAY_A );
+
+        // empty or error
+        if ( is_wp_error($record_post_id) && empty( $record_post_id ) ) {
+            return false;
+        }
+        // found 1 match
+        else if ( count( $record_post_id ) === 1 ) {
+            return $record_post_id[0];
+        }
+        // found more than 1 match
+        else {
+            foreach( $record_post_id as $row ) {
+                if ( in_array( $row['status'], ['active', 'active_reporter'] ) ) {
+                    return $row;
+                }
+            }
+            return false;
+        }
     }
 }
 

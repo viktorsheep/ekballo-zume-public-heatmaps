@@ -3,11 +3,9 @@ jQuery(document).ready(function() {
 
   window.new_inc = 0
 
-  if ( '' === jsObject.parts.action || 'groups' === jsObject.parts.action ) {
+  if ( 'list' === jsObject.parts.action ) {
     window.load_tree()
-    if ( ! Cookies.get('portal_app_groups_intro') ) {
-      window.intro_home()
-    }
+
   }
 
 });
@@ -247,6 +245,8 @@ window.create_group_by_map = ( ) => {
           })
 
         response.post.title = ""
+        response.post.name = ""
+        jsObject.custom_marks = response.custom_marks
         window.load_modal_content( response.post, response.post_fields )
 
       } else {
@@ -291,6 +291,11 @@ window.load_modal_content = ( post, post_fields ) => {
     member_count = post.member_count
   }
 
+  let start_date = ''
+  if ( typeof post.church_start_date !== 'undefined' ) {
+    start_date = post.church_start_date.formatted
+  }
+
   let type_select
   let selected = 'church'
   if ( typeof post.group_type !== "undefined" ) {
@@ -324,9 +329,9 @@ window.load_modal_content = ( post, post_fields ) => {
 
             <!-- title -->
             <div class="cell">
-              Name<br>
+              Name <span style="color:red;">*</span><br>
               <div class="input-group">
-                <input type="text" style="border:0; border-bottom: 1px solid darkgrey;font-size:1.5rem;line-height: 2rem;" id="group_title" placeholder="${post.name}" value="${post.title}" />
+                <input type="text" style="border:0; border-bottom: 1px solid darkgrey;font-size:1.5rem;line-height: 2rem;" id="group_title" placeholder="${post.name}" value="${post.title}" autofocus />
                 <div class="input-group-button">
                      <div><span class="loading-field-spinner group_title"></span></div>
                 </div>
@@ -337,7 +342,7 @@ window.load_modal_content = ( post, post_fields ) => {
             <div class="cell">
               Start Date<br>
               <div class="input-group">
-                <input type="date" style="border:0; border-bottom: 1px solid darkgrey;font-size:1.5rem;line-height: 2rem;" id="group_start_date" value="${post.church_start_date.formatted}" />
+                <input type="date" style="border:0; border-bottom: 1px solid darkgrey;font-size:1.5rem;line-height: 2rem;" id="group_start_date" value="${start_date}" />
                 <div class="input-group-button">
                      <div><span class="loading-field-spinner group_start_date"></span></div>
                 </div>
@@ -435,7 +440,7 @@ window.load_modal_content = ( post, post_fields ) => {
   })
   jQuery(window).on(
     'closed.zf.reveal', function () {
-      if ( 'map' === jsObject.parts.action ) {
+      if ( '' === jsObject.parts.action || 'map' === jsObject.parts.action ) {
         load_map()
         jQuery('#offCanvasNestedPush').foundation('close')
       }
@@ -449,6 +454,7 @@ window.load_modal_content = ( post, post_fields ) => {
     lat = post.location_grid_meta[0].lat
   }
   load_mapbox(lng, lat, post.ID )
+
 
   jQuery('.loading-spinner').removeClass('active')
 }
@@ -666,26 +672,3 @@ function remove_location( id ) {
     })
 
 }
-
-window.intro_home = () => {
-
-  introJs().setOptions({
-    steps: [
-      {
-        element: document.querySelector('#menu-icon'),
-        intro: `<h1>Menu</h1>Access the side menu for help and other views.<br><br><img src="${jsObject.intro_images}open-menu.gif" />`
-      },
-      {
-        element: document.querySelector('.dd-new-item'),
-        intro: `<h1>Add New Groups</h1>Add new groups by clicking here.<br><br><img src="${jsObject.intro_images}create-new-item.gif" />`
-      },
-      {
-        intro: `<h1>Set Generations</h1>You can arrange groups according to generation by just dragging them under their parent church.<br><br><img src="${jsObject.intro_images}nesting-generations.gif" /><br>`
-      }
-    ]
-  }).start();
-
-  Cookies.set('portal_app_groups_intro', true )
-}
-
-
