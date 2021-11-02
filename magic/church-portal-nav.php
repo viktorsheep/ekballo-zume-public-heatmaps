@@ -21,7 +21,6 @@ if ( is_wp_error( $parts_post ) ){
             <div class="cell"><a href="<?php echo esc_url( site_url() . '/' . $this->parts['root'] . '/' . $this->parts['type'] . '/' . $this->parts['public_key'] . '/' ) ?>"><h3>Map</h3></a></div>
             <div class="cell"><a href="<?php echo esc_url( site_url() . '/' . $this->parts['root'] . '/' . $this->parts['type'] . '/' . $this->parts['public_key'] . '/list' ) ?>"><h3>List</h3></a></div>
             <br><br>
-            <div class="cell"><a onclick="window.intro()"><i class="fi-info" style="font-size:1.5rem;"></i> </a></div>
         </div>
     </div>
 </div>

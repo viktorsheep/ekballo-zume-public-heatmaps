@@ -74,6 +74,31 @@ jQuery(document).ready(function($){
         }
 
     `)
+  $('#custom-style-portal').empty().append(`
+        #wrapper {
+            height: ${window.innerHeight-60}px !important;
+        }
+        #map-wrapper {
+            height: ${window.innerHeight-60}px !important;
+        }
+        #map {
+            height: ${window.innerHeight-60}px !important;
+        }
+        .off-canvas.position-right {
+            width:${slider_width}px;
+            background-color:white;
+        }
+        #initialize-screen {
+            height: ${window.innerHeight-60}px !important;
+        }
+        #welcome-modal {
+            height: ${window.innerHeight - 30}px !important;
+        }
+        #map-sidebar-wrapper {
+            height: ${window.innerHeight-60}px !important;
+        }
+
+    `)
 
   let initialize_screen = jQuery('.initialize-progress')
 

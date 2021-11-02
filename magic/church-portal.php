@@ -225,19 +225,22 @@ class Zume_App_Portal extends DT_Magic_Url_Base {
                             steps: [
                                 {
                                     element: document.querySelector('#menu-icon'),
-                                    intro: `<h1>Menu</h1>Access the side menu for help and other views.<br><br><img src="${jsObject.intro_images}open-menu.gif" />`
+                                    intro: `<img src="${jsObject.intro_images}open-menu.gif" /><h1>Map View</h1>Add churches by clicking on the map<h1>List View</h1>Add and edit your churches and generation depth in list view.`
                                 },
                                 {
-                                    element: document.querySelector('.dd-new-item'),
-                                    intro: `<h1>Add New Groups</h1>Add new groups by clicking here.<br><br><img src="${jsObject.intro_images}create-new-item.gif" />`
+                                    element: document.querySelector('#map'),
+                                    intro: `<h1>Search for Location</h1>Speed your search for a location with the search field.`
                                 },
                                 {
-                                    intro: `<h1>Set Generations</h1>You can arrange groups according to generation by just dragging them under their parent church.<br><br><img src="${jsObject.intro_images}nesting-generations.gif" /><br>`
+                                    intro: `<h1>Click for More</h1>Click the map to reveal progress and goals for an administrativebrew  division.<br><br><img src="${jsObject.intro_images}nesting-generations.gif" /><br>`
+                                },
+                                {
+                                    intro: `<h1>Add New Church</h1>.<br><br><img src="${jsObject.intro_images}nesting-generations.gif" /><br>`
                                 }
                             ]
                         }).start();
 
-                        Cookies.set('portal_app_maps_intro', true )
+                        // Cookies.set('portal_app_maps_intro', true )
                     }
                 })
 
@@ -273,20 +276,19 @@ class Zume_App_Portal extends DT_Magic_Url_Base {
                         introJs().setOptions({
                             steps: [
                                 {
-                                    element: document.querySelector('#menu-icon'),
-                                    intro: `<h1>Menu</h1>Access the side menu for help and other views.<br><br><img src="${jsObject.intro_images}open-menu.gif" />`
-                                },
-                                {
                                     element: document.querySelector('.dd-new-item'),
-                                    intro: `<h1>Add New Groups</h1>Add new groups by clicking here.<br><br><img src="${jsObject.intro_images}create-new-item.gif" />`
+                                    intro: `<h1>Add New Churches</h1>Add new churches by clicking the dotted box. Then fill in the church information.<br><br><img src="${jsObject.intro_images}create-new-item.gif" />`
                                 },
                                 {
-                                    intro: `<h1>Set Generations</h1>You can arrange groups according to generation by just dragging them under their parent church.<br><br><img src="${jsObject.intro_images}nesting-generations.gif" /><br>`
+                                    intro: `<h1>Edit, Delete & Add Child Generation</h1>You can edit, add a child generation, and delete a reported church.<br><br><img src="${jsObject.intro_images}show-edit-buttons.gif" /><br>`
+                                },
+                                {
+                                    intro: `<h1>Set Generation Depth</h1>You can arrange groups according to generation by just dragging them under their parent church.<br><br><img src="${jsObject.intro_images}nesting-generations.gif" /><br>`
                                 }
                             ]
                         }).start();
 
-                        Cookies.set('portal_app_list_intro', true )
+                        // Cookies.set('portal_app_list_intro', true )
                     }
                 })
             </script>
@@ -378,13 +380,15 @@ class Zume_App_Portal extends DT_Magic_Url_Base {
 
     public function list_body(){
         DT_Mapbox_API::geocoder_scripts();
-        ?>
+            ?>
         <!-- title -->
         <div class="grid-x">
             <div class="cell padding-1" >
                 <button type="button" style="margin:1em;" id="menu-icon" data-open="offCanvasLeft"><i class="fi-list" style="font-size:2em;"></i></button>
                 <span style="font-size:1.5rem;font-weight: bold;">Report by Generation List</span>
-                <span class="loading-spinner active" style="float:right;margin:10px;"></span><!-- javascript container -->
+                <?php if ( ! wp_is_mobile() ) : ?>
+                    <span class="loading-spinner active" style="float:right;margin:10px;"></span><!-- javascript container -->
+                <?php endif; ?>
             </div>
         </div>
 
@@ -419,10 +423,10 @@ class Zume_App_Portal extends DT_Magic_Url_Base {
     public function add_endpoints() {
         $namespace = $this->root . '/v1';
         register_rest_route(
-            $namespace, '/'.$this->type, [
+            $namespace, '/'.$this->type . '_list', [
                 [
-                    'methods'  => "GET",
-                    'callback' => [ $this, 'endpoint_get' ],
+                    'methods'  => "POST",
+                    'callback' => [ $this, 'endpoint_list' ],
             //                    'permission_callback' => function( WP_REST_Request $request ){
             //                        $magic = new DT_Magic_URL( $this->root );
             //                        return $magic->verify_rest_endpoint_permissions_on_post( $request );
@@ -435,7 +439,7 @@ class Zume_App_Portal extends DT_Magic_Url_Base {
             $namespace, '/'.$this->type . '_update', [
                 [
                     'methods'  => "POST",
-                    'callback' => [ $this, 'update_record' ],
+                    'callback' => [ $this, 'endpoint_update' ],
             //                    'permission_callback' => function( WP_REST_Request $request ){
             //                        $magic = new DT_Magic_URL( $this->root );
             //                        return $magic->verify_rest_endpoint_permissions_on_post( $request );
@@ -450,14 +454,14 @@ class Zume_App_Portal extends DT_Magic_Url_Base {
             [
                 [
                     'methods'  => WP_REST_Server::CREATABLE,
-                    'callback' => [ $this, 'map_endpoint' ],
+                    'callback' => [ $this, 'endpoint_map' ],
                     'permission_callback' => '__return_true',
                 ],
             ]
         );
     }
 
-    public function map_endpoint( WP_REST_Request $request ) {
+    public function endpoint_map( WP_REST_Request $request ) {
         $params = $request->get_params();
 
         if ( ! isset( $params['parts'], $params['action'] ) ) {
@@ -489,7 +493,7 @@ class Zume_App_Portal extends DT_Magic_Url_Base {
         }
     }
 
-    public function endpoint_get( WP_REST_Request $request ) {
+    public function endpoint_list( WP_REST_Request $request ) {
         $params = $request->get_params();
         if ( ! isset( $params['parts'], $params['action'] ) ) {
             return new WP_Error( __METHOD__, "Missing parameters", [ 'status' => 400 ] );
@@ -530,56 +534,7 @@ class Zume_App_Portal extends DT_Magic_Url_Base {
         ];
     }
 
-    public function get_custom_map_markers( $post_id ) {
-        global $wpdb;
-        $list = $wpdb->get_results($wpdb->prepare( "
-            SELECT lgm.lng, lgm.lat, p.post_title
-            FROM $wpdb->p2p as p2p
-            LEFT JOIN $wpdb->dt_location_grid_meta as lgm ON lgm.post_id = p2p.p2p_from
-            LEFT JOIN $wpdb->posts as p ON p.ID = p2p.p2p_from
-            WHERE p2p.p2p_to = %s
-        ", $post_id), ARRAY_A );
-
-        if ( ! empty( $list ) ) {
-            foreach ( $list as $index => $item ) {
-                $list[$index]['lng'] = (float) $item['lng'];
-                $list[$index]['lat'] = (float) $item['lat'];
-            }
-        }
-        return $list;
-    }
-
-    /**
-     * @see https://stackoverflow.com/questions/2915748/convert-a-series-of-parent-child-relationships-into-a-hierarchical-tree
-     *
-     * @param $tree
-     * @param $title_list
-     * @param null $root
-     * @return array|null
-     */
-    public function parse_tree( $tree, $title_list, $root = null) {
-        $return = array();
-        # Traverse the tree and search for direct children of the root
-        foreach ($tree as $child => $parent) {
-            # A direct child is found
-            if ($parent == $root) {
-                # Remove item from tree (we don't need to traverse this again)
-                unset( $tree[$child] );
-                # Append the child into result array and parse its children
-                $return[] = array(
-                    'id' => $child,
-                    'title' => $child,
-                    'name' => $title_list[$child] ?? 'No Name',
-                    'children' => $this->parse_tree( $tree, $title_list, $child ),
-                    '__domenu_params' => []
-                );
-            }
-        }
-        return empty( $return ) ? null : $return;
-    }
-
-
-    public function update_record( WP_REST_Request $request ) {
+    public function endpoint_update( WP_REST_Request $request ) {
         $params = $request->get_params();
         if ( ! isset( $params['parts'], $params['action'] ) ) {
             return new WP_Error( __METHOD__, "Missing parameters", [ 'status' => 400 ] );
@@ -809,6 +764,55 @@ class Zume_App_Portal extends DT_Magic_Url_Base {
         }
         return false;
     }
+
+    public function get_custom_map_markers( $post_id ) {
+        global $wpdb;
+        $list = $wpdb->get_results($wpdb->prepare( "
+            SELECT lgm.lng, lgm.lat, p.post_title
+            FROM $wpdb->p2p as p2p
+            LEFT JOIN $wpdb->dt_location_grid_meta as lgm ON lgm.post_id = p2p.p2p_from
+            LEFT JOIN $wpdb->posts as p ON p.ID = p2p.p2p_from
+            WHERE p2p.p2p_to = %s
+        ", $post_id), ARRAY_A );
+
+        if ( ! empty( $list ) ) {
+            foreach ( $list as $index => $item ) {
+                $list[$index]['lng'] = (float) $item['lng'];
+                $list[$index]['lat'] = (float) $item['lat'];
+            }
+        }
+        return $list;
+    }
+
+    /**
+     * @see https://stackoverflow.com/questions/2915748/convert-a-series-of-parent-child-relationships-into-a-hierarchical-tree
+     *
+     * @param $tree
+     * @param $title_list
+     * @param null $root
+     * @return array|null
+     */
+    public function parse_tree( $tree, $title_list, $root = null) {
+        $return = array();
+        # Traverse the tree and search for direct children of the root
+        foreach ($tree as $child => $parent) {
+            # A direct child is found
+            if ($parent == $root) {
+                # Remove item from tree (we don't need to traverse this again)
+                unset( $tree[$child] );
+                # Append the child into result array and parse its children
+                $return[] = array(
+                    'id' => $child,
+                    'title' => $child,
+                    'name' => $title_list[$child] ?? 'No Name',
+                    'children' => $this->parse_tree( $tree, $title_list, $child ),
+                    '__domenu_params' => []
+                );
+            }
+        }
+        return empty( $return ) ? null : $return;
+    }
+
 
     /* map section */
 
