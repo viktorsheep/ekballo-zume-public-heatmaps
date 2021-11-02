@@ -41,11 +41,12 @@ class Zume_Public_Reporter_Manager extends DT_Magic_Url_Base
         add_action( 'dt_blank_body', [ $this, 'body' ] );
         add_filter( 'dt_magic_url_base_allowed_css', [ $this, 'dt_magic_url_base_allowed_css' ], 10, 1 );
         add_filter( 'dt_magic_url_base_allowed_js', [ $this, 'dt_magic_url_base_allowed_js' ], 10, 1 );
-//        add_action( 'wp_enqueue_scripts', [ $this, 'wp_enqueue_scripts' ], 99 );
+        add_action( 'wp_enqueue_scripts', [ $this, 'wp_enqueue_scripts' ], 99 );
 
     }
 
     public function dt_magic_url_base_allowed_js( $allowed_js ) {
+        $allowed_js[] = 'reporter';
         return $allowed_js;
     }
 
@@ -53,32 +54,9 @@ class Zume_Public_Reporter_Manager extends DT_Magic_Url_Base
         return $allowed_css;
     }
 
-    public function body(){
-        DT_Mapbox_API::geocoder_scripts();
-
-    }
-
-    public function footer_javascript(){
-        ?>
-        <script>
-            let jsObject = [<?php echo json_encode([
-                'map_key' => DT_Mapbox_API::get_key(),
-                'mirror_url' => dt_get_location_grid_mirror( true ),
-                'theme_uri' => trailingslashit( get_stylesheet_directory_uri() ),
-                'root' => esc_url_raw( rest_url() ),
-                'nonce' => wp_create_nonce( 'wp_rest' ),
-                'parts' => $this->parts,
-                'post_type' => $this->post_type,
-                'trans' => [
-                    'add' => __( 'Zume', 'disciple_tools' ),
-                ],
-            ]) ?>][0]
-
-            jQuery(document).ready(function($){
-                
-            })
-        </script>
-        <?php
+    public function wp_enqueue_scripts(){
+        wp_enqueue_script( 'reporter', trailingslashit( plugin_dir_url( __FILE__ ) ) . 'reporter.js', [
+        ], filemtime( plugin_dir_path( __FILE__ ) .'reporter.js' ), true );
     }
 
     public function add_endpoints() {
@@ -107,14 +85,54 @@ class Zume_Public_Reporter_Manager extends DT_Magic_Url_Base
         $action = sanitize_text_field( wp_unslash( $params['action'] ) );
 
         switch ( $action ) {
-            case '':
-
-                return true;
+            case 'new_registration':
+                return Zume_App_Heatmap::create_new_reporter( 'zume_app', 'report_new_churches', $params['data'] );
+            case 'send_link':
+                return Zume_App_Heatmap::send_reporter_link( 'zume_app', 'report_new_churches', $params['data'] );
 
             default:
                 return new WP_Error( __METHOD__, "Missing valid action", [ 'status' => 400 ] );
         }
     }
 
+    public function body(){
+        ?>
+        <div id="wrapper">
+            <div class="grid-x">
+                <div class="cell" id="report-content"></div>
+            </div>
+        </div>
+        <?php
+    }
 
+    public function footer_javascript(){
+        ?>
+        <style>
+            body {
+                background-color:white;
+            }
+            #wrapper {
+                max-width: 600px;
+                margin: 1em auto;
+            }
+            #email {
+                display:none !important;
+            }
+        </style>
+        <script>
+            let jsObject = [<?php echo json_encode([
+                'map_key' => DT_Mapbox_API::get_key(),
+                'mirror_url' => dt_get_location_grid_mirror( true ),
+                'theme_uri' => trailingslashit( get_stylesheet_directory_uri() ),
+                'root' => esc_url_raw( rest_url() ),
+                'nonce' => wp_create_nonce( 'wp_rest' ),
+                'parts' => $this->parts,
+                'post_type' => $this->post_type,
+                'trans' => [
+                    'add' => __( 'Zume', 'disciple_tools' ),
+                ],
+            ]) ?>][0]
+        </script>
+        <?php
+    }
 }

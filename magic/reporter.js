@@ -15,18 +15,9 @@ jQuery(document).ready(function($){
       })
   }
 
-  $('#report-modal-button').on('click', function() {
-    build_modal()
-    $('#report-modal').foundation('open');
-  })
-
   function build_modal(){
     // add html
-    $('#report-modal-title').empty().html(`
-        Contribute to the Map
-        <!-- <i class="fi-info primary-color small"></i>-->
-    `)
-    $('#report-modal-content').empty().html(`
+    $('#report-content').empty().html(`
         <input type="hidden" id="first report-grid-id" />
         <div id="panel1" class="not-new not-send">
             <div class="grid-x">
@@ -119,7 +110,8 @@ jQuery(document).ready(function($){
     $('#submit-send-link').on('click', function(){
       send_link_to_reporter()
     })
-  }
+  } // end function
+  build_modal()
 
 
   function create_reporter() {

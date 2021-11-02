@@ -109,8 +109,8 @@ class Zume_Public_Heatmaps_Tab_General {
                     <div id="post-body-content">
                         <!-- Main Column -->
 
-                        <?php DT_Ipstack_API::metabox_for_admin(); ?>
                         <?php $this->main_column() ?>
+                        <?php DT_Ipstack_API::metabox_for_admin(); ?>
 
                         <!-- End Main Column -->
                     </div><!-- end post-body-content -->
@@ -130,15 +130,6 @@ class Zume_Public_Heatmaps_Tab_General {
     }
 
     public function main_column() {
-        if ( isset( $_POST['heatmap_settings'] ) && wp_verify_nonce( sanitize_text_field( wp_unslash( $_POST['heatmap_settings'] ) ), 'heatmap_settings_nonce' ) ) {
-            $globe_div = sanitize_text_field( wp_unslash( str_replace( ',', '', trim( $_POST['globe_div'] ?? '' ) ) ) );
-            update_option( 'heatmap_global_div', $globe_div, true );
-
-            $us_div = sanitize_text_field( wp_unslash( str_replace( ',', '', trim( $_POST['us_div'] ?? '' ) ) ) );
-            update_option( 'heatmap_us_div', $us_div, true );
-        }
-        $globe_div = get_option( 'heatmap_global_div', 25000 );
-        $us_div = get_option( 'heatmap_us_div', 2500 );
         ?>
         <form method="post">
             <?php wp_nonce_field( 'heatmap_settings_nonce', 'heatmap_settings' )?>
@@ -152,26 +143,17 @@ class Zume_Public_Heatmaps_Tab_General {
             <tbody>
             <tr>
                 <td>
-                    Global Division <br>
-                    <input type="text" name="globe_div" value="<?php echo $globe_div ?>" />
+                   Reporter Manager<br>
+                    <a href="<?php echo site_url() ?>/zume_app/reporter_manager"><?php echo site_url() ?>/zume_app/reporter_manager</a>
                 </td>
             </tr>
             <tr>
                 <td>
-                    US Division <br>
-                    <input type="text" name="us_div" value="<?php echo $us_div ?>" />
+                    Church Heatmap<br>
+                    <a href="<?php echo site_url() ?>/zume_app/heatmap_churches"><?php echo site_url() ?>/zume_app/heatmap_churches</a>
                 </td>
             </tr>
-            <tr>
-                <td>
-                    The division about calculates the number of units per population division. Example: To get 2 churches for every 50k people. You must count one unit for every 25k, which results in 2 for every 50k.
-                </td>
-            </tr>
-            <tr>
-                <td>
-                    <button type="submit">Update</button>
-                </td>
-            </tr>
+
             </tbody>
         </table>
         <br>
