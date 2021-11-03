@@ -286,7 +286,7 @@ jQuery(document).ready(function(){
   function update_activity_list(){
     container.empty()
     let spinner = jQuery('.loading-spinner')
-    container.append(`<li>Found (${window.activity_list.count})</li><li><hr style="margin:0;"></li>`)
+    container.append(`<li>Found (${window.activity_list.count})</li><li><hr style="margin:0 0 1rem;"></li>`)
     jQuery.each( window.activity_list.list, function(i,v){
       if ( '' === v.note ) {
         return
