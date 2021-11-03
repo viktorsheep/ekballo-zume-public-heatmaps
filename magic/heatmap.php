@@ -3687,7 +3687,7 @@ class Zume_Public_Heatmap_100hours_Utilities {
         $timezoneOffset = $utc_time->format( 'Z' );
 
         $additional_where = '';
-        if ( ! empty( $filters['bounds'] ) && is_array( $filters['bounds'] ) && $filters['zoom'] > 2 && 'none' === $filters['country'] ) {
+        if ( ! empty( $filters['bounds'] ) && is_array( $filters['bounds'] ) && $filters['zoom'] > 1.5  ) {
             if ( isset( $filters['bounds']['n_lat'] )
                 && isset( $filters['bounds']['s_lat'] )
                 && isset( $filters['bounds']['e_lng'] )
@@ -3700,6 +3700,10 @@ class Zume_Public_Heatmap_100hours_Utilities {
                 AND lat < ".$filters['bounds']['n_lat']."
                 ";
             }
+        }
+
+        if ( 'none' !== $filters['country'] ) {
+            $additional_where .= " AND lga0.country_code = '" .$filters['country']. "'";
         }
 
         $timestamp = strtotime( '-100 hours' );
@@ -3722,7 +3726,6 @@ class Zume_Public_Heatmap_100hours_Utilities {
             }
         }
 
-        $features = [];
         foreach ( $results as $result ) {
 
             $payload = maybe_unserialize( $result['payload'] );
@@ -3746,34 +3749,55 @@ class Zume_Public_Heatmap_100hours_Utilities {
             // note and type data
             $data = self::create_note_data( $result['action'], $string_elements, $payload );
 
+            $prepared_array = array(
+                "note" => esc_html( $data['note'] ),
+                "time" => esc_attr( $time_string ),
+                "type" => esc_attr( $result['type'] ),
+                "language" => esc_attr( $payload['language_code'] ?? '' ),
+                "country" => esc_attr( $result['country_code'] )
+            );
+
             // filter out non selected country
-            $add = false;
+            // no filter set
             if ( 'none' === $filters['country'] && 'none' === $filters['language'] && 'none' === $filters['type'] ) {
-                $add = true;
+                $list[] = $prepared_array;
             }
-            else if ( $result['country_code'] === $filters['country'] ) {
-                $add = true;
+            // country set
+            else if ( $prepared_array['country'] === $filters['country'] && 'none' === $filters['language'] && 'none' === $filters['type'] ) {
+                $list[] = $prepared_array;
             }
-            else if ( ( $payload['language_code'] ?? '' ) === $filters['language'] ) {
-                $add = true;
+            // language set
+            else if ( 'none' === $filters['country'] && $prepared_array['language'] === $filters['language'] && 'none' === $filters['type'] ) {
+                $list[] = $prepared_array;
             }
-            else if ( $result['type'] === $filters['type'] ) {
-                $add = true;
+            // type set
+            else if ( 'none' === $filters['country'] && 'none' === $filters['language'] && $prepared_array['type'] === $filters['type'] ) {
+                $list[] = $prepared_array;
+            }
+            // language & type set
+            else if ( 'none' === $filters['country'] && $prepared_array['language'] === $filters['language'] && $prepared_array['type'] === $filters['type'] ) {
+                $list[] = $prepared_array;
+            }
+            // country & type set
+            else if ( $prepared_array['country'] === $filters['country'] && 'none' === $filters['language'] && $prepared_array['type'] === $filters['type'] ) {
+                $list[] = $prepared_array;
+            }
+            // country & language set
+            else if ( $prepared_array['country'] === $filters['country'] && $prepared_array['language'] === $filters['language'] && 'none' === $filters['type'] ) {
+                $list[] = $prepared_array;
+            }
+            // country & language & type set
+            else if ( $prepared_array['country'] === $filters['country'] && $prepared_array['language'] === $filters['language'] && $prepared_array['type'] === $filters['type'] ) {
+                $list[] = $prepared_array;
             }
 
-            if ( $add ) {
-                $list[] = array(
-                    "note" => esc_html( $data['note'] ),
-                    "time" => esc_attr( $time_string ),
-                    "type" => esc_attr( $result['type'] ),
-                    "language" => esc_attr( $payload['language_code'] ?? '' ),
-                    "country" => esc_attr( $result['country_code'] )
-                );
-            }
         } // end foreach loop
 
         if ( empty( $list ) ) {
-            return [];
+            return [
+                'list' => [],
+                'count' => 0
+            ];
         }
 
         $c = array_chunk( $list, 250 );

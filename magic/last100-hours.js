@@ -96,6 +96,13 @@ jQuery(document).ready(function(){
   map.dragRotate.disable();
   map.touchZoomRotate.disableRotation();
 
+  map.addControl(
+    new MapboxGeocoder({
+      accessToken: mapboxgl.accessToken,
+      mapboxgl: mapboxgl
+    })
+  );
+
   map.on('load', function() {
     initialize_cluster_map()
   });
@@ -233,17 +240,39 @@ jQuery(document).ready(function(){
     }
 
     jQuery.each( window.activity_geojson.features, function(i,v){
-      if ( data.type === v.properties.type ) {
-        geojson.features.push(v)
-      } else if ( data.language === v.properties.language ) {
-        geojson.features.push(v)
-      } else if ( data.country === v.properties.country ) {
-        geojson.features.push(v)
-      }
-
+      // none set
       if ( 'none' === data.type && 'none' === data.language && 'none' === data.country ) {
         geojson.features.push(v)
       }
+      // type set
+      else if ( v.properties.type === data.type && 'none' === data.language && 'none' === data.country ) {
+        geojson.features.push(v)
+      }
+      // language set
+      else if ( 'none' === data.type && v.properties.language === data.language && 'none' === data.country ) {
+        geojson.features.push(v)
+      }
+      // country set
+      else if ( 'none' === data.type && 'none' === data.language && v.properties.country === data.country ) {
+        geojson.features.push(v)
+      }
+      // language & type set
+      else if ( v.properties.type === data.type && v.properties.language === data.language && 'none' === data.country ) {
+        geojson.features.push(v)
+      }
+      // country & type set
+      else if ( v.properties.type === data.type && 'none' === data.language && v.properties.country === data.country ) {
+        geojson.features.push(v)
+      }
+      // country & language set
+      else if ( 'none' === data.type && v.properties.language === data.language && v.properties.country === data.country ) {
+        geojson.features.push(v)
+      }
+      // country & language & type set
+      else if ( v.properties.type === data.type && v.properties.language === data.language && v.properties.country === data.country ) {
+        geojson.features.push(v)
+      }
+
     })
 
     var mapSource= map.getSource('layer-source-contacts');
@@ -257,6 +286,7 @@ jQuery(document).ready(function(){
   function update_activity_list(){
     container.empty()
     let spinner = jQuery('.loading-spinner')
+    container.append(`<li>Found (${window.activity_list.count})</li><li><hr style="margin:0;"></li>`)
     jQuery.each( window.activity_list.list, function(i,v){
       if ( '' === v.note ) {
         return
@@ -264,7 +294,7 @@ jQuery(document).ready(function(){
       container.append(`<li class="${v.type} ${v.country} ${v.language}"><strong>(${v.time})</strong> ${v.note} </li>`)
     })
 
-    if ( window.activity_list.list.length < 1 ) {
+    if ( ! window.activity_list.list  ) {
       container.append(`<li><strong>Results</strong> 0</li>`)
     }
 
@@ -319,18 +349,19 @@ jQuery(document).ready(function(){
     let producing = ''
 
     let add_selected = ''
-    type_dropdown.append(`<option value="none">All Types</option>`)
-    type_dropdown.append(`<option disabled>---</option>`)
-    type_dropdown.append(`<option value="" id="learning"></option>`)
-    type_dropdown.append(`<option value="" id="joining"></option>`)
-    type_dropdown.append(`<option value="" id="producing"></option>`)
+    type_dropdown.append(
+      `<option value="none">All Types</option>
+        <option disabled>---</option>
+        <option value="" id="learning"></option>
+        <option value="" id="joining"></option>
+        <option value="" id="producing"></option>`
+    )
     jQuery.each(points.types, function(i,v){
       add_selected = ''
       if ( v.code === window.selected_type ) {
         add_selected = ' selected'
       }
       jQuery('#'+v.code).val(v.code).html(`${v.name} (${v.count})`)
-      // type_dropdown.append(`<option value="${v.code}" ${add_selected}>${v.name} (${v.count})</option>`)
     })
   }
 })
