@@ -137,7 +137,7 @@ class Zume_Public_Heatmaps_Tab_General {
         <table class="widefat striped">
             <thead>
             <tr>
-                <th>Heatmap Goals</th>
+                <th>Heatmaps</th>
             </tr>
             </thead>
             <tbody>
@@ -149,8 +149,36 @@ class Zume_Public_Heatmaps_Tab_General {
             </tr>
             <tr>
                 <td>
+                    Disciple-Maker Heatmap<br>
+                    <a href="<?php echo site_url() ?>/zume_app/heatmap_multipliers"><?php echo site_url() ?>/zume_app/heatmap_multipliers</a>
+                </td>
+            </tr>
+            <tr>
+                <td>
                     Church Heatmap<br>
                     <a href="<?php echo site_url() ?>/zume_app/heatmap_churches"><?php echo site_url() ?>/zume_app/heatmap_churches</a>
+                </td>
+            </tr>
+
+            <!-- Network Dashboard -->
+            <tr>
+                <td>
+                    Last 100 Hours<br>
+                    <a href="<?php echo site_url() ?>/zume_app/last100_hours"><?php echo site_url() ?>/zume_app/last100_hours</a>
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    Network Activity Map<br>
+                    <a href="<?php echo site_url() ?>/zume_app/heatmap_activity"><?php echo site_url() ?>/zume_app/heatmap_activity</a>
+                </td>
+            </tr>
+
+            <!-- Zume -->
+            <tr>
+                <td>
+                    Registrations Map<br>
+                    <a href="<?php echo site_url() ?>/zume_app/heatmap_activity"><?php echo site_url() ?>/zume_app/heatmap_activity</a>
                 </td>
             </tr>
 

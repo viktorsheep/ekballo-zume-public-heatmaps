@@ -54,7 +54,6 @@ class Zume_Public_Heatmap_Churches extends DT_Magic_Url_Base
         $allowed_js[] = 'jquery-cookie';
         $allowed_js[] = 'mapbox-cookie';
         $allowed_js[] = 'heatmap-js';
-        $allowed_js[] = 'heatmap-join-js';
         return $allowed_js;
     }
 
@@ -185,10 +184,6 @@ class Zume_Public_Heatmap_Churches extends DT_Magic_Url_Base
             case 'grid_data':
                 $grid_totals = Zume_App_Heatmap::query_church_grid_totals();
                 return Zume_App_Heatmap::_initial_polygon_value_list( $grid_totals, $this->global_div, $this->us_div );
-            case 'new_registration':
-                return Zume_App_Heatmap::create_new_reporter( 'zume_app', 'report_new_churches', $params['data'] );
-            case 'send_link':
-                return Zume_App_Heatmap::send_reporter_link( 'zume_app', 'report_new_churches', $params['data'] );
             default:
                 return new WP_Error( __METHOD__, "Missing valid action", [ 'status' => 400 ] );
         }
