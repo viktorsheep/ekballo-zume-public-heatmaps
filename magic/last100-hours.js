@@ -47,7 +47,7 @@ jQuery(document).ready(function(){
         <div class="medium-9 cell">
             <div id="map-wrapper">
                 <div id='map'></div>
-                <div id="map-header"><h3>Last 100 Hours of Movement Activity</h3></div>
+                <div id="map-header"><h3>Last 100 Hours of Activity</h3></div>
             </div>
         </div>
         <div class="medium-3 cell">
@@ -312,18 +312,25 @@ jQuery(document).ready(function(){
   function load_type_dropdown() {
     let type_dropdown = jQuery('#type-dropdown')
     let points = window.activity_geojson
-    window.selected_language = type_dropdown.val()
+    window.selected_type = type_dropdown.val()
     type_dropdown.empty()
+    let learning = ''
+    let joining = ''
+    let producing = ''
 
     let add_selected = ''
     type_dropdown.append(`<option value="none">All Types</option>`)
     type_dropdown.append(`<option disabled>---</option>`)
+    type_dropdown.append(`<option value="" id="learning"></option>`)
+    type_dropdown.append(`<option value="" id="joining"></option>`)
+    type_dropdown.append(`<option value="" id="producing"></option>`)
     jQuery.each(points.types, function(i,v){
       add_selected = ''
-      if ( v.code === window.selected_language ) {
+      if ( v.code === window.selected_type ) {
         add_selected = ' selected'
       }
-      type_dropdown.append(`<option value="${v.code}" ${add_selected}>${v.name} (${v.count})</option>`)
+      jQuery('#'+v.code).val(v.code).html(`${v.name} (${v.count})`)
+      // type_dropdown.append(`<option value="${v.code}" ${add_selected}>${v.name} (${v.count})</option>`)
     })
   }
 })
