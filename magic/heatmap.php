@@ -2763,7 +2763,7 @@ class Zume_App_Heatmap {
             return false;
         }
 
-        $percent = ceil( $level['reported'] / $level['needed'] * 100 );
+        $percent = $level['reported'] / $level['needed'] * 100 ;
         if ( 100 < $percent ) {
             $percent = 100;
         } else {
