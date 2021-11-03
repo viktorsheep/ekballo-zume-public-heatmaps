@@ -86,7 +86,7 @@ class Zume_Public_Heatmaps {
 
         require_once( 'magic/heatmap.php' );
         require_once( 'magic/heatmap-activity.php' );
-        require_once( 'magic/heatmap-church.php' );
+        require_once( 'magic/heatmap-churches.php' );
         require_once( 'magic/heatmap-trainings.php' );
         require_once( 'magic/heatmap-registrations.php' );
         require_once( 'magic/heatmap-trained-people.php' );

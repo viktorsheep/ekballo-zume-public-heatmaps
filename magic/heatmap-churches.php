@@ -96,11 +96,6 @@ class Zume_Public_Heatmap_Churches extends DT_Magic_Url_Base
                 'custom_marks' => []
             ]) ?>][0]
         </script>
-        <style>
-            #report-modal-button {
-                display:block !important;
-            }
-        </style>
         <?php
 
         $this->customized_welcome_script();
