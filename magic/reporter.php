@@ -96,6 +96,7 @@ class Zume_Public_Reporter_Manager extends DT_Magic_Url_Base
     }
 
     public function body(){
+        DT_Mapbox_API::geocoder_scripts();
         ?>
         <div id="wrapper">
             <div class="grid-x">
@@ -116,6 +117,9 @@ class Zume_Public_Reporter_Manager extends DT_Magic_Url_Base
                 margin: 1em auto;
             }
             #email {
+                display:none !important;
+            }
+            #email-send {
                 display:none !important;
             }
         </style>
@@ -170,7 +174,8 @@ class Zume_Public_Reporter_Manager extends DT_Magic_Url_Base
         $fields = [
             'title' => $data['name'],
             'overall_status' => 'active_reporter',
-            'type' => 'placeholder',
+            'type' => 'access',
+            'assigned_to' => 0,
             "contact_phone" => [
                 [
                     "value" => $data['phone']

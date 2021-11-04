@@ -9,15 +9,16 @@ class Zume_App_Portal extends DT_Magic_Url_Base {
 
     public $magic = false;
     public $parts = false;
-    public $page_title = 'Zume Portal';
+    public $page_title = 'Portal';
     public $root = "zume_app";
     public $type = 'report_new_churches';
     public $post_type = 'contacts';
     private $meta_key = '';
     public $type_actions = [
-        '' => "Map",
-        'map' => "by Location",
-        'list' => "by Generation List",
+        '' => "Home",
+        'profile' => "Profile",
+        'list' => "List View",
+        'map' => "Map View",
     ];
     public $us_div = 2500; // this is 2 for every 5000
     public $global_div = 25000; // this equals 2 for every 50000
@@ -61,8 +62,14 @@ class Zume_App_Portal extends DT_Magic_Url_Base {
         if ( 'list' === $this->parts['action'] ) {
             add_action( 'dt_blank_body', [ $this, 'list_body' ] );
         }
-        else if ( '' === $this->parts['action'] || 'map' === $this->parts['action'] ) {
+        else if ( 'map' === $this->parts['action'] ) {
             add_action( 'dt_blank_body', [ $this, 'map_body' ] );
+        }
+        else if ( 'profile' === $this->parts['action'] ) {
+            add_action( 'dt_blank_body', [ $this, 'profile_body' ] );
+        }
+        else if ( '' === $this->parts['action'] ) {
+            add_action( 'dt_blank_body', [ $this, 'home_body' ] );
         } else {
             return;
         }
@@ -80,15 +87,21 @@ class Zume_App_Portal extends DT_Magic_Url_Base {
         $allowed_js[] = 'lodash';
         $allowed_js[] = 'introjs-js';
         $allowed_js[] = 'jquery-cookie';
-        $allowed_js[] = 'portal-app-js';
+        $allowed_js[] = 'portal';
 
-        if ( '' === $this->parts['action'] || 'map' === $this->parts['action'] ) {
+        if ( 'map' === $this->parts['action'] ) {
             $allowed_js[] = 'heatmap-js';
             $allowed_js[] = 'mapbox-cookie';
         }
         else if ( 'list' === $this->parts['action'] ) {
             $allowed_js[] = 'portal-app-domenu-js';
         }
+        else if ( 'profile' === $this->parts['action'] ) {
+            $allowed_js[] = 'portal-profile';
+        }
+//        else if ( '' === $this->parts['action'] ) {
+//            $allowed_js[] = 'mapbox-cookie';
+//        }
 
         return $allowed_js;
     }
@@ -97,14 +110,20 @@ class Zume_App_Portal extends DT_Magic_Url_Base {
 
         $allowed_css[] = 'mapbox-gl-css';
         $allowed_css[] = 'introjs-css';
-        $allowed_css[] = 'portal-app-css';
+        $allowed_css[] = 'portal';
 
-        if ( '' === $this->parts['action'] || 'map' === $this->parts['action'] ) {
+        if ( 'map' === $this->parts['action'] ) {
             $allowed_css[] = 'heatmap-css';
         }
         else if ( 'list' === $this->parts['action'] ) {
             $allowed_css[] = 'portal-app-domenu-css';
         }
+//        else if ( 'profile' === $this->parts['action'] ) {
+//            $allowed_js[] = 'portal-profile';
+//        }
+//        else if ( '' === $this->parts['action'] ) {
+//            $allowed_js[] = 'mapbox-cookie';
+//        }
 
         return $allowed_css;
     }
@@ -125,13 +144,14 @@ class Zume_App_Portal extends DT_Magic_Url_Base {
         filemtime( trailingslashit( plugin_dir_path( __FILE__ ) ) .'js.cookie.min.js' ), true );
 
         /* group-gen */
-        wp_enqueue_script( 'portal-app-js', trailingslashit( plugin_dir_url( __FILE__ ) ) . 'church-portal-app.js', [ 'jquery' ],
-        filemtime( trailingslashit( plugin_dir_path( __FILE__ ) ) .'church-portal-app.js' ), true );
+        wp_enqueue_script( 'portal', trailingslashit( plugin_dir_url( __FILE__ ) ) . 'portal.js', [ 'jquery' ],
+        filemtime( trailingslashit( plugin_dir_path( __FILE__ ) ) .'portal.js' ), true );
 
-        wp_enqueue_style( 'portal-app-css', trailingslashit( plugin_dir_url( __FILE__ ) ) . 'church-portal-app.css', [],
-        filemtime( trailingslashit( plugin_dir_path( __FILE__ ) ) .'church-portal-app.css' ) );
+        wp_enqueue_style( 'portal', trailingslashit( plugin_dir_url( __FILE__ ) ) . 'portal.css', [],
+        filemtime( trailingslashit( plugin_dir_path( __FILE__ ) ) .'portal.css' ) );
 
-        if ( '' === $this->parts['action'] || 'map' === $this->parts['action'] ) {
+
+        if ( 'map' === $this->parts['action'] ) {
 
             /* heatmap */
             wp_enqueue_script( 'heatmap-js', trailingslashit( plugin_dir_url( __FILE__ ) ) . 'heatmap.js', [],
@@ -151,6 +171,14 @@ class Zume_App_Portal extends DT_Magic_Url_Base {
             wp_enqueue_style( 'portal-app-domenu-css', trailingslashit( plugin_dir_url( __FILE__ ) ) . 'jquery.domenu-0.100.77.css', [],
             filemtime( trailingslashit( plugin_dir_path( __FILE__ ) ) .'jquery.domenu-0.100.77.css' ) );
         }
+        else if ( 'profile' === $this->parts['action'] ) {
+            wp_enqueue_script( 'portal-profile', trailingslashit( plugin_dir_url( __FILE__ ) ) . 'portal-profile.js', [ 'jquery' ],
+                filemtime( trailingslashit( plugin_dir_path( __FILE__ ) ) .'portal-profile.js' ), true );
+        }
+//        else if ( '' === $this->parts['action'] ) {
+//            wp_enqueue_script( 'portal-profile', trailingslashit( plugin_dir_url( __FILE__ ) ) . 'church-portal-profile.js', [ 'jquery' ],
+//                filemtime( trailingslashit( plugin_dir_path( __FILE__ ) ) .'church-portal-profile.js' ), true );
+//        }
 
     }
 
@@ -169,6 +197,14 @@ class Zume_App_Portal extends DT_Magic_Url_Base {
         return $fields;
     }
 
+    /**
+     * @param $filters
+     * @param $post_type
+     * @return mixed
+     *
+     *
+     * @todo not currently working
+     */
     public static function dt_user_list_filters( $filters, $post_type )
     {
         if ($post_type === 'contacts') {
@@ -194,13 +230,24 @@ class Zume_App_Portal extends DT_Magic_Url_Base {
         return $filters;
     }
 
+    public function header_style(){
+        ?>
+        <style>
+            body {
+                background-color: white;
+                padding: 0 .2rem;
+            }
+        </style>
+        <?php
+    }
+
     /**
      * Writes javascript to the footer
      *
      * @see DT_Magic_Url_Base()->footer_javascript() for default state
      */
     public function footer_javascript(){
-        if ( '' === $this->parts['action'] || 'map' === $this->parts['action'] ) {
+        if ( 'map' === $this->parts['action'] ) {
             ?>
             <script>
                 let jsObject = [<?php echo json_encode([
@@ -219,30 +266,30 @@ class Zume_App_Portal extends DT_Magic_Url_Base {
                     'custom_marks' => $this->get_custom_map_markers( $this->parts['post_id'] )
                 ]) ?>][0]
 
-                jQuery(document).ready(function() {
-                    if ( ! Cookies.get('portal_app_maps_intro') ) {
-                        introJs().setOptions({
-                            steps: [
-                                {
-                                    element: document.querySelector('#menu-icon'),
-                                    intro: `<img src="${jsObject.intro_images}open-menu.gif" /><h1>Map View</h1>Add churches by clicking on the map<h1>List View</h1>Add and edit your churches and generation depth in list view.`
-                                },
-                                {
-                                    element: document.querySelector('#map'),
-                                    intro: `<h1>Search for Location</h1>Speed your search for a location with the search field.`
-                                },
-                                {
-                                    intro: `<h1>Click for More</h1>Click the map to reveal progress and goals for an administrativebrew  division.<br><br><img src="${jsObject.intro_images}nesting-generations.gif" /><br>`
-                                },
-                                {
-                                    intro: `<h1>Add New Church</h1>.<br><br><img src="${jsObject.intro_images}nesting-generations.gif" /><br>`
-                                }
-                            ]
-                        }).start();
-
-                        // Cookies.set('portal_app_maps_intro', true )
-                    }
-                })
+                // jQuery(document).ready(function() {
+                //     if ( ! Cookies.get('portal_app_maps_intro') ) {
+                //         introJs().setOptions({
+                //             steps: [
+                //                 {
+                //                     element: document.querySelector('#menu-icon'),
+                //                     intro: `<img src="${jsObject.intro_images}open-menu.gif" /><h1>Map View</h1>Add churches by clicking on the map<h1>List View</h1>Add and edit your churches and generation depth in list view.`
+                //                 },
+                //                 {
+                //                     element: document.querySelector('#map'),
+                //                     intro: `<h1>Search for Location</h1>Speed your search for a location with the search field.`
+                //                 },
+                //                 {
+                //                     intro: `<h1>Click for More</h1>Click the map to reveal progress and goals for an administrativebrew  division.<br><br><img src="${jsObject.intro_images}nesting-generations.gif" /><br>`
+                //                 },
+                //                 {
+                //                     intro: `<h1>Add New Church</h1>.<br><br><img src="${jsObject.intro_images}nesting-generations.gif" /><br>`
+                //                 }
+                //             ]
+                //         }).start();
+                //
+                //         Cookies.set('portal_app_maps_intro', true )
+                //     }
+                // })
 
             </script>
             <?php
@@ -271,111 +318,124 @@ class Zume_App_Portal extends DT_Magic_Url_Base {
                     'grid_data' => ['data' => [], 'highest_value' => 1 ],
                 ]) ?>][0]
 
-                jQuery(document).ready(function() {
-                    if ( ! Cookies.get('portal_app_list_intro') ) {
-                        introJs().setOptions({
-                            steps: [
-                                {
-                                    element: document.querySelector('.dd-new-item'),
-                                    intro: `<h1>Add New Churches</h1>Add new churches by clicking the dotted box. Then fill in the church information.<br><br><img src="${jsObject.intro_images}create-new-item.gif" />`
-                                },
-                                {
-                                    intro: `<h1>Edit, Delete & Add Child Generation</h1>You can edit, add a child generation, and delete a reported church.<br><br><img src="${jsObject.intro_images}show-edit-buttons.gif" /><br>`
-                                },
-                                {
-                                    intro: `<h1>Set Generation Depth</h1>You can arrange groups according to generation by just dragging them under their parent church.<br><br><img src="${jsObject.intro_images}nesting-generations.gif" /><br>`
-                                }
-                            ]
-                        }).start();
+                // jQuery(document).ready(function() {
+                //     if ( ! Cookies.get('portal_app_list_intro') ) {
+                //         introJs().setOptions({
+                //             steps: [
+                //                 {
+                //                     element: document.querySelector('.dd-new-item'),
+                //                     intro: `<h1>Add New Churches</h1>Add new churches by clicking the dotted box. Then fill in the church information.<br><br><img src="${jsObject.intro_images}create-new-item.gif" />`
+                //                 },
+                //                 {
+                //                     intro: `<h1>Edit, Delete & Add Child Generation</h1>You can edit, add a child generation, and delete a reported church.<br><br><img src="${jsObject.intro_images}show-edit-buttons.gif" /><br>`
+                //                 },
+                //                 {
+                //                     intro: `<h1>Set Generation Depth</h1>You can arrange groups according to generation by just dragging them under their parent church.<br><br><img src="${jsObject.intro_images}nesting-generations.gif" /><br>`
+                //                 }
+                //             ]
+                //         }).start();
+                //
+                //         Cookies.set('portal_app_list_intro', true )
+                //     }
+                // })
+            </script>
+            <?php
+        }
+        else if ( 'profile' === $this->parts['action'] ) {
+            $post_id = $this->parts["post_id"];
+            $post = DT_Posts::get_post( $this->post_type, $post_id, true, false );
+            if ( is_wp_error( $post ) ){
+                return;
+            }
+            ?>
+            <script>
+                let jsObject = [<?php echo json_encode([
+                    'map_key' => DT_Mapbox_API::get_key(),
+                    'mirror_url' => dt_get_location_grid_mirror( true ),
+                    'root' => esc_url_raw( rest_url() ),
+                    'nonce' => wp_create_nonce( 'wp_rest' ),
+                    'intro_images' => trailingslashit( plugin_dir_url( __FILE__ ) ) . 'images/',
+                    'parts' => $this->parts,
+                    'post' => $post,
+                    'translations' => [
+                        'add' => __( 'Add Magic', 'disciple-tools-contact-portal' ),
+                    ],
+                    'grid_data' => ['data' => [], 'highest_value' => 1 ],
+                ]) ?>][0]
 
-                        // Cookies.set('portal_app_list_intro', true )
-                    }
-                })
+                jQuery('.loading-spinner').removeClass('active')
+
+                // jQuery(document).ready(function() {
+                //     if ( ! Cookies.get('portal_app_list_intro') ) {
+                //         introJs().setOptions({
+                //             steps: [
+                //                 {
+                //                     element: document.querySelector('.dd-new-item'),
+                //                     intro: `<h1>Add New Churches</h1>Add new churches by clicking the dotted box. Then fill in the church information.<br><br><img src="${jsObject.intro_images}create-new-item.gif" />`
+                //                 },
+                //                 {
+                //                     intro: `<h1>Edit, Delete & Add Child Generation</h1>You can edit, add a child generation, and delete a reported church.<br><br><img src="${jsObject.intro_images}show-edit-buttons.gif" /><br>`
+                //                 },
+                //                 {
+                //                     intro: `<h1>Set Generation Depth</h1>You can arrange groups according to generation by just dragging them under their parent church.<br><br><img src="${jsObject.intro_images}nesting-generations.gif" /><br>`
+                //                 }
+                //             ]
+                //         }).start();
+                //
+                //         // Cookies.set('portal_app_list_intro', true )
+                //     }
+                // })
+            </script>
+            <?php
+        }
+        else if ( '' === $this->parts['action'] ) {
+            $post_id = $this->parts["post_id"];
+            $post = DT_Posts::get_post( $this->post_type, $post_id, true, false );
+            if ( is_wp_error( $post ) ){
+                return;
+            }
+            ?>
+            <script>
+                let jsObject = [<?php echo json_encode([
+                    'map_key' => DT_Mapbox_API::get_key(),
+                    'mirror_url' => dt_get_location_grid_mirror( true ),
+                    'root' => esc_url_raw( rest_url() ),
+                    'nonce' => wp_create_nonce( 'wp_rest' ),
+                    'intro_images' => trailingslashit( plugin_dir_url( __FILE__ ) ) . 'images/',
+                    'parts' => $this->parts,
+                    'post' => $post,
+                    'translations' => [
+                        'add' => __( 'Add Magic', 'disciple-tools-contact-portal' ),
+                    ],
+                    'grid_data' => ['data' => [], 'highest_value' => 1 ],
+                ]) ?>][0]
+
+                jQuery('.loading-spinner').removeClass('active')
+
+                // jQuery(document).ready(function() {
+                //     if ( ! Cookies.get('portal_app_list_intro') ) {
+                //         introJs().setOptions({
+                //             steps: [
+                //                 {
+                //                     element: document.querySelector('.dd-new-item'),
+                //                     intro: `<h1>Add New Churches</h1>Add new churches by clicking the dotted box. Then fill in the church information.<br><br><img src="${jsObject.intro_images}create-new-item.gif" />`
+                //                 },
+                //                 {
+                //                     intro: `<h1>Edit, Delete & Add Child Generation</h1>You can edit, add a child generation, and delete a reported church.<br><br><img src="${jsObject.intro_images}show-edit-buttons.gif" /><br>`
+                //                 },
+                //                 {
+                //                     intro: `<h1>Set Generation Depth</h1>You can arrange groups according to generation by just dragging them under their parent church.<br><br><img src="${jsObject.intro_images}nesting-generations.gif" /><br>`
+                //                 }
+                //             ]
+                //         }).start();
+                //
+                //         // Cookies.set('portal_app_list_intro', true )
+                //     }
+                // })
             </script>
             <?php
         }
 
-    }
-
-    /**
-     * Can be customized with class extension
-     */
-    public function customized_welcome_script(){
-        ?>
-        <script>
-            jQuery(document).ready(function($){
-                let asset_url = '<?php echo esc_url( trailingslashit( plugin_dir_url( __FILE__ ) ) . 'images/' ) ?>'
-                $('.training-content').append(`
-                <div class="grid-x grid-padding-x" >
-                    <div class="cell center">
-                        <img class="training-screen-image" src="${asset_url + 'search.svg'}" alt="search icon" />
-                        <h2>Search</h2>
-                        <p>Search for any city or place with the search input.</p>
-                    </div>
-                    <div class="cell center">
-                        <img class="training-screen-image" src="${asset_url + 'zoom.svg'}" alt="zoom icon"  />
-                        <h2>Zoom</h2>
-                        <p>Scroll zoom with your mouse or pinch zoom with track pads and phones to focus on sections of the map.</p>
-                    </div>
-                    <div class="cell center">
-                        <img class="training-screen-image" src="${asset_url + 'drag.svg'}" alt="drag icon"  />
-                        <h2>Drag</h2>
-                        <p>Click and drag the map any direction to look at a different part of the map.</p>
-                    </div>
-                    <div class="cell center">
-                        <img class="training-screen-image" src="${asset_url + 'click.svg'}" alt="click icon" />
-                        <h2>Click</h2>
-                        <p>Click a single section and reveal a details panel with more information about the location.</p>
-                    </div>
-                </div>
-                `)
-
-            })
-        </script>
-        <?php
-    }
-
-    /**
-     * Post Type Tile Examples
-     */
-    public function dt_details_additional_tiles( $tiles, $post_type = "" ) {
-        if ( $post_type === $this->post_type ){
-            $tiles["dt_contact_portal"] = [
-                "label" => __( "Personal Portals", 'disciple-tools-contact-portal' ),
-                "description" => "The Portal sets up a page accessible without authentication, only the link is needed. Useful for small applications liked to this record, like quick surveys or updates."
-            ];
-        }
-        return $tiles;
-    }
-
-    public function dt_details_additional_section( $section, $post_type ) {
-        // test if campaigns post type and campaigns_app_module enabled
-        if ( $post_type === $this->post_type ) {
-            if ( 'dt_contact_portal' === $section ) {
-                $record = DT_Posts::get_post( $post_type, get_the_ID() );
-                if ( isset( $record[$this->meta_key] )) {
-                    $key = $record[$this->meta_key];
-                } else {
-                    $key = dt_create_unique_key();
-                    update_post_meta( get_the_ID(), $this->meta_key, $key );
-                }
-                $link = DT_Magic_URL::get_link_url( $this->root, $this->type, $key )
-                ?>
-                <a class="button" href="<?php echo esc_html( $link ); ?>" target="_blank">Church Reporting</a>
-<!--                <a class="button" id="open-portal-activity" style="cursor:pointer;">Open Activity</a>-->
-                <script>
-                    jQuery(document).ready(function(){
-                        jQuery('#open-portal-activity').on('click', function(e){
-                            jQuery('#modal-full-title').empty().html(`Portal Activity`)
-                            jQuery('#modal-full-content').empty().html(`content`) // @todo add content logic
-
-                            jQuery('#modal-full').foundation('open')
-                        })
-                    })
-                </script>
-                <?php
-            }
-        }
     }
 
     public function list_body(){
@@ -394,8 +454,8 @@ class Zume_App_Portal extends DT_Magic_Url_Base {
 
         <!-- nav -->
         <?php
-        require_once( 'church-portal-nav.php' );
-        require_once( 'church-portal.html' );
+        $this->nav();
+        require_once( 'portal-list.html' );
     }
 
     public function map_body(){
@@ -412,8 +472,81 @@ class Zume_App_Portal extends DT_Magic_Url_Base {
 
         <!-- nav -->
         <?php
-        require_once( 'church-portal-nav.php' );
-        require_once( 'church-portal-map.html' );
+        $this->nav();
+        require_once( 'portal-map.html' );
+    }
+
+    public function profile_body(){
+        DT_Mapbox_API::geocoder_scripts();
+        ?>
+        <!-- title -->
+        <div class="grid-x">
+            <div class="cell padding-1" >
+                <button type="button" style="margin:1em;" id="menu-icon" data-open="offCanvasLeft"><i class="fi-list" style="font-size:2em;"></i></button>
+                <span style="font-size:1.5rem;font-weight: bold;">My Profile</span>
+                <?php if ( ! wp_is_mobile() ) : ?>
+                    <span class="loading-spinner active" style="float:right;margin:10px;"></span><!-- javascript container -->
+                <?php endif; ?>
+            </div>
+        </div>
+
+        <!-- nav -->
+        <?php
+        $this->nav();
+        require_once( 'portal-profile.html' );
+    }
+
+    public function home_body(){
+        DT_Mapbox_API::geocoder_scripts();
+        ?>
+        <!-- title -->
+        <div class="grid-x">
+            <div class="cell padding-1" >
+                <button type="button" style="margin:1em;" id="menu-icon" data-open="offCanvasLeft"><i class="fi-list" style="font-size:2em;"></i></button>
+                <span style="font-size:1.5rem;font-weight: bold;">Report Manager</span>
+                <?php if ( ! wp_is_mobile() ) : ?>
+                    <span class="loading-spinner active" style="float:right;margin:10px;"></span><!-- javascript container -->
+                <?php endif; ?>
+            </div>
+        </div>
+
+        <!-- nav -->
+        <?php
+        $this->nav();
+        require_once( 'portal-home.html' );
+        ?>
+
+        <?php
+    }
+
+    public function nav() {
+        $parts_post_id = $this->parts["post_id"];
+        $parts_post = DT_Posts::get_post( $this->post_type, $parts_post_id, true, false );
+        if ( is_wp_error( $parts_post ) ){
+            return;
+        }
+        ?>
+
+        <!-- off canvas menus -->
+        <div class="off-canvas-wrapper">
+            <!-- Left Canvas -->
+            <div class="off-canvas position-left" id="offCanvasLeft" data-off-canvas data-transition="push">
+                <button class="close-button" aria-label="Close alert" type="button" data-close>
+                    <span aria-hidden="true">&times;</span>
+                </button>
+                <div class="grid-x grid-padding-x center">
+                    <div class="cell " style="padding-top: 1em;"><h3><?php echo esc_html( $parts_post['title'] ?? '' ) ?></h3></div>
+                    <div class="cell"><hr></div>
+                    <div class="cell"><a href="<?php echo esc_url( site_url() . '/' . $this->parts['root'] . '/' . $this->parts['type'] . '/' . $this->parts['public_key'] . '/' ) ?>"><h3>Home</h3></a></div>
+                    <div class="cell"><a href="<?php echo esc_url( site_url() . '/' . $this->parts['root'] . '/' . $this->parts['type'] . '/' . $this->parts['public_key'] . '/profile' ) ?>"><h3>My Profile</h3></a></div>
+                    <div class="cell"><hr><h3>My Churches</h3></div>
+                    <div class="cell"><a href="<?php echo esc_url( site_url() . '/' . $this->parts['root'] . '/' . $this->parts['type'] . '/' . $this->parts['public_key'] . '/list' ) ?>"><h3>List View</h3></a></div>
+                    <div class="cell"><a href="<?php echo esc_url( site_url() . '/' . $this->parts['root'] . '/' . $this->parts['type'] . '/' . $this->parts['public_key'] . '/map' ) ?>"><h3>Map View</h3></a></div>
+                    <br><br>
+                </div>
+            </div>
+        </div>
+    <?php
     }
 
     /**
@@ -813,9 +946,7 @@ class Zume_App_Portal extends DT_Magic_Url_Base {
         return empty( $return ) ? null : $return;
     }
 
-
     /* map section */
-
     public function get_grid_totals(){
         return Zume_App_Heatmap::query_church_grid_totals();
     }
@@ -839,6 +970,87 @@ class Zume_App_Portal extends DT_Magic_Url_Base {
 
     public function _browser_tab_title( $title ){
         return __( "Zúme Churches Map", 'disciple_tools' );
+    }
+
+    /**
+     * Can be customized with class extension
+     */
+    public function customized_welcome_script(){
+        ?>
+        <script>
+            jQuery(document).ready(function($){
+                let asset_url = '<?php echo esc_url( trailingslashit( plugin_dir_url( __FILE__ ) ) . 'images/' ) ?>'
+                $('.training-content').append(`
+                <div class="grid-x grid-padding-x" >
+                    <div class="cell center">
+                        <img class="training-screen-image" src="${asset_url + 'search.svg'}" alt="search icon" />
+                        <h2>Search</h2>
+                        <p>Search for any city or place with the search input.</p>
+                    </div>
+                    <div class="cell center">
+                        <img class="training-screen-image" src="${asset_url + 'zoom.svg'}" alt="zoom icon"  />
+                        <h2>Zoom</h2>
+                        <p>Scroll zoom with your mouse or pinch zoom with track pads and phones to focus on sections of the map.</p>
+                    </div>
+                    <div class="cell center">
+                        <img class="training-screen-image" src="${asset_url + 'drag.svg'}" alt="drag icon"  />
+                        <h2>Drag</h2>
+                        <p>Click and drag the map any direction to look at a different part of the map.</p>
+                    </div>
+                    <div class="cell center">
+                        <img class="training-screen-image" src="${asset_url + 'click.svg'}" alt="click icon" />
+                        <h2>Click</h2>
+                        <p>Click a single section and reveal a details panel with more information about the location.</p>
+                    </div>
+                </div>
+                `)
+
+            })
+        </script>
+        <?php
+    }
+
+    /**
+     * Post Type Tile Examples
+     */
+    public function dt_details_additional_tiles( $tiles, $post_type = "" ) {
+        if ( $post_type === $this->post_type ){
+            $tiles["dt_contact_portal"] = [
+                "label" => __( "Personal Portals", 'disciple-tools-contact-portal' ),
+                "description" => "The Portal sets up a page accessible without authentication, only the link is needed. Useful for small applications liked to this record, like quick surveys or updates."
+            ];
+        }
+        return $tiles;
+    }
+
+    public function dt_details_additional_section( $section, $post_type ) {
+        // test if campaigns post type and campaigns_app_module enabled
+        if ( $post_type === $this->post_type ) {
+            if ( 'dt_contact_portal' === $section ) {
+                $record = DT_Posts::get_post( $post_type, get_the_ID() );
+                if ( isset( $record[$this->meta_key] )) {
+                    $key = $record[$this->meta_key];
+                } else {
+                    $key = dt_create_unique_key();
+                    update_post_meta( get_the_ID(), $this->meta_key, $key );
+                }
+                $link = DT_Magic_URL::get_link_url( $this->root, $this->type, $key )
+                ?>
+                <a class="button" href="<?php echo esc_html( $link ); ?>" target="_blank">Church Reporting</a>
+                <!--                <a class="button" id="open-portal-activity" style="cursor:pointer;">Open Activity</a>-->
+                <script>
+                    jQuery(document).ready(function(){
+                        jQuery('#open-portal-activity').on('click', function(e){
+                            jQuery('#modal-full-title').empty().html(`Portal Activity`)
+                            jQuery('#modal-full-content').empty().html(`content`) // @todo add content logic
+
+                            jQuery('#modal-full').foundation('open')
+                        })
+                    })
+                </script>
+                <?php
+            }
+        }
     }
 }
 Zume_App_Portal::instance();

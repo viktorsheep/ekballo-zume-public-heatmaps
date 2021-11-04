@@ -34,7 +34,7 @@ window.post_item = ( action, data ) => {
 window.load_tree = () => {
   jQuery.ajax({
     type: "POST",
-    data: { action: 'POST', parts: jsObject.parts },
+    data: JSON.stringify({ action: 'POST', parts: jsObject.parts }),
     contentType: "application/json; charset=utf-8",
     dataType: "json",
     url: jsObject.root + jsObject.parts.root + '/v1/' + jsObject.parts.type + '_list',
@@ -267,6 +267,18 @@ window.open_empty_modal= () => {
   jQuery('#edit-modal').foundation('open')
 }
 
+window.open_create_modal= () => {
+  let title = jQuery('#modal-title')
+  let content = jQuery('#modal-content')
+
+  title.empty().html(`<span class="loading-spinner active"></span>`)
+  content.empty()
+  jQuery('#edit-modal').foundation('open')
+}
+jQuery('.float').on('click', function(){
+  window.open_create_modal()
+})
+
 window.open_modal = ( id ) => {
   let title = jQuery('#modal-title')
   let content = jQuery('#modal-content')
@@ -443,7 +455,7 @@ window.load_modal_content = ( post, post_fields ) => {
   })
   jQuery(window).on(
     'closed.zf.reveal', function () {
-      if ( '' === jsObject.parts.action || 'map' === jsObject.parts.action ) {
+      if ( 'map' === jsObject.parts.action ) {
         load_map()
         jQuery('#offCanvasNestedPush').foundation('close')
       }

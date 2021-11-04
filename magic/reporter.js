@@ -18,14 +18,14 @@ jQuery(document).ready(function($){
   function build_modal(){
     // add html
     $('#report-content').empty().html(`
-        <input type="hidden" id="first report-grid-id" />
-        <div id="panel1" class="not-new not-send">
+        <input type="hidden" id="report-grid-id" />
+        <div id="panel1" class="first not-new not-send">
             <div class="grid-x">
                 <div class="cell">
-                    <button type="button" class="button expanded" id="show-new">I'm reporting for the first time</button>
+                    <button type="button" class="button expanded show-new">I'm reporting for the first time</button>
                 </div>
                 <div class="cell">
-                    <button type="button" class="button expanded" id="show-send">I've reported previously</button>
+                    <button type="button" class="button expanded show-send">I've reported previously</button>
                 </div>
             </div>
         </div>
@@ -58,7 +58,8 @@ jQuery(document).ready(function($){
                     </select>
                 </div>
                 <div class="cell center">
-                    <button class="button" id="submit-new">Register</button> <span class="loading-spinner"></span>
+                    <button class="button" id="submit-new">Register</button> <span class="loading-spinner"></span><br>
+                    <a class="show-first">back</a>
                 </div>
             </div>
         </div>
@@ -73,7 +74,8 @@ jQuery(document).ready(function($){
                 </div>
 
                 <div class="cell center">
-                    <button class="button" id="submit-send-link">Email me access link</button> <span class="loading-spinner"></span>
+                    <button class="button" id="submit-send-link">Email me access link</button> <span class="loading-spinner"></span><br>
+                    <a class="show-first">back</a>
                 </div>
             </div>
         </div>
@@ -87,17 +89,17 @@ jQuery(document).ready(function($){
     let first = $('.first')
     let not_first = $('.not-first')
     let note = $('.panel-note')
-    $('#show-new').on('click', function() {
+    $('.show-new').on('click', function() {
       new_input.show()
       not_new.hide()
       note.empty()
     })
-    $('#show-send').on('click', function() {
+    $('.show-send').on('click', function() {
       send.show()
       not_send.hide()
       note.empty()
     })
-    $('#show-first').on('click', function() {
+    $('.show-first').on('click', function() {
       first.show()
       not_first.hide()
       note.empty()
