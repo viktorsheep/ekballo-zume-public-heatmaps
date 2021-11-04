@@ -2800,6 +2800,7 @@ class Zume_App_Heatmap {
                 $needed_without_us = $world_population_without_us / $global_pop_block;
                 $needed_in_the_us = $us_population / $us_pop_block;
                 $level['needed'] = $needed_without_us + $needed_in_the_us;
+                $percent = $level['reported'] / $level['needed'] * 100 ;
             }
         }
         // @todo end temp cover for populations
@@ -2814,7 +2815,7 @@ class Zume_App_Heatmap {
             'population' => number_format_i18n( $level['population'] ),
             'needed' => number_format_i18n( $level['needed'] ),
             'reported' => number_format_i18n( $raw_reported ),
-            'percent' => $percent,
+            'percent' => number_format_i18n( $percent, 2 ),
         ];
 
         return $data;
