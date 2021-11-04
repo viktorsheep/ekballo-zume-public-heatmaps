@@ -59,7 +59,7 @@ body {
     height:60px;
     bottom:30px;
     right:30px;
-    background-color:#0C9;
+    background-color:#3f729b;
     color:#FFF;
     border-radius:50px;
     text-align:center;
@@ -67,6 +67,14 @@ body {
     z-index:100;
 }
 
-.fi-plus:before {
+.floating.fi-plus:before {
     margin-top:22px;
+}
+
+.dd .dd-new-item {
+    background: #3f729b !important;
+    color:white !important;
+    border: 1px solid #3f729b !important;
+    box-shadow: 2px 2px 3px #999;
+    border-radius: 20px !important;
 }

@@ -439,92 +439,22 @@ class Zume_App_Portal extends DT_Magic_Url_Base {
     }
 
     public function list_body(){
-        DT_Mapbox_API::geocoder_scripts();
-            ?>
-        <!-- title -->
-        <div class="grid-x">
-            <div class="cell padding-1" >
-                <button type="button" style="margin:1em;" id="menu-icon" data-open="offCanvasLeft"><i class="fi-list" style="font-size:2em;"></i></button>
-                <span style="font-size:1.5rem;font-weight: bold;">Report by Generation List</span>
-                <?php if ( ! wp_is_mobile() ) : ?>
-                    <span class="loading-spinner active" style="float:right;margin:10px;"></span><!-- javascript container -->
-                <?php endif; ?>
-            </div>
-        </div>
-
-        <!-- nav -->
-        <?php
-        $this->nav();
-        require_once( 'portal-list.html' );
+        require_once( 'portal-list-html.php' );
     }
 
     public function map_body(){
-        DT_Mapbox_API::geocoder_scripts();
-        ?>
-        <!-- title -->
-        <div class="grid-x">
-            <div class="cell padding-1" >
-                <button type="button" style="margin:1em;" id="menu-icon" data-open="offCanvasLeft"><i class="fi-list" style="font-size:2em;"></i></button>
-                <span style="font-size:1.5rem;font-weight: bold;">Report by Map</span>
-                <span class="loading-spinner active" style="float:right;margin:10px;"></span><!-- javascript container -->
-            </div>
-        </div>
-
-        <!-- nav -->
-        <?php
-        $this->nav();
-        require_once( 'portal-map.html' );
+        require_once( 'portal-map-html.php' );
     }
 
     public function profile_body(){
-        DT_Mapbox_API::geocoder_scripts();
-        ?>
-        <!-- title -->
-        <div class="grid-x">
-            <div class="cell padding-1" >
-                <button type="button" style="margin:1em;" id="menu-icon" data-open="offCanvasLeft"><i class="fi-list" style="font-size:2em;"></i></button>
-                <span style="font-size:1.5rem;font-weight: bold;">My Profile</span>
-                <?php if ( ! wp_is_mobile() ) : ?>
-                    <span class="loading-spinner active" style="float:right;margin:10px;"></span><!-- javascript container -->
-                <?php endif; ?>
-            </div>
-        </div>
-
-        <!-- nav -->
-        <?php
-        $this->nav();
-        require_once( 'portal-profile.html' );
+        require_once( 'portal-profile-html.php' );
     }
 
     public function home_body(){
-        DT_Mapbox_API::geocoder_scripts();
-        ?>
-        <!-- title -->
-        <div class="grid-x">
-            <div class="cell padding-1" >
-                <button type="button" style="margin:1em;" id="menu-icon" data-open="offCanvasLeft"><i class="fi-list" style="font-size:2em;"></i></button>
-                <span style="font-size:1.5rem;font-weight: bold;">Report Manager</span>
-                <?php if ( ! wp_is_mobile() ) : ?>
-                    <span class="loading-spinner active" style="float:right;margin:10px;"></span><!-- javascript container -->
-                <?php endif; ?>
-            </div>
-        </div>
-
-        <!-- nav -->
-        <?php
-        $this->nav();
-        require_once( 'portal-home.html' );
-        ?>
-
-        <?php
+        require_once( 'portal-home-html.php' );
     }
 
     public function nav() {
-        $parts_post_id = $this->parts["post_id"];
-        $parts_post = DT_Posts::get_post( $this->post_type, $parts_post_id, true, false );
-        if ( is_wp_error( $parts_post ) ){
-            return;
-        }
         ?>
 
         <!-- off canvas menus -->
@@ -534,14 +464,12 @@ class Zume_App_Portal extends DT_Magic_Url_Base {
                 <button class="close-button" aria-label="Close alert" type="button" data-close>
                     <span aria-hidden="true">&times;</span>
                 </button>
-                <div class="grid-x grid-padding-x center">
-                    <div class="cell " style="padding-top: 1em;"><h3><?php echo esc_html( $parts_post['title'] ?? '' ) ?></h3></div>
-                    <div class="cell"><hr></div>
-                    <div class="cell"><a href="<?php echo esc_url( site_url() . '/' . $this->parts['root'] . '/' . $this->parts['type'] . '/' . $this->parts['public_key'] . '/' ) ?>"><h3>Home</h3></a></div>
-                    <div class="cell"><a href="<?php echo esc_url( site_url() . '/' . $this->parts['root'] . '/' . $this->parts['type'] . '/' . $this->parts['public_key'] . '/profile' ) ?>"><h3>My Profile</h3></a></div>
-                    <div class="cell"><hr><h3>My Churches</h3></div>
-                    <div class="cell"><a href="<?php echo esc_url( site_url() . '/' . $this->parts['root'] . '/' . $this->parts['type'] . '/' . $this->parts['public_key'] . '/list' ) ?>"><h3>List View</h3></a></div>
-                    <div class="cell"><a href="<?php echo esc_url( site_url() . '/' . $this->parts['root'] . '/' . $this->parts['type'] . '/' . $this->parts['public_key'] . '/map' ) ?>"><h3>Map View</h3></a></div>
+                <div class="grid-x grid-padding-x" style="padding:1em">
+                    <div class="cell"><br><br></div>
+                    <div class="cell"><a href="<?php echo esc_url( site_url() . '/' . $this->parts['root'] . '/' . $this->parts['type'] . '/' . $this->parts['public_key'] . '/' ) ?>"><h3><i class="fi-home"></i> Home</h3></a></div>
+                    <div class="cell"><a href="<?php echo esc_url( site_url() . '/' . $this->parts['root'] . '/' . $this->parts['type'] . '/' . $this->parts['public_key'] . '/profile' ) ?>"><h3><i class="fi-torso"></i> Community Profile</h3></a></div>
+                    <div class="cell"><a href="<?php echo esc_url( site_url() . '/' . $this->parts['root'] . '/' . $this->parts['type'] . '/' . $this->parts['public_key'] . '/list' ) ?>"><h3><i class="fi-list-thumbnails"></i> Edit Church List</h3></a></div>
+                    <div class="cell"><a href="<?php echo esc_url( site_url() . '/' . $this->parts['root'] . '/' . $this->parts['type'] . '/' . $this->parts['public_key'] . '/map' ) ?>"><h3><i class="fi-map"></i> Map</h3></a></div>
                     <br><br>
                 </div>
             </div>

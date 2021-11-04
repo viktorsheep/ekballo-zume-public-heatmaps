@@ -271,7 +271,9 @@ window.open_create_modal= () => {
   let title = jQuery('#modal-title')
   let content = jQuery('#modal-content')
 
-  title.empty().html(`<span class="loading-spinner active"></span>`)
+  title.empty().html(`
+       <h1>Add New Church</h1>
+       <span class="loading-spinner active"></span>`)
   content.empty()
   jQuery('#edit-modal').foundation('open')
 }

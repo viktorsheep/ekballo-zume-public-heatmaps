@@ -1,3 +1,18 @@
+<?php DT_Mapbox_API::geocoder_scripts(); ?>
+
+<!-- title -->
+<div class="grid-x">
+    <div class="cell padding-1" >
+        <button type="button" style="margin:1em .5em 1em;" id="menu-icon" data-open="offCanvasLeft"><i class="fi-list" style="font-size:2em;"></i></button>
+        <a style="margin:1em 1em 1em 0; color:black;" href="<?php echo esc_url( site_url() . '/' . $this->parts['root'] . '/' . $this->parts['type'] . '/' . $this->parts['public_key'] . '/' ) ?>"><i class="fi-home" style="font-size:2em;"></i></a>
+        <span style="font-size:1.5rem;font-weight: bold;">Map</span>
+        <span class="loading-spinner active" style="float:right;margin:10px;"></span><!-- javascript container -->
+    </div>
+</div>
+
+<!-- nav -->
+<?php $this->nav(); ?>
+
 <style id="custom-style-portal">
     #wrapper {
         height: 2000px !important;
@@ -129,11 +144,11 @@
     <div id="modal-title"></div>
     <div id="modal-content"></div>
     <button class="close-button" data-close aria-label="Close modal" type="button">
-        <span aria-hidden="true">Close &times;</span>
+        <span aria-hidden="true">Save</span>
     </button>
 </div>
 
 <div class="float">
-    <i class="fi fi-plus small"></i>
+    <i class="fi fi-plus floating small"></i>
 </div>
 
