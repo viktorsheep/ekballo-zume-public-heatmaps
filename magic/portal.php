@@ -942,7 +942,8 @@ class Zume_App_Portal extends DT_Magic_Url_Base {
      * Post Type Tile Examples
      */
     public function dt_details_additional_tiles( $tiles, $post_type = "" ) {
-        if ( $post_type === $this->post_type ){
+        if ( $post_type === $this->post_type && user_can( get_current_user_id(), 'manage_dt') ){
+
             $tiles["dt_contact_portal"] = [
                 "label" => __( "Personal Portals", 'disciple-tools-contact-portal' ),
                 "description" => "The Portal sets up a page accessible without authentication, only the link is needed. Useful for small applications liked to this record, like quick surveys or updates."
@@ -954,7 +955,7 @@ class Zume_App_Portal extends DT_Magic_Url_Base {
     public function dt_details_additional_section( $section, $post_type ) {
         // test if campaigns post type and campaigns_app_module enabled
         if ( $post_type === $this->post_type ) {
-            if ( 'dt_contact_portal' === $section ) {
+            if ( 'dt_contact_portal' === $section && user_can( get_current_user_id(), 'manage_dt') ) {
                 $record = DT_Posts::get_post( $post_type, get_the_ID() );
                 if ( isset( $record[$this->meta_key] )) {
                     $key = $record[$this->meta_key];
