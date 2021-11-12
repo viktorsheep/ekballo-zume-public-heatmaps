@@ -1,7 +1,7 @@
 <?php
 if ( !defined( 'ABSPATH' ) ) { exit; } // Exit if accessed directly.
 
-class DT_Contact_Portal_Charts
+class Zume_Public_Heatmaps_Metrics
 {
     private static $_instance = null;
     public static function instance(){
@@ -13,8 +13,8 @@ class DT_Contact_Portal_Charts
 
     public function __construct(){
 
-        require_once( 'one-page-chart-template.php' );
-        new DT_Contact_Portal_Chart_Template();
+        require_once( 'metrics-map-practitioners.php' );
+        new Zume_Public_Heatmaps_Metrics_Map_Practitioners();
 
         /**
          * @todo add other charts like the pattern above here
@@ -22,4 +22,4 @@ class DT_Contact_Portal_Charts
 
     } // End __construct
 }
-DT_Contact_Portal_Charts::instance();
+Zume_Public_Heatmaps_Metrics::instance();

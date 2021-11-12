@@ -185,13 +185,48 @@ class Zume_App_Portal extends DT_Magic_Url_Base {
     public function add_active_reporter_status( array $fields, string $post_type = "" ) {
         //check if we are dealing with a contact
         if ( $post_type === "contacts" ) {
-            if ( isset( $fields["overall_status"] ) && !isset( $fields["overall_status"]["default"]["active_reporter"] ) ) {
-                $fields["overall_status"]["default"]["active_reporter"] = __( "Active Reporter", 'disciple-tools-facebook' );
+            if ( isset( $fields["overall_status"] ) && !isset( $fields["overall_status"]["default"]["reporting_only"] ) ) {
+                $fields["overall_status"]["default"]["reporting_only"] = __( "Reporting Only", 'zume-public-heatmaps' );
             }
-            $fields['inquiry_permission'] = [
-                'name'   => 'Community Inquiry Permission',
-                'type'   => 'text',
-                'hidden' => true,
+            $fields["practitioner"] = [
+                'name' => __( 'Practitioner', 'zume-public-heatmaps' ),
+                'description' => __( "Key stages of engagement to the effort as a practitioner", 'zume-public-heatmaps' ),
+                'type' => 'multi_select',
+                'default' => [
+                    'trained' => [
+                        'label' => __( 'Trained', 'zume-public-heatmaps' ),
+                        'description' => _x( 'Item 1.', 'field description', 'zume-public-heatmaps' ),
+                    ],
+                    'practicing' => [
+                        'label' => __( 'Practicing', 'zume-public-heatmaps' ),
+                        'description' => _x( 'Item 1.', 'field description', 'zume-public-heatmaps' ),
+                    ],
+                    'reporting' => [
+                        'label' => __( 'Reporting', 'zume-public-heatmaps' ),
+                        'description' => _x( 'Item 1.', 'field description', 'zume-public-heatmaps' ),
+                    ],
+                ],
+                "tile" => "details",
+                "in_create_form" => true,
+                'icon' => get_template_directory_uri() . "/dt-assets/images/coach.svg?v=2",
+            ];
+            $fields["practitioner_community_restrictions"] = [
+                'name' => __( 'Community Restrictions', 'zume-public-heatmaps' ),
+                'description' => __( "Restrictions for communication and publicity of information in the community/coalition/network.", 'zume-public-heatmaps' ),
+                'type' => 'multi_select',
+                'default' => [
+                    'no_inquiries' => [
+                        'label' => __( 'No Inquiries', 'zume-public-heatmaps' ),
+                        'description' => _x( 'Do not connect me with other community members or forward inquiries to me.', 'field description', 'zume-public-heatmaps' ),
+                    ],
+                    'no_public_map' => [
+                        'label' => __( 'No Public Map', 'zume-public-heatmaps' ),
+                        'description' => _x( 'Do not add my location to the public map. Internal maps can have my location.', 'field description', 'zume-public-heatmaps' ),
+                    ]
+                ],
+                "tile" => "details",
+                "in_create_form" => true,
+                'icon' => get_template_directory_uri() . "/dt-assets/images/sign-post.svg?v=2",
             ];
         }
         return $fields;
@@ -944,9 +979,9 @@ class Zume_App_Portal extends DT_Magic_Url_Base {
     public function dt_details_additional_tiles( $tiles, $post_type = "" ) {
         if ( $post_type === $this->post_type && user_can( get_current_user_id(), 'manage_dt') ){
 
-            $tiles["dt_contact_portal"] = [
-                "label" => __( "Personal Portals", 'disciple-tools-contact-portal' ),
-                "description" => "The Portal sets up a page accessible without authentication, only the link is needed. Useful for small applications liked to this record, like quick surveys or updates."
+            $tiles["apps"] = [
+                "label" => __( "Apps", 'disciple-tools-contact-portal' ),
+                "description" => "This tile contains magic link apps and survey tools."
             ];
         }
         return $tiles;
@@ -955,7 +990,7 @@ class Zume_App_Portal extends DT_Magic_Url_Base {
     public function dt_details_additional_section( $section, $post_type ) {
         // test if campaigns post type and campaigns_app_module enabled
         if ( $post_type === $this->post_type ) {
-            if ( 'dt_contact_portal' === $section && user_can( get_current_user_id(), 'manage_dt') ) {
+            if ( 'apps' === $section && user_can( get_current_user_id(), 'manage_dt') ) {
                 $record = DT_Posts::get_post( $post_type, get_the_ID() );
                 if ( isset( $record[$this->meta_key] )) {
                     $key = $record[$this->meta_key];
@@ -965,8 +1000,14 @@ class Zume_App_Portal extends DT_Magic_Url_Base {
                 }
                 $link = DT_Magic_URL::get_link_url( $this->root, $this->type, $key )
                 ?>
-                <a class="button" href="<?php echo esc_html( $link ); ?>" target="_blank">Church Reporting</a>
-                <!--                <a class="button" id="open-portal-activity" style="cursor:pointer;">Open Activity</a>-->
+                <div class="section-subheader">Practitioner Portal</div>
+                <div id="practitioner_portal">
+                    <a class="button small hollow" href="<?php echo esc_html( $link ); ?>" target="_blank">Open Portal</a>
+                    <a class="button small hollow" href="<?php echo esc_html( $link ); ?>" target="_blank">Copy Link</a>
+                    <!--                <a class="button" id="open-portal-activity" style="cursor:pointer;">Open Activity</a>-->
+                </div>
+
+
                 <script>
                     jQuery(document).ready(function(){
                         jQuery('#open-portal-activity').on('click', function(e){

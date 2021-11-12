@@ -1,21 +1,16 @@
 <?php
 if ( !defined( 'ABSPATH' ) ) { exit; } // Exit if accessed directly.
 
-/**
- * @todo replace all occurrences of the string "template" with a string of your choice
- * @todo also rename in charts-loader.php
- */
-
-class DT_Contact_Portal_Chart_Template extends DT_Metrics_Chart_Base
+class Zume_Public_Heatmaps_Metrics_Map_Practitioners extends DT_Metrics_Chart_Base
 {
-    public $base_slug = 'disciple-tools-contact-portal-metrics'; // lowercase
-    public $base_title = "Contact Portal Metrics";
+    public $base_slug = 'zume-public-heatmaps'; // lowercase
+    public $base_title = "Public Maps";
 
-    public $title = 'Template';
-    public $slug = 'template'; // lowercase
+    public $title = 'Practitioner Saturation Map';
+    public $slug = 'practitioner-saturation-map'; // lowercase
     public $js_object_name = 'wp_js_object'; // This object will be loaded into the metrics.js file by the wp_localize_script.
-    public $js_file_name = 'one-page-chart-template.js'; // should be full file name plus extension
-    public $permissions = [ 'dt_all_access_contacts', 'view_project_metrics' ];
+    public $js_file_name = 'metrics-map-practitioners.js'; // should be full file name plus extension
+    public $permissions = [ 'dt_access_contacts', 'view_project_metrics' ];
 
     public function __construct() {
         parent::__construct();
@@ -34,19 +29,13 @@ class DT_Contact_Portal_Chart_Template extends DT_Metrics_Chart_Base
         }
     }
 
-
     /**
      * Load scripts for the plugin
      */
     public function scripts() {
 
-        wp_register_script( 'amcharts-core', 'https://www.amcharts.com/lib/4/core.js', false, '4' );
-        wp_register_script( 'amcharts-charts', 'https://www.amcharts.com/lib/4/charts.js', false, '4' );
-
         wp_enqueue_script( 'dt_'.$this->slug.'_script', trailingslashit( plugin_dir_url( __FILE__ ) ) . $this->js_file_name, [
             'jquery',
-            'amcharts-core',
-            'amcharts-charts'
         ], filemtime( plugin_dir_path( __FILE__ ) .$this->js_file_name ), true );
 
         // Localize script with array data
@@ -60,6 +49,7 @@ class DT_Contact_Portal_Chart_Template extends DT_Metrics_Chart_Base
                 'nonce' => wp_create_nonce( 'wp_rest' ),
                 'current_user_login' => wp_get_current_user()->user_login,
                 'current_user_id' => get_current_user_id(),
+                'magic_link' => site_url() . '',
                 'stats' => [
                     // add preload stats data into arrays here
                 ],
@@ -74,7 +64,7 @@ class DT_Contact_Portal_Chart_Template extends DT_Metrics_Chart_Base
     public function add_api_routes() {
         $namespace = "$this->base_slug/$this->slug";
         register_rest_route(
-            $namespace, '/sample', [
+            $namespace, '/heatmap_practitioner', [
                 'methods'  => 'POST',
                 'callback' => [ $this, 'sample' ],
                 'permission_callback' => function( WP_REST_Request $request ) {

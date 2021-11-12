@@ -1327,6 +1327,225 @@ class Zume_App_Heatmap {
         return $list;
     }
 
+    public static function query_practitioner_grid_totals( $administrative_level = null ) {
+
+        if ( false !== ( $value = get_transient( __METHOD__ . $administrative_level ) ) ) { // phpcs:ignore
+            return $value;
+        }
+
+        global $wpdb;
+
+        switch ( $administrative_level ) {
+            case 'a0':
+                $results = $wpdb->get_results( "
+                    SELECT t0.admin0_grid_id as grid_id, count(t0.admin0_grid_id) as count
+                    FROM (
+                        SELECT lg.admin0_grid_id, lg.admin1_grid_id, lg.admin2_grid_id, lg.admin3_grid_id, lg.admin4_grid_id, lg.admin5_grid_id
+                        FROM $wpdb->postmeta as pm
+                        JOIN $wpdb->posts as p ON p.ID=pm.post_id AND p.post_type = 'contacts'
+                        JOIN $wpdb->postmeta as pm2 ON pm2.post_id=pm.post_id AND pm2.meta_key = 'overall_status' AND pm2.meta_value != 'closed'
+                        JOIN $wpdb->postmeta as pm3 ON pm3.post_id=pm.post_id AND pm3.meta_key = 'practitioner' AND pm3.meta_value = 'practicing'
+                        LEFT JOIN $wpdb->dt_location_grid as lg ON pm.meta_value=lg.grid_id
+                        WHERE pm.meta_key = 'location_grid'
+                    ) as t0
+                    GROUP BY t0.admin0_grid_id
+                    ", ARRAY_A );
+                break;
+            case 'a1':
+                $results = $wpdb->get_results( "
+                    SELECT t1.admin1_grid_id as grid_id, count(t1.admin1_grid_id) as count
+                    FROM (
+                        SELECT lg.admin0_grid_id, lg.admin1_grid_id, lg.admin2_grid_id, lg.admin3_grid_id, lg.admin4_grid_id, lg.admin5_grid_id
+                        FROM $wpdb->postmeta as pm
+                        JOIN $wpdb->posts as p ON p.ID=pm.post_id AND p.post_type = 'contacts'
+                        JOIN $wpdb->postmeta as pm2 ON pm2.post_id=pm.post_id AND pm2.meta_key = 'overall_status' AND pm2.meta_value != 'closed'
+                        JOIN $wpdb->postmeta as pm3 ON pm3.post_id=pm.post_id AND pm3.meta_key = 'practitioner' AND pm3.meta_value = 'practicing'
+                        LEFT JOIN $wpdb->dt_location_grid as lg ON pm.meta_value=lg.grid_id
+                        WHERE pm.meta_key = 'location_grid'
+                    ) as t1
+                    GROUP BY t1.admin1_grid_id
+                    ", ARRAY_A );
+                break;
+            case 'a2':
+                $results = $wpdb->get_results( "
+                    SELECT t2.admin2_grid_id as grid_id, count(t2.admin2_grid_id) as count
+                    FROM (
+                        SELECT lg.admin0_grid_id, lg.admin1_grid_id, lg.admin2_grid_id, lg.admin3_grid_id, lg.admin4_grid_id, lg.admin5_grid_id
+                        FROM $wpdb->postmeta as pm
+                        JOIN $wpdb->posts as p ON p.ID=pm.post_id AND p.post_type = 'contacts'
+                        JOIN $wpdb->postmeta as pm2 ON pm2.post_id=pm.post_id AND pm2.meta_key = 'overall_status' AND pm2.meta_value != 'closed'
+                        JOIN $wpdb->postmeta as pm3 ON pm3.post_id=pm.post_id AND pm3.meta_key = 'practitioner' AND pm3.meta_value = 'practicing'
+                        LEFT JOIN $wpdb->dt_location_grid as lg ON pm.meta_value=lg.grid_id
+                        WHERE pm.meta_key = 'location_grid'
+                    ) as t2
+                    GROUP BY t2.admin2_grid_id
+                    ", ARRAY_A );
+                break;
+            case 'a3':
+                $results = $wpdb->get_results( "
+                    SELECT t3.admin3_grid_id as grid_id, count(t3.admin3_grid_id) as count
+                    FROM (
+                        SELECT lg.admin0_grid_id, lg.admin1_grid_id, lg.admin2_grid_id, lg.admin3_grid_id, lg.admin4_grid_id, lg.admin5_grid_id
+                        FROM $wpdb->postmeta as pm
+                        JOIN $wpdb->posts as p ON p.ID=pm.post_id AND p.post_type = 'contacts'
+                        JOIN $wpdb->postmeta as pm2 ON pm2.post_id=pm.post_id AND pm2.meta_key = 'overall_status' AND pm2.meta_value != 'closed'
+                        JOIN $wpdb->postmeta as pm3 ON pm3.post_id=pm.post_id AND pm3.meta_key = 'practitioner' AND pm3.meta_value = 'practicing'
+                        LEFT JOIN $wpdb->dt_location_grid as lg ON pm.meta_value=lg.grid_id
+                        WHERE pm.meta_key = 'location_grid'
+                    ) as t3
+                    GROUP BY t3.admin3_grid_id
+
+                    ", ARRAY_A );
+                break;
+            case 'world':
+                $results = $wpdb->get_results( "
+                    SELECT 1 as grid_id, count('World') as count
+                    FROM (
+                            SELECT 'World'
+                            FROM $wpdb->postmeta as pm
+                            JOIN $wpdb->posts as p ON p.ID=pm.post_id AND p.post_type = 'contacts'
+                            JOIN $wpdb->postmeta as pm2 ON pm2.post_id=pm.post_id AND pm2.meta_key = 'overall_status' AND pm2.meta_value != 'closed'
+                            JOIN $wpdb->postmeta as pm3 ON pm3.post_id=pm.post_id AND pm3.meta_key = 'practitioner' AND pm3.meta_value = 'practicing'
+                            LEFT JOIN $wpdb->dt_location_grid as lg ON pm.meta_value=lg.grid_id
+                            WHERE pm.meta_key = 'location_grid'
+                         ) as tw
+                    GROUP BY 'World'
+                    ", ARRAY_A );
+                break;
+            case 'full': // full query including world
+                $results = $wpdb->get_results( "
+                    SELECT t0.admin0_grid_id as grid_id, count(t0.admin0_grid_id) as count
+                    FROM (
+                     SELECT lg.admin0_grid_id, lg.admin1_grid_id, lg.admin2_grid_id, lg.admin3_grid_id, lg.admin4_grid_id, lg.admin5_grid_id
+                        FROM $wpdb->postmeta as pm
+                        JOIN $wpdb->posts as p ON p.ID=pm.post_id AND p.post_type = 'contacts'
+                        JOIN $wpdb->postmeta as pm2 ON pm2.post_id=pm.post_id AND pm2.meta_key = 'overall_status' AND pm2.meta_value != 'closed'
+                        JOIN $wpdb->postmeta as pm3 ON pm3.post_id=pm.post_id AND pm3.meta_key = 'practitioner' AND pm3.meta_value = 'practicing'
+                        LEFT JOIN $wpdb->dt_location_grid as lg ON pm.meta_value=lg.grid_id
+                        WHERE pm.meta_key = 'location_grid'
+                    ) as t0
+                    GROUP BY t0.admin0_grid_id
+                    UNION ALL
+                    SELECT t1.admin1_grid_id as grid_id, count(t1.admin1_grid_id) as count
+                    FROM (
+                        SELECT lg.admin0_grid_id, lg.admin1_grid_id, lg.admin2_grid_id, lg.admin3_grid_id, lg.admin4_grid_id, lg.admin5_grid_id
+                        FROM $wpdb->postmeta as pm
+                        JOIN $wpdb->posts as p ON p.ID=pm.post_id AND p.post_type = 'contacts'
+                        JOIN $wpdb->postmeta as pm2 ON pm2.post_id=pm.post_id AND pm2.meta_key = 'overall_status' AND pm2.meta_value != 'closed'
+                        JOIN $wpdb->postmeta as pm3 ON pm3.post_id=pm.post_id AND pm3.meta_key = 'practitioner' AND pm3.meta_value = 'practicing'
+                        LEFT JOIN $wpdb->dt_location_grid as lg ON pm.meta_value=lg.grid_id
+                        WHERE pm.meta_key = 'location_grid'
+                    ) as t1
+                    GROUP BY t1.admin1_grid_id
+                    UNION ALL
+                    SELECT t2.admin2_grid_id as grid_id, count(t2.admin2_grid_id) as count
+                    FROM (
+                        SELECT lg.admin0_grid_id, lg.admin1_grid_id, lg.admin2_grid_id, lg.admin3_grid_id, lg.admin4_grid_id, lg.admin5_grid_id
+                        FROM $wpdb->postmeta as pm
+                        JOIN $wpdb->posts as p ON p.ID=pm.post_id AND p.post_type = 'contacts'
+                        JOIN $wpdb->postmeta as pm2 ON pm2.post_id=pm.post_id AND pm2.meta_key = 'overall_status' AND pm2.meta_value != 'closed'
+                        JOIN $wpdb->postmeta as pm3 ON pm3.post_id=pm.post_id AND pm3.meta_key = 'practitioner' AND pm3.meta_value = 'practicing'
+                        LEFT JOIN $wpdb->dt_location_grid as lg ON pm.meta_value=lg.grid_id
+                        WHERE pm.meta_key = 'location_grid'
+                    ) as t2
+                    GROUP BY t2.admin2_grid_id
+                    UNION ALL
+                    SELECT t3.admin3_grid_id as grid_id, count(t3.admin3_grid_id) as count
+                    FROM (
+                        SELECT lg.admin0_grid_id, lg.admin1_grid_id, lg.admin2_grid_id, lg.admin3_grid_id, lg.admin4_grid_id, lg.admin5_grid_id
+                        FROM $wpdb->postmeta as pm
+                        JOIN $wpdb->posts as p ON p.ID=pm.post_id AND p.post_type = 'contacts'
+                        JOIN $wpdb->postmeta as pm2 ON pm2.post_id=pm.post_id AND pm2.meta_key = 'overall_status' AND pm2.meta_value != 'closed'
+                        JOIN $wpdb->postmeta as pm3 ON pm3.post_id=pm.post_id AND pm3.meta_key = 'practitioner' AND pm3.meta_value = 'practicing'
+                        LEFT JOIN $wpdb->dt_location_grid as lg ON pm.meta_value=lg.grid_id
+                        WHERE pm.meta_key = 'location_grid'
+                    ) as t3
+                    GROUP BY t3.admin3_grid_id
+                    UNION ALL
+                    SELECT 1 as grid_id, count('World') as count
+                    FROM (
+                             SELECT 'World'
+                                FROM $wpdb->postmeta as pm
+                                JOIN $wpdb->posts as p ON p.ID=pm.post_id AND p.post_type = 'contacts'
+                                JOIN $wpdb->postmeta as pm2 ON pm2.post_id=pm.post_id AND pm2.meta_key = 'overall_status' AND pm2.meta_value != 'closed'
+                                JOIN $wpdb->postmeta as pm3 ON pm3.post_id=pm.post_id AND pm3.meta_key = 'practitioner' AND pm3.meta_value = 'practicing'
+                                LEFT JOIN $wpdb->dt_location_grid as lg ON pm.meta_value=lg.grid_id
+                                WHERE pm.meta_key = 'location_grid'
+                         ) as tw
+                    GROUP BY 'World'
+                    ", ARRAY_A );
+                break;
+            default:
+                $results = $wpdb->get_results( "
+                        SELECT t0.admin0_grid_id as grid_id, count(t0.admin0_grid_id) as count
+                        FROM (
+                         SELECT lg.admin0_grid_id, lg.admin1_grid_id, lg.admin2_grid_id, lg.admin3_grid_id, lg.admin4_grid_id, lg.admin5_grid_id
+                            FROM $wpdb->postmeta as pm
+                            JOIN $wpdb->posts as p ON p.ID=pm.post_id AND p.post_type = 'contacts'
+                            JOIN $wpdb->postmeta as pm2 ON pm2.post_id=pm.post_id AND pm2.meta_key = 'overall_status' AND pm2.meta_value != 'closed'
+                            JOIN $wpdb->postmeta as pm3 ON pm3.post_id=pm.post_id AND pm3.meta_key = 'practitioner' AND pm3.meta_value = 'practicing'
+                            LEFT JOIN $wpdb->dt_location_grid as lg ON pm.meta_value=lg.grid_id
+                            WHERE pm.meta_key = 'location_grid'
+                        ) as t0
+                        GROUP BY t0.admin0_grid_id
+                        UNION ALL
+                        SELECT t1.admin1_grid_id as grid_id, count(t1.admin1_grid_id) as count
+                        FROM (
+                            SELECT lg.admin0_grid_id, lg.admin1_grid_id, lg.admin2_grid_id, lg.admin3_grid_id, lg.admin4_grid_id, lg.admin5_grid_id
+                            FROM $wpdb->postmeta as pm
+                            JOIN $wpdb->posts as p ON p.ID=pm.post_id AND p.post_type = 'contacts'
+                            JOIN $wpdb->postmeta as pm2 ON pm2.post_id=pm.post_id AND pm2.meta_key = 'overall_status' AND pm2.meta_value != 'closed'
+                            JOIN $wpdb->postmeta as pm3 ON pm3.post_id=pm.post_id AND pm3.meta_key = 'practitioner' AND pm3.meta_value = 'practicing'
+                            LEFT JOIN $wpdb->dt_location_grid as lg ON pm.meta_value=lg.grid_id
+                            WHERE pm.meta_key = 'location_grid'
+                        ) as t1
+                        GROUP BY t1.admin1_grid_id
+                        UNION ALL
+                        SELECT t2.admin2_grid_id as grid_id, count(t2.admin2_grid_id) as count
+                        FROM (
+                            SELECT lg.admin0_grid_id, lg.admin1_grid_id, lg.admin2_grid_id, lg.admin3_grid_id, lg.admin4_grid_id, lg.admin5_grid_id
+                            FROM $wpdb->postmeta as pm
+                            JOIN $wpdb->posts as p ON p.ID=pm.post_id AND p.post_type = 'contacts'
+                            JOIN $wpdb->postmeta as pm2 ON pm2.post_id=pm.post_id AND pm2.meta_key = 'overall_status' AND pm2.meta_value != 'closed'
+                            JOIN $wpdb->postmeta as pm3 ON pm3.post_id=pm.post_id AND pm3.meta_key = 'practitioner' AND pm3.meta_value = 'practicing'
+                            LEFT JOIN $wpdb->dt_location_grid as lg ON pm.meta_value=lg.grid_id
+                            WHERE pm.meta_key = 'location_grid'
+                        ) as t2
+                        GROUP BY t2.admin2_grid_id
+                        UNION ALL
+                        SELECT t3.admin3_grid_id as grid_id, count(t3.admin3_grid_id) as count
+                        FROM (
+                            SELECT lg.admin0_grid_id, lg.admin1_grid_id, lg.admin2_grid_id, lg.admin3_grid_id, lg.admin4_grid_id, lg.admin5_grid_id
+                            FROM $wpdb->postmeta as pm
+                            JOIN $wpdb->posts as p ON p.ID=pm.post_id AND p.post_type = 'contacts'
+                            JOIN $wpdb->postmeta as pm2 ON pm2.post_id=pm.post_id AND pm2.meta_key = 'overall_status' AND pm2.meta_value != 'closed'
+                            JOIN $wpdb->postmeta as pm3 ON pm3.post_id=pm.post_id AND pm3.meta_key = 'practitioner' AND pm3.meta_value = 'practicing'
+                            LEFT JOIN $wpdb->dt_location_grid as lg ON pm.meta_value=lg.grid_id
+                            WHERE pm.meta_key = 'location_grid'
+                        ) as t3
+                        GROUP BY t3.admin3_grid_id
+                        ", ARRAY_A );
+                break;
+        }
+
+        $list = [];
+        if ( is_array( $results ) ) {
+            foreach ( $results as $result ) {
+                if ( empty( $result['grid_id'] ) ) {
+                    continue;
+                }
+                if ( empty( $result['count'] ) ) {
+                    continue;
+                }
+                $list[$result['grid_id']] = $result['count'];
+            }
+        }
+
+        set_transient( __METHOD__ . $administrative_level, $list, HOUR_IN_SECONDS . 6 );
+
+        return $list;
+    }
+
     public static function clear_multiplier_grid_totals() {
         delete_transient( 'Zume_App_Heatmap::query_multiplier_grid_totals' );
         delete_transient( 'Zume_App_Heatmap::query_multiplier_grid_totalsa0' );
