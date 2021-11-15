@@ -44,7 +44,7 @@ class Zume_Public_Heatmap_Churches extends DT_Magic_Url_Base
         add_action( 'dt_blank_body', [ $this, 'body' ] );
         add_filter( 'dt_magic_url_base_allowed_css', [ $this, 'dt_magic_url_base_allowed_css' ], 10, 1 );
         add_filter( 'dt_magic_url_base_allowed_js', [ $this, 'dt_magic_url_base_allowed_js' ], 10, 1 );
-        add_action( 'wp_enqueue_scripts', [ $this, 'wp_enqueue_scripts' ], 99 );
+        add_action( 'wp_enqueue_scripts', [ $this, '_wp_enqueue_scripts' ], 99 );
 
     }
 
@@ -69,8 +69,8 @@ class Zume_Public_Heatmap_Churches extends DT_Magic_Url_Base
         Zume_App_Heatmap::_header();
     }
 
-    public static function wp_enqueue_scripts(){
-        Zume_App_Heatmap::wp_enqueue_scripts();
+    public static function _wp_enqueue_scripts(){
+        Zume_App_Heatmap::_wp_enqueue_scripts();
     }
 
     public function body(){

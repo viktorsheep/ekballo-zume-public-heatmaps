@@ -73,8 +73,8 @@ class Zume_Public_Heatmap_100hours_V2 extends DT_Magic_Url_Base {
 
     public function scripts() {
         wp_enqueue_script( 'lodash' );
-        wp_enqueue_script( 'last100-hours-js', trailingslashit( plugin_dir_url( __FILE__ ) ) . 'map-1-last100.js', [ 'jquery' ],
-        filemtime( trailingslashit( plugin_dir_path( __FILE__ ) ) .'map-1-last100.js' ), true );
+        wp_enqueue_script( 'last100-hours-js', trailingslashit( plugin_dir_url( __FILE__ ) ) . 'last100.js', [ 'jquery' ],
+        filemtime( trailingslashit( plugin_dir_path( __FILE__ ) ) .'last100.js' ), true );
     }
 
     /**

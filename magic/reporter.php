@@ -41,7 +41,7 @@ class Zume_Public_Reporter_Manager extends DT_Magic_Url_Base
         add_action( 'dt_blank_body', [ $this, 'body' ] );
         add_filter( 'dt_magic_url_base_allowed_css', [ $this, 'dt_magic_url_base_allowed_css' ], 10, 1 );
         add_filter( 'dt_magic_url_base_allowed_js', [ $this, 'dt_magic_url_base_allowed_js' ], 10, 1 );
-        add_action( 'wp_enqueue_scripts', [ $this, 'wp_enqueue_scripts' ], 99 );
+        add_action( 'wp_enqueue_scripts', [ $this, '_wp_enqueue_scripts' ], 99 );
 
     }
 
@@ -54,7 +54,7 @@ class Zume_Public_Reporter_Manager extends DT_Magic_Url_Base
         return $allowed_css;
     }
 
-    public function wp_enqueue_scripts(){
+    public function _wp_enqueue_scripts(){
         wp_enqueue_script( 'reporter', trailingslashit( plugin_dir_url( __FILE__ ) ) . 'reporter.js', [
         ], filemtime( plugin_dir_path( __FILE__ ) .'reporter.js' ), true );
     }

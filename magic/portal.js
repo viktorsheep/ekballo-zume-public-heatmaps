@@ -10,8 +10,14 @@ jQuery(document).ready(function() {
 
   if ( 'list' === jsObject.parts.action ) {
     window.load_tree()
+  } else if ( 'profile' === jsObject.parts.action ) {
+
   }
 });
+
+/**
+ * List Section
+ */
 
 window.post_item = ( action, data ) => {
   return jQuery.ajax({
@@ -688,4 +694,52 @@ function remove_location( id ) {
       window.force_values = false
     })
 
+}
+
+
+/**
+ * Profile Section
+ */
+
+window.load_profile = () => {
+  jQuery.ajax({
+    type: "POST",
+    data: JSON.stringify({ action: 'POST', parts: jsObject.parts }),
+    contentType: "application/json; charset=utf-8",
+    dataType: "json",
+    url: jsObject.root + jsObject.parts.root + '/v1/' + jsObject.parts.type + '_list',
+    beforeSend: function (xhr) {
+      xhr.setRequestHeader('X-WP-Nonce', jsObject.nonce )
+    }
+  })
+    .done(function(data){
+      console.log(data)
+
+      window.load_domenu(data)
+
+      jQuery('.loading-spinner').removeClass('active')
+      jQuery('#initial-loading-spinner').hide()
+    })
+    .fail(function(e) {
+      console.log(e)
+      jQuery('#error').html(e)
+      jQuery('.loading-spinner').removeClass('active')
+    })
+}
+window.post_profile = ( action, data ) => {
+  return jQuery.ajax({
+    type: "POST",
+    data: JSON.stringify({ action: action, parts: jsObject.parts, data: data }),
+    contentType: "application/json; charset=utf-8",
+    dataType: "json",
+    url: jsObject.root + jsObject.parts.root + '/v1/' + jsObject.parts.type + '_update',
+    beforeSend: function (xhr) {
+      xhr.setRequestHeader('X-WP-Nonce', jsObject.nonce )
+    }
+  })
+    .fail(function(e) {
+      console.log(e)
+      jQuery('#error').html(e)
+      jQuery('.loading-spinner').removeClass('active')
+    })
 }

@@ -6,6 +6,7 @@ if (is_wp_error($parts_post)) {
 }
 
 DT_Mapbox_API::geocoder_scripts();
+
 ?>
 
 <!-- title -->

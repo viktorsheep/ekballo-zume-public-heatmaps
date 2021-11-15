@@ -2147,7 +2147,7 @@ class Zume_App_Heatmap {
         ];
     }
 
-    public static function wp_enqueue_scripts(){
+    public static function _wp_enqueue_scripts(){
         wp_enqueue_script( 'lodash' );
         wp_enqueue_script( 'jquery-ui' );
         wp_enqueue_script( 'jquery-touch-punch' );

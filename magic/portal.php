@@ -9,9 +9,10 @@ class Zume_App_Portal extends DT_Magic_Url_Base {
 
     public $magic = false;
     public $parts = false;
-    public $page_title = 'Portal';
+    public $page_title = 'Practitioner Portal';
+    public $page_description = 'This is a portal for reporting church multiplication and practitioner profile.';
     public $root = "zume_app";
-    public $type = 'report_new_churches';
+    public $type = 'portal';
     public $post_type = 'contacts';
     private $meta_key = '';
     public $type_actions = [
@@ -35,13 +36,11 @@ class Zume_App_Portal extends DT_Magic_Url_Base {
         $this->meta_key = $this->root . '_' . $this->type . '_magic_key';
         parent::__construct();
 
-        /**
-         * post type and module section
-         */
+        add_action( 'rest_api_init', [ $this, 'add_endpoints' ] );
         add_action( 'dt_details_additional_section', [ $this, 'dt_details_additional_section' ], 30, 2 );
         add_filter( 'dt_details_additional_tiles', [ $this, 'dt_details_additional_tiles' ], 10, 2 );
-        add_action( 'rest_api_init', [ $this, 'add_endpoints' ] );
         add_filter( 'dt_custom_fields_settings', [ $this, 'add_active_reporter_status' ], 50, 2 );
+        add_filter( 'dt_settings_apps_list', [ $this, 'dt_settings_apps_list' ], 10, 1 );
 
         /**
          * tests if other URL
@@ -77,7 +76,7 @@ class Zume_App_Portal extends DT_Magic_Url_Base {
         // load if valid url
         add_filter( 'dt_magic_url_base_allowed_css', [ $this, 'dt_magic_url_base_allowed_css' ], 10, 1 );
         add_filter( 'dt_magic_url_base_allowed_js', [ $this, 'dt_magic_url_base_allowed_js' ], 10, 1 );
-        add_action( 'wp_enqueue_scripts', [ $this, 'scripts' ], 99 );
+        add_action( 'wp_enqueue_scripts', [ $this, '_wp_enqueue_scripts' ], 99 );
     }
 
     public function dt_magic_url_base_allowed_js( $allowed_js ) {
@@ -95,9 +94,6 @@ class Zume_App_Portal extends DT_Magic_Url_Base {
         }
         else if ( 'list' === $this->parts['action'] ) {
             $allowed_js[] = 'portal-app-domenu-js';
-        }
-        else if ( 'profile' === $this->parts['action'] ) {
-            $allowed_js[] = 'portal-profile';
         }
 
         return $allowed_js;
@@ -119,7 +115,7 @@ class Zume_App_Portal extends DT_Magic_Url_Base {
         return $allowed_css;
     }
 
-    public function scripts() {
+    public function _wp_enqueue_scripts() {
         wp_enqueue_script( 'lodash' );
         wp_register_script( 'jquery-touch-punch', '/wp-includes/js/jquery/jquery.ui.touch-punch.js' ); // @phpcs:ignore
 
@@ -137,7 +133,6 @@ class Zume_App_Portal extends DT_Magic_Url_Base {
         /* group-gen */
         wp_enqueue_script( 'portal', trailingslashit( plugin_dir_url( __FILE__ ) ) . 'portal.js', [ 'jquery' ],
         filemtime( trailingslashit( plugin_dir_path( __FILE__ ) ) .'portal.js' ), true );
-
 
         if ( 'map' === $this->parts['action'] ) {
 
@@ -158,10 +153,6 @@ class Zume_App_Portal extends DT_Magic_Url_Base {
 
             wp_enqueue_style( 'portal-app-domenu-css', trailingslashit( plugin_dir_url( __FILE__ ) ) . 'jquery.domenu-0.100.77.css', [],
             filemtime( trailingslashit( plugin_dir_path( __FILE__ ) ) .'jquery.domenu-0.100.77.css' ) );
-        }
-        else if ( 'profile' === $this->parts['action'] ) {
-            wp_enqueue_script( 'portal-profile', trailingslashit( plugin_dir_url( __FILE__ ) ) . 'portal-profile.js', [ 'jquery' ],
-                filemtime( trailingslashit( plugin_dir_path( __FILE__ ) ) .'portal-profile.js' ), true );
         }
 
     }
@@ -950,6 +941,16 @@ class Zume_App_Portal extends DT_Magic_Url_Base {
     /**
      * Post Type Tile Examples
      */
+    public function dt_settings_apps_list( $apps_list ) {
+        $apps_list[$this->meta_key] = [
+            'key' => $this->meta_key,
+            'url_base' => $this->root. '/'. $this->type,
+            'label' => $this->page_title,
+            'description' => $this->page_description,
+        ];
+        return $apps_list;
+    }
+
     public function dt_details_additional_tiles( $tiles, $post_type = "" ) {
         if ( $post_type === $this->post_type && user_can( get_current_user_id(), 'manage_dt') ){
 
