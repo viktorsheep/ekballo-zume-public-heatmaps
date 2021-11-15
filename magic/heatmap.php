@@ -2513,7 +2513,7 @@ class Zume_App_Heatmap {
                     SELECT t0.admin0_grid_id as grid_id, count(t0.admin0_grid_id) as count
                     FROM (
                      SELECT lg.admin0_grid_id, lg.admin1_grid_id, lg.admin2_grid_id, lg.admin3_grid_id, lg.admin4_grid_id, lg.admin5_grid_id
-                        FROM $wpdb->dt_movement_log ml
+                        FROM $wpdb->dt_reports ml
                         JOIN $wpdb->dt_location_grid lg ON lg.grid_id=ml.grid_id
                         WHERE ml.grid_id > 0
                     ) as t0
@@ -2525,7 +2525,7 @@ class Zume_App_Heatmap {
                     SELECT t1.admin1_grid_id as grid_id, count(t1.admin1_grid_id) as count
                     FROM (
                         SELECT lg.admin0_grid_id, lg.admin1_grid_id, lg.admin2_grid_id, lg.admin3_grid_id, lg.admin4_grid_id, lg.admin5_grid_id
-                        FROM $wpdb->dt_movement_log ml
+                        FROM $wpdb->dt_reports ml
                         JOIN $wpdb->dt_location_grid lg ON lg.grid_id=ml.grid_id
                         WHERE ml.grid_id > 0
                     ) as t1
@@ -2537,7 +2537,7 @@ class Zume_App_Heatmap {
                     SELECT t2.admin2_grid_id as grid_id, count(t2.admin2_grid_id) as count
                     FROM (
                         SELECT lg.admin0_grid_id, lg.admin1_grid_id, lg.admin2_grid_id, lg.admin3_grid_id, lg.admin4_grid_id, lg.admin5_grid_id
-                        FROM $wpdb->dt_movement_log ml
+                        FROM $wpdb->dt_reports ml
                         JOIN $wpdb->dt_location_grid lg ON lg.grid_id=ml.grid_id
                         WHERE ml.grid_id > 0
                     ) as t2
@@ -2549,7 +2549,7 @@ class Zume_App_Heatmap {
                     SELECT t3.admin3_grid_id as grid_id, count(t3.admin3_grid_id) as count
                     FROM (
                         SELECT lg.admin0_grid_id, lg.admin1_grid_id, lg.admin2_grid_id, lg.admin3_grid_id, lg.admin4_grid_id, lg.admin5_grid_id
-                        FROM $wpdb->dt_movement_log ml
+                        FROM $wpdb->dt_reports ml
                         JOIN $wpdb->dt_location_grid lg ON lg.grid_id=ml.grid_id
                         WHERE ml.grid_id > 0
                     ) as t3
@@ -2561,7 +2561,7 @@ class Zume_App_Heatmap {
                     SELECT 1 as grid_id, count('World') as count
                     FROM (
                         SELECT 'World'
-                        FROM $wpdb->dt_movement_log ml
+                        FROM $wpdb->dt_reports ml
                         LEFT JOIN $wpdb->dt_location_grid lg ON lg.grid_id=ml.grid_id
                         WHERE ml.grid_id != 0
                     ) as tw
@@ -2573,7 +2573,7 @@ class Zume_App_Heatmap {
                     SELECT t0.admin0_grid_id as grid_id, count(t0.admin0_grid_id) as count
                     FROM (
                      SELECT lg.admin0_grid_id, lg.admin1_grid_id, lg.admin2_grid_id, lg.admin3_grid_id, lg.admin4_grid_id, lg.admin5_grid_id
-                        FROM $wpdb->dt_movement_log as ml
+                        FROM $wpdb->dt_reports as ml
                         JOIN $wpdb->dt_location_grid as lg ON ml.grid_id=lg.grid_id
                         WHERE ml.grid_id > 0
                     ) as t0
@@ -2582,7 +2582,7 @@ class Zume_App_Heatmap {
                     SELECT t1.admin1_grid_id as grid_id, count(t1.admin1_grid_id) as count
                     FROM (
                      SELECT lg.admin0_grid_id, lg.admin1_grid_id, lg.admin2_grid_id, lg.admin3_grid_id, lg.admin4_grid_id, lg.admin5_grid_id
-                        FROM $wpdb->dt_movement_log as ml
+                        FROM $wpdb->dt_reports as ml
                         JOIN $wpdb->dt_location_grid as lg ON ml.grid_id=lg.grid_id
                         WHERE ml.grid_id > 0
                     ) as t1
@@ -2591,7 +2591,7 @@ class Zume_App_Heatmap {
                     SELECT t2.admin2_grid_id as grid_id, count(t2.admin2_grid_id) as count
                     FROM (
                         SELECT lg.admin0_grid_id, lg.admin1_grid_id, lg.admin2_grid_id, lg.admin3_grid_id, lg.admin4_grid_id, lg.admin5_grid_id
-                        FROM $wpdb->dt_movement_log as ml
+                        FROM $wpdb->dt_reports as ml
                         JOIN $wpdb->dt_location_grid as lg ON ml.grid_id=lg.grid_id
                         WHERE ml.grid_id > 0
                     ) as t2
@@ -2600,7 +2600,7 @@ class Zume_App_Heatmap {
                     SELECT t3.admin3_grid_id as grid_id, count(t3.admin3_grid_id) as count
                     FROM (
                         SELECT lg.admin0_grid_id, lg.admin1_grid_id, lg.admin2_grid_id, lg.admin3_grid_id, lg.admin4_grid_id, lg.admin5_grid_id
-                        FROM $wpdb->dt_movement_log as ml
+                        FROM $wpdb->dt_reports as ml
                         JOIN $wpdb->dt_location_grid as lg ON ml.grid_id=lg.grid_id
                         WHERE ml.grid_id > 0
                     ) as t3
@@ -2609,7 +2609,7 @@ class Zume_App_Heatmap {
                     SELECT t4.admin4_grid_id as grid_id, count(t4.admin4_grid_id) as count
                     FROM (
                         SELECT lg.admin0_grid_id, lg.admin1_grid_id, lg.admin2_grid_id, lg.admin3_grid_id, lg.admin4_grid_id, lg.admin5_grid_id
-                        FROM $wpdb->dt_movement_log as ml
+                        FROM $wpdb->dt_reports as ml
                         JOIN $wpdb->dt_location_grid as lg ON ml.grid_id=lg.grid_id
                         WHERE ml.grid_id > 0
                     ) as t4
@@ -2618,7 +2618,7 @@ class Zume_App_Heatmap {
                     SELECT t5.admin5_grid_id as grid_id, count(t5.admin5_grid_id) as count
                     FROM (
                         SELECT lg.admin0_grid_id, lg.admin1_grid_id, lg.admin2_grid_id, lg.admin3_grid_id, lg.admin4_grid_id, lg.admin5_grid_id
-                        FROM $wpdb->dt_movement_log as ml
+                        FROM $wpdb->dt_reports as ml
                         JOIN $wpdb->dt_location_grid as lg ON ml.grid_id=lg.grid_id
                         WHERE ml.grid_id > 0
                     ) as t5
@@ -2627,7 +2627,7 @@ class Zume_App_Heatmap {
                     SELECT 1 as grid_id, count('World') as count
                     FROM (
                         SELECT 'World'
-                        FROM $wpdb->dt_movement_log ml
+                        FROM $wpdb->dt_reports ml
                         LEFT JOIN $wpdb->dt_location_grid lg ON lg.grid_id=ml.grid_id
                         WHERE ml.grid_id != 0
                     ) as tw
@@ -2639,7 +2639,7 @@ class Zume_App_Heatmap {
                     SELECT t0.admin0_grid_id as grid_id, count(t0.admin0_grid_id) as count
                     FROM (
                      SELECT lg.admin0_grid_id, lg.admin1_grid_id, lg.admin2_grid_id, lg.admin3_grid_id, lg.admin4_grid_id, lg.admin5_grid_id
-                        FROM $wpdb->dt_movement_log as ml
+                        FROM $wpdb->dt_reports as ml
                         JOIN $wpdb->dt_location_grid as lg ON ml.grid_id=lg.grid_id
                         WHERE ml.grid_id > 0
                     ) as t0
@@ -2648,7 +2648,7 @@ class Zume_App_Heatmap {
                     SELECT t1.admin1_grid_id as grid_id, count(t1.admin1_grid_id) as count
                     FROM (
                      SELECT lg.admin0_grid_id, lg.admin1_grid_id, lg.admin2_grid_id, lg.admin3_grid_id, lg.admin4_grid_id, lg.admin5_grid_id
-                        FROM $wpdb->dt_movement_log as ml
+                        FROM $wpdb->dt_reports as ml
                         JOIN $wpdb->dt_location_grid as lg ON ml.grid_id=lg.grid_id
                         WHERE ml.grid_id > 0
                     ) as t1
@@ -2657,7 +2657,7 @@ class Zume_App_Heatmap {
                     SELECT t2.admin2_grid_id as grid_id, count(t2.admin2_grid_id) as count
                     FROM (
                         SELECT lg.admin0_grid_id, lg.admin1_grid_id, lg.admin2_grid_id, lg.admin3_grid_id, lg.admin4_grid_id, lg.admin5_grid_id
-                        FROM $wpdb->dt_movement_log as ml
+                        FROM $wpdb->dt_reports as ml
                         JOIN $wpdb->dt_location_grid as lg ON ml.grid_id=lg.grid_id
                         WHERE ml.grid_id > 0
                     ) as t2
@@ -2666,7 +2666,7 @@ class Zume_App_Heatmap {
                     SELECT t3.admin3_grid_id as grid_id, count(t3.admin3_grid_id) as count
                     FROM (
                         SELECT lg.admin0_grid_id, lg.admin1_grid_id, lg.admin2_grid_id, lg.admin3_grid_id, lg.admin4_grid_id, lg.admin5_grid_id
-                        FROM $wpdb->dt_movement_log as ml
+                        FROM $wpdb->dt_reports as ml
                         JOIN $wpdb->dt_location_grid as lg ON ml.grid_id=lg.grid_id
                         WHERE ml.grid_id > 0
                     ) as t3
@@ -2675,7 +2675,7 @@ class Zume_App_Heatmap {
                     SELECT t4.admin4_grid_id as grid_id, count(t4.admin4_grid_id) as count
                     FROM (
                         SELECT lg.admin0_grid_id, lg.admin1_grid_id, lg.admin2_grid_id, lg.admin3_grid_id, lg.admin4_grid_id, lg.admin5_grid_id
-                        FROM $wpdb->dt_movement_log as ml
+                        FROM $wpdb->dt_reports as ml
                         JOIN $wpdb->dt_location_grid as lg ON ml.grid_id=lg.grid_id
                         WHERE ml.grid_id > 0
                     ) as t4
@@ -2684,7 +2684,7 @@ class Zume_App_Heatmap {
                     SELECT t5.admin5_grid_id as grid_id, count(t5.admin5_grid_id) as count
                     FROM (
                         SELECT lg.admin0_grid_id, lg.admin1_grid_id, lg.admin2_grid_id, lg.admin3_grid_id, lg.admin4_grid_id, lg.admin5_grid_id
-                        FROM $wpdb->dt_movement_log as ml
+                        FROM $wpdb->dt_reports as ml
                         JOIN $wpdb->dt_location_grid as lg ON ml.grid_id=lg.grid_id
                         WHERE ml.grid_id > 0
                     ) as t5
@@ -2720,7 +2720,7 @@ class Zume_App_Heatmap {
         SELECT t0.admin0_grid_id as grid_id, count(t0.admin0_grid_id) as count
             FROM (
              SELECT lg.admin0_grid_id, lg.admin1_grid_id, lg.admin2_grid_id, lg.admin3_grid_id, lg.admin4_grid_id, lg.admin5_grid_id
-                FROM $wpdb->dt_movement_log ml
+                FROM $wpdb->dt_reports ml
                 LEFT JOIN $wpdb->dt_location_grid lg ON lg.grid_id=ml.grid_id
                 WHERE ml.grid_id != 0
             ) as t0
@@ -2729,7 +2729,7 @@ class Zume_App_Heatmap {
             SELECT t1.admin1_grid_id as grid_id, count(t1.admin1_grid_id) as count
             FROM (
                 SELECT lg.admin0_grid_id, lg.admin1_grid_id, lg.admin2_grid_id, lg.admin3_grid_id, lg.admin4_grid_id, lg.admin5_grid_id
-                FROM $wpdb->dt_movement_log ml
+                FROM $wpdb->dt_reports ml
                 LEFT JOIN $wpdb->dt_location_grid lg ON lg.grid_id=ml.grid_id
                 WHERE ml.grid_id != 0
             ) as t1
@@ -2738,7 +2738,7 @@ class Zume_App_Heatmap {
             SELECT t2.admin2_grid_id as grid_id, count(t2.admin2_grid_id) as count
             FROM (
                 SELECT lg.admin0_grid_id, lg.admin1_grid_id, lg.admin2_grid_id, lg.admin3_grid_id, lg.admin4_grid_id, lg.admin5_grid_id
-                FROM $wpdb->dt_movement_log ml
+                FROM $wpdb->dt_reports ml
                 LEFT JOIN $wpdb->dt_location_grid lg ON lg.grid_id=ml.grid_id
                 WHERE ml.grid_id != 0
             ) as t2
@@ -2747,7 +2747,7 @@ class Zume_App_Heatmap {
             SELECT t3.admin3_grid_id as grid_id, count(t3.admin3_grid_id) as count
             FROM (
                 SELECT lg.admin0_grid_id, lg.admin1_grid_id, lg.admin2_grid_id, lg.admin3_grid_id, lg.admin4_grid_id, lg.admin5_grid_id
-                FROM $wpdb->dt_movement_log ml
+                FROM $wpdb->dt_reports ml
                 LEFT JOIN $wpdb->dt_location_grid lg ON lg.grid_id=ml.grid_id
                 WHERE ml.grid_id != 0
             ) as t3
@@ -3161,8 +3161,8 @@ class Zume_App_Heatmap {
         $list = $wpdb->get_results("
                 SELECT
                        id,
-                       action,
-                       category,
+                       type as action,
+                       subtype as category,
                        lng,
                        lat,
                        label,
@@ -3170,7 +3170,7 @@ class Zume_App_Heatmap {
                        payload,
                        timestamp,
                        'A Zúme partner' as site_name
-                FROM $wpdb->dt_movement_log
+                FROM $wpdb->dt_reports
                 WHERE grid_id IN ($prepared_list)
                 ORDER BY timestamp DESC", ARRAY_A);
         // phpcs:enable
@@ -3183,15 +3183,7 @@ class Zume_App_Heatmap {
             $list[$index]['formatted_time'] = gmdate( 'M, d Y, g:i a', $item['timestamp'] + $offset );
         }
 
-        if ( function_exists( 'zume_log_actions' ) ) {
-            $list = zume_log_actions( $list );
-        }
-        if ( function_exists( 'dt_network_dashboard_translate_log_generations' ) ) {
-            $list = dt_network_dashboard_translate_log_generations( $list );
-        }
-        if ( function_exists( 'dt_network_dashboard_translate_log_new_posts' ) ) {
-            $list = dt_network_dashboard_translate_log_new_posts( $list );
-        }
+        $list = self::prepare_message( $list );
 
         foreach ( $list as $index => $item ){
             if ( ! isset( $item['message'] ) ) {
@@ -3200,6 +3192,132 @@ class Zume_App_Heatmap {
         }
 
         return $list;
+    }
+
+    public static function prepare_message( $activity_log ){
+
+        foreach ( $activity_log as $index => $log ){
+
+            /* new_baptism */
+            if ( 'studying' === substr( $log['category'], 0, 8 ) ) {
+                $initials = self::zume_action_create_initials( $log['lng'], $log['lat'], $log['payload'] );
+                $activity_log[$index]['message'] = $initials . ' is studying "' . $log['payload']['title'] . '"';
+            }
+
+            else if ( 'leading' === substr( $log['category'], 0, 7 ) ) {
+                $initials = self::zume_action_create_initials( $log['lng'], $log['lat'], $log['payload'] );
+                $activity_log[$index]['message'] = $initials . ' is leading a group through session '. str_replace( '_', '', substr( $log['action'], -2, 2 ) ).'!';
+            }
+
+            else if ( 'zume_training' === $log['action'] && 'joining' === $log['category'] ) {
+                $initials = self::zume_action_create_initials( $log['lng'], $log['lat'], $log['payload'] );
+                $activity_log[$index]['message'] = $initials . ' is registering for Zúme Training! ';
+            }
+
+            else if ( 'zume_vision' === $log['action'] && 'joining' === $log['category'] ) {
+                $initials = self::zume_action_create_initials( $log['lng'], $log['lat'], $log['payload'] );
+                $activity_log[$index]['message'] = $initials . ' is registering for Zúme Community! ';
+            }
+
+            else if ( 'updated_3_month' === $log['action'] ) {
+                $initials = self::zume_action_create_initials( $log['lng'], $log['lat'], $log['payload'] );
+                $activity_log[$index]['message'] = $initials . ' is updating there Zúme Training 3 month plan! ';
+            }
+
+            /* new_contact */
+            else if ( 'new_contact' === $log['action'] ) {
+                $activity_log[$index]['message'] = sprintf( __( '%s is reporting a new contact.', 'disciple-tools-network-dashboard' ), $log['site_name'] );
+            }
+
+            /* new_pre-group */
+            else if ( 'new_pre-group' === $log['action'] ) {
+                $activity_log[$index]['message'] = sprintf( __( '%s is reporting a new pre-group formed.', 'disciple-tools-network-dashboard' ), $log['site_name'] );
+            }
+
+            /* new_group */
+            else if ( 'new_group' === $log['action'] ) {
+                $activity_log[$index]['message'] = sprintf( __( '%s is reporting a new group formed.', 'disciple-tools-network-dashboard' ), $log['site_name'] );
+            }
+
+            /* new_church */
+            else if ( 'new_church' === $log['action'] ) {
+                $activity_log[$index]['message'] = sprintf( __( '%s is reporting a new church.', 'disciple-tools-network-dashboard' ), $log['site_name'] );
+            }
+
+            /* new_team */
+            else if ( 'new_team' === $log['action'] ) {
+                $activity_log[$index]['message'] = sprintf( __( '%s is reporting a new leadership team formed.', 'disciple-tools-network-dashboard' ), $log['site_name'] );
+            }
+
+            /* new_baptism */
+            else if ( 'new_baptism' === $log['action'] ) {
+                $activity_log[$index]['message'] = sprintf( __( '%s is reporting a new baptism.', 'disciple-tools-network-dashboard' ), $log['site_name'] );
+            }
+
+            /* new_coaching */
+            else if ( 'new_coaching' === $log['action'] ) {
+                $activity_log[$index]['message'] = sprintf( __( '%s is reporting an coaching relationship.', 'disciple-tools-network-dashboard' ), $log['site_name'] );
+            }
+
+            /* generation_pre-group */
+            else if ( 'generation_pre-group' === $log['action'] ) {
+                $activity_log[$index]['message'] = sprintf( __( '%s is reporting a new pre-group generation.', 'disciple-tools-network-dashboard' ), $log['site_name'] );
+            }
+
+            /* generation_group */
+            else if ( 'generation_group' === $log['action'] ) {
+                $activity_log[$index]['message'] = sprintf( __( '%s is reporting a new group generation.', 'disciple-tools-network-dashboard' ), $log['site_name'] );
+            }
+
+            /* generation_church */
+            else if ( 'generation_church' === $log['action'] ) {
+                $activity_log[$index]['message'] = sprintf( __( '%s is reporting a new church generation.', 'disciple-tools-network-dashboard' ), $log['site_name'] );
+            }
+
+            /* generation_team */
+            else if ( 'generation_team' === $log['action'] ) {
+                $activity_log[$index]['message'] = sprintf( __( '%s is reporting a new leadership team generation.', 'disciple-tools-network-dashboard' ), $log['site_name'] );
+            }
+
+        }
+
+        return $activity_log;
+    }
+
+    public static function zume_action_create_initials( $longitude, $latitude, $payload ) : string {
+        $letters = [
+            'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'N', 'S',
+            'M', 'N', 'O', 'P', 'R', 'S', 'T', 'U', 'V', 'W', 'E', 'A', 'R', 'I',
+            'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'D', 'E',
+            'M', 'N', 'O', 'P', 'R', 'S', 'T', 'U', 'V', 'W', 'E', 'A', 'R', 'I',
+            'E', 'A', 'R', 'I', 'T', 'N', 'S', 'L', 'E', 'A', 'R', 'I', 'N', 'S',
+            'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'C', 'D',
+            'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'A', 'B',
+            'M', 'N', 'O', 'P', 'R', 'S', 'T', 'U', 'V', 'W', 'E', 'A', 'R', 'I',
+            'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'A', 'B',
+            'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'E', 'A', 'R',
+            'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'N', 'S',
+            'M', 'N', 'O', 'P', 'R', 'S', 'T', 'U', 'V', 'W', 'E', 'A', 'R', 'I',
+            'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'D', 'E',
+            'M', 'N', 'O', 'P', 'R', 'S', 'T', 'U', 'V', 'W', 'E', 'A', 'R', 'I',
+            'E', 'A', 'R', 'I', 'T', 'N', 'S', 'L', 'E', 'A', 'R', 'I', 'N', 'S',
+            'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'C', 'D',
+            'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'A', 'B',
+            'E', 'A', 'R', 'I', 'T', 'N', 'S', 'L', 'E', 'A', 'R', 'I', 'N', 'S',
+            'M', 'N', 'O', 'P', 'R', 'S', 'T', 'U', 'V', 'W', 'E', 'A', 'R', 'I',
+            'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'N', 'S',
+        ];
+        $fnum = abs( round( $longitude ) );
+        $lnum = abs( round( $latitude ) );
+        $list = str_split( hash( 'sha256', maybe_serialize( $payload ) ) );
+        foreach( $list as $character ){
+            if ( is_numeric( $character ) ) {
+                $fnum = $fnum + $character;
+                $lnum = $lnum + $character;
+                break;
+            }
+        }
+        return strtoupper( $letters[$fnum] . $letters[$lnum] );
     }
 
     public static function query_multiplier_list_data( $grid_id ) {
@@ -3772,7 +3890,7 @@ class Zume_Public_Heatmap_100hours_Utilities {
 
         $initials = $string_elements['initials'] ?? '';
         $in_language = $string_elements['in_language'] ?? '';
-        $location_label = $string_elements['location_label'] ?? ' (' . $payload['country'] . ') ' ?? '';
+        $location_label =' (' . $string_elements['location_label'] . ') ' ?? '';
 
         $data = [
             'note' => '',
@@ -3928,8 +4046,8 @@ class Zume_Public_Heatmap_100hours_Utilities {
 
         $timestamp = strtotime( '-100 hours' );
         $results = $wpdb->get_results( "
-                SELECT ml.action, ml.category, ml.lng, ml.lat, ml.label, ml.payload, ml.timestamp, lga0.name as country_name, lga0.country_code
-                FROM $wpdb->dt_movement_log as ml
+                SELECT ml.type as action, ml.subtype as category, ml.lng, ml.lat, ml.label, ml.payload, ml.timestamp, lga0.name as country_name, lga0.country_code
+                FROM $wpdb->dt_reports as ml
                 LEFT JOIN $wpdb->dt_location_grid lg ON lg.grid_id=ml.grid_id
                 LEFT JOIN $wpdb->dt_location_grid lga0 ON lga0.grid_id=lg.admin0_grid_id
                 WHERE ml.timestamp > $timestamp
@@ -3964,7 +4082,7 @@ class Zume_Public_Heatmap_100hours_Utilities {
 
             // location string
             $location = self::create_location_precision( $result['lng'], $result['lat'], $result['label'], $payload );
-            $string_elements['label'] = $location['label'];
+            $string_elements['location_label'] = $location['label'];
 
             // note and type data
             $data = self::create_note_data( $result['action'], $string_elements, $payload );
@@ -4120,8 +4238,8 @@ class Zume_Public_Heatmap_100hours_Utilities {
         global $wpdb;
         $timestamp = strtotime( '-100 hours' );
         $results = $wpdb->get_results( "
-                SELECT ml.action, ml.category, ml.lng, ml.lat, ml.label, ml.payload, ml.timestamp, lga0.name as country_name, lga0.country_code
-                FROM $wpdb->dt_movement_log ml
+                SELECT ml.type as action, ml.subtype as category, ml.lng, ml.lat, ml.label, ml.payload, ml.timestamp, lga0.name as country_name, lga0.country_code
+                FROM $wpdb->dt_reports ml
                 LEFT JOIN $wpdb->dt_location_grid lg ON lg.grid_id=ml.grid_id
                 LEFT JOIN $wpdb->dt_location_grid lga0 ON lga0.grid_id=lg.admin0_grid_id
                 WHERE ml.timestamp > $timestamp
