@@ -166,9 +166,9 @@ class Zume_Public_Heatmap_100hours_V2 extends DT_Magic_Url_Base {
 
         switch ( $action ) {
             case 'load_geojson':
-                return Zume_Public_Heatmap_100hours_Utilities::get_activity_geojson();
+                return Zume_App_Heatmap::get_activity_geojson();
             case 'activity_list':
-                return Zume_Public_Heatmap_100hours_Utilities::get_activity_list( $params['data'], true );
+                return Zume_App_Heatmap::get_activity_list( $params['data'], true );
             default:
                 return new WP_Error( __METHOD__, "Missing valid action", [ 'status' => 400 ] );
         }

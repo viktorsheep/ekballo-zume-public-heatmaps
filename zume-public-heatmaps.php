@@ -92,7 +92,6 @@ class Zume_Public_Heatmaps {
         require_once( 'magic/heatmap-churches.php' );
         require_once( 'magic/heatmap-trainings.php' );
 
-        require_once( 'magic/last100-hours-v1.php' );
         require_once( 'magic/last100-hours-v2.php' );
 
         require_once( 'magic/reporter.php' );

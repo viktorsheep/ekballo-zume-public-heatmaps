@@ -2513,7 +2513,7 @@ class Zume_App_Heatmap {
                     SELECT t0.admin0_grid_id as grid_id, count(t0.admin0_grid_id) as count
                     FROM (
                      SELECT lg.admin0_grid_id, lg.admin1_grid_id, lg.admin2_grid_id, lg.admin3_grid_id, lg.admin4_grid_id, lg.admin5_grid_id
-                        FROM $wpdb->dt_reports ml
+                        FROM $wpdb->dt_movement_log ml
                         JOIN $wpdb->dt_location_grid lg ON lg.grid_id=ml.grid_id
                         WHERE ml.grid_id > 0
                     ) as t0
@@ -2525,7 +2525,7 @@ class Zume_App_Heatmap {
                     SELECT t1.admin1_grid_id as grid_id, count(t1.admin1_grid_id) as count
                     FROM (
                         SELECT lg.admin0_grid_id, lg.admin1_grid_id, lg.admin2_grid_id, lg.admin3_grid_id, lg.admin4_grid_id, lg.admin5_grid_id
-                        FROM $wpdb->dt_reports ml
+                        FROM $wpdb->dt_movement_log ml
                         JOIN $wpdb->dt_location_grid lg ON lg.grid_id=ml.grid_id
                         WHERE ml.grid_id > 0
                     ) as t1
@@ -2537,7 +2537,7 @@ class Zume_App_Heatmap {
                     SELECT t2.admin2_grid_id as grid_id, count(t2.admin2_grid_id) as count
                     FROM (
                         SELECT lg.admin0_grid_id, lg.admin1_grid_id, lg.admin2_grid_id, lg.admin3_grid_id, lg.admin4_grid_id, lg.admin5_grid_id
-                        FROM $wpdb->dt_reports ml
+                        FROM $wpdb->dt_movement_log ml
                         JOIN $wpdb->dt_location_grid lg ON lg.grid_id=ml.grid_id
                         WHERE ml.grid_id > 0
                     ) as t2
@@ -2549,7 +2549,7 @@ class Zume_App_Heatmap {
                     SELECT t3.admin3_grid_id as grid_id, count(t3.admin3_grid_id) as count
                     FROM (
                         SELECT lg.admin0_grid_id, lg.admin1_grid_id, lg.admin2_grid_id, lg.admin3_grid_id, lg.admin4_grid_id, lg.admin5_grid_id
-                        FROM $wpdb->dt_reports ml
+                        FROM $wpdb->dt_movement_log ml
                         JOIN $wpdb->dt_location_grid lg ON lg.grid_id=ml.grid_id
                         WHERE ml.grid_id > 0
                     ) as t3
@@ -2561,7 +2561,7 @@ class Zume_App_Heatmap {
                     SELECT 1 as grid_id, count('World') as count
                     FROM (
                         SELECT 'World'
-                        FROM $wpdb->dt_reports ml
+                        FROM $wpdb->dt_movement_log ml
                         LEFT JOIN $wpdb->dt_location_grid lg ON lg.grid_id=ml.grid_id
                         WHERE ml.grid_id != 0
                     ) as tw
@@ -2573,7 +2573,7 @@ class Zume_App_Heatmap {
                     SELECT t0.admin0_grid_id as grid_id, count(t0.admin0_grid_id) as count
                     FROM (
                      SELECT lg.admin0_grid_id, lg.admin1_grid_id, lg.admin2_grid_id, lg.admin3_grid_id, lg.admin4_grid_id, lg.admin5_grid_id
-                        FROM $wpdb->dt_reports as ml
+                        FROM $wpdb->dt_movement_log as ml
                         JOIN $wpdb->dt_location_grid as lg ON ml.grid_id=lg.grid_id
                         WHERE ml.grid_id > 0
                     ) as t0
@@ -2582,7 +2582,7 @@ class Zume_App_Heatmap {
                     SELECT t1.admin1_grid_id as grid_id, count(t1.admin1_grid_id) as count
                     FROM (
                      SELECT lg.admin0_grid_id, lg.admin1_grid_id, lg.admin2_grid_id, lg.admin3_grid_id, lg.admin4_grid_id, lg.admin5_grid_id
-                        FROM $wpdb->dt_reports as ml
+                        FROM $wpdb->dt_movement_log as ml
                         JOIN $wpdb->dt_location_grid as lg ON ml.grid_id=lg.grid_id
                         WHERE ml.grid_id > 0
                     ) as t1
@@ -2591,7 +2591,7 @@ class Zume_App_Heatmap {
                     SELECT t2.admin2_grid_id as grid_id, count(t2.admin2_grid_id) as count
                     FROM (
                         SELECT lg.admin0_grid_id, lg.admin1_grid_id, lg.admin2_grid_id, lg.admin3_grid_id, lg.admin4_grid_id, lg.admin5_grid_id
-                        FROM $wpdb->dt_reports as ml
+                        FROM $wpdb->dt_movement_log as ml
                         JOIN $wpdb->dt_location_grid as lg ON ml.grid_id=lg.grid_id
                         WHERE ml.grid_id > 0
                     ) as t2
@@ -2600,7 +2600,7 @@ class Zume_App_Heatmap {
                     SELECT t3.admin3_grid_id as grid_id, count(t3.admin3_grid_id) as count
                     FROM (
                         SELECT lg.admin0_grid_id, lg.admin1_grid_id, lg.admin2_grid_id, lg.admin3_grid_id, lg.admin4_grid_id, lg.admin5_grid_id
-                        FROM $wpdb->dt_reports as ml
+                        FROM $wpdb->dt_movement_log as ml
                         JOIN $wpdb->dt_location_grid as lg ON ml.grid_id=lg.grid_id
                         WHERE ml.grid_id > 0
                     ) as t3
@@ -2609,7 +2609,7 @@ class Zume_App_Heatmap {
                     SELECT t4.admin4_grid_id as grid_id, count(t4.admin4_grid_id) as count
                     FROM (
                         SELECT lg.admin0_grid_id, lg.admin1_grid_id, lg.admin2_grid_id, lg.admin3_grid_id, lg.admin4_grid_id, lg.admin5_grid_id
-                        FROM $wpdb->dt_reports as ml
+                        FROM $wpdb->dt_movement_log as ml
                         JOIN $wpdb->dt_location_grid as lg ON ml.grid_id=lg.grid_id
                         WHERE ml.grid_id > 0
                     ) as t4
@@ -2618,7 +2618,7 @@ class Zume_App_Heatmap {
                     SELECT t5.admin5_grid_id as grid_id, count(t5.admin5_grid_id) as count
                     FROM (
                         SELECT lg.admin0_grid_id, lg.admin1_grid_id, lg.admin2_grid_id, lg.admin3_grid_id, lg.admin4_grid_id, lg.admin5_grid_id
-                        FROM $wpdb->dt_reports as ml
+                        FROM $wpdb->dt_movement_log as ml
                         JOIN $wpdb->dt_location_grid as lg ON ml.grid_id=lg.grid_id
                         WHERE ml.grid_id > 0
                     ) as t5
@@ -2627,7 +2627,7 @@ class Zume_App_Heatmap {
                     SELECT 1 as grid_id, count('World') as count
                     FROM (
                         SELECT 'World'
-                        FROM $wpdb->dt_reports ml
+                        FROM $wpdb->dt_movement_log ml
                         LEFT JOIN $wpdb->dt_location_grid lg ON lg.grid_id=ml.grid_id
                         WHERE ml.grid_id != 0
                     ) as tw
@@ -2639,7 +2639,7 @@ class Zume_App_Heatmap {
                     SELECT t0.admin0_grid_id as grid_id, count(t0.admin0_grid_id) as count
                     FROM (
                      SELECT lg.admin0_grid_id, lg.admin1_grid_id, lg.admin2_grid_id, lg.admin3_grid_id, lg.admin4_grid_id, lg.admin5_grid_id
-                        FROM $wpdb->dt_reports as ml
+                        FROM $wpdb->dt_movement_log as ml
                         JOIN $wpdb->dt_location_grid as lg ON ml.grid_id=lg.grid_id
                         WHERE ml.grid_id > 0
                     ) as t0
@@ -2648,7 +2648,7 @@ class Zume_App_Heatmap {
                     SELECT t1.admin1_grid_id as grid_id, count(t1.admin1_grid_id) as count
                     FROM (
                      SELECT lg.admin0_grid_id, lg.admin1_grid_id, lg.admin2_grid_id, lg.admin3_grid_id, lg.admin4_grid_id, lg.admin5_grid_id
-                        FROM $wpdb->dt_reports as ml
+                        FROM $wpdb->dt_movement_log as ml
                         JOIN $wpdb->dt_location_grid as lg ON ml.grid_id=lg.grid_id
                         WHERE ml.grid_id > 0
                     ) as t1
@@ -2657,7 +2657,7 @@ class Zume_App_Heatmap {
                     SELECT t2.admin2_grid_id as grid_id, count(t2.admin2_grid_id) as count
                     FROM (
                         SELECT lg.admin0_grid_id, lg.admin1_grid_id, lg.admin2_grid_id, lg.admin3_grid_id, lg.admin4_grid_id, lg.admin5_grid_id
-                        FROM $wpdb->dt_reports as ml
+                        FROM $wpdb->dt_movement_log as ml
                         JOIN $wpdb->dt_location_grid as lg ON ml.grid_id=lg.grid_id
                         WHERE ml.grid_id > 0
                     ) as t2
@@ -2666,7 +2666,7 @@ class Zume_App_Heatmap {
                     SELECT t3.admin3_grid_id as grid_id, count(t3.admin3_grid_id) as count
                     FROM (
                         SELECT lg.admin0_grid_id, lg.admin1_grid_id, lg.admin2_grid_id, lg.admin3_grid_id, lg.admin4_grid_id, lg.admin5_grid_id
-                        FROM $wpdb->dt_reports as ml
+                        FROM $wpdb->dt_movement_log as ml
                         JOIN $wpdb->dt_location_grid as lg ON ml.grid_id=lg.grid_id
                         WHERE ml.grid_id > 0
                     ) as t3
@@ -2675,7 +2675,7 @@ class Zume_App_Heatmap {
                     SELECT t4.admin4_grid_id as grid_id, count(t4.admin4_grid_id) as count
                     FROM (
                         SELECT lg.admin0_grid_id, lg.admin1_grid_id, lg.admin2_grid_id, lg.admin3_grid_id, lg.admin4_grid_id, lg.admin5_grid_id
-                        FROM $wpdb->dt_reports as ml
+                        FROM $wpdb->dt_movement_log as ml
                         JOIN $wpdb->dt_location_grid as lg ON ml.grid_id=lg.grid_id
                         WHERE ml.grid_id > 0
                     ) as t4
@@ -2684,7 +2684,7 @@ class Zume_App_Heatmap {
                     SELECT t5.admin5_grid_id as grid_id, count(t5.admin5_grid_id) as count
                     FROM (
                         SELECT lg.admin0_grid_id, lg.admin1_grid_id, lg.admin2_grid_id, lg.admin3_grid_id, lg.admin4_grid_id, lg.admin5_grid_id
-                        FROM $wpdb->dt_reports as ml
+                        FROM $wpdb->dt_movement_log as ml
                         JOIN $wpdb->dt_location_grid as lg ON ml.grid_id=lg.grid_id
                         WHERE ml.grid_id > 0
                     ) as t5
@@ -2720,7 +2720,7 @@ class Zume_App_Heatmap {
         SELECT t0.admin0_grid_id as grid_id, count(t0.admin0_grid_id) as count
             FROM (
              SELECT lg.admin0_grid_id, lg.admin1_grid_id, lg.admin2_grid_id, lg.admin3_grid_id, lg.admin4_grid_id, lg.admin5_grid_id
-                FROM $wpdb->dt_reports ml
+                FROM $wpdb->dt_movement_log ml
                 LEFT JOIN $wpdb->dt_location_grid lg ON lg.grid_id=ml.grid_id
                 WHERE ml.grid_id != 0
             ) as t0
@@ -2729,7 +2729,7 @@ class Zume_App_Heatmap {
             SELECT t1.admin1_grid_id as grid_id, count(t1.admin1_grid_id) as count
             FROM (
                 SELECT lg.admin0_grid_id, lg.admin1_grid_id, lg.admin2_grid_id, lg.admin3_grid_id, lg.admin4_grid_id, lg.admin5_grid_id
-                FROM $wpdb->dt_reports ml
+                FROM $wpdb->dt_movement_log ml
                 LEFT JOIN $wpdb->dt_location_grid lg ON lg.grid_id=ml.grid_id
                 WHERE ml.grid_id != 0
             ) as t1
@@ -2738,7 +2738,7 @@ class Zume_App_Heatmap {
             SELECT t2.admin2_grid_id as grid_id, count(t2.admin2_grid_id) as count
             FROM (
                 SELECT lg.admin0_grid_id, lg.admin1_grid_id, lg.admin2_grid_id, lg.admin3_grid_id, lg.admin4_grid_id, lg.admin5_grid_id
-                FROM $wpdb->dt_reports ml
+                FROM $wpdb->dt_movement_log ml
                 LEFT JOIN $wpdb->dt_location_grid lg ON lg.grid_id=ml.grid_id
                 WHERE ml.grid_id != 0
             ) as t2
@@ -2747,7 +2747,7 @@ class Zume_App_Heatmap {
             SELECT t3.admin3_grid_id as grid_id, count(t3.admin3_grid_id) as count
             FROM (
                 SELECT lg.admin0_grid_id, lg.admin1_grid_id, lg.admin2_grid_id, lg.admin3_grid_id, lg.admin4_grid_id, lg.admin5_grid_id
-                FROM $wpdb->dt_reports ml
+                FROM $wpdb->dt_movement_log ml
                 LEFT JOIN $wpdb->dt_location_grid lg ON lg.grid_id=ml.grid_id
                 WHERE ml.grid_id != 0
             ) as t3
@@ -3161,8 +3161,8 @@ class Zume_App_Heatmap {
         $list = $wpdb->get_results("
                 SELECT
                        id,
-                       type as action,
-                       subtype as category,
+                       action,
+                       category,
                        lng,
                        lat,
                        label,
@@ -3170,7 +3170,7 @@ class Zume_App_Heatmap {
                        payload,
                        timestamp,
                        'A Zúme partner' as site_name
-                FROM $wpdb->dt_reports
+                FROM $wpdb->dt_movement_log
                 WHERE grid_id IN ($prepared_list)
                 ORDER BY timestamp DESC", ARRAY_A);
         // phpcs:enable
@@ -3183,7 +3183,17 @@ class Zume_App_Heatmap {
             $list[$index]['formatted_time'] = gmdate( 'M, d Y, g:i a', $item['timestamp'] + $offset );
         }
 
-        $list = self::prepare_message( $list );
+        if ( function_exists( 'zume_log_actions' ) ) {
+            $list = zume_log_actions( $list );
+        }
+        if ( function_exists( 'dt_network_dashboard_translate_log_generations' ) ) {
+            $list = dt_network_dashboard_translate_log_generations( $list );
+        }
+        if ( function_exists( 'dt_network_dashboard_translate_log_new_posts' ) ) {
+            $list = dt_network_dashboard_translate_log_new_posts( $list );
+        }
+
+        $list = apply_filters( 'dt_network_dashboard_build_message', $list );
 
         foreach ( $list as $index => $item ){
             if ( ! isset( $item['message'] ) ) {
@@ -3192,132 +3202,6 @@ class Zume_App_Heatmap {
         }
 
         return $list;
-    }
-
-    public static function prepare_message( $activity_log ){
-
-        foreach ( $activity_log as $index => $log ){
-
-            /* new_baptism */
-            if ( 'studying' === substr( $log['category'], 0, 8 ) ) {
-                $initials = self::zume_action_create_initials( $log['lng'], $log['lat'], $log['payload'] );
-                $activity_log[$index]['message'] = $initials . ' is studying "' . $log['payload']['title'] . '"';
-            }
-
-            else if ( 'leading' === substr( $log['category'], 0, 7 ) ) {
-                $initials = self::zume_action_create_initials( $log['lng'], $log['lat'], $log['payload'] );
-                $activity_log[$index]['message'] = $initials . ' is leading a group through session '. str_replace( '_', '', substr( $log['action'], -2, 2 ) ).'!';
-            }
-
-            else if ( 'zume_training' === $log['action'] && 'joining' === $log['category'] ) {
-                $initials = self::zume_action_create_initials( $log['lng'], $log['lat'], $log['payload'] );
-                $activity_log[$index]['message'] = $initials . ' is registering for Zúme Training! ';
-            }
-
-            else if ( 'zume_vision' === $log['action'] && 'joining' === $log['category'] ) {
-                $initials = self::zume_action_create_initials( $log['lng'], $log['lat'], $log['payload'] );
-                $activity_log[$index]['message'] = $initials . ' is registering for Zúme Community! ';
-            }
-
-            else if ( 'updated_3_month' === $log['action'] ) {
-                $initials = self::zume_action_create_initials( $log['lng'], $log['lat'], $log['payload'] );
-                $activity_log[$index]['message'] = $initials . ' is updating there Zúme Training 3 month plan! ';
-            }
-
-            /* new_contact */
-            else if ( 'new_contact' === $log['action'] ) {
-                $activity_log[$index]['message'] = sprintf( __( '%s is reporting a new contact.', 'disciple-tools-network-dashboard' ), $log['site_name'] );
-            }
-
-            /* new_pre-group */
-            else if ( 'new_pre-group' === $log['action'] ) {
-                $activity_log[$index]['message'] = sprintf( __( '%s is reporting a new pre-group formed.', 'disciple-tools-network-dashboard' ), $log['site_name'] );
-            }
-
-            /* new_group */
-            else if ( 'new_group' === $log['action'] ) {
-                $activity_log[$index]['message'] = sprintf( __( '%s is reporting a new group formed.', 'disciple-tools-network-dashboard' ), $log['site_name'] );
-            }
-
-            /* new_church */
-            else if ( 'new_church' === $log['action'] ) {
-                $activity_log[$index]['message'] = sprintf( __( '%s is reporting a new church.', 'disciple-tools-network-dashboard' ), $log['site_name'] );
-            }
-
-            /* new_team */
-            else if ( 'new_team' === $log['action'] ) {
-                $activity_log[$index]['message'] = sprintf( __( '%s is reporting a new leadership team formed.', 'disciple-tools-network-dashboard' ), $log['site_name'] );
-            }
-
-            /* new_baptism */
-            else if ( 'new_baptism' === $log['action'] ) {
-                $activity_log[$index]['message'] = sprintf( __( '%s is reporting a new baptism.', 'disciple-tools-network-dashboard' ), $log['site_name'] );
-            }
-
-            /* new_coaching */
-            else if ( 'new_coaching' === $log['action'] ) {
-                $activity_log[$index]['message'] = sprintf( __( '%s is reporting an coaching relationship.', 'disciple-tools-network-dashboard' ), $log['site_name'] );
-            }
-
-            /* generation_pre-group */
-            else if ( 'generation_pre-group' === $log['action'] ) {
-                $activity_log[$index]['message'] = sprintf( __( '%s is reporting a new pre-group generation.', 'disciple-tools-network-dashboard' ), $log['site_name'] );
-            }
-
-            /* generation_group */
-            else if ( 'generation_group' === $log['action'] ) {
-                $activity_log[$index]['message'] = sprintf( __( '%s is reporting a new group generation.', 'disciple-tools-network-dashboard' ), $log['site_name'] );
-            }
-
-            /* generation_church */
-            else if ( 'generation_church' === $log['action'] ) {
-                $activity_log[$index]['message'] = sprintf( __( '%s is reporting a new church generation.', 'disciple-tools-network-dashboard' ), $log['site_name'] );
-            }
-
-            /* generation_team */
-            else if ( 'generation_team' === $log['action'] ) {
-                $activity_log[$index]['message'] = sprintf( __( '%s is reporting a new leadership team generation.', 'disciple-tools-network-dashboard' ), $log['site_name'] );
-            }
-
-        }
-
-        return $activity_log;
-    }
-
-    public static function zume_action_create_initials( $longitude, $latitude, $payload ) : string {
-        $letters = [
-            'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'N', 'S',
-            'M', 'N', 'O', 'P', 'R', 'S', 'T', 'U', 'V', 'W', 'E', 'A', 'R', 'I',
-            'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'D', 'E',
-            'M', 'N', 'O', 'P', 'R', 'S', 'T', 'U', 'V', 'W', 'E', 'A', 'R', 'I',
-            'E', 'A', 'R', 'I', 'T', 'N', 'S', 'L', 'E', 'A', 'R', 'I', 'N', 'S',
-            'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'C', 'D',
-            'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'A', 'B',
-            'M', 'N', 'O', 'P', 'R', 'S', 'T', 'U', 'V', 'W', 'E', 'A', 'R', 'I',
-            'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'A', 'B',
-            'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'E', 'A', 'R',
-            'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'N', 'S',
-            'M', 'N', 'O', 'P', 'R', 'S', 'T', 'U', 'V', 'W', 'E', 'A', 'R', 'I',
-            'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'D', 'E',
-            'M', 'N', 'O', 'P', 'R', 'S', 'T', 'U', 'V', 'W', 'E', 'A', 'R', 'I',
-            'E', 'A', 'R', 'I', 'T', 'N', 'S', 'L', 'E', 'A', 'R', 'I', 'N', 'S',
-            'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'C', 'D',
-            'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'A', 'B',
-            'E', 'A', 'R', 'I', 'T', 'N', 'S', 'L', 'E', 'A', 'R', 'I', 'N', 'S',
-            'M', 'N', 'O', 'P', 'R', 'S', 'T', 'U', 'V', 'W', 'E', 'A', 'R', 'I',
-            'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'N', 'S',
-        ];
-        $fnum = abs( round( $longitude ) );
-        $lnum = abs( round( $latitude ) );
-        $list = str_split( hash( 'sha256', maybe_serialize( $payload ) ) );
-        foreach( $list as $character ){
-            if ( is_numeric( $character ) ) {
-                $fnum = $fnum + $character;
-                $lnum = $lnum + $character;
-                break;
-            }
-        }
-        return strtoupper( $letters[$fnum] . $letters[$lnum] );
     }
 
     public static function query_multiplier_list_data( $grid_id ) {
@@ -3350,293 +3234,9 @@ class Zume_App_Heatmap {
         return $list;
     }
 
-
-}
-
-class Zume_Public_Heatmap_100hours_Utilities {
-
     public static function create_initials( $longitude, $latitude, $payload ) : string {
         $letters = [
-            'A',
-            'B',
-            'C',
-            'D',
-            'E',
-            'F',
-            'G',
-            'H',
-            'I',
-            'J',
-            'K',
-            'L',
-            'N',
-            'S',
-            'M',
-            'N',
-            'O',
-            'P',
-            'R',
-            'S',
-            'T',
-            'U',
-            'V',
-            'W',
-            'E',
-            'A',
-            'R',
-            'I',
-            'A',
-            'B',
-            'C',
-            'D',
-            'E',
-            'F',
-            'G',
-            'H',
-            'I',
-            'J',
-            'K',
-            'L',
-            'D',
-            'E',
-            'M',
-            'N',
-            'O',
-            'P',
-            'R',
-            'S',
-            'T',
-            'U',
-            'V',
-            'W',
-            'E',
-            'A',
-            'R',
-            'I',
-            'E',
-            'A',
-            'R',
-            'I',
-            'T',
-            'N',
-            'S',
-            'L',
-            'E',
-            'A',
-            'R',
-            'I',
-            'N',
-            'S',
-            'A',
-            'B',
-            'C',
-            'D',
-            'E',
-            'F',
-            'G',
-            'H',
-            'I',
-            'J',
-            'K',
-            'L',
-            'C',
-            'D',
-            'A',
-            'B',
-            'C',
-            'D',
-            'E',
-            'F',
-            'G',
-            'H',
-            'I',
-            'J',
-            'K',
-            'L',
-            'A',
-            'B',
-            'M',
-            'N',
-            'O',
-            'P',
-            'R',
-            'S',
-            'T',
-            'U',
-            'V',
-            'W',
-            'E',
-            'A',
-            'R',
-            'I',
-            'A',
-            'B',
-            'C',
-            'D',
-            'E',
-            'F',
-            'G',
-            'H',
-            'I',
-            'J',
-            'K',
-            'L',
-            'A',
-            'B',
-            'M',
-            'N',
-            'O',
-            'P',
-            'Q',
-            'R',
-            'S',
-            'T',
-            'U',
-            'V',
-            'W',
-            'E',
-            'A',
-            'R',
-            'A',
-            'B',
-            'C',
-            'D',
-            'E',
-            'F',
-            'G',
-            'H',
-            'I',
-            'J',
-            'K',
-            'L',
-            'N',
-            'S',
-            'M',
-            'N',
-            'O',
-            'P',
-            'R',
-            'S',
-            'T',
-            'U',
-            'V',
-            'W',
-            'E',
-            'A',
-            'R',
-            'I',
-            'A',
-            'B',
-            'C',
-            'D',
-            'E',
-            'F',
-            'G',
-            'H',
-            'I',
-            'J',
-            'K',
-            'L',
-            'D',
-            'E',
-            'M',
-            'N',
-            'O',
-            'P',
-            'R',
-            'S',
-            'T',
-            'U',
-            'V',
-            'W',
-            'E',
-            'A',
-            'R',
-            'I',
-            'E',
-            'A',
-            'R',
-            'I',
-            'T',
-            'N',
-            'S',
-            'L',
-            'E',
-            'A',
-            'R',
-            'I',
-            'N',
-            'S',
-            'A',
-            'B',
-            'C',
-            'D',
-            'E',
-            'F',
-            'G',
-            'H',
-            'I',
-            'J',
-            'K',
-            'L',
-            'C',
-            'D',
-            'A',
-            'B',
-            'C',
-            'D',
-            'E',
-            'F',
-            'G',
-            'H',
-            'I',
-            'J',
-            'K',
-            'L',
-            'A',
-            'B',
-            'E',
-            'A',
-            'R',
-            'I',
-            'T',
-            'N',
-            'S',
-            'L',
-            'E',
-            'A',
-            'R',
-            'I',
-            'N',
-            'S',
-            'M',
-            'N',
-            'O',
-            'P',
-            'R',
-            'S',
-            'T',
-            'U',
-            'V',
-            'W',
-            'E',
-            'A',
-            'R',
-            'I',
-            'A',
-            'B',
-            'C',
-            'D',
-            'E',
-            'F',
-            'G',
-            'H',
-            'I',
-            'J',
-            'K',
-            'L',
-            'N',
-            'S',
+            'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'N', 'S', 'M', 'N', 'O', 'P', 'R', 'S', 'T', 'U', 'V', 'W', 'E', 'A', 'R', 'I', 'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'D', 'E', 'M', 'N', 'O', 'P', 'R', 'S', 'T', 'U', 'V', 'W', 'E', 'A', 'R', 'I', 'E', 'A', 'R', 'I', 'T', 'N', 'S', 'L', 'E', 'A', 'R', 'I', 'N', 'S', 'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'C', 'D', 'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'A', 'B', 'M', 'N', 'O', 'P', 'R', 'S', 'T', 'U', 'V', 'W', 'E', 'A', 'R', 'I', 'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'A', 'B', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'E', 'A', 'R', 'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'N', 'S', 'M', 'N', 'O', 'P', 'R', 'S', 'T', 'U', 'V', 'W', 'E', 'A', 'R', 'I', 'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'D', 'E', 'M', 'N', 'O', 'P', 'R', 'S', 'T', 'U', 'V', 'W', 'E', 'A', 'R', 'I', 'E', 'A', 'R', 'I', 'T', 'N', 'S', 'L', 'E', 'A', 'R', 'I', 'N', 'S', 'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'C', 'D', 'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'A', 'B', 'E', 'A', 'R', 'I', 'T', 'N', 'S', 'L', 'E', 'A', 'R', 'I', 'N', 'S', 'M', 'N', 'O', 'P', 'R', 'S', 'T', 'U', 'V', 'W', 'E', 'A', 'R', 'I', 'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'N', 'S',
         ];
         $fnum = abs( round( $longitude ) );
         $lnum = abs( round( $latitude ) );
@@ -3794,8 +3394,8 @@ class Zume_Public_Heatmap_100hours_Utilities {
     public static function _get_type( $action ) {
 
         switch ( $action ) {
-            case 'updated_3_month':
             case 'coaching':
+            case 'updated_3_month':
             case 'starting_group':
             case 'building_group':
             case 'leading_1':
@@ -4046,8 +3646,8 @@ class Zume_Public_Heatmap_100hours_Utilities {
 
         $timestamp = strtotime( '-100 hours' );
         $results = $wpdb->get_results( "
-                SELECT ml.type as action, ml.subtype as category, ml.lng, ml.lat, ml.label, ml.payload, ml.timestamp, lga0.name as country_name, lga0.country_code
-                FROM $wpdb->dt_reports as ml
+                SELECT ml.action, ml.category, ml.lng, ml.lat, ml.label, ml.payload, ml.timestamp, lga0.name as country_name, lga0.country_code
+                FROM $wpdb->dt_movement_log as ml
                 LEFT JOIN $wpdb->dt_location_grid lg ON lg.grid_id=ml.grid_id
                 LEFT JOIN $wpdb->dt_location_grid lga0 ON lga0.grid_id=lg.admin0_grid_id
                 WHERE ml.timestamp > $timestamp
@@ -4238,8 +3838,8 @@ class Zume_Public_Heatmap_100hours_Utilities {
         global $wpdb;
         $timestamp = strtotime( '-100 hours' );
         $results = $wpdb->get_results( "
-                SELECT ml.type as action, ml.subtype as category, ml.lng, ml.lat, ml.label, ml.payload, ml.timestamp, lga0.name as country_name, lga0.country_code
-                FROM $wpdb->dt_reports ml
+                SELECT ml.action, ml.category, ml.lng, ml.lat, ml.label, ml.payload, ml.timestamp, lga0.name as country_name, lga0.country_code
+                FROM $wpdb->dt_movement_log ml
                 LEFT JOIN $wpdb->dt_location_grid lg ON lg.grid_id=ml.grid_id
                 LEFT JOIN $wpdb->dt_location_grid lga0 ON lga0.grid_id=lg.admin0_grid_id
                 WHERE ml.timestamp > $timestamp
@@ -4257,4 +3857,445 @@ class Zume_Public_Heatmap_100hours_Utilities {
 
         return $results;
     }
+}
+
+
+/**
+ * REGISTER ACTIONS (AND CATEGORIES)
+ */
+add_action( 'dt_network_dashboard_register_actions', 'dt_network_dashboard_register_action_zume_public_keys', 30, 1 );
+function dt_network_dashboard_register_action_zume_public_keys( $actions ){
+
+    $actions['studying_1'] = [
+        'key' => 'studying_1',
+        'label' => 'Studying 1',
+        'message_pattern' => []
+    ];
+    $actions['studying_2'] = [
+        'key' => 'studying_2',
+        'label' => 'Studying 2',
+        'message_pattern' => []
+    ];
+    $actions['studying_3'] = [
+        'key' => 'studying_3',
+        'label' => 'Studying 3',
+        'message_pattern' => []
+    ];
+    $actions['studying_4'] = [
+        'key' => 'studying_4',
+        'label' => 'Studying 4',
+        'message_pattern' => []
+    ];
+    $actions['studying_5'] = [
+        'key' => 'studying_5',
+        'label' => 'Studying 5',
+        'message_pattern' => []
+    ];
+    $actions['studying_6'] = [
+        'key' => 'studying_6',
+        'label' => 'Studying 6',
+        'message_pattern' => []
+    ];
+    $actions['studying_7'] = [
+        'key' => 'studying_7',
+        'label' => 'Studying 7',
+        'message_pattern' => []
+    ];
+    $actions['studying_8'] = [
+        'key' => 'studying_8',
+        'label' => 'Studying 8',
+        'message_pattern' => []
+    ];
+    $actions['studying_9'] = [
+        'key' => 'studying_9',
+        'label' => 'Studying 9',
+        'message_pattern' => []
+    ];
+    $actions['studying_10'] = [
+        'key' => 'studying_10',
+        'label' => 'Studying 10',
+        'message_pattern' => []
+    ];
+    $actions['studying_11'] = [
+        'key' => 'studying_11',
+        'label' => 'Studying 11',
+        'message_pattern' => []
+    ];
+    $actions['studying_12'] = [
+        'key' => 'studying_12',
+        'label' => 'Studying 12',
+        'message_pattern' => []
+    ];
+    $actions['studying_13'] = [
+        'key' => 'studying_13',
+        'label' => 'Studying 13',
+        'message_pattern' => []
+    ];
+    $actions['studying_14'] = [
+        'key' => 'studying_14',
+        'label' => 'Studying 14',
+        'message_pattern' => []
+    ];
+    $actions['studying_15'] = [
+        'key' => 'studying_15',
+        'label' => 'Studying 15',
+        'message_pattern' => []
+    ];
+    $actions['studying_16'] = [
+        'key' => 'studying_16',
+        'label' => 'Studying 16',
+        'message_pattern' => []
+    ];
+    $actions['studying_17'] = [
+        'key' => 'studying_17',
+        'label' => 'Studying 17',
+        'message_pattern' => []
+    ];
+    $actions['studying_18'] = [
+        'key' => 'studying_18',
+        'label' => 'Studying 18',
+        'message_pattern' => []
+    ];
+    $actions['studying_19'] = [
+        'key' => 'studying_19',
+        'label' => 'Studying 19',
+        'message_pattern' => []
+    ];
+    $actions['studying_20'] = [
+        'key' => 'studying_20',
+        'label' => 'Studying 20',
+        'message_pattern' => []
+    ];
+    $actions['studying_21'] = [
+        'key' => 'studying_21',
+        'label' => 'Studying 21',
+        'message_pattern' => []
+    ];
+    $actions['studying_22'] = [
+        'key' => 'studying_22',
+        'label' => 'Studying 22',
+        'message_pattern' => []
+    ];
+    $actions['studying_23'] = [
+        'key' => 'studying_23',
+        'label' => 'Studying 23',
+        'message_pattern' => []
+    ];
+    $actions['studying_24'] = [
+        'key' => 'studying_24',
+        'label' => 'Studying 24',
+        'message_pattern' => []
+    ];
+    $actions['studying_25'] = [
+        'key' => 'studying_25',
+        'label' => 'Studying 25',
+        'message_pattern' => []
+    ];
+    $actions['studying_26'] = [
+        'key' => 'studying_26',
+        'label' => 'Studying 26',
+        'message_pattern' => []
+    ];
+    $actions['studying_27'] = [
+        'key' => 'studying_27',
+        'label' => 'Studying 27',
+        'message_pattern' => []
+    ];
+    $actions['studying_28'] = [
+        'key' => 'studying_28',
+        'label' => 'Studying 28',
+        'message_pattern' => []
+    ];
+    $actions['studying_29'] = [
+        'key' => 'studying_29',
+        'label' => 'Studying 29',
+        'message_pattern' => []
+    ];
+    $actions['studying_30'] = [
+        'key' => 'studying_30',
+        'label' => 'Studying 30',
+        'message_pattern' => []
+    ];
+    $actions['studying_31'] = [
+        'key' => 'studying_31',
+        'label' => 'Studying 31',
+        'message_pattern' => []
+    ];
+    $actions['studying_32'] = [
+        'key' => 'studying_32',
+        'label' => 'Studying 32',
+        'message_pattern' => []
+    ];
+
+    // offline
+    $actions['studying_offline_1'] = [
+        'key' => 'studying_offline_1',
+        'label' => 'Studying Offline 1',
+        'message_pattern' => []
+    ];
+    $actions['studying_offline_2'] = [
+        'key' => 'studying_offline_2',
+        'label' => 'Studying Offline 2',
+        'message_pattern' => []
+    ];
+    $actions['studying_offline_3'] = [
+        'key' => 'studying_offline_3',
+        'label' => 'Studying Offline 3',
+        'message_pattern' => []
+    ];
+    $actions['studying_offline_4'] = [
+        'key' => 'studying_offline_4',
+        'label' => 'Studying Offline 4',
+        'message_pattern' => []
+    ];
+    $actions['studying_offline_5'] = [
+        'key' => 'studying_offline_5',
+        'label' => 'Studying Offline 5',
+        'message_pattern' => []
+    ];
+    $actions['studying_offline_6'] = [
+        'key' => 'studying_offline_6',
+        'label' => 'Studying Offline 6',
+        'message_pattern' => []
+    ];
+    $actions['studying_offline_7'] = [
+        'key' => 'studying_offline_7',
+        'label' => 'Studying Offline 7',
+        'message_pattern' => []
+    ];
+    $actions['studying_offline_8'] = [
+        'key' => 'studying_offline_8',
+        'label' => 'Studying Offline 8',
+        'message_pattern' => []
+    ];
+    $actions['studying_offline_9'] = [
+        'key' => 'studying_offline_9',
+        'label' => 'Studying Offline 9',
+        'message_pattern' => []
+    ];
+    $actions['studying_offline_10'] = [
+        'key' => 'studying_offline_10',
+        'label' => 'Studying Offline 10',
+        'message_pattern' => []
+    ];
+    $actions['studying_offline_11'] = [
+        'key' => 'studying_offline_11',
+        'label' => 'Studying Offline 11',
+        'message_pattern' => []
+    ];
+    $actions['studying_offline_12'] = [
+        'key' => 'studying_offline_12',
+        'label' => 'Studying Offline 12',
+        'message_pattern' => []
+    ];
+    $actions['studying_offline_13'] = [
+        'key' => 'studying_offline_13',
+        'label' => 'Studying Offline 13',
+        'message_pattern' => []
+    ];
+    $actions['studying_offline_14'] = [
+        'key' => 'studying_offline_14',
+        'label' => 'Studying Offline 14',
+        'message_pattern' => []
+    ];
+    $actions['studying_offline_15'] = [
+        'key' => 'studying_offline_15',
+        'label' => 'Studying Offline 15',
+        'message_pattern' => []
+    ];
+    $actions['studying_offline_16'] = [
+        'key' => 'studying_offline_16',
+        'label' => 'Studying Offline 16',
+        'message_pattern' => []
+    ];
+    $actions['studying_offline_17'] = [
+        'key' => 'studying_offline_17',
+        'label' => 'Studying Offline 17',
+        'message_pattern' => []
+    ];
+    $actions['studying_offline_18'] = [
+        'key' => 'studying_offline_18',
+        'label' => 'Studying Offline 18',
+        'message_pattern' => []
+    ];
+    $actions['studying_offline_19'] = [
+        'key' => 'studying_offline_19',
+        'label' => 'Studying Offline 19',
+        'message_pattern' => []
+    ];
+    $actions['studying_offline_20'] = [
+        'key' => 'studying_offline_20',
+        'label' => 'Studying Offline 20',
+        'message_pattern' => []
+    ];
+    $actions['studying_offline_21'] = [
+        'key' => 'studying_offline_21',
+        'label' => 'Studying Offline 21',
+        'message_pattern' => []
+    ];
+    $actions['studying_offline_22'] = [
+        'key' => 'studying_offline_22',
+        'label' => 'Studying Offline 22',
+        'message_pattern' => []
+    ];
+    $actions['studying_offline_23'] = [
+        'key' => 'studying_offline_23',
+        'label' => 'Studying Offline 23',
+        'message_pattern' => []
+    ];
+    $actions['studying_offline_24'] = [
+        'key' => 'studying_offline_24',
+        'label' => 'Studying Offline 24',
+        'message_pattern' => []
+    ];
+    $actions['studying_offline_25'] = [
+        'key' => 'studying_offline_25',
+        'label' => 'Studying Offline 25',
+        'message_pattern' => []
+    ];
+    $actions['studying_offline_26'] = [
+        'key' => 'studying_offline_26',
+        'label' => 'Studying Offline 26',
+        'message_pattern' => []
+    ];
+    $actions['studying_offline_27'] = [
+        'key' => 'studying_offline_27',
+        'label' => 'Studying Offline 27',
+        'message_pattern' => []
+    ];
+    $actions['studying_offline_28'] = [
+        'key' => 'studying_offline_28',
+        'label' => 'Studying Offline 28',
+        'message_pattern' => []
+    ];
+    $actions['studying_offline_29'] = [
+        'key' => 'studying_offline_29',
+        'label' => 'Studying Offline 29',
+        'message_pattern' => []
+    ];
+    $actions['studying_offline_30'] = [
+        'key' => 'studying_offline_30',
+        'label' => 'Studying Offline 30',
+        'message_pattern' => []
+    ];
+    $actions['studying_offline_31'] = [
+        'key' => 'studying_offline_31',
+        'label' => 'Studying Offline 31',
+        'message_pattern' => []
+    ];
+    $actions['studying_offline_32'] = [
+        'key' => 'studying_offline_32',
+        'label' => 'Studying Offline 32',
+        'message_pattern' => []
+    ];
+
+
+
+    $actions['leading_1'] = [
+        'key' => 'leading_1',
+        'label' => 'Leading 1',
+        'message_pattern' => []
+    ];
+    $actions['leading_2'] = [
+        'key' => 'leading_2',
+        'label' => 'Leading 2',
+        'message_pattern' => []
+    ];
+    $actions['leading_3'] = [
+        'key' => 'leading_3',
+        'label' => 'Leading 3',
+        'message_pattern' => []
+    ];
+    $actions['leading_4'] = [
+        'key' => 'leading_4',
+        'label' => 'Leading 4',
+        'message_pattern' => []
+    ];
+    $actions['leading_5'] = [
+        'key' => 'leading_5',
+        'label' => 'Leading 5',
+        'message_pattern' => []
+    ];
+    $actions['leading_6'] = [
+        'key' => 'leading_6',
+        'label' => 'Leading 6',
+        'message_pattern' => []
+    ];
+    $actions['leading_7'] = [
+        'key' => 'leading_7',
+        'label' => 'Leading 7',
+        'message_pattern' => []
+    ];
+    $actions['leading_8'] = [
+        'key' => 'leading_8',
+        'label' => 'Leading 8',
+        'message_pattern' => []
+    ];
+    $actions['leading_9'] = [
+        'key' => 'leading_9',
+        'label' => 'Leading 9',
+        'message_pattern' => []
+    ];
+    $actions['leading_10'] = [
+        'key' => 'leading_10',
+        'label' => 'Leading 10',
+        'message_pattern' => []
+    ];
+
+    $actions['zume_training'] = [
+        'key' => 'zume_training',
+        'label' => 'Registered for Training',
+        'message_pattern' => []
+    ];
+    $actions['zume_vision'] = [
+        'key' => 'zume_vision',
+        'label' => 'Joined Vision',
+        'message_pattern' => []
+    ];
+    $actions['updated_3_month'] = [
+        'key' => 'updated_3_month',
+        'label' => 'Updated 3 Month Plan',
+        'message_pattern' => []
+    ];
+
+    return $actions;
+}
+
+/**
+ * READ LOG
+ */
+add_filter( 'dt_network_dashboard_build_message', 'zume_public_log_actions', 10, 1 );
+function zume_public_log_actions( $activity_log ){
+
+    foreach ( $activity_log as $index => $log ){
+
+        /* new_baptism */
+        if ( 'studying' === substr( $log['action'], 0, 8 ) ) {
+            $initials = Zume_App_Heatmap::create_initials( $log['lng'], $log['lat'], $log['payload'] );
+            $activity_log[$index]['message'] = $initials . ' is studying "' . $log['payload']['title'] . '"';
+        }
+
+        if ( 'leading' === substr( $log['action'], 0, 7 ) ) {
+            $initials = Zume_App_Heatmap::create_initials( $log['lng'], $log['lat'], $log['payload'] );
+            $activity_log[$index]['message'] = $initials . ' is leading a group through session '. str_replace( '_', '', substr( $log['action'], -2, 2 ) ).'!';
+        }
+
+        if ( 'zume_training' === $log['action'] && 'joining' === $log['category'] ) {
+            $initials = Zume_App_Heatmap::create_initials( $log['lng'], $log['lat'], $log['payload'] );
+            $activity_log[$index]['message'] = $initials . ' is registering for Zúme Training! ';
+        }
+
+        if ( 'zume_vision' === $log['action'] && 'joining' === $log['category'] ) {
+            $initials = Zume_App_Heatmap::create_initials( $log['lng'], $log['lat'], $log['payload'] );
+            $activity_log[$index]['message'] = $initials . ' is registering for Zúme Community! ';
+        }
+
+        if ( 'updated_3_month' === $log['action'] ) {
+            $initials = Zume_App_Heatmap::create_initials( $log['lng'], $log['lat'], $log['payload'] );
+            $activity_log[$index]['message'] = $initials . ' is updating there Zúme Training 3 month plan! ';
+        }
+
+    }
+
+    return $activity_log;
 }

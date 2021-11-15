@@ -30,7 +30,6 @@ class Zume_Public_Heatmap_Registrations extends DT_Magic_Url_Base
 
         add_action( 'rest_api_init', [ $this, 'add_endpoints' ] );
 
-
         // fail if not valid url
         $url = dt_get_url_path();
         if ( strpos( $url, $this->root . '/' . $this->type ) === false ) {
