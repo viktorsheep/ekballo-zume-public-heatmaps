@@ -2,18 +2,11 @@
 $parts_post_id = $this->parts["post_id"];
 $parts_post = DT_Posts::get_post( $this->post_type, $parts_post_id, true, false );
 if ( is_wp_error( $parts_post ) ){
-return;
+    return;
 }
 
-$message = "
-<p>Thank you for reporting your simple churches to the community.</p>
-<ul>
-<li>Please, update your profile and communication preferences as an active disciple maker.</li>
-<li>Please, update, add, or verify 'active/inactive' status of churches your are stewarding.</li>
-</ul>
-";
-
 DT_Mapbox_API::geocoder_scripts();
+
 ?>
 <!-- title -->
 <div class="grid-x">
@@ -27,7 +20,7 @@ DT_Mapbox_API::geocoder_scripts();
 </div>
 
 <!-- nav -->
-<?php  $this->nav(); ?>
+<?php $this->nav(); ?>
 
 <div id="wrapper">
     <div class="grid-x">
@@ -46,16 +39,8 @@ DT_Mapbox_API::geocoder_scripts();
         <div class="cell">
             <a class="button large expanded" href="<?php echo esc_url( site_url() . '/' . $this->parts['root'] . '/' . $this->parts['type'] . '/' . $this->parts['public_key'] . '/map' ) ?>"><i class="fi-map"></i> MAP</a>
         </div>
-<!--        <div class="cell">-->
-<!--            <div class="callout">-->
-<!--                --><?php //echo wp_kses_post( $message ) ?>
-<!--            </div>-->
-<!--        </div>-->
     </div>
-
-
 </div>
-
 
 <div class="reveal large" id="edit-modal" data-v-offset="0" data-close-on-click="false" data-reveal>
     <div id="modal-title"></div>

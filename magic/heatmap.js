@@ -176,29 +176,15 @@ function load_map() {
   jQuery('#initialize-screen').hide()
 
   // set title
-  let ptt = ''
-  if ( 'groups' === jsObject.post_type ){
-    ptt = 'Churches'
-  } else if ( 'trainings' === jsObject.post_type  ) {
-    ptt = 'Trainings'
-  } else if ( 'trained_people' === jsObject.post_type ) {
-    ptt = 'Trained People'
-  } else if ( 'activity' === jsObject.post_type ) {
-    ptt = 'Activity'
-  } else if ( 'contacts' === jsObject.post_type ) {
-   ptt = 'Practitioners'
-  } else if ( 'registrations' === jsObject.post_type ) {
-    ptt = 'Registrations'
-  }
-  $('#panel-type-title').html(ptt)
+  $('#panel-type-title').html(jsObject.title)
 
   $('.loading-spinner').removeClass('active')
 
   let center = [-98, 38.88]
-  let maxzoom = 8
-  if ( 'contacts' === jsObject.post_type ) {
-    maxzoom = 13
-  }
+  let maxzoom = jsObject.zoom
+  // if ( 'contacts' === jsObject.post_type ) {
+  //   maxzoom = 13
+  // }
 
   mapboxgl.accessToken = jsObject.map_key;
   let map = new mapboxgl.Map({
@@ -422,26 +408,6 @@ function load_map() {
                 }
               })
 
-
-            /* @todo this supports custom list inclusion. review strategy. */
-            if ( 'contacts' === jsObject.post_type ) {
-              let lc = $('#list-content')
-              lc.html('<span class="loading-spinner active"></span>')
-              window.get_grid_data('get_list', e.features[0].properties.grid_id )
-                .done(function(data){
-                  lc.empty()
-                  if ( data.length < 1 ) {
-                    lc.append(`<div>No Practitioners</div>`)
-                  } else {
-                    jQuery.each(data, function(i,v){
-                      if ( typeof v.post_title !== 'undefined' ){
-                        lc.append(`<div> <span>${v.post_title}</span></div>`)
-                      }
-                    })
-                  }
-                })
-            }
-
             $('#offCanvasNestedPush').foundation('toggle', e);
           });
 
@@ -451,8 +417,6 @@ function load_map() {
   }) /* for each loop */
 
 } /* .preCache */
-
-
 
 /**************************
 Support Functions
@@ -466,120 +430,5 @@ function hide_details_panel(){
   $('#details-panel').hide()
 }
 
-function load_self_content( data ) {
-  if ('groups' === jsObject.post_type ) {
-    let pop_div = data.population_division_int * 2
-    jQuery('#custom-paragraph').html(`
-      <span class="self_name ucwords temp-spinner bold">${data.name}</span> is one of <span class="self_peers  bold">${data.peers}</span>
-      administrative divisions in <span class="parent_name ucwords bold">${data.parent_name}</span> and it has a population of
-      <span class="self_population  bold">${data.population}</span>.
-      In order to reach the community goal of 2 churches for every <span class="population_division  bold">${pop_div.toLocaleString("en-US")}</span> people,
-      <span class="self_name ucwords  bold">${data.name}</span> needs
-      <span class="self_needed bold">${data.needed}</span> new churches.
-    `)
-  } else if ('trainings' === jsObject.post_type || 'trained_people' === jsObject.post_type ) {
-    jQuery('#custom-paragraph').html(`
-      <span class="self_name ucwords temp-spinner bold">${data.name}</span> is one of <span class="self_peers  bold">${data.peers}</span>
-      administrative divisions in <span class="parent_name ucwords bold">${data.parent_name}</span> and it has a population of
-      <span class="self_population  bold">${data.population}</span>.
-      In order to reach the community goal of 1 training for every <span class="population_division  bold">${data.population_division}</span> people,
-      <span class="self_name ucwords  bold">${data.name}</span> needs
-      <span class="self_needed bold">${data.needed}</span> new trainings.
-    `)
-  } else if ('registrations' === jsObject.post_type || 'activity' === jsObject.post_type) {
-    jQuery('#custom-paragraph').html(`
-      <span class="self_name ucwords temp-spinner bold">${data.name}</span> is one of <span class="self_peers  bold">${data.peers}</span>
-      administrative divisions in <span class="parent_name ucwords bold">${data.parent_name}</span> and it has a population of
-      <span class="self_population bold">${data.population}</span>.
-    `)
-  } else if ( 'contacts' === jsObject.post_type ) {
-    jQuery('#custom-paragraph').html(`
-      <span class="self_name ucwords temp-spinner bold">${data.name}</span> is one of <span class="self_peers  bold">${data.peers}</span>
-      administrative divisions in <span class="parent_name ucwords bold">${data.parent_name}</span> and it has a population of
-      <span class="self_population  bold">${data.population}</span>.
-      In order to reach the community goal of 1 practitioner for every <span class="population_division  bold">${data.population_division}</span> people,
-      <span class="self_name ucwords  bold">${data.name}</span> needs
-      <span class="self_needed bold">${data.needed}</span> practitioners.
-    `)
-  }
-}
-function load_level_content( data, level ) {
-  if ( 'groups' === jsObject.post_type ) {
-    let gl = jQuery('#'+level+'-list-item')
-    gl.empty()
-    if ( false !== data ) {
-      gl.append(`
-      <div class="cell">
-          <strong>${data.name}</strong><br>
-          Population: <span>${data.population}</span><br>
-          Churches Needed: <span>${data.needed}</span><br>
-          Churches Reported: <span class="reported_number">${data.reported}</span><br>
-          Goal Reached: <span>${data.percent}</span>%
-          <meter class="meter" value="${data.percent}" min="0" low="33" high="66" optimum="100" max="100"></meter>
-      </div>
-      `)
-    }
-  }
-  else if ( 'trainings' === jsObject.post_type || 'trained_people' === jsObject.post_type  ) {
-    let gl = jQuery('#'+level+'-list-item')
-    gl.empty()
-    if ( false !== data ) {
-      gl.append(`
-      <div class="cell">
-          <strong>${data.name}</strong><br>
-          Population: <span>${data.population}</span><br>
-          Trainings Needed: <span>${data.needed}</span><br>
-          Trainings Reported: <span class="reported_number">${data.reported}</span><br>
-          Goal Reached: <span>${data.percent}</span>%
-          <meter class="meter" value="${data.percent}" min="0" low="33" high="66" optimum="100" max="100"></meter>
-      </div>
-      `)
-    }
-  }
-  else if ( 'registrations' === jsObject.post_type ) {
-    let gl = jQuery('#'+level+'-list-item')
-    gl.empty()
-    if ( data ) {
-      gl.append(`
-      <div class="cell">
-          <strong>${data.name}</strong><br>
-          Population: <span>${data.population}</span><br>
-          Registrations Reported: <span>${data.reported}</span><br>
-          <hr>
-      </div>
-      `)
-    }
-  }
-  else if ( 'contacts' === jsObject.post_type ) {
-    let gl = jQuery('#'+level+'-list-item')
-    gl.empty()
-    if ( false !== data ) {
-      gl.append(`
-      <div class="cell">
-          <strong>${data.name}</strong><br>
-          Population: <span>${data.population}</span><br>
-          Practitioners Needed: <span>${data.needed}</span><br>
-          Practitioners Reported: <span class="reported_number">${data.reported}</span><br>
-          Goal Reached: <span>${data.percent}</span>%
-          <meter class="meter" value="${data.percent}" min="0" low="33" high="66" optimum="100" max="100"></meter>
-      </div>
-      `)
-    }
-  }
-  else if ( 'activity' === jsObject.post_type ) {
-    let gl = jQuery('#'+level+'-list-item')
-    gl.empty()
-    if ( data ) {
-      gl.append(`
-      <div class="cell">
-          <strong>${data.name}</strong><br>
-          Population: <span>${data.population}</span><br>
-          Activities Reported: <span>${data.reported}</span><br>
-          <hr>
-      </div>
-      `)
-    }
-  }
 
-}
 

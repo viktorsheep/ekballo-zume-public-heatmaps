@@ -2,19 +2,19 @@
 if ( !defined( 'ABSPATH' ) ) { exit; } // Exit if accessed directly.
 
 if ( strpos( dt_get_url_path(), 'zume_app' ) !== false || dt_is_rest() ){
-    Zume_Public_Heatmap_Churches::instance();
+    Zume_Public_Heatmap_Trainings::instance();
 }
 
-class Zume_Public_Heatmap_Churches extends DT_Magic_Url_Base
+class Zume_Public_Heatmap_Trainings extends DT_Magic_Url_Base
 {
-    public $page_title = 'Zúme Churches Map';
+    public $page_title = 'Zúme Trainings Map';
     public $root = "zume_app";
-    public $type = 'heatmap_churches';
-    public $type_name = '';
+    public $type = 'heatmap_trainings';
+    public $type_name = 'Trainings';
     public $post_type = 'groups';
     private $meta_key = '';
-    public $us_div = 2500; // this is 2 for every 5000
-    public $global_div = 25000; // this equals 2 for every 50000
+    public $us_div = 5000; // this is 2 for every 5000
+    public $global_div = 50000; // this equals 2 for every 50000
 
     private static $_instance = null;
     public static function instance() {
@@ -93,8 +93,40 @@ class Zume_Public_Heatmap_Churches extends DT_Magic_Url_Base
                     'add' => __( 'Zume', 'disciple_tools' ),
                 ],
                 'grid_data' => ['data' => [], 'highest_value' => 1 ],
-                'custom_marks' => []
+                'custom_marks' => [],
+                'title' => $this->page_title,
+                'zoom' => 8
             ]) ?>][0]
+
+            /* custom content */
+            function load_self_content( data ) {
+                let pop_div = data.population_division_int * 2
+                jQuery('#custom-paragraph').html(`
+                  <span class="self_name ucwords temp-spinner bold">${data.name}</span> is one of <span class="self_peers  bold">${data.peers}</span>
+                  administrative divisions in <span class="parent_name ucwords bold">${data.parent_name}</span> and it has a population of
+                  <span class="self_population  bold">${data.population}</span>.
+                  In order to reach the community goal of 2 churches for every <span class="population_division  bold">${pop_div.toLocaleString("en-US")}</span> people,
+                  <span class="self_name ucwords  bold">${data.name}</span> needs
+                  <span class="self_needed bold">${data.needed}</span> new churches.
+                `)
+            }
+            /* custom level content */
+            function load_level_content( data, level ) {
+                let gl = jQuery('#'+level+'-list-item')
+                gl.empty()
+                if ( false !== data ) {
+                    gl.append(`
+                        <div class="cell">
+                          <strong>${data.name}</strong><br>
+                          Population: <span>${data.population}</span><br>
+                          Trainings Needed: <span>${data.needed}</span><br>
+                          Trainings Reported: <span class="reported_number">${data.reported}</span><br>
+                          Goal Reached: <span>${data.percent}</span>%
+                          <meter class="meter" value="${data.percent}" min="0" low="33" high="66" optimum="100" max="100"></meter>
+                        </div>
+                    `)
+                }
+            }
         </script>
         <?php
 
@@ -170,14 +202,14 @@ class Zume_Public_Heatmap_Churches extends DT_Magic_Url_Base
             case 'a1':
             case 'a0':
             case 'world':
-                $list = Zume_App_Heatmap::query_church_grid_totals( $action );
+                $list = Zume_App_Heatmap::query_training_grid_totals( $action );
                 return Zume_App_Heatmap::endpoint_get_level( $params['grid_id'], $action, $list, $this->global_div, $this->us_div );
             case 'activity_data':
                 $grid_id = sanitize_text_field( wp_unslash( $params['grid_id'] ) );
                 $offset = sanitize_text_field( wp_unslash( $params['offset'] ) );
                 return Zume_App_Heatmap::query_activity_data( $grid_id, $offset );
             case 'grid_data':
-                $grid_totals = Zume_App_Heatmap::query_church_grid_totals();
+                $grid_totals = Zume_App_Heatmap::query_training_grid_totals();
                 return Zume_App_Heatmap::_initial_polygon_value_list( $grid_totals, $this->global_div, $this->us_div );
             default:
                 return new WP_Error( __METHOD__, "Missing valid action", [ 'status' => 400 ] );

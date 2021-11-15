@@ -2,16 +2,16 @@
 if ( !defined( 'ABSPATH' ) ) { exit; } // Exit if accessed directly.
 
 if ( strpos( dt_get_url_path(), 'zume_app' ) !== false || dt_is_rest() ){
-    Zume_Public_Heatmap_Registrations::instance();
+    Zume_Public_Heatmap_Activity::instance();
 }
 
-class Zume_Public_Heatmap_Registrations extends DT_Magic_Url_Base
+class Zume_Public_Heatmap_Activity extends DT_Magic_Url_Base
 {
-    public $page_title = 'Zúme Registrations Map';
+    public $page_title = 'Zúme Activity';
     public $root = "zume_app";
-    public $type = 'heatmap_registrations';
-    public $type_name = 'Registrations';
-    public $post_type = 'registrations';
+    public $type = 'heatmap_activity';
+    public $type_name = 'Activity';
+    public $post_type = 'activity';
     private $meta_key = '';
     public $us_div = 5000; // this is 2 for every 5000
     public $global_div = 50000; // this equals 2 for every 50000
@@ -29,6 +29,7 @@ class Zume_Public_Heatmap_Registrations extends DT_Magic_Url_Base
         parent::__construct();
 
         add_action( 'rest_api_init', [ $this, 'add_endpoints' ] );
+
 
         // fail if not valid url
         $url = dt_get_url_path();
@@ -51,6 +52,7 @@ class Zume_Public_Heatmap_Registrations extends DT_Magic_Url_Base
         $allowed_js[] = 'jquery-touch-punch';
         $allowed_js[] = 'mapbox-gl';
         $allowed_js[] = 'jquery-cookie';
+        $allowed_js[] = 'mapbox-cookie';
         $allowed_js[] = 'heatmap-js';
         return $allowed_js;
     }
@@ -91,17 +93,44 @@ class Zume_Public_Heatmap_Registrations extends DT_Magic_Url_Base
                     'add' => __( 'Zume', 'disciple_tools' ),
                 ],
                 'grid_data' => ['data' => [], 'highest_value' => 1 ],
-                'custom_marks' => []
+                'custom_marks' => [],
+                'title' => $this->page_title,
+                'zoom' => 8
             ]) ?>][0]
-        </script>
-        <?php
 
+            /* custom content */
+            function load_self_content( data ) {
+                jQuery('#custom-paragraph').html(`
+                  <span class="self_name ucwords temp-spinner bold">${data.name}</span> is one of <span class="self_peers  bold">${data.peers}</span>
+                  administrative divisions in <span class="parent_name ucwords bold">${data.parent_name}</span> and it has a population of
+                  <span class="self_population bold">${data.population}</span>.
+                `)
+            }
+            /* custom level content */
+            function load_level_content( data, level ) {
+                let gl = jQuery('#'+level+'-list-item')
+                gl.empty()
+                if ( data ) {
+                    gl.append(`
+                      <div class="cell">
+                          <strong>${data.name}</strong><br>
+                          Population: <span>${data.population}</span><br>
+                          Activities Reported: <span>${data.reported}</span><br>
+                          <hr>
+                      </div>
+                    `)
+                }
+            }
+        </script>
+
+        <?php
         $this->customized_welcome_script();
         return true;
     }
 
     public function customized_welcome_script(){
         ?>
+        <style>#needed-row { display:none;} #goal-row { display:none; }</style>
         <script>
             jQuery(document).ready(function($){
                 let asset_url = '<?php echo esc_url( trailingslashit( plugin_dir_url( __FILE__ ) ) . 'images/' ) ?>'
@@ -129,7 +158,6 @@ class Zume_Public_Heatmap_Registrations extends DT_Magic_Url_Base
                     </div>
                 </div>
                 `)
-
             })
         </script>
         <?php
@@ -168,18 +196,73 @@ class Zume_Public_Heatmap_Registrations extends DT_Magic_Url_Base
             case 'a1':
             case 'a0':
             case 'world':
-                $list = Zume_App_Heatmap::query_registration_grid_totals( $action );
+                $list = Zume_App_Heatmap::query_activity_grid_totals( $action );
                 return Zume_App_Heatmap::endpoint_get_level( $params['grid_id'], $action, $list, $this->global_div, $this->us_div );
             case 'activity_data':
                 $grid_id = sanitize_text_field( wp_unslash( $params['grid_id'] ) );
                 $offset = sanitize_text_field( wp_unslash( $params['offset'] ) );
                 return Zume_App_Heatmap::query_activity_data( $grid_id, $offset );
             case 'grid_data':
-                $grid_totals = Zume_App_Heatmap::query_registration_grid_totals();
-                return Zume_App_Heatmap::_initial_polygon_value_list( $grid_totals, $this->global_div, $this->us_div );
+                return $this->_initial_polygon_value_list();
             default:
                 return new WP_Error( __METHOD__, "Missing valid action", [ 'status' => 400 ] );
         }
+    }
+
+    public function _initial_polygon_value_list(){
+        $flat_grid = Zume_App_Heatmap::query_saturation_list();
+        $grid_totals = Zume_App_Heatmap::query_activity_grid_totals();
+
+        $data = [];
+        $highest_value = 1;
+        foreach ( $flat_grid as $i => $v ){
+            $data[$i] = [
+                'grid_id' => $i,
+                'population' => number_format_i18n( $v['population'] ),
+                'needed' => 1,
+                'reported' => 0,
+                'percent' => 0,
+            ];
+
+            $population_division = Zume_App_Heatmap::_get_population_division( $v['country_code'], $this->global_div, $this->us_div );
+
+            $needed = round( $v['population'] / $population_division );
+            if ( $needed < 1 ){
+                $needed = 1;
+            }
+
+            if ( isset( $grid_totals[$v['grid_id']] ) && ! empty( $grid_totals[$v['grid_id']] ) ){
+                $reported = $grid_totals[$v['grid_id']];
+                if ( ! empty( $reported ) && ! empty( $needed ) ){
+                    $data[$v['grid_id']]['needed'] = $needed;
+
+                    $data[$v['grid_id']]['reported'] = $reported;
+
+                    $percent = round( $reported / $needed * 100 );
+                    if ( 100 < $percent ) {
+                        $percent = 100;
+                    } else {
+                        $percent = number_format_i18n( $percent, 2 );
+                    }
+                    $data[$v['grid_id']]['percent'] = $percent;
+                }
+            }
+            else {
+                $data[$v['grid_id']]['percent'] = 0;
+                $data[$v['grid_id']]['reported'] = 0;
+                $data[$v['grid_id']]['needed'] = $needed;
+            }
+
+            if ( $highest_value < $data[$v['grid_id']]['reported'] ){
+//                $highest_value = $data[$v['grid_id']]['reported'];
+                $highest_value = 200;
+            }
+        }
+
+        return [
+            'highest_value' => (int) $highest_value,
+            'data' => $data
+        ];
     }
 
 }

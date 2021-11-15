@@ -99,9 +99,6 @@ class Zume_App_Portal extends DT_Magic_Url_Base {
         else if ( 'profile' === $this->parts['action'] ) {
             $allowed_js[] = 'portal-profile';
         }
-//        else if ( '' === $this->parts['action'] ) {
-//            $allowed_js[] = 'mapbox-cookie';
-//        }
 
         return $allowed_js;
     }
@@ -118,12 +115,6 @@ class Zume_App_Portal extends DT_Magic_Url_Base {
         else if ( 'list' === $this->parts['action'] ) {
             $allowed_css[] = 'portal-app-domenu-css';
         }
-//        else if ( 'profile' === $this->parts['action'] ) {
-//            $allowed_js[] = 'portal-profile';
-//        }
-//        else if ( '' === $this->parts['action'] ) {
-//            $allowed_js[] = 'mapbox-cookie';
-//        }
 
         return $allowed_css;
     }
@@ -146,9 +137,6 @@ class Zume_App_Portal extends DT_Magic_Url_Base {
         /* group-gen */
         wp_enqueue_script( 'portal', trailingslashit( plugin_dir_url( __FILE__ ) ) . 'portal.js', [ 'jquery' ],
         filemtime( trailingslashit( plugin_dir_path( __FILE__ ) ) .'portal.js' ), true );
-
-        wp_enqueue_style( 'portal', trailingslashit( plugin_dir_url( __FILE__ ) ) . 'portal.css', [],
-        filemtime( trailingslashit( plugin_dir_path( __FILE__ ) ) .'portal.css' ) );
 
 
         if ( 'map' === $this->parts['action'] ) {
@@ -175,10 +163,6 @@ class Zume_App_Portal extends DT_Magic_Url_Base {
             wp_enqueue_script( 'portal-profile', trailingslashit( plugin_dir_url( __FILE__ ) ) . 'portal-profile.js', [ 'jquery' ],
                 filemtime( trailingslashit( plugin_dir_path( __FILE__ ) ) .'portal-profile.js' ), true );
         }
-//        else if ( '' === $this->parts['action'] ) {
-//            wp_enqueue_script( 'portal-profile', trailingslashit( plugin_dir_url( __FILE__ ) ) . 'church-portal-profile.js', [ 'jquery' ],
-//                filemtime( trailingslashit( plugin_dir_path( __FILE__ ) ) .'church-portal-profile.js' ), true );
-//        }
 
     }
 
@@ -269,9 +253,84 @@ class Zume_App_Portal extends DT_Magic_Url_Base {
         ?>
         <style>
             body {
-                background-color: white;
+                background-color: white !important;
                 padding: 0 .2rem;
             }
+            #wrapper {
+                padding:0 .5rem;
+                margin: 0 auto;
+            }
+            #offCanvasLeft ul {
+                list-style-type: none;
+            }
+            .link {
+                cursor: pointer;
+                color: #3f729b;
+            }
+            #location-status {
+                height:1.5rem;
+                width:1.5rem;
+                border-radius: 50%;
+                position: absolute;
+                bottom: 20px;
+                right: 20px;
+                z-index: 100;
+            }
+            @keyframes spin {
+                0% {
+                    transform: rotate(0deg);
+                }
+
+                100% {
+                    transform: rotate(360deg);
+                }
+            }
+            .loading-field-spinner.active {
+                border-radius: 50%;
+                width: 24px;
+                height: 24px;
+                border: 0.25rem solid #919191;
+                border-top-color: black;
+                animation: spin 1s infinite linear;
+                display: inline-block;
+            }
+            #initial-loading-spinner {
+                padding-top: 10px;
+            }
+            .mapboxgl-ctrl-top-right.mapboxgl-ctrl{
+                width:100% !important;
+                margin:10px !important;
+            }
+            .input-group-button {
+                padding:8px 0 0 5px !important;
+            }
+            #map-edit, #map-wrapper-edit  {
+                height: 300px !important;
+            }
+            .float{
+                position:fixed;
+                width:60px;
+                height:60px;
+                bottom:30px;
+                right:30px;
+                background-color:#3f729b;
+                color:#FFF;
+                border-radius:50px;
+                text-align:center;
+                box-shadow: 2px 2px 3px #999;
+                z-index:100;
+            }
+            .floating.fi-plus:before {
+                margin-top:22px;
+            }
+            .dd .dd-new-item {
+                background: #3f729b !important;
+                color:white !important;
+                border: 1px solid #3f729b !important;
+                box-shadow: 2px 2px 3px #999;
+                border-radius: 20px !important;
+            }
+
         </style>
         <?php
     }
@@ -301,31 +360,35 @@ class Zume_App_Portal extends DT_Magic_Url_Base {
                     'custom_marks' => $this->get_custom_map_markers( $this->parts['post_id'] )
                 ]) ?>][0]
 
-                // jQuery(document).ready(function() {
-                //     if ( ! Cookies.get('portal_app_maps_intro') ) {
-                //         introJs().setOptions({
-                //             steps: [
-                //                 {
-                //                     element: document.querySelector('#menu-icon'),
-                //                     intro: `<img src="${jsObject.intro_images}open-menu.gif" /><h1>Map View</h1>Add churches by clicking on the map<h1>List View</h1>Add and edit your churches and generation depth in list view.`
-                //                 },
-                //                 {
-                //                     element: document.querySelector('#map'),
-                //                     intro: `<h1>Search for Location</h1>Speed your search for a location with the search field.`
-                //                 },
-                //                 {
-                //                     intro: `<h1>Click for More</h1>Click the map to reveal progress and goals for an administrativebrew  division.<br><br><img src="${jsObject.intro_images}nesting-generations.gif" /><br>`
-                //                 },
-                //                 {
-                //                     intro: `<h1>Add New Church</h1>.<br><br><img src="${jsObject.intro_images}nesting-generations.gif" /><br>`
-                //                 }
-                //             ]
-                //         }).start();
-                //
-                //         Cookies.set('portal_app_maps_intro', true )
-                //     }
-                // })
-
+                /* custom content */
+                function load_self_content( data ) {
+                    let pop_div = data.population_division_int * 2
+                    jQuery('#custom-paragraph').html(`
+                          <span class="self_name ucwords temp-spinner bold">${data.name}</span> is one of <span class="self_peers  bold">${data.peers}</span>
+                          administrative divisions in <span class="parent_name ucwords bold">${data.parent_name}</span> and it has a population of
+                          <span class="self_population  bold">${data.population}</span>.
+                          In order to reach the community goal of 2 churches for every <span class="population_division  bold">${pop_div.toLocaleString("en-US")}</span> people,
+                          <span class="self_name ucwords  bold">${data.name}</span> needs
+                          <span class="self_needed bold">${data.needed}</span> new churches.
+                    `)
+                }
+                /* custom level content */
+                function load_level_content( data, level ) {
+                    let gl = jQuery('#'+level+'-list-item')
+                    gl.empty()
+                    if ( false !== data ) {
+                        gl.append(`
+                        <div class="cell">
+                          <strong>${data.name}</strong><br>
+                          Population: <span>${data.population}</span><br>
+                          Churches Needed: <span>${data.needed}</span><br>
+                          Churches Reported: <span class="reported_number">${data.reported}</span><br>
+                          Goal Reached: <span>${data.percent}</span>%
+                          <meter class="meter" value="${data.percent}" min="0" low="33" high="66" optimum="100" max="100"></meter>
+                        </div>
+                    `)
+                    }
+                }
             </script>
             <?php
 
@@ -353,26 +416,6 @@ class Zume_App_Portal extends DT_Magic_Url_Base {
                     'grid_data' => ['data' => [], 'highest_value' => 1 ],
                 ]) ?>][0]
 
-                // jQuery(document).ready(function() {
-                //     if ( ! Cookies.get('portal_app_list_intro') ) {
-                //         introJs().setOptions({
-                //             steps: [
-                //                 {
-                //                     element: document.querySelector('.dd-new-item'),
-                //                     intro: `<h1>Add New Churches</h1>Add new churches by clicking the dotted box. Then fill in the church information.<br><br><img src="${jsObject.intro_images}create-new-item.gif" />`
-                //                 },
-                //                 {
-                //                     intro: `<h1>Edit, Delete & Add Child Generation</h1>You can edit, add a child generation, and delete a reported church.<br><br><img src="${jsObject.intro_images}show-edit-buttons.gif" /><br>`
-                //                 },
-                //                 {
-                //                     intro: `<h1>Set Generation Depth</h1>You can arrange groups according to generation by just dragging them under their parent church.<br><br><img src="${jsObject.intro_images}nesting-generations.gif" /><br>`
-                //                 }
-                //             ]
-                //         }).start();
-                //
-                //         Cookies.set('portal_app_list_intro', true )
-                //     }
-                // })
             </script>
             <?php
         }
@@ -400,26 +443,6 @@ class Zume_App_Portal extends DT_Magic_Url_Base {
 
                 jQuery('.loading-spinner').removeClass('active')
 
-                // jQuery(document).ready(function() {
-                //     if ( ! Cookies.get('portal_app_list_intro') ) {
-                //         introJs().setOptions({
-                //             steps: [
-                //                 {
-                //                     element: document.querySelector('.dd-new-item'),
-                //                     intro: `<h1>Add New Churches</h1>Add new churches by clicking the dotted box. Then fill in the church information.<br><br><img src="${jsObject.intro_images}create-new-item.gif" />`
-                //                 },
-                //                 {
-                //                     intro: `<h1>Edit, Delete & Add Child Generation</h1>You can edit, add a child generation, and delete a reported church.<br><br><img src="${jsObject.intro_images}show-edit-buttons.gif" /><br>`
-                //                 },
-                //                 {
-                //                     intro: `<h1>Set Generation Depth</h1>You can arrange groups according to generation by just dragging them under their parent church.<br><br><img src="${jsObject.intro_images}nesting-generations.gif" /><br>`
-                //                 }
-                //             ]
-                //         }).start();
-                //
-                //         // Cookies.set('portal_app_list_intro', true )
-                //     }
-                // })
             </script>
             <?php
         }
@@ -446,52 +469,29 @@ class Zume_App_Portal extends DT_Magic_Url_Base {
                 ]) ?>][0]
 
                 jQuery('.loading-spinner').removeClass('active')
-
-                // jQuery(document).ready(function() {
-                //     if ( ! Cookies.get('portal_app_list_intro') ) {
-                //         introJs().setOptions({
-                //             steps: [
-                //                 {
-                //                     element: document.querySelector('.dd-new-item'),
-                //                     intro: `<h1>Add New Churches</h1>Add new churches by clicking the dotted box. Then fill in the church information.<br><br><img src="${jsObject.intro_images}create-new-item.gif" />`
-                //                 },
-                //                 {
-                //                     intro: `<h1>Edit, Delete & Add Child Generation</h1>You can edit, add a child generation, and delete a reported church.<br><br><img src="${jsObject.intro_images}show-edit-buttons.gif" /><br>`
-                //                 },
-                //                 {
-                //                     intro: `<h1>Set Generation Depth</h1>You can arrange groups according to generation by just dragging them under their parent church.<br><br><img src="${jsObject.intro_images}nesting-generations.gif" /><br>`
-                //                 }
-                //             ]
-                //         }).start();
-                //
-                //         // Cookies.set('portal_app_list_intro', true )
-                //     }
-                // })
             </script>
             <?php
         }
-
     }
 
     public function list_body(){
-        require_once( 'portal-list-html.php' );
+        require_once( 'portal-html-list.php' );
     }
 
     public function map_body(){
-        require_once( 'portal-map-html.php' );
+        require_once( 'portal-html-map.php' );
     }
 
     public function profile_body(){
-        require_once( 'portal-profile-html.php' );
+        require_once( 'portal-html-profile.php' );
     }
 
     public function home_body(){
-        require_once( 'portal-home-html.php' );
+        require_once( 'portal-html-home.php' );
     }
 
     public function nav() {
         ?>
-
         <!-- off canvas menus -->
         <div class="off-canvas-wrapper">
             <!-- Left Canvas -->
@@ -523,10 +523,6 @@ class Zume_App_Portal extends DT_Magic_Url_Base {
                 [
                     'methods'  => "POST",
                     'callback' => [ $this, 'endpoint_list' ],
-            //                    'permission_callback' => function( WP_REST_Request $request ){
-            //                        $magic = new DT_Magic_URL( $this->root );
-            //                        return $magic->verify_rest_endpoint_permissions_on_post( $request );
-            //                    },
                     'permission_callback' => '__return_true',
                 ],
             ]
@@ -536,10 +532,6 @@ class Zume_App_Portal extends DT_Magic_Url_Base {
                 [
                     'methods'  => "POST",
                     'callback' => [ $this, 'endpoint_update' ],
-            //                    'permission_callback' => function( WP_REST_Request $request ){
-            //                        $magic = new DT_Magic_URL( $this->root );
-            //                        return $magic->verify_rest_endpoint_permissions_on_post( $request );
-            //                    },
                     'permission_callback' => '__return_true',
                 ],
             ]
@@ -721,7 +713,6 @@ class Zume_App_Portal extends DT_Magic_Url_Base {
                     ]
                 ];
 
-
                 $new_post = DT_Posts::create_post( 'groups', $fields, true, false );
                 if ( ! is_wp_error( $new_post ) ) {
                     // clear cash on church grid totals
@@ -854,9 +845,6 @@ class Zume_App_Portal extends DT_Magic_Url_Base {
                 Zume_App_Heatmap::clear_church_grid_totals();
 
                 return Location_Grid_Meta::delete_location_grid_meta( $post_id, 'all', 0 );
-
-
-
         }
         return false;
     }
@@ -918,19 +906,6 @@ class Zume_App_Portal extends DT_Magic_Url_Base {
         return Zume_App_Heatmap::query_church_grid_totals( $administrative_level );
     }
 
-    /**
-     * Can be customized with class extension
-     * @param $country_code
-     * @return float|int
-     */
-    public function get_population_division( $country_code ){
-        $population_division = $this->global_div * 2;
-        if ( $country_code === 'US' ){
-            $population_division = $this->us_div * 2;
-        }
-        return $population_division;
-    }
-
     public function _browser_tab_title( $title ){
         return __( "Zúme Churches Map", 'disciple_tools' );
     }
@@ -967,7 +942,6 @@ class Zume_App_Portal extends DT_Magic_Url_Base {
                     </div>
                 </div>
                 `)
-
             })
         </script>
         <?php
@@ -1007,13 +981,11 @@ class Zume_App_Portal extends DT_Magic_Url_Base {
                     <!--                <a class="button" id="open-portal-activity" style="cursor:pointer;">Open Activity</a>-->
                 </div>
 
-
                 <script>
                     jQuery(document).ready(function(){
                         jQuery('#open-portal-activity').on('click', function(e){
                             jQuery('#modal-full-title').empty().html(`Portal Activity`)
                             jQuery('#modal-full-content').empty().html(`content`) // @todo add content logic
-
                             jQuery('#modal-full').foundation('open')
                         })
                     })

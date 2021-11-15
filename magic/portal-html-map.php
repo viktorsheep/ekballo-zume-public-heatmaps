@@ -95,7 +95,6 @@
                 <div class="cell">
                     <h1 id="modal_tile"></h1>
                     <h3>Population: <span id="modal_population">0</span></h3>
-                    <button class="button" onclick="window.create_group_by_map()">Report New Church</button>
                 </div>
             </div>
             <hr>

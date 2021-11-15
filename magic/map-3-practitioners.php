@@ -93,8 +93,41 @@ class Zume_Public_Heatmap_Practitioner extends DT_Magic_Url_Base
                     'add' => __( 'Zume', 'disciple_tools' ),
                 ],
                 'grid_data' => ['data' => [], 'highest_value' => 1 ],
-                'custom_marks' => []
+                'custom_marks' => [],
+                'title' => $this->page_title,
+                'zoom' => 8
             ]) ?>][0]
+
+
+            /* custom content */
+            function load_self_content( data ) {
+                jQuery('#custom-paragraph').html(`
+                  <span class="self_name ucwords temp-spinner bold">${data.name}</span> is one of <span class="self_peers  bold">${data.peers}</span>
+                  administrative divisions in <span class="parent_name ucwords bold">${data.parent_name}</span> and it has a population of
+                  <span class="self_population  bold">${data.population}</span>.
+                  In order to reach the community goal of 1 practitioner for every <span class="population_division  bold">${data.population_division}</span> people,
+                  <span class="self_name ucwords  bold">${data.name}</span> needs
+                  <span class="self_needed bold">${data.needed}</span> practitioners.
+                `)
+            }
+            /* custom level content */
+            function load_level_content( data, level ) {
+                let gl = jQuery('#'+level+'-list-item')
+                gl.empty()
+                if ( false !== data ) {
+                    gl.append(`
+                        <div class="cell">
+                          <strong>${data.name}</strong><br>
+                          Population: <span>${data.population}</span><br>
+                          Practitioners Needed: <span>${data.needed}</span><br>
+                          Practitioners Reported: <span class="reported_number">${data.reported}</span><br>
+                          Goal Reached: <span>${data.percent}</span>%
+                          <meter class="meter" value="${data.percent}" min="0" low="33" high="66" optimum="100" max="100"></meter>
+                        </div>
+                    `)
+                }
+            }
+
         </script>
         <?php
 

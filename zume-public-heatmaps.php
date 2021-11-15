@@ -85,23 +85,16 @@ class Zume_Public_Heatmaps {
     private function __construct() {
 
         require_once( 'magic/heatmap.php' );
-        require_once( 'magic/heatmap-activity.php' );
-        require_once( 'magic/heatmap-registrations.php' ); // registrations
-        require_once( 'magic/heatmap-trained-people.php' ); // trained people
-        require_once( 'magic/heatmap-practitioners.php' );
-        require_once( 'magic/heatmap-churches.php' );
-        require_once( 'magic/heatmap-trainings.php' );
-
-        require_once( 'magic/last100-hours-v2.php' );
+        require_once( 'magic/map-1-last100.php' );
+        require_once( 'magic/map-2-network-activities.php' );
+        require_once( 'magic/map-3-practitioners.php' );
+        require_once( 'magic/map-4-trainings.php' );
+        require_once( 'magic/map-5-churches.php' );
 
         require_once( 'magic/reporter.php' );
         require_once( 'magic/portal.php' );
 
-        require_once( 'magic/heatmap-multipliers.php' );
-        require_once( 'magic/multiplier.php' );
-
         require_once( 'charts/charts-loader.php');
-
 
         if ( is_admin() ) {
             require_once( 'admin/admin-menu-and-tabs.php' ); // adds starter admin page and section for plugin
