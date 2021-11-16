@@ -11,14 +11,13 @@ jQuery(document).ready(function() {
   if ( 'list' === jsObject.parts.action ) {
     window.load_tree()
   } else if ( 'profile' === jsObject.parts.action ) {
-
+    window.load_profile()
   }
 });
 
 /**
  * List Section
  */
-
 window.post_item = ( action, data ) => {
   return jQuery.ajax({
     type: "POST",
@@ -264,6 +263,7 @@ window.create_group_by_map = ( ) => {
 
     })
 }
+
 window.open_empty_modal= () => {
   let title = jQuery('#modal-title')
   let content = jQuery('#modal-content')
@@ -283,6 +283,7 @@ window.open_create_modal= () => {
   content.empty()
   jQuery('#edit-modal').foundation('open')
 }
+
 jQuery('.float').on('click', function(){
   window.open_create_modal()
 })
@@ -693,32 +694,26 @@ function remove_location( id ) {
       window.load_mapbox()
       window.force_values = false
     })
-
 }
-
 
 /**
  * Profile Section
  */
-
 window.load_profile = () => {
   jQuery.ajax({
     type: "POST",
-    data: JSON.stringify({ action: 'POST', parts: jsObject.parts }),
+    data: JSON.stringify({ action: 'get_profile', parts: jsObject.parts }),
     contentType: "application/json; charset=utf-8",
     dataType: "json",
-    url: jsObject.root + jsObject.parts.root + '/v1/' + jsObject.parts.type + '_list',
+    url: jsObject.root + jsObject.parts.root + '/v1/' + jsObject.parts.type + '_profile',
     beforeSend: function (xhr) {
       xhr.setRequestHeader('X-WP-Nonce', jsObject.nonce )
     }
   })
     .done(function(data){
       console.log(data)
-
-      window.load_domenu(data)
-
+      window.write_profile( data )
       jQuery('.loading-spinner').removeClass('active')
-      jQuery('#initial-loading-spinner').hide()
     })
     .fail(function(e) {
       console.log(e)
@@ -732,7 +727,7 @@ window.post_profile = ( action, data ) => {
     data: JSON.stringify({ action: action, parts: jsObject.parts, data: data }),
     contentType: "application/json; charset=utf-8",
     dataType: "json",
-    url: jsObject.root + jsObject.parts.root + '/v1/' + jsObject.parts.type + '_update',
+    url: jsObject.root + jsObject.parts.root + '/v1/' + jsObject.parts.type + '_profile',
     beforeSend: function (xhr) {
       xhr.setRequestHeader('X-WP-Nonce', jsObject.nonce )
     }
@@ -743,3 +738,89 @@ window.post_profile = ( action, data ) => {
       jQuery('.loading-spinner').removeClass('active')
     })
 }
+
+window.write_profile = ( data ) => {
+  let content = jQuery('#wrapper')
+
+  content.empty().html(
+    `
+    <div class="callout">
+      <div class="grid-x">
+        <div class="cell">
+            <h2>Are you actively being a disciple and making disciples?</h2>
+        </div>
+        <div class="cell">
+          <div class="switch large">
+            <input class="switch-input" id="yes-no" type="checkbox" name="exampleSwitch">
+            <label class="switch-paddle" for="yes-no">
+              <span class="show-for-sr">Do you like me?</span>
+              <span class="switch-active" aria-hidden="true">Yes</span>
+              <span class="switch-inactive" aria-hidden="true">No</span>
+            </label>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="callout">
+      <div class="grid-x">
+        <div class="cell">
+            <h2>Is this information about you correct?</h2>
+        </div>
+        <div class="cell">
+            <label>Name:</label>
+           <input type="text" placeholder="Name" value="${data.title}"  />
+        </div>
+        <div class="cell">
+            <label>Email</label>
+           <input type="text" placeholder="Email" data-key="${data.contact_email[0].key}" value="${data.contact_email[0].value}" />
+        </div>
+        <div class="cell">
+            <label>Phone</label>
+           <input type="text" placeholder="Phone" data-key="${data.contact_phone[0].key}" value="${data.contact_phone[0].value}"/>
+        </div>
+        <div class="cell">
+            <label>Location</label>
+           <input type="text" placeholder="Location" data-key="${data.location_grid_meta[0].grid_meta_id}" value="${data.location_grid_meta[0].label}"/>
+        </div>
+        <div class="cell">
+            <label>Bio</label>
+            <textarea placeholder="Bio" ></textarea>
+        </div>
+      </div>
+    </div>
+
+    <div class="callout">
+      <div class="grid-x">
+        <div class="cell">
+            <h2>Do you have communication concerns?</h2>
+        </div>
+        <div class="cell">
+            <label>Hide my details on the public map?</label>
+           <div class="switch large">
+            <input class="switch-input" id="hide-map" type="checkbox" name="exampleSwitch">
+            <label class="switch-paddle" for="hide-map">
+              <span class="show-for-sr">Hide on public map?</span>
+              <span class="switch-active" aria-hidden="true">Yes</span>
+              <span class="switch-inactive" aria-hidden="true">No</span>
+            </label>
+          </div>
+        </div>
+        <div class="cell">
+            <label>Withhold my details from inquiries? (i.e. only forward requests for information to me)</label>
+           <div class="switch large">
+            <input class="switch-input" id="forward-requests" type="checkbox" name="exampleSwitch">
+            <label class="switch-paddle" for="forward-requests">
+              <span class="show-for-sr">Hide on public map?</span>
+              <span class="switch-active" aria-hidden="true">Yes</span>
+              <span class="switch-inactive" aria-hidden="true">No</span>
+            </label>
+          </div>
+        </div>
+    </div>
+  </div>
+
+    `
+  )
+}
+

@@ -5,10 +5,9 @@ if (is_wp_error($parts_post)) {
     return;
 }
 
-DT_Mapbox_API::geocoder_scripts();
+//DT_Mapbox_API::geocoder_scripts();
 
 ?>
-
 <!-- title -->
 <div class="grid-x">
     <div class="cell padding-1" >
@@ -25,36 +24,7 @@ DT_Mapbox_API::geocoder_scripts();
 <?php $this->nav(); ?>
 
 <div id="wrapper">
-    <div class="callout">
-        <div class="grid-x">
-
-            <div class="cell">
-                <label>Name:</label>
-               <input type="text" placeholder="Name" value="<?php echo esc_html( $parts_post['title'] ) ?>" />
-            </div>
-            <div class="cell">
-                <label>Email</label>
-               <input type="text" placeholder="Email" />
-            </div>
-            <div class="cell">
-                <label>Phone</label>
-               <input type="text" placeholder="Phone" />
-            </div>
-            <div class="cell">
-                <label>Location</label>
-               <input type="text" placeholder="Location" />
-            </div>
-            <div class="cell">
-                <label>Visibility</label>
-               <input type="text" placeholder="Visibility" />
-            </div>
-            <div class="cell">
-                <label>Bio</label>
-                <textarea placeholder="Bio" ></textarea>
-            </div>
-
-        </div>
-    </div>
+    <span class="loading-spinner active"></span>
 </div>
 
 <div class="reveal large" id="edit-modal" data-v-offset="0" data-close-on-click="false" data-reveal>

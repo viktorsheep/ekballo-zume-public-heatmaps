@@ -432,7 +432,6 @@ class Zume_App_Portal extends DT_Magic_Url_Base {
                     'grid_data' => ['data' => [], 'highest_value' => 1 ],
                 ]) ?>][0]
 
-                jQuery('.loading-spinner').removeClass('active')
 
             </script>
             <?php
@@ -523,6 +522,15 @@ class Zume_App_Portal extends DT_Magic_Url_Base {
                 [
                     'methods'  => "POST",
                     'callback' => [ $this, 'endpoint_update' ],
+                    'permission_callback' => '__return_true',
+                ],
+            ]
+        );
+        register_rest_route(
+            $namespace, '/'.$this->type . '_profile', [
+                [
+                    'methods'  => "POST",
+                    'callback' => [ $this, 'endpoint_profile' ],
                     'permission_callback' => '__return_true',
                 ],
             ]
@@ -838,6 +846,26 @@ class Zume_App_Portal extends DT_Magic_Url_Base {
                 return Location_Grid_Meta::delete_location_grid_meta( $post_id, 'all', 0 );
         }
         return false;
+    }
+
+    public function endpoint_profile( WP_REST_Request $request ) {
+        $params = $request->get_params();
+        if ( ! isset( $params['parts'], $params['action'] ) ) {
+            return new WP_Error( __METHOD__, "Missing parameters", [ 'status' => 400 ] );
+        }
+        $params = dt_recursive_sanitize_array( $params );
+
+        $post_id = $params["parts"]["post_id"];
+        $post = DT_Posts::get_post( $this->post_type, $post_id, true, false );
+
+        $action = sanitize_text_field( wp_unslash( $params['action'] ) );
+
+        switch ( $action ) {
+            case 'get_profile':
+                return $post;
+            default:
+                return new WP_Error( __METHOD__, "Missing valid action", [ 'status' => 400 ] );
+        }
     }
 
     public function get_custom_map_markers( $post_id ) {
