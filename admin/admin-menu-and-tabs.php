@@ -144,19 +144,13 @@ class Zume_Public_Heatmaps_Tab_General {
             <tr>
                 <td>
                    Reporter Manager<br>
-                    <a href="<?php echo site_url() ?>/zume_app/reporter_manager"><?php echo site_url() ?>/zume_app/reporter_manager</a>
-                </td>
-            </tr>
-            <tr>
-                <td>
-                    Disciple-Maker Heatmap<br>
-                    <a href="<?php echo site_url() ?>/zume_app/heatmap_multipliers"><?php echo site_url() ?>/zume_app/heatmap_multipliers</a>
+                    <a href="<?php echo esc_url( site_url() ) ?>/zume_app/reporter_manager"><?php echo esc_url( site_url() ) ?>/zume_app/reporter_manager</a>
                 </td>
             </tr>
             <tr>
                 <td>
                     Church Heatmap<br>
-                    <a href="<?php echo site_url() ?>/zume_app/heatmap_churches"><?php echo site_url() ?>/zume_app/heatmap_churches</a>
+                    <a href="<?php echo esc_url( site_url() ) ?>/zume_app/heatmap_churches"><?php echo esc_url( site_url() ) ?>/zume_app/heatmap_churches</a>
                 </td>
             </tr>
 
@@ -164,13 +158,7 @@ class Zume_Public_Heatmaps_Tab_General {
             <tr>
                 <td>
                     Last 100 Hours<br>
-                    <a href="<?php echo site_url() ?>/zume_app/last100_hours"><?php echo site_url() ?>/zume_app/last100_hours</a>
-                </td>
-            </tr>
-            <tr>
-                <td>
-                    Network Activity Map<br>
-                    <a href="<?php echo site_url() ?>/zume_app/heatmap_activity"><?php echo site_url() ?>/zume_app/heatmap_activity</a>
+                    <a href="<?php echo esc_url( site_url() ) ?>/zume_app/last100_hours"><?php echo esc_url( site_url() ) ?>/zume_app/last100_hours</a>
                 </td>
             </tr>
 
@@ -178,7 +166,7 @@ class Zume_Public_Heatmaps_Tab_General {
             <tr>
                 <td>
                     Registrations Map<br>
-                    <a href="<?php echo site_url() ?>/zume_app/heatmap_activity"><?php echo site_url() ?>/zume_app/heatmap_activity</a>
+                    <a href="<?php echo esc_url( site_url() ) ?>/zume_app/heatmap_activity"><?php echo esc_url( site_url() ) ?>/zume_app/heatmap_activity</a>
                 </td>
             </tr>
 

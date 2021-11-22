@@ -48,7 +48,7 @@ class Zume_Public_Heatmaps_Metrics_Map_Last100 extends DT_Metrics_Chart_Base
             'magic_link' => $this->magic_link,
             'translations' => [
                 "title" => $this->title,
-                "copy" => __("Copy Public URL", 'zume-public-heatmap')
+                "copy" => __( "Copy Public URL", 'zume-public-heatmap' )
             ]
         ];
         ?>

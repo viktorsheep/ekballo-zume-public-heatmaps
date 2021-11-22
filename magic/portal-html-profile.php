@@ -1,11 +1,11 @@
 <?php
 $parts_post_id = $this->parts["post_id"];
-$parts_post = DT_Posts::get_post($this->post_type, $parts_post_id, true, false);
-if (is_wp_error($parts_post)) {
+$parts_post = DT_Posts::get_post( $this->post_type, $parts_post_id, true, false );
+if (is_wp_error( $parts_post )) {
     return;
 }
 
-//DT_Mapbox_API::geocoder_scripts();
+DT_Mapbox_API::geocoder_scripts();
 
 ?>
 <!-- title -->

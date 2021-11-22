@@ -1392,7 +1392,7 @@ class Zume_App_Heatmap {
                         FROM $wpdb->postmeta as pm
                         JOIN $wpdb->posts as p ON p.ID=pm.post_id AND p.post_type = 'contacts'
                         JOIN $wpdb->postmeta as pm2 ON pm2.post_id=pm.post_id AND pm2.meta_key = 'overall_status' AND pm2.meta_value != 'closed'
-                        JOIN $wpdb->postmeta as pm3 ON pm3.post_id=pm.post_id AND pm3.meta_key = 'practitioner' AND pm3.meta_value = 'practicing'
+                        JOIN $wpdb->postmeta as pm3 ON pm3.post_id=pm.post_id AND pm3.meta_key = 'faith_status' AND pm3.meta_value = 'leader'
                         LEFT JOIN $wpdb->dt_location_grid as lg ON pm.meta_value=lg.grid_id
                         WHERE pm.meta_key = 'location_grid'
                     ) as t0
@@ -1407,7 +1407,7 @@ class Zume_App_Heatmap {
                         FROM $wpdb->postmeta as pm
                         JOIN $wpdb->posts as p ON p.ID=pm.post_id AND p.post_type = 'contacts'
                         JOIN $wpdb->postmeta as pm2 ON pm2.post_id=pm.post_id AND pm2.meta_key = 'overall_status' AND pm2.meta_value != 'closed'
-                        JOIN $wpdb->postmeta as pm3 ON pm3.post_id=pm.post_id AND pm3.meta_key = 'practitioner' AND pm3.meta_value = 'practicing'
+                        JOIN $wpdb->postmeta as pm3 ON pm3.post_id=pm.post_id AND pm3.meta_key = 'faith_status' AND pm3.meta_value = 'leader'
                         LEFT JOIN $wpdb->dt_location_grid as lg ON pm.meta_value=lg.grid_id
                         WHERE pm.meta_key = 'location_grid'
                     ) as t1
@@ -1422,7 +1422,7 @@ class Zume_App_Heatmap {
                         FROM $wpdb->postmeta as pm
                         JOIN $wpdb->posts as p ON p.ID=pm.post_id AND p.post_type = 'contacts'
                         JOIN $wpdb->postmeta as pm2 ON pm2.post_id=pm.post_id AND pm2.meta_key = 'overall_status' AND pm2.meta_value != 'closed'
-                        JOIN $wpdb->postmeta as pm3 ON pm3.post_id=pm.post_id AND pm3.meta_key = 'practitioner' AND pm3.meta_value = 'practicing'
+                        JOIN $wpdb->postmeta as pm3 ON pm3.post_id=pm.post_id AND pm3.meta_key = 'faith_status' AND pm3.meta_value = 'leader'
                         LEFT JOIN $wpdb->dt_location_grid as lg ON pm.meta_value=lg.grid_id
                         WHERE pm.meta_key = 'location_grid'
                     ) as t2
@@ -1437,7 +1437,7 @@ class Zume_App_Heatmap {
                         FROM $wpdb->postmeta as pm
                         JOIN $wpdb->posts as p ON p.ID=pm.post_id AND p.post_type = 'contacts'
                         JOIN $wpdb->postmeta as pm2 ON pm2.post_id=pm.post_id AND pm2.meta_key = 'overall_status' AND pm2.meta_value != 'closed'
-                        JOIN $wpdb->postmeta as pm3 ON pm3.post_id=pm.post_id AND pm3.meta_key = 'practitioner' AND pm3.meta_value = 'practicing'
+                        JOIN $wpdb->postmeta as pm3 ON pm3.post_id=pm.post_id AND pm3.meta_key = 'faith_status' AND pm3.meta_value = 'leader'
                         LEFT JOIN $wpdb->dt_location_grid as lg ON pm.meta_value=lg.grid_id
                         WHERE pm.meta_key = 'location_grid'
                     ) as t3
@@ -1453,7 +1453,7 @@ class Zume_App_Heatmap {
                             FROM $wpdb->postmeta as pm
                             JOIN $wpdb->posts as p ON p.ID=pm.post_id AND p.post_type = 'contacts'
                             JOIN $wpdb->postmeta as pm2 ON pm2.post_id=pm.post_id AND pm2.meta_key = 'overall_status' AND pm2.meta_value != 'closed'
-                            JOIN $wpdb->postmeta as pm3 ON pm3.post_id=pm.post_id AND pm3.meta_key = 'practitioner' AND pm3.meta_value = 'practicing'
+                            JOIN $wpdb->postmeta as pm3 ON pm3.post_id=pm.post_id AND pm3.meta_key = 'faith_status' AND pm3.meta_value = 'leader'
                             LEFT JOIN $wpdb->dt_location_grid as lg ON pm.meta_value=lg.grid_id
                             WHERE pm.meta_key = 'location_grid'
                          ) as tw
@@ -1468,7 +1468,7 @@ class Zume_App_Heatmap {
                         FROM $wpdb->postmeta as pm
                         JOIN $wpdb->posts as p ON p.ID=pm.post_id AND p.post_type = 'contacts'
                         JOIN $wpdb->postmeta as pm2 ON pm2.post_id=pm.post_id AND pm2.meta_key = 'overall_status' AND pm2.meta_value != 'closed'
-                        JOIN $wpdb->postmeta as pm3 ON pm3.post_id=pm.post_id AND pm3.meta_key = 'practitioner' AND pm3.meta_value = 'practicing'
+                        JOIN $wpdb->postmeta as pm3 ON pm3.post_id=pm.post_id AND pm3.meta_key = 'faith_status' AND pm3.meta_value = 'leader'
                         LEFT JOIN $wpdb->dt_location_grid as lg ON pm.meta_value=lg.grid_id
                         WHERE pm.meta_key = 'location_grid'
                     ) as t0
@@ -1480,7 +1480,7 @@ class Zume_App_Heatmap {
                         FROM $wpdb->postmeta as pm
                         JOIN $wpdb->posts as p ON p.ID=pm.post_id AND p.post_type = 'contacts'
                         JOIN $wpdb->postmeta as pm2 ON pm2.post_id=pm.post_id AND pm2.meta_key = 'overall_status' AND pm2.meta_value != 'closed'
-                        JOIN $wpdb->postmeta as pm3 ON pm3.post_id=pm.post_id AND pm3.meta_key = 'practitioner' AND pm3.meta_value = 'practicing'
+                        JOIN $wpdb->postmeta as pm3 ON pm3.post_id=pm.post_id AND pm3.meta_key = 'faith_status' AND pm3.meta_value = 'leader'
                         LEFT JOIN $wpdb->dt_location_grid as lg ON pm.meta_value=lg.grid_id
                         WHERE pm.meta_key = 'location_grid'
                     ) as t1
@@ -1492,7 +1492,7 @@ class Zume_App_Heatmap {
                         FROM $wpdb->postmeta as pm
                         JOIN $wpdb->posts as p ON p.ID=pm.post_id AND p.post_type = 'contacts'
                         JOIN $wpdb->postmeta as pm2 ON pm2.post_id=pm.post_id AND pm2.meta_key = 'overall_status' AND pm2.meta_value != 'closed'
-                        JOIN $wpdb->postmeta as pm3 ON pm3.post_id=pm.post_id AND pm3.meta_key = 'practitioner' AND pm3.meta_value = 'practicing'
+                        JOIN $wpdb->postmeta as pm3 ON pm3.post_id=pm.post_id AND pm3.meta_key = 'faith_status' AND pm3.meta_value = 'leader'
                         LEFT JOIN $wpdb->dt_location_grid as lg ON pm.meta_value=lg.grid_id
                         WHERE pm.meta_key = 'location_grid'
                     ) as t2
@@ -1504,7 +1504,7 @@ class Zume_App_Heatmap {
                         FROM $wpdb->postmeta as pm
                         JOIN $wpdb->posts as p ON p.ID=pm.post_id AND p.post_type = 'contacts'
                         JOIN $wpdb->postmeta as pm2 ON pm2.post_id=pm.post_id AND pm2.meta_key = 'overall_status' AND pm2.meta_value != 'closed'
-                        JOIN $wpdb->postmeta as pm3 ON pm3.post_id=pm.post_id AND pm3.meta_key = 'practitioner' AND pm3.meta_value = 'practicing'
+                        JOIN $wpdb->postmeta as pm3 ON pm3.post_id=pm.post_id AND pm3.meta_key = 'faith_status' AND pm3.meta_value = 'leader'
                         LEFT JOIN $wpdb->dt_location_grid as lg ON pm.meta_value=lg.grid_id
                         WHERE pm.meta_key = 'location_grid'
                     ) as t3
@@ -1516,7 +1516,7 @@ class Zume_App_Heatmap {
                                 FROM $wpdb->postmeta as pm
                                 JOIN $wpdb->posts as p ON p.ID=pm.post_id AND p.post_type = 'contacts'
                                 JOIN $wpdb->postmeta as pm2 ON pm2.post_id=pm.post_id AND pm2.meta_key = 'overall_status' AND pm2.meta_value != 'closed'
-                                JOIN $wpdb->postmeta as pm3 ON pm3.post_id=pm.post_id AND pm3.meta_key = 'practitioner' AND pm3.meta_value = 'practicing'
+                                JOIN $wpdb->postmeta as pm3 ON pm3.post_id=pm.post_id AND pm3.meta_key = 'faith_status' AND pm3.meta_value = 'leader'
                                 LEFT JOIN $wpdb->dt_location_grid as lg ON pm.meta_value=lg.grid_id
                                 WHERE pm.meta_key = 'location_grid'
                          ) as tw
@@ -1531,7 +1531,7 @@ class Zume_App_Heatmap {
                             FROM $wpdb->postmeta as pm
                             JOIN $wpdb->posts as p ON p.ID=pm.post_id AND p.post_type = 'contacts'
                             JOIN $wpdb->postmeta as pm2 ON pm2.post_id=pm.post_id AND pm2.meta_key = 'overall_status' AND pm2.meta_value != 'closed'
-                            JOIN $wpdb->postmeta as pm3 ON pm3.post_id=pm.post_id AND pm3.meta_key = 'practitioner' AND pm3.meta_value = 'practicing'
+                            JOIN $wpdb->postmeta as pm3 ON pm3.post_id=pm.post_id AND pm3.meta_key = 'faith_status' AND pm3.meta_value = 'leader'
                             LEFT JOIN $wpdb->dt_location_grid as lg ON pm.meta_value=lg.grid_id
                             WHERE pm.meta_key = 'location_grid'
                         ) as t0
@@ -1543,7 +1543,7 @@ class Zume_App_Heatmap {
                             FROM $wpdb->postmeta as pm
                             JOIN $wpdb->posts as p ON p.ID=pm.post_id AND p.post_type = 'contacts'
                             JOIN $wpdb->postmeta as pm2 ON pm2.post_id=pm.post_id AND pm2.meta_key = 'overall_status' AND pm2.meta_value != 'closed'
-                            JOIN $wpdb->postmeta as pm3 ON pm3.post_id=pm.post_id AND pm3.meta_key = 'practitioner' AND pm3.meta_value = 'practicing'
+                            JOIN $wpdb->postmeta as pm3 ON pm3.post_id=pm.post_id AND pm3.meta_key = 'faith_status' AND pm3.meta_value = 'leader'
                             LEFT JOIN $wpdb->dt_location_grid as lg ON pm.meta_value=lg.grid_id
                             WHERE pm.meta_key = 'location_grid'
                         ) as t1
@@ -1555,7 +1555,7 @@ class Zume_App_Heatmap {
                             FROM $wpdb->postmeta as pm
                             JOIN $wpdb->posts as p ON p.ID=pm.post_id AND p.post_type = 'contacts'
                             JOIN $wpdb->postmeta as pm2 ON pm2.post_id=pm.post_id AND pm2.meta_key = 'overall_status' AND pm2.meta_value != 'closed'
-                            JOIN $wpdb->postmeta as pm3 ON pm3.post_id=pm.post_id AND pm3.meta_key = 'practitioner' AND pm3.meta_value = 'practicing'
+                            JOIN $wpdb->postmeta as pm3 ON pm3.post_id=pm.post_id AND pm3.meta_key = 'faith_status' AND pm3.meta_value = 'leader'
                             LEFT JOIN $wpdb->dt_location_grid as lg ON pm.meta_value=lg.grid_id
                             WHERE pm.meta_key = 'location_grid'
                         ) as t2
@@ -1567,7 +1567,7 @@ class Zume_App_Heatmap {
                             FROM $wpdb->postmeta as pm
                             JOIN $wpdb->posts as p ON p.ID=pm.post_id AND p.post_type = 'contacts'
                             JOIN $wpdb->postmeta as pm2 ON pm2.post_id=pm.post_id AND pm2.meta_key = 'overall_status' AND pm2.meta_value != 'closed'
-                            JOIN $wpdb->postmeta as pm3 ON pm3.post_id=pm.post_id AND pm3.meta_key = 'practitioner' AND pm3.meta_value = 'practicing'
+                            JOIN $wpdb->postmeta as pm3 ON pm3.post_id=pm.post_id AND pm3.meta_key = 'faith_status' AND pm3.meta_value = 'leader'
                             LEFT JOIN $wpdb->dt_location_grid as lg ON pm.meta_value=lg.grid_id
                             WHERE pm.meta_key = 'location_grid'
                         ) as t3
@@ -2161,7 +2161,7 @@ class Zume_App_Heatmap {
         wp_enqueue_style( 'heatmap-css', trailingslashit( plugin_dir_url( __FILE__ ) ) . 'heatmap.css', [], filemtime( plugin_dir_path( __FILE__ ) .'heatmap.css' ) );
 
         wp_enqueue_script( 'jquery-cookie', trailingslashit( plugin_dir_url( __FILE__ ) ) . 'js.cookie.min.js', [ 'jquery' ],
-            filemtime( trailingslashit( plugin_dir_path( __FILE__ ) ) .'js.cookie.min.js' ), true );
+        filemtime( trailingslashit( plugin_dir_path( __FILE__ ) ) .'js.cookie.min.js' ), true );
 
         wp_enqueue_script( 'mapbox-cookie', trailingslashit( get_stylesheet_directory_uri() ) . 'dt-mapping/geocode-api/mapbox-cookie.js', [ 'jquery', 'jquery-cookie' ], '3.0.0' );
     }
@@ -2217,7 +2217,7 @@ class Zume_App_Heatmap {
             return false;
         }
 
-        $percent = $level['reported'] / $level['needed'] * 100 ;
+        $percent = $level['reported'] / $level['needed'] * 100;
         if ( 100 < $percent ) {
             $percent = 100;
         } else {
@@ -2254,7 +2254,7 @@ class Zume_App_Heatmap {
                 $needed_without_us = $world_population_without_us / $global_pop_block;
                 $needed_in_the_us = $us_population / $us_pop_block;
                 $level['needed'] = $needed_without_us + $needed_in_the_us;
-                $percent = $level['reported'] / $level['needed'] * 100 ;
+                $percent = $level['reported'] / $level['needed'] * 100;
             }
         }
         // @todo end temp cover for populations
@@ -2442,14 +2442,14 @@ class Zume_App_Heatmap {
     public static function query_activity_list() {
         global $wpdb;
         $timestamp = strtotime( '-100 hours' );
-        $results = $wpdb->get_results( "
+        $results = $wpdb->get_results( $wpdb->prepare( "
                 SELECT ml.action, ml.category, ml.lng, ml.lat, ml.label, ml.payload, ml.timestamp, lga0.name as country_name, lga0.country_code
                 FROM $wpdb->dt_movement_log ml
                 LEFT JOIN $wpdb->dt_location_grid lg ON lg.grid_id=ml.grid_id
                 LEFT JOIN $wpdb->dt_location_grid lga0 ON lga0.grid_id=lg.admin0_grid_id
-                WHERE ml.timestamp > $timestamp
+                WHERE ml.timestamp > %d
                 ORDER BY ml.timestamp DESC
-                ", ARRAY_A );
+                ", $timestamp), ARRAY_A );
 
         foreach ( $results as $i => $v ) {
             $t = self::_get_type( $v['action'] );
@@ -2465,7 +2465,286 @@ class Zume_App_Heatmap {
 
     public static function create_initials( $longitude, $latitude, $payload ) : string {
         $letters = [
-            'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'N', 'S', 'M', 'N', 'O', 'P', 'R', 'S', 'T', 'U', 'V', 'W', 'E', 'A', 'R', 'I', 'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'D', 'E', 'M', 'N', 'O', 'P', 'R', 'S', 'T', 'U', 'V', 'W', 'E', 'A', 'R', 'I', 'E', 'A', 'R', 'I', 'T', 'N', 'S', 'L', 'E', 'A', 'R', 'I', 'N', 'S', 'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'C', 'D', 'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'A', 'B', 'M', 'N', 'O', 'P', 'R', 'S', 'T', 'U', 'V', 'W', 'E', 'A', 'R', 'I', 'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'A', 'B', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'E', 'A', 'R', 'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'N', 'S', 'M', 'N', 'O', 'P', 'R', 'S', 'T', 'U', 'V', 'W', 'E', 'A', 'R', 'I', 'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'D', 'E', 'M', 'N', 'O', 'P', 'R', 'S', 'T', 'U', 'V', 'W', 'E', 'A', 'R', 'I', 'E', 'A', 'R', 'I', 'T', 'N', 'S', 'L', 'E', 'A', 'R', 'I', 'N', 'S', 'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'C', 'D', 'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'A', 'B', 'E', 'A', 'R', 'I', 'T', 'N', 'S', 'L', 'E', 'A', 'R', 'I', 'N', 'S', 'M', 'N', 'O', 'P', 'R', 'S', 'T', 'U', 'V', 'W', 'E', 'A', 'R', 'I', 'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'N', 'S',
+            'A',
+        'B',
+        'C',
+        'D',
+        'E',
+        'F',
+        'G',
+        'H',
+        'I',
+        'J',
+        'K',
+        'L',
+        'N',
+        'S',
+        'M',
+        'N',
+        'O',
+        'P',
+        'R',
+        'S',
+        'T',
+        'U',
+        'V',
+        'W',
+        'E',
+        'A',
+        'R',
+        'I',
+        'A',
+        'B',
+        'C',
+        'D',
+        'E',
+        'F',
+        'G',
+        'H',
+        'I',
+        'J',
+        'K',
+        'L',
+        'D',
+        'E',
+        'M',
+        'N',
+        'O',
+        'P',
+        'R',
+        'S',
+        'T',
+        'U',
+        'V',
+        'W',
+        'E',
+        'A',
+        'R',
+        'I',
+        'E',
+        'A',
+        'R',
+        'I',
+        'T',
+        'N',
+        'S',
+        'L',
+        'E',
+        'A',
+        'R',
+        'I',
+        'N',
+        'S',
+        'A',
+        'B',
+        'C',
+        'D',
+        'E',
+        'F',
+        'G',
+        'H',
+        'I',
+        'J',
+        'K',
+        'L',
+        'C',
+        'D',
+        'A',
+        'B',
+        'C',
+        'D',
+        'E',
+        'F',
+        'G',
+        'H',
+        'I',
+        'J',
+        'K',
+        'L',
+        'A',
+        'B',
+        'M',
+        'N',
+        'O',
+        'P',
+        'R',
+        'S',
+        'T',
+        'U',
+        'V',
+        'W',
+        'E',
+        'A',
+        'R',
+        'I',
+        'A',
+        'B',
+        'C',
+        'D',
+        'E',
+        'F',
+        'G',
+        'H',
+        'I',
+        'J',
+        'K',
+        'L',
+        'A',
+        'B',
+        'M',
+        'N',
+        'O',
+        'P',
+        'Q',
+        'R',
+        'S',
+        'T',
+        'U',
+        'V',
+        'W',
+        'E',
+        'A',
+        'R',
+        'A',
+        'B',
+        'C',
+        'D',
+        'E',
+        'F',
+        'G',
+        'H',
+        'I',
+        'J',
+        'K',
+        'L',
+        'N',
+        'S',
+        'M',
+        'N',
+        'O',
+        'P',
+        'R',
+        'S',
+        'T',
+        'U',
+        'V',
+        'W',
+        'E',
+        'A',
+        'R',
+        'I',
+        'A',
+        'B',
+        'C',
+        'D',
+        'E',
+        'F',
+        'G',
+        'H',
+        'I',
+        'J',
+        'K',
+        'L',
+        'D',
+        'E',
+        'M',
+        'N',
+        'O',
+        'P',
+        'R',
+        'S',
+        'T',
+        'U',
+        'V',
+        'W',
+        'E',
+        'A',
+        'R',
+        'I',
+        'E',
+        'A',
+        'R',
+        'I',
+        'T',
+        'N',
+        'S',
+        'L',
+        'E',
+        'A',
+        'R',
+        'I',
+        'N',
+        'S',
+        'A',
+        'B',
+        'C',
+        'D',
+        'E',
+        'F',
+        'G',
+        'H',
+        'I',
+        'J',
+        'K',
+        'L',
+        'C',
+        'D',
+        'A',
+        'B',
+        'C',
+        'D',
+        'E',
+        'F',
+        'G',
+        'H',
+        'I',
+        'J',
+        'K',
+        'L',
+        'A',
+        'B',
+        'E',
+        'A',
+        'R',
+        'I',
+        'T',
+        'N',
+        'S',
+        'L',
+        'E',
+        'A',
+        'R',
+        'I',
+        'N',
+        'S',
+        'M',
+        'N',
+        'O',
+        'P',
+        'R',
+        'S',
+        'T',
+        'U',
+        'V',
+        'W',
+        'E',
+        'A',
+        'R',
+        'I',
+        'A',
+        'B',
+        'C',
+        'D',
+        'E',
+        'F',
+        'G',
+        'H',
+        'I',
+        'J',
+        'K',
+        'L',
+        'N',
+        'S',
         ];
         $fnum = abs( round( $longitude ) );
         $lnum = abs( round( $latitude ) );
@@ -2486,10 +2765,10 @@ class Zume_App_Heatmap {
             $time_string = self::_time_elapsed_string( '@'.$timestamp );
         }
         else if ( $timestamp > strtotime( 'today+00:00' ) + $timezone_offset ) {
-            $time_string = date( 'g:i a', $adjusted_time );
+            $time_string = date( 'g:i a', $adjusted_time ); // @phpcs:ignore
         }
         else {
-            $time_string = date( 'D g:i a', $adjusted_time );
+            $time_string = date( 'D g:i a', $adjusted_time ); // @phpcs:ignore
         }
         return $time_string;
     }
@@ -2850,10 +3129,10 @@ class Zume_App_Heatmap {
         global $wpdb;
 
         $utc_time = new DateTime( 'now', new DateTimeZone( $filters['timezone'] ) );
-        $timezoneOffset = $utc_time->format( 'Z' );
+        $timezone_offset = $utc_time->format( 'Z' );
 
         $additional_where = '';
-        if ( ! empty( $filters['bounds'] ) && is_array( $filters['bounds'] ) && $filters['zoom'] > 1.5  ) {
+        if ( ! empty( $filters['bounds'] ) && is_array( $filters['bounds'] ) && $filters['zoom'] > 1.5 ) {
             if ( isset( $filters['bounds']['n_lat'] )
                 && isset( $filters['bounds']['s_lat'] )
                 && isset( $filters['bounds']['e_lng'] )
@@ -2873,6 +3152,7 @@ class Zume_App_Heatmap {
         }
 
         $timestamp = strtotime( '-100 hours' );
+        // @phpcs:disable
         $results = $wpdb->get_results( "
                 SELECT ml.action, ml.category, ml.lng, ml.lat, ml.label, ml.payload, ml.timestamp, lga0.name as country_name, lga0.country_code
                 FROM $wpdb->dt_movement_log as ml
@@ -2882,6 +3162,7 @@ class Zume_App_Heatmap {
                 $additional_where
                 ORDER BY ml.timestamp DESC
                 ", ARRAY_A );
+        // @phpcs:enable
 
         foreach ( $results as $i => $v ) {
             $t = self::_get_type( $v['action'] );
@@ -2900,7 +3181,7 @@ class Zume_App_Heatmap {
             $string_elements = [];
 
             // time string
-            $time_string = self::create_time_string( $result['timestamp'], $timezoneOffset );
+            $time_string = self::create_time_string( $result['timestamp'], $timezone_offset );
 
             // language
             $string_elements['in_language'] = self::create_in_language_string( $payload );
@@ -2956,7 +3237,6 @@ class Zume_App_Heatmap {
             else if ( $prepared_array['country'] === $filters['country'] && $prepared_array['language'] === $filters['language'] && $prepared_array['type'] === $filters['type'] ) {
                 $list[] = $prepared_array;
             }
-
         } // end foreach loop
 
         if ( empty( $list ) ) {
@@ -3500,7 +3780,6 @@ function zume_public_log_actions( $activity_log ){
             $initials = Zume_App_Heatmap::create_initials( $log['lng'], $log['lat'], $log['payload'] );
             $activity_log[$index]['message'] = $initials . ' is updating there Zúme Training 3 month plan! ';
         }
-
     }
 
     return $activity_log;

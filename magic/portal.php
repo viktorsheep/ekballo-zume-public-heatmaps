@@ -37,9 +37,6 @@ class Zume_App_Portal extends DT_Magic_Url_Base {
         parent::__construct();
 
         add_action( 'rest_api_init', [ $this, 'add_endpoints' ] );
-        add_action( 'dt_details_additional_section', [ $this, 'dt_details_additional_section' ], 30, 2 );
-        add_filter( 'dt_details_additional_tiles', [ $this, 'dt_details_additional_tiles' ], 10, 2 );
-        add_filter( 'dt_custom_fields_settings', [ $this, 'add_active_reporter_status' ], 50, 2 );
         add_filter( 'dt_settings_apps_list', [ $this, 'dt_settings_apps_list' ], 10, 1 );
 
         /**
@@ -120,7 +117,7 @@ class Zume_App_Portal extends DT_Magic_Url_Base {
         wp_register_script( 'jquery-touch-punch', '/wp-includes/js/jquery/jquery.ui.touch-punch.js' ); // @phpcs:ignore
 
         /* intro js */
-        wp_enqueue_script( 'introjs-js', trailingslashit( plugin_dir_url( __FILE__ ) ) . 'intro.min.js', ['jquery'],
+        wp_enqueue_script( 'introjs-js', trailingslashit( plugin_dir_url( __FILE__ ) ) . 'intro.min.js', [ 'jquery' ],
         filemtime( trailingslashit( plugin_dir_path( __FILE__ ) ) .'intro.min.js' ), true );
 
         wp_enqueue_style( 'introjs-css', trailingslashit( plugin_dir_url( __FILE__ ) ) . 'introjs.min.css', [],
@@ -157,66 +154,14 @@ class Zume_App_Portal extends DT_Magic_Url_Base {
 
     }
 
-    public function add_active_reporter_status( array $fields, string $post_type = "" ) {
-        //check if we are dealing with a contact
-        if ( $post_type === "contacts" ) {
-            if ( isset( $fields["overall_status"] ) && !isset( $fields["overall_status"]["default"]["reporting_only"] ) ) {
-                $fields["overall_status"]["default"]["reporting_only"] = __( "Reporting Only", 'zume-public-heatmaps' );
-            }
-            $fields["practitioner"] = [
-                'name' => __( 'Practitioner', 'zume-public-heatmaps' ),
-                'description' => __( "Key stages of engagement to the effort as a practitioner", 'zume-public-heatmaps' ),
-                'type' => 'multi_select',
-                'default' => [
-                    'trained' => [
-                        'label' => __( 'Trained', 'zume-public-heatmaps' ),
-                        'description' => _x( 'Item 1.', 'field description', 'zume-public-heatmaps' ),
-                    ],
-                    'practicing' => [
-                        'label' => __( 'Practicing', 'zume-public-heatmaps' ),
-                        'description' => _x( 'Item 1.', 'field description', 'zume-public-heatmaps' ),
-                    ],
-                    'reporting' => [
-                        'label' => __( 'Reporting', 'zume-public-heatmaps' ),
-                        'description' => _x( 'Item 1.', 'field description', 'zume-public-heatmaps' ),
-                    ],
-                ],
-                "tile" => "details",
-                "in_create_form" => true,
-                'icon' => get_template_directory_uri() . "/dt-assets/images/coach.svg?v=2",
-            ];
-            $fields["practitioner_community_restrictions"] = [
-                'name' => __( 'Community Restrictions', 'zume-public-heatmaps' ),
-                'description' => __( "Restrictions for communication and publicity of information in the community/coalition/network.", 'zume-public-heatmaps' ),
-                'type' => 'multi_select',
-                'default' => [
-                    'no_inquiries' => [
-                        'label' => __( 'No Inquiries', 'zume-public-heatmaps' ),
-                        'description' => _x( 'Do not connect me with other community members or forward inquiries to me.', 'field description', 'zume-public-heatmaps' ),
-                    ],
-                    'no_public_map' => [
-                        'label' => __( 'No Public Map', 'zume-public-heatmaps' ),
-                        'description' => _x( 'Do not add my location to the public map. Internal maps can have my location.', 'field description', 'zume-public-heatmaps' ),
-                    ]
-                ],
-                "tile" => "details",
-                "in_create_form" => true,
-                'icon' => get_template_directory_uri() . "/dt-assets/images/sign-post.svg?v=2",
-            ];
-        }
-        return $fields;
-    }
-
     /**
      * @param $filters
      * @param $post_type
      * @return mixed
      *
-     *
      * @todo not currently working
      */
-    public static function dt_user_list_filters( $filters, $post_type )
-    {
+    public static function dt_user_list_filters( $filters, $post_type ) {
         if ($post_type === 'contacts') {
             $filters["filters"][] = [
                 'ID' => 'active_reporter',
@@ -497,9 +442,12 @@ class Zume_App_Portal extends DT_Magic_Url_Base {
                     <div class="cell"><a href="<?php echo esc_url( site_url() . '/' . $this->parts['root'] . '/' . $this->parts['type'] . '/' . $this->parts['public_key'] . '/map' ) ?>"><h3><i class="fi-map"></i> Map</h3></a></div>
                     <br><br>
                 </div>
+                <div class="center" style="position: absolute; bottom: 10px; width:100%;">
+                    <a href="<?php echo esc_url( site_url() . '/contacts' ) ?>">Login</a>
+                </div>
             </div>
         </div>
-    <?php
+        <?php
     }
 
     /**
@@ -863,6 +811,39 @@ class Zume_App_Portal extends DT_Magic_Url_Base {
         switch ( $action ) {
             case 'get_profile':
                 return $post;
+            case 'update_profile_phone':
+                return $post;
+            case 'update_profile_email':
+                return $post;
+            case 'update_profile_title':
+                return $post;
+            case 'update_profile_location':
+
+                $post_id = $params['data']['post_id'];
+                $location_data = $params['data']['location_data'];
+                $delete = $params['data']['delete'];
+
+                if ( $delete ) {
+                    delete_post_meta( $post_id, 'location_grid' );
+                    delete_post_meta( $post_id, 'location_grid_meta' );
+                    Location_Grid_Meta::delete_location_grid_meta( $post_id, 'all', 0 );
+                }
+
+                $result = DT_Posts::update_post( 'contacts', $post_id, $location_data, false, false );
+
+//                Zume_App_Heatmap::clear_church_grid_totals();
+
+                return $result;
+
+            case 'delete_profile_location':
+                $post_id = $params['data']['post_id'];
+                delete_post_meta( $post_id, 'location_grid' );
+                delete_post_meta( $post_id, 'location_grid_meta' );
+
+//                Zume_App_Heatmap::clear_church_grid_totals();
+
+                return Location_Grid_Meta::delete_location_grid_meta( $post_id, 'all', 0 );
+
             default:
                 return new WP_Error( __METHOD__, "Missing valid action", [ 'status' => 400 ] );
         }
@@ -979,49 +960,5 @@ class Zume_App_Portal extends DT_Magic_Url_Base {
         return $apps_list;
     }
 
-    public function dt_details_additional_tiles( $tiles, $post_type = "" ) {
-        if ( $post_type === $this->post_type && user_can( get_current_user_id(), 'manage_dt') ){
-
-            $tiles["apps"] = [
-                "label" => __( "Apps", 'disciple-tools-contact-portal' ),
-                "description" => "This tile contains magic link apps and survey tools."
-            ];
-        }
-        return $tiles;
-    }
-
-    public function dt_details_additional_section( $section, $post_type ) {
-        // test if campaigns post type and campaigns_app_module enabled
-        if ( $post_type === $this->post_type ) {
-            if ( 'apps' === $section && user_can( get_current_user_id(), 'manage_dt') ) {
-                $record = DT_Posts::get_post( $post_type, get_the_ID() );
-                if ( isset( $record[$this->meta_key] )) {
-                    $key = $record[$this->meta_key];
-                } else {
-                    $key = dt_create_unique_key();
-                    update_post_meta( get_the_ID(), $this->meta_key, $key );
-                }
-                $link = DT_Magic_URL::get_link_url( $this->root, $this->type, $key )
-                ?>
-                <div class="section-subheader">Practitioner Portal</div>
-                <div id="practitioner_portal">
-                    <a class="button small hollow" href="<?php echo esc_html( $link ); ?>" target="_blank">Open Portal</a>
-                    <a class="button small hollow" href="<?php echo esc_html( $link ); ?>" target="_blank">Copy Link</a>
-                    <!--                <a class="button" id="open-portal-activity" style="cursor:pointer;">Open Activity</a>-->
-                </div>
-
-                <script>
-                    jQuery(document).ready(function(){
-                        jQuery('#open-portal-activity').on('click', function(e){
-                            jQuery('#modal-full-title').empty().html(`Portal Activity`)
-                            jQuery('#modal-full-content').empty().html(`content`) // @todo add content logic
-                            jQuery('#modal-full').foundation('open')
-                        })
-                    })
-                </script>
-                <?php
-            }
-        }
-    }
 }
 Zume_App_Portal::instance();

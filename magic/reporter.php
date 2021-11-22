@@ -55,8 +55,7 @@ class Zume_Public_Reporter_Manager extends DT_Magic_Url_Base
     }
 
     public function _wp_enqueue_scripts(){
-        wp_enqueue_script( 'reporter', trailingslashit( plugin_dir_url( __FILE__ ) ) . 'reporter.js', [
-        ], filemtime( plugin_dir_path( __FILE__ ) .'reporter.js' ), true );
+        wp_enqueue_script( 'reporter', trailingslashit( plugin_dir_url( __FILE__ ) ) . 'reporter.js', [], filemtime( plugin_dir_path( __FILE__ ) .'reporter.js' ), true );
     }
 
     public function add_endpoints() {
@@ -145,7 +144,7 @@ class Zume_Public_Reporter_Manager extends DT_Magic_Url_Base
         if ( ! isset( $data['name'], $data['phone'], $data['email'], $data['inquiry_permission'] ) ) {
             return [
                 'status' => 'FAIL',
-                'error' => new WP_Error(__METHOD__, 'Missing parameter',  [ 'status' => 400 ] )
+                'error' => new WP_Error( __METHOD__, 'Missing parameter', [ 'status' => 400 ] )
             ];
         }
 
@@ -188,12 +187,12 @@ class Zume_Public_Reporter_Manager extends DT_Magic_Url_Base
             ],
             "sources" => [
                 "values" => [
-                    [ "value" => 'active_reporter'],  //set a value, the value must be predefined in the field options
+                    [ "value" => 'active_reporter' ],  //set a value, the value must be predefined in the field options
                 ]
             ],
             "tags" => [
                 "values" => [
-                    [ "value" => 'active_reporter'],  //set a value, the value must be predefined in the field options
+                    [ "value" => 'active_reporter' ],  //set a value, the value must be predefined in the field options
                 ]
             ],
             "inquiry_permission" => $data['inquiry_permission'],
@@ -203,7 +202,7 @@ class Zume_Public_Reporter_Manager extends DT_Magic_Url_Base
             $meta_key => $key
         ];
 
-        if ( class_exists('DT_Ipstack_API') && ! empty( DT_Ipstack_API::get_key() ) ) {
+        if ( class_exists( 'DT_Ipstack_API' ) && ! empty( DT_Ipstack_API::get_key() ) ) {
             $ip_result = DT_Ipstack_API::geocode_current_visitor();
             if ( ! empty( $ip_result ) ) {
                 $fields['location_grid_meta'] = [
@@ -242,7 +241,7 @@ class Zume_Public_Reporter_Manager extends DT_Magic_Url_Base
     public function send_reporter_link( $root, $type, $data ) {
         // test if valid email
         if ( ! isset( $data['email'] ) || empty( $data['email'] ) ) {
-            return new WP_Error(__METHOD__, 'email not set', [ 'status' => 400 ] );
+            return new WP_Error( __METHOD__, 'email not set', [ 'status' => 400 ] );
         }
 
         // sanitize
@@ -286,7 +285,7 @@ class Zume_Public_Reporter_Manager extends DT_Magic_Url_Base
         ", $root . '_' . $type . '_magic_key', $email ), ARRAY_A );
 
         // empty or error
-        if ( is_wp_error($record_post_id) && empty( $record_post_id ) ) {
+        if ( is_wp_error( $record_post_id ) && empty( $record_post_id ) ) {
             return false;
         }
         // found 1 match
@@ -295,8 +294,8 @@ class Zume_Public_Reporter_Manager extends DT_Magic_Url_Base
         }
         // found more than 1 match
         else {
-            foreach( $record_post_id as $row ) {
-                if ( in_array( $row['status'], ['active', 'active_reporter'] ) ) {
+            foreach ( $record_post_id as $row ) {
+                if ( in_array( $row['status'], [ 'active', 'active_reporter' ] ) ) {
                     return $row;
                 }
             }

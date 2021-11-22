@@ -94,7 +94,9 @@ class Zume_Public_Heatmaps {
         require_once( 'magic/reporter.php' );
         require_once( 'magic/portal.php' );
 
-        require_once( 'charts/charts-loader.php');
+        require_once( 'magic/custom-fields.php' );
+
+        require_once( 'charts/charts-loader.php' );
 
         if ( is_admin() ) {
             require_once( 'admin/admin-menu-and-tabs.php' ); // adds starter admin page and section for plugin
