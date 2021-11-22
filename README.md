@@ -2,13 +2,11 @@
 
 # Zúme - Public Heatmap
 
-This plugin adds public & private saturation heat maps that map the live activity of the Network Dashboard, Practitioners, Trainings, and new Churches.
-It also adds reporting portal to every contact so that they can self report on their practitioner status and new churches
-started.
+Add public & private saturation heat maps for Activity, Practitioners, Trainings, and new Churches, as well as add a reporting portal to every contact so that they can self report on status and church planting progress.
 
 ## Purpose
 
-Create public maps for key movement targets and offer magic link reporting tool.
+Expand Disciple Tools' ability to communicate progress and collect progress from key contacts.
 
 ## Usage
 

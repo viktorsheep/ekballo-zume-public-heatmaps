@@ -15,7 +15,7 @@
   "license_url": "https://raw.githubusercontent.com/ZumeProject/zume-public-heatmaps/master/LICENSE",
   "readme_url": "https://raw.githubusercontent.com/ZumeProject/zume-public-heatmaps/master/README.md",
   "requires": "4.7",
-  "tested": "5.7",
+  "tested": "5.8",
   "upgrade_notice": "Upgrade to get the latest features.",
   "banners": {
     "low": "https://raw.githubusercontent.com/ZumeProject/zume-public-heatmaps/master/documentation/banner.png",
@@ -23,7 +23,7 @@
   },
   "icon": "https://raw.githubusercontent.com/ZumeProject/zume-public-heatmaps/master/documentation/icon.png",
   "sections": {
-    "description": "Kick start your Disciple.Tools plugin project with this template! This plugin is a collection of our best practices and code bases for creating Disciple.Tools plugins. ",
+    "description": "Add public & private saturation heat maps for Activity, Practitioners, Trainings, and new Churches, as well as add a reporting portal to every contact so that they can self report on status and church planting progress.",
     "installation": "(Required) You must have Disciple.Tools Theme installed before using this plugin. Once Disciple.Tools is installed, you can use the normal Plugin system to install the plugin.",
     "changelog": ""
   }
