@@ -4,29 +4,22 @@
 
 # Zúme - Public Heatmap
 
-Description Description Description Description Description Description Description
-Description Description Description Description Description Description Description
+This plugin adds public & private saturation heat maps that map the live activity of the Network Dashboard, Practitioners, Trainings, and new Churches.
+It also adds reporting portal to every contact so that they can self report on their practitioner status and new churches
+started.
 
 ## Purpose
 
-Purpose purpose purpose purpose purpose purpose purpose purpose purpose purpose purpose
-Purpose purpose purpose purpose purpose purpose purpose purpose purpose purpose purpose
-
-Purpose purpose purpose purpose purpose purpose purpose purpose purpose purpose purpose
-Purpose purpose purpose purpose purpose purpose purpose purpose purpose purpose purpose
+Create public maps for key movement targets and offer magic link reporting tool.
 
 ## Usage
 
 #### Will Do
 
-- Item
-- Item
-- Item
+- The measurement for the saturation statistics is 1 practitioner and 2 churches for every 5,000 in the US and 50k for the world.
+- Adds magic links for public map display
+- Adds a reporting portal that allows a contact to edit the contact's personal details and report churches generationally.
 
-#### Will Not Do
-
-- Item
-- Item
 
 ## Requirements
 
@@ -48,5 +41,13 @@ system for git. For a more details on contribution see the
 
 
 ## Screenshots
-
-![screenshot](documentation/community/starter-banners/banner-blue-green.png)
+Saturation Map Screen
+![screenshot](documentation/map-heat.png)
+Saturation Map - Saturation Measurement Panel
+![screenshot](documentation/map-open-menu.png)
+Report Home (mobile first, magic link)
+![screenshot](documentation/report-home.png)
+Report Menu (mobile first, magic link)
+![screenshot](documentation/report-menu.png)
+Report New Church Editor
+![screenshot](documentation/report-churches.png)
