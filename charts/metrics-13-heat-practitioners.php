@@ -1,13 +1,13 @@
 <?php
 if ( !defined( 'ABSPATH' ) ) { exit; } // Exit if accessed directly.
 
-class Zume_Public_Heatmaps_Metrics_Map_Trainings extends DT_Metrics_Chart_Base
+class Zume_Public_Heatmaps_Metrics_Map_Practitioners extends DT_Metrics_Chart_Base
 {
     public $base_slug = 'zume-public-heatmaps';
     public $base_title = "Public Maps";
 
-    public $title = 'Trainings Saturation Map';
-    public $slug = 'trainings-saturation-map';
+    public $title = 'Practitioner Saturation';
+    public $slug = 'practitioner-saturation-map';
 
     public $permissions = [ 'dt_access_contacts', 'view_project_metrics' ];
     public $magic_link;
@@ -21,12 +21,8 @@ class Zume_Public_Heatmaps_Metrics_Map_Trainings extends DT_Metrics_Chart_Base
     }
 
     public function __construct() {
-        $this->magic_link = site_url() . '/zume_app/heatmap_trainings/';
+        $this->magic_link = site_url() . '/zume_app/heatmap_practitioner/';
         parent::__construct();
-
-        if ( ! class_exists( 'DT_Training' ) ) {
-            return;
-        }
 
         if ( !$this->has_permission() ){
             return;
@@ -72,30 +68,7 @@ class Zume_Public_Heatmaps_Metrics_Map_Trainings extends DT_Metrics_Chart_Base
                       <div id="heatmap"></div>
                     `)
 
-                /**
-                 * use the class .copy_to_clipboard to copy the contents of data-value="" to the clipboard.
-                 */
-                jQuery('.copy_to_clipboard').on('click', function(){
-                    let str = jQuery(this).data('value')
-                    const el = document.createElement('textarea');
-                    el.value = str;
-                    el.setAttribute('readonly', '');
-                    el.style.position = 'absolute';
-                    el.style.left = '-9999px';
-                    document.body.appendChild(el);
-                    const selected =
-                        document.getSelection().rangeCount > 0
-                            ? document.getSelection().getRangeAt(0)
-                            : false;
-                    el.select();
-                    document.execCommand('copy');
-                    document.body.removeChild(el);
-                    if (selected) {
-                        document.getSelection().removeAllRanges();
-                        document.getSelection().addRange(selected);
-                    }
-                    alert('Copied')
-                })
+
 
                 jQuery('#heatmap').html(`<iframe width="100%" height="${window.innerHeight - 190}" src="${jsObject.magic_link}" style="border:0" allowfullscreen=""></iframe>`)
 
@@ -104,4 +77,4 @@ class Zume_Public_Heatmaps_Metrics_Map_Trainings extends DT_Metrics_Chart_Base
         <?php
     }
 }
-Zume_Public_Heatmaps_Metrics_Map_Trainings::instance();
+Zume_Public_Heatmaps_Metrics_Map_Practitioners::instance();

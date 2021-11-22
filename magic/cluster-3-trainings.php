@@ -2,20 +2,20 @@
 if ( !defined( 'ABSPATH' ) ) { exit; } // Exit if accessed directly.
 
 if ( strpos( dt_get_url_path(), 'zume_app' ) !== false || dt_is_rest() ){
-    Zume_Public_Heatmap_100hours_V2::instance();
+    Zume_Public_Heatmaps_Cluster_Trainings::instance();
 }
 
 /**
  * Class Disciple_Tools_Plugin_Starter_Template_Magic_Link
  */
-class Zume_Public_Heatmap_100hours_V2 extends DT_Magic_Url_Base {
+class Zume_Public_Heatmaps_Cluster_Trainings extends DT_Magic_Url_Base {
 
     public $magic = false;
     public $parts = false;
-    public $page_title = 'Last 100 Hours';
+    public $page_title = 'All Time Activity';
     public $root = "zume_app";
-    public $type = 'last100_hours';
-    public $post_type = 'contacts';
+    public $type = 'cluster_trainings';
+    public $post_type = 'activity';
     private $meta_key = '';
 
     private static $_instance = null;
@@ -61,7 +61,7 @@ class Zume_Public_Heatmap_100hours_V2 extends DT_Magic_Url_Base {
         $allowed_js[] = 'jquery-cookie';
         $allowed_js[] = 'mapbox-cookie';
         $allowed_js[] = 'mapbox-gl';
-        $allowed_js[] = 'last100-hours-js';
+        $allowed_js[] = 'cluster-js';
         $allowed_js[] = 'lodash';
         return $allowed_js;
     }
@@ -73,8 +73,8 @@ class Zume_Public_Heatmap_100hours_V2 extends DT_Magic_Url_Base {
 
     public function scripts() {
         wp_enqueue_script( 'lodash' );
-        wp_enqueue_script( 'last100-hours-js', trailingslashit( plugin_dir_url( __FILE__ ) ) . 'cluster-1-last100.js', [ 'jquery' ],
-        filemtime( trailingslashit( plugin_dir_path( __FILE__ ) ) .'cluster-1-last100.js' ), true );
+        wp_enqueue_script( 'cluster-js', trailingslashit( plugin_dir_url( __FILE__ ) ) . 'cluster.js', [ 'jquery' ],
+            filemtime( trailingslashit( plugin_dir_path( __FILE__ ) ) .'cluster.js' ), true );
     }
 
     /**
@@ -166,12 +166,101 @@ class Zume_Public_Heatmap_100hours_V2 extends DT_Magic_Url_Base {
 
         switch ( $action ) {
             case 'load_geojson':
-                return Zume_App_Heatmap::get_activity_geojson();
+                return self::geojson();
+            case 'load_empty_geojson':
+                return self::geojson( true );
             case 'activity_list':
-                return Zume_App_Heatmap::get_activity_list( $params['data'], true );
+                return self::activity( $params['data'] );
             default:
                 return new WP_Error( __METHOD__, "Missing valid action", [ 'status' => 400 ] );
         }
+    }
+
+    public function geojson( $empty = false ){
+        $flat_grid = Zume_App_Heatmap::query_saturation_list_full();
+        $grid_totals = Zume_App_Heatmap::query_training_grid_totals();
+
+        foreach ( $flat_grid as $i => $v ){
+            $properties = [
+                'grid_id' => $i,
+                'reported' => 0,
+            ];
+
+            if ( isset( $grid_totals[$v['grid_id']] ) && ! empty( $grid_totals[$v['grid_id']] ) ){
+                $properties['reported'] = $grid_totals[$v['grid_id']];
+            }
+
+            $lng = round( $v['longitude'], 2 );
+            $lat = round( $v['latitude'], 2 );
+
+            if ( $empty && 0 === $properties['reported'] ) { // true && report is 0, then
+                $features[] = array(
+                    'type' => 'Feature',
+                    'id' => $i,
+                    'geometry' => array(
+                        'type' => 'Point',
+                        'coordinates' => array(
+                            $lng,
+                            $lat,
+                            1
+                        ),
+                    ),
+                );
+            }
+
+            else if ( ! $empty && $properties['reported'] ) { // neg false && report positive
+                $features[] = array(
+                    'type' => 'Feature',
+                    'id' => $i,
+                    'geometry' => array(
+                        'type' => 'Point',
+                        'coordinates' => array(
+                            $lng,
+                            $lat,
+                            1
+                        ),
+                    ),
+                );
+            }
+        }
+
+        $new_data = array(
+            'type' => 'FeatureCollection',
+            'features' => $features,
+        );
+
+        return $new_data;
+    }
+
+    public function activity( $filters ){
+        $flat_grid = Zume_App_Heatmap::query_saturation_list_with_filters( $filters );
+        $grid_totals = Zume_App_Heatmap::query_training_grid_totals();
+
+        $list = [];
+        $empty = 0;
+        foreach ( $flat_grid as $i => $v ){
+            if ( isset( $grid_totals[$v['grid_id']] ) && ! empty( $grid_totals[$v['grid_id']] ) ){
+                $list[] =  $v['full_name'] . ' (' . $grid_totals[$v['grid_id']] . ')';
+            }
+            else {
+                $empty++;
+            }
+        }
+
+        if ( empty( $list ) ) {
+            return [
+                'list' => [],
+                'count' => 0,
+                'empty_count' => ( ! empty( $flat_grid ) ) ? count( $flat_grid ) : 0
+            ];
+        }
+
+        $c = array_chunk( $list, 250 );
+        return [
+            'list' => $c[0] ?? $list,
+            'count' => count( $list ),
+            'empty_count' => $empty
+        ];
     }
 
 }

@@ -6,7 +6,7 @@ class Zume_Public_Heatmaps_Metrics_Map_Activity extends DT_Metrics_Chart_Base
     public $base_slug = 'zume-public-heatmaps';
     public $base_title = "Public Maps";
 
-    public $title = 'Activity Saturation Map';
+    public $title = 'Activity Saturation';
     public $slug = 'activity-saturation-map';
 
     public $permissions = [ 'dt_access_contacts', 'view_project_metrics' ];
@@ -68,30 +68,7 @@ class Zume_Public_Heatmaps_Metrics_Map_Activity extends DT_Metrics_Chart_Base
                       <div id="heatmap"></div>
                     `)
 
-                /**
-                 * use the class .copy_to_clipboard to copy the contents of data-value="" to the clipboard.
-                 */
-                jQuery('.copy_to_clipboard').on('click', function(){
-                    let str = jQuery(this).data('value')
-                    const el = document.createElement('textarea');
-                    el.value = str;
-                    el.setAttribute('readonly', '');
-                    el.style.position = 'absolute';
-                    el.style.left = '-9999px';
-                    document.body.appendChild(el);
-                    const selected =
-                        document.getSelection().rangeCount > 0
-                            ? document.getSelection().getRangeAt(0)
-                            : false;
-                    el.select();
-                    document.execCommand('copy');
-                    document.body.removeChild(el);
-                    if (selected) {
-                        document.getSelection().removeAllRanges();
-                        document.getSelection().addRange(selected);
-                    }
-                    alert('Copied')
-                })
+
 
                 jQuery('#heatmap').html(`<iframe width="100%" height="${window.innerHeight - 190}" src="${jsObject.magic_link}" style="border:0" allowfullscreen=""></iframe>`)
 
