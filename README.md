@@ -1,5 +1,3 @@
-[![Build Status](https://travis-ci.com/ZumeProject/zume-public-heatmaps.svg?branch=master)](https://travis-ci.com/ZumeProject/zume-public-heatmaps)
-
 ![Plugin Banner](https://raw.githubusercontent.com/ZumeProject/zume-public-heatmaps/master/documentation/banner.png)
 
 # Zúme - Public Heatmap
