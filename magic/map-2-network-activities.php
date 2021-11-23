@@ -91,10 +91,10 @@ class Zume_Public_Heatmap_Activity extends DT_Magic_Url_Base
                 'post_type' => $this->post_type,
                 'trans' => [
                     'add' => __( 'Zume', 'disciple_tools' ),
+                    'title' => 'Activities',
                 ],
                 'grid_data' => ['data' => [], 'highest_value' => 1 ],
                 'custom_marks' => [],
-                'title' => $this->page_title,
                 'zoom' => 8
             ]) ?>][0]
 

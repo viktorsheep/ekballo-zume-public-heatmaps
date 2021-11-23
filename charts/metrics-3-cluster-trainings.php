@@ -6,7 +6,7 @@ class Zume_Public_Heatmaps_Metrics_Cluster_Trainings extends DT_Metrics_Chart_Ba
     public $base_slug = 'zume-public-heatmaps';
     public $base_title = "Public Maps";
 
-    public $title = 'Trainings';
+    public $title = 'Trainings Cluster';
     public $slug = 'cluster-trainings';
 
     public $permissions = [ 'dt_access_contacts', 'view_project_metrics' ];

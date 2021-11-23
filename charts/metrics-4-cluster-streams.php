@@ -6,7 +6,7 @@ class Zume_Public_Heatmaps_Metrics_Cluster_Streams extends DT_Metrics_Chart_Base
     public $base_slug = 'zume-public-heatmaps';
     public $base_title = "Public Maps";
 
-    public $title = 'Streams/Hubs';
+    public $title = 'Streams Cluster';
     public $slug = 'cluster-streams';
 
     public $permissions = [ 'dt_access_contacts', 'view_project_metrics' ];
@@ -21,7 +21,7 @@ class Zume_Public_Heatmaps_Metrics_Cluster_Streams extends DT_Metrics_Chart_Base
     }
 
     public function __construct() {
-        $this->magic_link = site_url() . '/zume_app/cluster_activity/';
+        $this->magic_link = site_url() . '/zume_app/cluster_streams/';
         parent::__construct();
 
         if ( !$this->has_permission() ){

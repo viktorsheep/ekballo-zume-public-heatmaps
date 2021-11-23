@@ -77,7 +77,7 @@ jQuery(document).ready(function(){
         <div class="medium-9 cell">
             <div id="map-wrapper">
                 <div id='map'></div>
-                <div id="map-header"><h3>All Time Activity</h3></div>
+                <div id="map-header"><h3>${jsObject.trans.map_title}</h3></div>
                 <div id="map-spinner" class="loading-spinner-map-center active"></div>
             </div>
         </div>
@@ -222,7 +222,7 @@ jQuery(document).ready(function(){
       source: 'layer-empty-item',
       filter: ['has', 'point_count'],
       layout: {
-        'text-field': '{point_count_abbreviated}',
+        'text-field': '',
         'text-font': ['DIN Offc Pro Medium', 'Arial Unicode MS Bold'],
         'text-size': 12
       }
@@ -251,7 +251,7 @@ jQuery(document).ready(function(){
         "use strict";
         window.activity_geojson = data
 
-        var mapSource= map.getSource('layer-source-contacts');
+        var mapSource = map.getSource('layer-source-contacts');
         if( typeof mapSource !== 'undefined') {
           map.getSource('layer-source-contacts').setData(window.activity_geojson);
         }

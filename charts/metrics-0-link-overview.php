@@ -81,7 +81,7 @@ class Zume_Public_Heatmaps_Metrics_Overview extends DT_Metrics_Chart_Base
                             <h2>Cluster/Activity Maps</h2>
                             <div class="grid-x" data-equalizer data-equalize-on="medium">
                                 <div class="cell medium-3">
-                                    <div class="card" style="width: 300px; float:left;margin:10px;" data-equalizer-watch>
+                                    <div class="card" style="width: 300px; float:left;margin:10px; cursor: pointer;" data-equalizer-watch onclick="window.location = 'https://global.zume.community/metrics/zume-public-heatmaps/last100-hours-activity'">
                                       <div class="card-divider">
                                         Last 100 Hours
                                       </div>
@@ -93,7 +93,7 @@ class Zume_Public_Heatmaps_Metrics_Overview extends DT_Metrics_Chart_Base
                                     </div>
                                 </div>
                                 <div class="cell medium-3">
-                                    <div class="card" style="width: 300px; float:left;margin:10px;" data-equalizer-watch>
+                                    <div class="card" style="width: 300px; float:left;margin:10px; cursor: pointer;" data-equalizer-watch  onclick="window.location = 'https://global.zume.community/metrics/zume-public-heatmaps/cluster-activity'">
                                       <div class="card-divider">
                                         Activity
                                       </div>
@@ -105,7 +105,7 @@ class Zume_Public_Heatmaps_Metrics_Overview extends DT_Metrics_Chart_Base
                                     </div>
                                 </div>
                                 <div class="cell medium-3">
-                                    <div class="card" style="width: 300px; float:left;margin:10px;" data-equalizer-watch>
+                                    <div class="card" style="width: 300px; float:left;margin:10px; cursor: pointer;" data-equalizer-watch  onclick="window.location = 'https://global.zume.community/metrics/zume-public-heatmaps/cluster-trainings'">
                                       <div class="card-divider">
                                         Trainings
                                       </div>
@@ -117,7 +117,7 @@ class Zume_Public_Heatmaps_Metrics_Overview extends DT_Metrics_Chart_Base
                                     </div>
                                 </div>
                                 <div class="cell medium-3">
-                                    <div class="card" style="width: 300px; float:left;margin:10px;" data-equalizer-watch>
+                                    <div class="card" style="width: 300px; float:left;margin:10px; cursor: pointer;" data-equalizer-watch  onclick="window.location = 'https://global.zume.community/metrics/zume-public-heatmaps/cluster-streams'">
                                       <div class="card-divider">
                                         Streams/Hubs
                                       </div>
@@ -134,7 +134,7 @@ class Zume_Public_Heatmaps_Metrics_Overview extends DT_Metrics_Chart_Base
                             <h2>Saturation Maps</h2>
                             <div class="grid-x" data-equalizer data-equalize-on="medium">
                                 <div class="cell medium-3">
-                                    <div class="card" style="width: 300px; float:left;margin:10px;" data-equalizer-watch>
+                                    <div class="card" style="width: 300px; float:left;margin:10px; cursor: pointer;" data-equalizer-watch   onclick="window.location = 'https://global.zume.community/metrics/zume-public-heatmaps/activity-saturation-map'">
                                       <div class="card-divider">
                                         Activity Saturation
                                       </div>
@@ -146,7 +146,7 @@ class Zume_Public_Heatmaps_Metrics_Overview extends DT_Metrics_Chart_Base
                                     </div>
                                 </div>
                                 <div class="cell medium-3">
-                                    <div class="card" style="width: 300px; float:left;margin:10px;" data-equalizer-watch>
+                                    <div class="card" style="width: 300px; float:left;margin:10px; cursor: pointer;" data-equalizer-watch   onclick="window.location = 'https://global.zume.community/metrics/zume-public-heatmaps/practitioner-saturation-map'">
                                       <div class="card-divider">
                                         Practitioner Saturation
                                       </div>
@@ -158,7 +158,7 @@ class Zume_Public_Heatmaps_Metrics_Overview extends DT_Metrics_Chart_Base
                                     </div>
                                 </div>
                                 <div class="cell medium-3">
-                                    <div class="card" style="width: 300px; float:left;margin:10px;" data-equalizer-watch>
+                                    <div class="card" style="width: 300px; float:left;margin:10px; cursor: pointer;" data-equalizer-watch   onclick="window.location = 'https://global.zume.community/metrics/zume-public-heatmaps/churches-saturation-map'">
                                       <div class="card-divider">
                                         Churches Saturation
                                       </div>

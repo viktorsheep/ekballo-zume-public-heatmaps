@@ -6,7 +6,7 @@ class Zume_Public_Heatmaps_Metrics_Cluster_Activity extends DT_Metrics_Chart_Bas
     public $base_slug = 'zume-public-heatmaps';
     public $base_title = "Public Maps";
 
-    public $title = 'All Time Activity';
+    public $title = 'All Time Activity Cluster';
     public $slug = 'cluster-activity';
 
     public $permissions = [ 'dt_access_contacts', 'view_project_metrics' ];

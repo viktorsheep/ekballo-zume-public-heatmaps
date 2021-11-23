@@ -93,6 +93,7 @@ class Zume_Public_Heatmaps {
         require_once( 'magic/cluster-1-last100.php' );
         require_once( 'magic/cluster-2-all-time-activity.php' );
         require_once( 'magic/cluster-3-trainings.php' );
+        require_once( 'magic/cluster-4-streams.php' );
 
         require_once( 'magic/reporter.php' );
         require_once( 'magic/portal.php' );

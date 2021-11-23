@@ -90,11 +90,11 @@ class Zume_Public_Heatmap_Practitioner extends DT_Magic_Url_Base
                 'parts' => $this->parts,
                 'post_type' => $this->post_type,
                 'trans' => [
-                    'add' => __( 'Zume', 'disciple_tools' ),
+                    'add' => __( 'Zúme', 'disciple_tools' ),
+                    'title' => 'Practitioner'
                 ],
                 'grid_data' => ['data' => [], 'highest_value' => 1 ],
                 'custom_marks' => [],
-                'title' => $this->page_title,
                 'zoom' => 8
             ]) ?>][0]
 
