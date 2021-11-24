@@ -199,9 +199,6 @@ class Zume_Public_Heatmaps_Cluster_Activity extends DT_Magic_Url_Base {
             if ( $empty && 0 === $properties['reported'] ) { // true && report is 0, then
                 $features[] = array(
                     'type' => 'Feature',
-//                    'properties' => [
-//                        'id' => $i
-//                    ],
                     'id' => $i,
                     'geometry' => array(
                         'type' => 'Point',
@@ -217,9 +214,6 @@ class Zume_Public_Heatmaps_Cluster_Activity extends DT_Magic_Url_Base {
             else if ( ! $empty && $properties['reported'] ) { // neg false && report positive
                 $features[] = array(
                     'type' => 'Feature',
-//                    'properties' => [
-//                        'grid_id' => $i
-//                    ],
                     'id' => $i,
                     'geometry' => array(
                         'type' => 'Point',

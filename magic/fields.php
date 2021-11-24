@@ -41,25 +41,25 @@ class Zume_Public_Map_Fields {
 
             if ( isset( $fields["milestones"] ) && !isset( $fields["milestones"]["default"]["milestones_trained"] ) ) {
                 $fields["milestones"]["default"]["milestones_trained"] = [
-                    "label" => __( "Trained", 'zume-public-heatmaps' ),
+                    "label" => __( "DMM Trained", 'zume-public-heatmaps' ),
                     "description" => 'This is a DMM trained person. This milestone contributes to the Zúme public mapping system.',
                     "icon" => get_template_directory_uri() . "/dt-assets/images/coach.svg?v=2",
                 ];
             }
             if ( isset( $fields["milestones"] ) && !isset( $fields["milestones"]["default"]["milestones_practicing"] ) ) {
                 $fields["milestones"]["default"]["milestones_practicing"] = [
-                    "label" => __( "Practicing", 'zume-public-heatmaps' ),
+                    "label" => __( "DMM Practicing", 'zume-public-heatmaps' ),
                     "description" => 'This is a DMM practitioner. This milestone contributes to the Zúme public mapping system.',
                     "icon" => get_template_directory_uri() . "/dt-assets/images/group-peer.svg?v=2",
                 ];
             }
-            if ( isset( $fields["milestones"] ) && !isset( $fields["milestones"]["default"]["milestones_reporting"] ) ) {
-                $fields["milestones"]["default"]["milestones_reporting"] = [
-                    "label" => __( "Reporting", 'zume-public-heatmaps' ),
-                    "description" => 'This is a DMM reporting person. This milestone contributes to the Zúme public mapping system.',
-                    "icon" => get_template_directory_uri() . "/dt-assets/images/socialmedia.svg?v=2",
-                ];
-            }
+//            if ( isset( $fields["milestones"] ) && !isset( $fields["milestones"]["default"]["milestones_reporting"] ) ) {
+//                $fields["milestones"]["default"]["milestones_reporting"] = [
+//                    "label" => __( "Reporting", 'zume-public-heatmaps' ),
+//                    "description" => 'This is a DMM reporting person. This milestone contributes to the Zúme public mapping system.',
+//                    "icon" => get_template_directory_uri() . "/dt-assets/images/socialmedia.svg?v=2",
+//                ];
+//            }
             $fields["practitioner_community_name"] = [
                 'name' => __( 'Community Name', 'zume-public-heatmaps' ),
                 'description' => __( "Name for sharing in the community.", 'zume-public-heatmaps' ),

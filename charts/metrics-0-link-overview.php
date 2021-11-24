@@ -44,6 +44,7 @@ class Zume_Public_Heatmaps_Metrics_Overview extends DT_Metrics_Chart_Base
             'nonce' => wp_create_nonce( 'wp_rest' ),
             'current_user_login' => wp_get_current_user()->user_login,
             'current_user_id' => get_current_user_id(),
+            'site_url' => site_url(),
             'translations' => [
                 "title" => $this->title,
                 "copy" => __( "Copy Public URL", 'zume-public-heatmap' )
@@ -79,52 +80,48 @@ class Zume_Public_Heatmaps_Metrics_Overview extends DT_Metrics_Chart_Base
                         </div>
                         <div class="cell">
                             <h2>Cluster/Activity Maps</h2>
-                            <div class="grid-x" data-equalizer data-equalize-on="medium">
+                            <div class="grid-x grid-padding-x" data-equalizer data-equalize-on="medium">
                                 <div class="cell medium-3">
-                                    <div class="card" style="width: 300px; float:left;margin:10px; cursor: pointer;" data-equalizer-watch onclick="window.location = 'https://global.zume.community/metrics/zume-public-heatmaps/last100-hours-activity'">
+                                    <div class="card" style="cursor: pointer;" data-equalizer-watch onclick="window.location = '${jsObject.site_url}/metrics/zume-public-heatmaps/last100-hours-activity'">
                                       <div class="card-divider">
                                         Last 100 Hours
                                       </div>
                                     <div class="cluster-block"></div>
                                       <div class="card-section">
-                                        <h4>This is a card.</h4>
-                                        <p>It has an easy to override visual style, and is appropriately subdued.</p>
+                                        <p>Shows the last 100 hours of activity aggregated into the Network Dashboard. Inclused anonymization techniques.</p>
                                       </div>
                                     </div>
                                 </div>
                                 <div class="cell medium-3">
-                                    <div class="card" style="width: 300px; float:left;margin:10px; cursor: pointer;" data-equalizer-watch  onclick="window.location = 'https://global.zume.community/metrics/zume-public-heatmaps/cluster-activity'">
+                                    <div class="card" style="cursor: pointer;" data-equalizer-watch  onclick="window.location = '${jsObject.site_url}/metrics/zume-public-heatmaps/cluster-activity'">
                                       <div class="card-divider">
-                                        Activity
+                                        All Time Activity Cluster
                                       </div>
                                     <div class="cluster-block"></div>
                                       <div class="card-section">
-                                        <h4>This is a card.</h4>
-                                        <p>It has an easy to override visual style, and is appropriately subdued.</p>
+                                        <p>Shows active and inactive locations for the entire history of tracking in the Network Dashboard..</p>
                                       </div>
                                     </div>
                                 </div>
                                 <div class="cell medium-3">
-                                    <div class="card" style="width: 300px; float:left;margin:10px; cursor: pointer;" data-equalizer-watch  onclick="window.location = 'https://global.zume.community/metrics/zume-public-heatmaps/cluster-trainings'">
+                                    <div class="card" style="cursor: pointer;" data-equalizer-watch  onclick="window.location = '${jsObject.site_url}/metrics/zume-public-heatmaps/cluster-trainings'">
                                       <div class="card-divider">
-                                        Trainings
+                                        Trainings Cluster
                                       </div>
                                     <div class="cluster-block"></div>
                                       <div class="card-section">
-                                        <h4>This is a card.</h4>
-                                        <p>It has an easy to override visual style, and is appropriately subdued.</p>
+                                        <p>Shows locations where trainings have happened and where they have not happened.</p>
                                       </div>
                                     </div>
                                 </div>
                                 <div class="cell medium-3">
-                                    <div class="card" style="width: 300px; float:left;margin:10px; cursor: pointer;" data-equalizer-watch  onclick="window.location = 'https://global.zume.community/metrics/zume-public-heatmaps/cluster-streams'">
+                                    <div class="card" style=" cursor: pointer;" data-equalizer-watch  onclick="window.location = '${jsObject.site_url}/metrics/zume-public-heatmaps/cluster-streams'">
                                       <div class="card-divider">
-                                        Streams/Hubs
+                                        Streams Cluster
                                       </div>
                                     <div class="cluster-block"></div>
                                       <div class="card-section">
-                                        <h4>This is a card.</h4>
-                                        <p>It has an easy to override visual style, and is appropriately subdued.</p>
+                                        <p>Shows locations where streams are active and where they have not active.</p>
                                       </div>
                                     </div>
                                 </div>
@@ -134,31 +131,29 @@ class Zume_Public_Heatmaps_Metrics_Overview extends DT_Metrics_Chart_Base
                             <h2>Saturation Maps</h2>
                             <div class="grid-x" data-equalizer data-equalize-on="medium">
                                 <div class="cell medium-3">
-                                    <div class="card" style="width: 300px; float:left;margin:10px; cursor: pointer;" data-equalizer-watch   onclick="window.location = 'https://global.zume.community/metrics/zume-public-heatmaps/activity-saturation-map'">
+                                    <div class="card" style="width: 300px; float:left;margin:10px; cursor: pointer;" data-equalizer-watch  onclick="window.location = '${jsObject.site_url}/metrics/zume-public-heatmaps/activity-saturation-map'">
                                       <div class="card-divider">
                                         Activity Saturation
                                       </div>
                                     <div class="heat-block"></div>
                                       <div class="card-section">
-                                        <h4>This is a card.</h4>
-                                        <p>It has an easy to override visual style, and is appropriately subdued.</p>
+                                        <p>All movement activity tracked according to the global grid.</p>
                                       </div>
                                     </div>
                                 </div>
                                 <div class="cell medium-3">
-                                    <div class="card" style="width: 300px; float:left;margin:10px; cursor: pointer;" data-equalizer-watch   onclick="window.location = 'https://global.zume.community/metrics/zume-public-heatmaps/practitioner-saturation-map'">
+                                    <div class="card" style="width: 300px; float:left;margin:10px; cursor: pointer;" data-equalizer-watch   onclick="window.location = '${jsObject.site_url}/metrics/zume-public-heatmaps/practitioner-saturation-map'">
                                       <div class="card-divider">
                                         Practitioner Saturation
                                       </div>
                                     <div class="heat-block"></div>
                                       <div class="card-section">
-                                        <h4>This is a card.</h4>
-                                        <p>It has an easy to override visual style, and is appropriately subdued.</p>
+                                        <p>Tracks practitioners according to </p>
                                       </div>
                                     </div>
                                 </div>
                                 <div class="cell medium-3">
-                                    <div class="card" style="width: 300px; float:left;margin:10px; cursor: pointer;" data-equalizer-watch   onclick="window.location = 'https://global.zume.community/metrics/zume-public-heatmaps/churches-saturation-map'">
+                                    <div class="card" style="width: 300px; float:left;margin:10px; cursor: pointer;" data-equalizer-watch   onclick="window.location = '${jsObject.site_url}/metrics/zume-public-heatmaps/churches-saturation-map'">
                                       <div class="card-divider">
                                         Churches Saturation
                                       </div>

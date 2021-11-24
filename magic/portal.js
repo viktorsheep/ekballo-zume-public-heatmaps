@@ -24,7 +24,7 @@ window.post_item = ( action, data ) => {
     data: JSON.stringify({ action: action, parts: jsObject.parts, data: data }),
     contentType: "application/json; charset=utf-8",
     dataType: "json",
-    url: jsObject.root + jsObject.parts.root + '/v1/' + jsObject.parts.type + '_update',
+    url: jsObject.root + jsObject.parts.root + '/v1/' + jsObject.parts.type,
     beforeSend: function (xhr) {
       xhr.setRequestHeader('X-WP-Nonce', jsObject.nonce )
     }
@@ -42,7 +42,7 @@ window.load_tree = () => {
     data: JSON.stringify({ action: 'POST', parts: jsObject.parts }),
     contentType: "application/json; charset=utf-8",
     dataType: "json",
-    url: jsObject.root + jsObject.parts.root + '/v1/' + jsObject.parts.type + '_list',
+    url: jsObject.root + jsObject.parts.root + '/v1/' + jsObject.parts.type,
     beforeSend: function (xhr) {
       xhr.setRequestHeader('X-WP-Nonce', jsObject.nonce )
     }
@@ -558,7 +558,7 @@ window.load_mapbox = (lng,lat, post_id, post_type = 'groups' ) => {
     types: 'country region district locality neighborhood address place',
     mapboxgl: mapboxgl
   });
-  map.addControl(geocoder);
+  map.addControl(geocoder, 'top-left' );
   geocoder.on('result', function(e) { // respond to search
     console.log(e)
     if ( window.active_marker ) {
@@ -603,7 +603,7 @@ window.load_mapbox = (lng,lat, post_id, post_type = 'groups' ) => {
     trackUserLocation: false,
     showUserLocation: false
   })
-  map.addControl(userGeocode);
+  map.addControl(userGeocode, 'top-left' );
   userGeocode.on('geolocate', function(e) { // respond to search
     console.log(e)
     if ( window.active_marker ) {
@@ -637,9 +637,10 @@ window.load_mapbox = (lng,lat, post_id, post_type = 'groups' ) => {
     save_new_location( post_id, post_type )
   })
 
-  map.dragRotate.disable();
+  let navControl = new mapboxgl.NavigationControl();
+  map.addControl( navControl, 'top-left' );
   map.touchZoomRotate.disableRotation();
-  map.addControl(new mapboxgl.NavigationControl());
+  map.dragRotate.disable();
 
 }
 
@@ -932,8 +933,15 @@ window.load_create_mapbox = () => {
 
 }
 
-/**
+
+
+
+
+
+/***********************************************************************
+ *
  * Profile Section
+ *
  */
 window.load_profile = () => {
   jQuery.ajax({
@@ -941,7 +949,7 @@ window.load_profile = () => {
     data: JSON.stringify({ action: 'get_profile', parts: jsObject.parts }),
     contentType: "application/json; charset=utf-8",
     dataType: "json",
-    url: jsObject.root + jsObject.parts.root + '/v1/' + jsObject.parts.type + '_profile',
+    url: jsObject.root + jsObject.parts.root + '/v1/' + jsObject.parts.type,
     beforeSend: function (xhr) {
       xhr.setRequestHeader('X-WP-Nonce', jsObject.nonce )
     }
@@ -964,7 +972,7 @@ window.post_profile = ( action, data ) => {
     data: JSON.stringify({ action: action, parts: jsObject.parts, data: data }),
     contentType: "application/json; charset=utf-8",
     dataType: "json",
-    url: jsObject.root + jsObject.parts.root + '/v1/' + jsObject.parts.type + '_profile',
+    url: jsObject.root + jsObject.parts.root + '/v1/' + jsObject.parts.type,
     beforeSend: function (xhr) {
       xhr.setRequestHeader('X-WP-Nonce', jsObject.nonce )
     }
@@ -1001,52 +1009,11 @@ window.write_profile = ( data ) => {
     <div class="callout">
       <div class="grid-x">
         <div class="cell">
-            <h2>Community profile</h2>
-        </div>
-        <div class="cell">
-          <label>I have had multiplicative training.</label>
-          <div class="switch large">
-            <input class="switch-input" id="has-training" type="checkbox" name="Has Training">
-            <label class="switch-paddle" for="has-training">
-              <span class="show-for-sr">Do you like me?</span>
-              <span class="switch-active" aria-hidden="true">Yes</span>
-              <span class="switch-inactive" aria-hidden="true">No</span>
-            </label>
-          </div>
-        </div>
-        <div class="cell">
-          <label>I am actively seeking movement.</label>
-          <div class="switch large">
-            <input class="switch-input" id="is-seeking-movement" type="checkbox" name="exampleSwitch">
-            <label class="switch-paddle" for="is-seeking-movement">
-              <span class="show-for-sr">Do you like me?</span>
-              <span class="switch-active" aria-hidden="true">Yes</span>
-              <span class="switch-inactive" aria-hidden="true">No</span>
-            </label>
-          </div>
-        </div>
-        <div class="cell">
-            <label>Connect me with others in my area or interested in our local work.</label>
-           <div class="switch large">
-            <input class="switch-input" id="connect-with-others" type="checkbox" name="exampleSwitch">
-            <label class="switch-paddle" for="connect-with-others">
-              <span class="show-for-sr">Hide on public map?</span>
-              <span class="switch-active" aria-hidden="true">Yes</span>
-              <span class="switch-inactive" aria-hidden="true">No</span>
-            </label>
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <div class="callout">
-      <div class="grid-x">
-        <div class="cell">
-            <h2>Personal information</h2>
+            <h2>Practitioner Profile</h2>
         </div>
         <div class="cell">
             <div class="section-subheader">
-               Community Profile Name
+               Community Name
             </div>
             <div class="input-group">
                 <input type="text" placeholder="Name" id="title" data-key="${title}" value="${title}" class="dt-communication-channel input-group-field title" />
@@ -1055,13 +1022,16 @@ window.write_profile = ( data ) => {
                 </div>
             </div>
         </div>
+        <div class="cell">
+            <div class="section-subheader">
+               Milestones
+            </div>
+            <div class="small button-group" id="milestone_wrapper" style="display: inline-block"></div>
+        </div>
         <!-- Email -->
         <div class="cell">
             <div class="section-subheader">
                 Email
-                <button data-list-class="contact_email" class="add-button" type="button">
-                    <img src="/wp-content/themes/disciple-tools-theme/dt-assets/images/small-add.svg">
-                </button>
             </div>
             <div id="email-container"></div>
         </div>
@@ -1069,9 +1039,6 @@ window.write_profile = ( data ) => {
         <div class="cell">
             <div class="section-subheader">
                 Phone
-                  <button data-list-class="contact_phone" class="add-button" type="button">
-                      <img src="/wp-content/themes/disciple-tools-theme/dt-assets/images/small-add.svg">
-                  </button>
             </div>
             <div id="phone-container"></div>
         </div>
@@ -1091,45 +1058,100 @@ window.write_profile = ( data ) => {
       </div>
     </div>
 
+    <div class="callout">
+      <div class="grid-x">
+        <div class="cell">
+            <h2>Community Visibility</h2>
+        </div>
+        <div class="cell">
+            <label>Connect me with others in my area or interested in our local work.</label>
+           <div class="switch large">
+            <input class="switch-input" id="connect-with-others" type="checkbox" name="exampleSwitch">
+            <label class="switch-paddle" for="connect-with-others">
+              <span class="show-for-sr">Hide on public map?</span>
+              <span class="switch-active" aria-hidden="true">Yes</span>
+              <span class="switch-inactive" aria-hidden="true">No</span>
+            </label>
+          </div>
+        </div>
+      </div>
+    </div>
    `)
 
   window.load_mapbox( location.lng, location.lat, data.ID, 'contacts' )
 
   // add fields
+  if ( typeof jsObject.post_fields.milestones !== 'undefined' ){
+    let m_wrapper = jQuery('#milestone_wrapper')
+    let m_class = ''
+    jQuery.each(jsObject.post_fields.milestones.default, function(i,v){
+      m_class = 'empty-select-button'
+      if ( typeof data.milestones !== 'undefined' && findValueInArray(i,data.milestones) ){
+        m_class = 'selected-select-button'
+      }
+      m_wrapper.append(`
+        <button id="${i}" type="button" data-field-key="milestones" data-option-key="${i}" class="dt_multi_select ${m_class} select-button button">
+          <img class="dt-icon" src="${v.icon}">
+            ${v.label}
+        </button>
+      `)
+    })
+  }
 
-  if ( typeof data.contact_email !== 'undefined' ){
-    let email_container = jQuery('#email-container')
-    jQuery.each( data.contact_email, function(i,v) {
-      email_container.append(`
-        <div class="input-group">
-            <input id="${v.key}" type="text" data-field="contact_email" value="${v.value}" class="dt-communication-channel input-group-field email" dir="auto">
-            <div class="input-group-button">
-                <button class="button alert input-height delete-button-style channel-delete-button delete-button" data-field="contact_email" data-key="${v.key}" value="${v.value}">×</button>
-                <div class="wrapper-field-spinner"><span class="loading-field-spinner email"></span></div>
-            </div>
-        </div>
-      `)
-    })
-  }
+  let phone_container = jQuery('#phone-container')
+  let phone_value = ''
   if ( typeof data.contact_phone !== 'undefined' ){
-    let phone_container = jQuery('#phone-container')
-    jQuery.each( data.contact_phone, function(i,v) {
-      phone_container.append(`
-        <div class="input-group">
-            <input id="${v.key}" type="text" data-field="contact_phone" value="${v.value}" class="dt-communication-channel input-group-field phone" dir="auto">
-            <div class="input-group-button">
-                <button class="button alert input-height delete-button-style channel-delete-button delete-button" data-field="contact_phone" data-key="${v.key}" value="${v.value}">×</button>
-                <div class="wrapper-field-spinner"><span class="loading-field-spinner phone"></span></div>
-            </div>
-        </div>
-      `)
-    })
+    phone_value = data.contact_phone[0].value
   }
+  phone_container.append(`
+    <div class="input-group">
+        <input id="" type="text" data-field="contact_phone" value="${phone_value}" class="dt-communication-channel input-group-field phone" dir="auto">
+        <div class="input-group-button">
+            <div class="wrapper-field-spinner"><span class="loading-field-spinner phone"></span></div>
+        </div>
+    </div>
+  `)
+
+  let email_container = jQuery('#email-container')
+  let email_value = ''
+  if ( typeof data.contact_email !== 'undefined' ){
+    email_value = data.contact_email[0].value
+  }
+  email_container.append(`
+    <div class="input-group">
+        <input id="" type="text" data-field="contact_phone" value="${email_value}" class="dt-communication-channel input-group-field email" dir="auto">
+        <div class="input-group-button">
+            <div class="wrapper-field-spinner"><span class="loading-field-spinner email"></span></div>
+        </div>
+    </div>
+  `)
 
 
   jQuery('.dt-communication-channel.input-group-field.title').on('change', function(e){
     jQuery('.loading-field-spinner.title').addClass('active')
     window.post_profile('update_profile_title', { post_id: data.ID, new_value: e.target.value } )
+      .done(function(result) {
+        console.log(result)
+        if ( typeof result.errors !== 'undefined') {
+          console.log(result)
+        }
+        jQuery('.loading-field-spinner.title').removeClass('active')
+      })
+  })
+  jQuery('.dt_multi_select').on('click', function(e){
+    // jQuery('.loading-field-spinner.title').addClass('active')
+    let key = jQuery(this).data('field-key')
+    let option = jQuery(this).data('option-key')
+    let state = jQuery(this).hasClass('selected-select-button')
+
+    if ( state ) {
+      jQuery(this).removeClass('selected-select-button')
+      jQuery(this).addClass('empty-select-button')
+    } else {
+      jQuery(this).addClass('selected-select-button')
+      jQuery(this).removeClass('empty-select-button')
+    }
+    window.post_profile('update_multiselect', { post_id: data.ID, key: key, option: option, state: state } )
       .done(function(result) {
         console.log(result)
         if ( typeof result.errors !== 'undefined') {
@@ -1162,4 +1184,19 @@ window.write_profile = ( data ) => {
   })
 
 }
+
+function findValueInArray(value,arr){
+  var result = false;
+
+  for(var i=0; i<arr.length; i++){
+    var name = arr[i];
+    if(name === value){
+      result = true;
+      break;
+    }
+  }
+
+  return result;
+}
+
 

@@ -278,6 +278,7 @@ class Zume_App_Portal extends DT_Magic_Url_Base {
      * @see DT_Magic_Url_Base()->footer_javascript() for default state
      */
     public function footer_javascript(){
+
         if ( 'map' === $this->parts['action'] ) {
             ?>
             <script>
@@ -362,6 +363,7 @@ class Zume_App_Portal extends DT_Magic_Url_Base {
             if ( is_wp_error( $post ) ){
                 return;
             }
+            $post_fields = DT_Posts::get_post_field_settings( $this->post_type );
             ?>
             <script>
                 let jsObject = [<?php echo json_encode([
@@ -372,6 +374,7 @@ class Zume_App_Portal extends DT_Magic_Url_Base {
                     'intro_images' => trailingslashit( plugin_dir_url( __FILE__ ) ) . 'images/',
                     'parts' => $this->parts,
                     'post' => $post,
+                    'post_fields' => $post_fields,
                     'translations' => [
                         'add' => __( 'Add Magic', 'disciple-tools-contact-portal' ),
                     ],
@@ -388,6 +391,7 @@ class Zume_App_Portal extends DT_Magic_Url_Base {
             if ( is_wp_error( $post ) ){
                 return;
             }
+
             ?>
             <script>
                 let jsObject = [<?php echo json_encode([
@@ -458,46 +462,22 @@ class Zume_App_Portal extends DT_Magic_Url_Base {
     public function add_endpoints() {
         $namespace = $this->root . '/v1';
         register_rest_route(
-            $namespace, '/'.$this->type . '_list', [
-                [
-                    'methods'  => "POST",
-                    'callback' => [ $this, 'endpoint_list' ],
-                    'permission_callback' => '__return_true',
-                ],
-            ]
-        );
-        register_rest_route(
-            $namespace, '/'.$this->type . '_update', [
-                [
-                    'methods'  => "POST",
-                    'callback' => [ $this, 'endpoint_update' ],
-                    'permission_callback' => '__return_true',
-                ],
-            ]
-        );
-        register_rest_route(
-            $namespace, '/'.$this->type . '_profile', [
-                [
-                    'methods'  => "POST",
-                    'callback' => [ $this, 'endpoint_profile' ],
-                    'permission_callback' => '__return_true',
-                ],
-            ]
-        );
-        register_rest_route(
             $namespace,
             '/'.$this->type,
             [
                 [
                     'methods'  => WP_REST_Server::CREATABLE,
-                    'callback' => [ $this, 'endpoint_map' ],
-                    'permission_callback' => '__return_true',
+                    'callback' => [ $this, 'endpoint' ],
+                    'permission_callback' => function( WP_REST_Request $request ){
+                        $magic = new DT_Magic_URL( $this->root );
+                        return $magic->verify_rest_endpoint_permissions_on_post( $request );
+                    },
                 ],
             ]
         );
     }
 
-    public function endpoint_map( WP_REST_Request $request ) {
+    public function endpoint( WP_REST_Request $request ) {
         $params = $request->get_params();
 
         if ( ! isset( $params['parts'], $params['action'] ) ) {
@@ -508,6 +488,8 @@ class Zume_App_Portal extends DT_Magic_Url_Base {
         $action = sanitize_text_field( wp_unslash( $params['action'] ) );
 
         switch ( $action ) {
+
+            // mapping
             case 'self':
                 return Zume_App_Heatmap::get_self( $params['grid_id'], $this->global_div, $this->us_div );
             case 'a3':
@@ -524,17 +506,41 @@ class Zume_App_Portal extends DT_Magic_Url_Base {
             case 'grid_data':
                 $grid_totals = Zume_App_Heatmap::query_church_grid_totals();
                 return Zume_App_Heatmap::_initial_polygon_value_list( $grid_totals, $this->global_div, $this->us_div );
+
+            // list support
+            case 'get_list':
+                return $this->_endpoint_get_list( $params);
+
+            // update support
+            case 'create_group':
+            case 'create_group_by_map':
+            case 'onItemRemoved':
+            case 'onItemDrop':
+            case 'get_group':
+            case 'update_group_title':
+            case 'update_group_member_count':
+            case 'update_group_start_date':
+            case 'update_group_status':
+            case 'update_group_location':
+            case 'delete_group_location':
+                return $this->_endpoint_update_list( $params);
+
+            // profile support
+            case 'get_profile':
+            case 'update_profile_title':
+            case 'update_profile_phone':
+            case 'update_profile_email':
+            case 'update_profile_location':
+            case 'delete_profile_location':
+            case 'update_multiselect':
+                return $this->_endpoint_profile( $params );
+
             default:
                 return new WP_Error( __METHOD__, "Missing valid action", [ 'status' => 400 ] );
         }
     }
 
-    public function endpoint_list( WP_REST_Request $request ) {
-        $params = $request->get_params();
-        if ( ! isset( $params['parts'], $params['action'] ) ) {
-            return new WP_Error( __METHOD__, "Missing parameters", [ 'status' => 400 ] );
-        }
-
+    public function _endpoint_get_list( $params) {
         $tree = [];
         $title_list = [];
         $pre_tree = [];
@@ -570,12 +576,7 @@ class Zume_App_Portal extends DT_Magic_Url_Base {
         ];
     }
 
-    public function endpoint_update( WP_REST_Request $request ) {
-        $params = $request->get_params();
-        if ( ! isset( $params['parts'], $params['action'] ) ) {
-            return new WP_Error( __METHOD__, "Missing parameters", [ 'status' => 400 ] );
-        }
-        $params = dt_recursive_sanitize_array( $params );
+    public function _endpoint_update_list( $params ) {
 
         $post_id = $params["parts"]["post_id"]; //has been verified in verify_rest_endpoint_permissions_on_post()
         $post = DT_Posts::get_post( $this->post_type, $post_id, true, false );
@@ -797,14 +798,7 @@ class Zume_App_Portal extends DT_Magic_Url_Base {
         return false;
     }
 
-    public function endpoint_profile( WP_REST_Request $request ) {
-        $params = $request->get_params();
-        if ( ! isset( $params['parts'], $params['action'] ) ) {
-            return new WP_Error( __METHOD__, "Missing parameters", [ 'status' => 400 ] );
-        }
-        $params = dt_recursive_sanitize_array( $params );
-
-        dt_write_log($params);
+    public function _endpoint_profile( $params ) {
 
         $post_id = $params["parts"]["post_id"];
         $post = DT_Posts::get_post( $this->post_type, $post_id, true, false );
@@ -814,20 +808,40 @@ class Zume_App_Portal extends DT_Magic_Url_Base {
         switch ( $action ) {
             case 'get_profile':
                 return $post;
-            case 'update_profile_phone':
-
-//                $fields = [
-//                    "contact_phone" => [
-//                        ["value" => "94 39 29 39"], //create
-//                        ["key" => "contact_phone_123", "delete" => true] //delete
-//                    ]
-//                ];
-//                $result = DT_Posts::update_post( 'contacts', $post_id, $fields, false, false );
-                return $post;
-            case 'update_profile_email':
-                return $post;
             case 'update_profile_title':
-                return $post;
+                 $fields = [
+                      "practitioner_community_name" => $params['data']['new_value']
+                 ];
+                return DT_Posts::update_post( 'contacts', $post_id, $fields, false, false );
+            case 'update_profile_phone':
+                $fields = [
+                    "contact_phone" => [
+                        "values" => [
+                            [ "value" => $params['data']['new_value']],
+                        ],
+                        "force_values" => true
+                    ]
+                ];
+                return DT_Posts::update_post( 'contacts', $post_id, $fields, false, false );
+            case 'update_profile_email':
+                $fields = [
+                    "contact_email" => [
+                        "values" => [
+                            [ "value" => $params['data']['new_value']],
+                        ],
+                        "force_values" => true
+                    ]
+                ];
+                return DT_Posts::update_post( 'contacts', $post_id, $fields, false, false );
+            case 'update_multiselect':
+                $fields = [
+                    $params['data']['key'] => [
+                        "values" => [
+                            [ "value" => $params['data']['option'], "delete" => $params['data']['state'] ],
+                        ],
+                    ]
+                ];
+                return DT_Posts::update_post( 'contacts', $post_id, $fields, false, false );
             case 'update_profile_location':
 
                 $post_id = $params['data']['post_id'];
@@ -842,7 +856,7 @@ class Zume_App_Portal extends DT_Magic_Url_Base {
 
                 $result = DT_Posts::update_post( 'contacts', $post_id, $location_data, false, false );
 
-//                Zume_App_Heatmap::clear_church_grid_totals();
+                Zume_App_Heatmap::clear_practitioner_grid_totals();
 
                 return $result;
 
@@ -851,7 +865,7 @@ class Zume_App_Portal extends DT_Magic_Url_Base {
                 delete_post_meta( $post_id, 'location_grid' );
                 delete_post_meta( $post_id, 'location_grid_meta' );
 
-//                Zume_App_Heatmap::clear_church_grid_totals();
+                Zume_App_Heatmap::clear_practitioner_grid_totals();
 
                 return Location_Grid_Meta::delete_location_grid_meta( $post_id, 'all', 0 );
 
