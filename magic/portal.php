@@ -508,10 +508,11 @@ class Zume_App_Portal extends DT_Magic_Url_Base {
                 return Zume_App_Heatmap::_initial_polygon_value_list( $grid_totals, $this->global_div, $this->us_div );
 
             // list support
-            case 'get_list':
+            case 'load_tree':
                 return $this->_endpoint_get_list( $params);
 
             // update support
+            case 'create_church':
             case 'create_group':
             case 'create_group_by_map':
             case 'onItemRemoved':
@@ -547,7 +548,7 @@ class Zume_App_Portal extends DT_Magic_Url_Base {
         $post_id = $params["parts"]["post_id"];
         $list = DT_Posts::list_posts('groups', [
             'fields_to_return' => [],
-            'coaches' => [ $post_id ]
+            'church_reporter' => [ $post_id ]
         ], false );
 
         if ( ! empty( $list['posts'] ) ) {
@@ -581,16 +582,65 @@ class Zume_App_Portal extends DT_Magic_Url_Base {
         $post_id = $params["parts"]["post_id"]; //has been verified in verify_rest_endpoint_permissions_on_post()
         $post = DT_Posts::get_post( $this->post_type, $post_id, true, false );
 
-        $args = [];
-        if ( !is_user_logged_in() ){
-            $args["comment_author"] = $post['name'];
-            wp_set_current_user( 0 );
-            $current_user = wp_get_current_user();
-            $current_user->add_cap( "create_contact" );
-            $current_user->display_name = $post['name'];
-        }
+//        $args = [];
+//        if ( !is_user_logged_in() ){
+//            $args["comment_author"] = $post['name'];
+//            wp_set_current_user( 0 );
+//            $current_user = wp_get_current_user();
+//            $current_user->add_cap( "create_contact" );
+//            $current_user->display_name = $post['name'];
+//        }
 
         switch ( $params['action'] ) {
+            case 'create_church':
+                dt_write_log( 'create_church' );
+
+//                $inc = $params['data']['inc'];
+//                $temp_id = $params['data']['temp_id'];
+//                $parent_id = $params['data']['parent_id'];
+
+                $fields = [
+                    "title" => $post['name'],
+                    "group_status" => "active",
+                    "group_type" => "church",
+                    "church_reporter" => [
+                        "values" => [
+                            [ "value" => $post_id ]
+                        ]
+                    ],
+                    'member_count' => $params['data']['members'],
+                    "start_date" => $params['data']['start_date'],
+                    "church_start_date" => $params['data']['start_date'],
+                    'location_grid_meta' => $params['data']['location_grid_meta']
+                ];
+
+//                if ( 'domenu-0' !== $parent_id && is_numeric( $parent_id ) ) {
+//                    $fields["parent_groups"] = [
+//                        "values" => [
+//                            [ "value" => $parent_id ]
+//                        ]
+//                    ];
+//                }
+
+                $new_post = DT_Posts::create_post( 'groups', $fields, true, false );
+                if ( ! is_wp_error( $new_post ) ) {
+                    // clear cash on church grid totals
+                    Zume_App_Heatmap::clear_church_grid_totals();
+
+                    return [
+                        'id' => $new_post['ID'],
+                        'title' => $new_post['name'],
+//                        'prev_parent' => $parent_id,
+//                        'temp_id' => $temp_id,
+                        'post' => $new_post,
+                        'post_fields' => DT_Posts::get_post_field_settings( 'groups', true, false ),
+                        'custom_marks' => self::get_custom_map_markers( $post_id ),
+                    ];
+                }
+                else {
+                    dt_write_log( $new_post );
+                    return false;
+                }
             case 'create_group':
                 dt_write_log( 'create_group' );
 
@@ -602,7 +652,7 @@ class Zume_App_Portal extends DT_Magic_Url_Base {
                     "title" => $post['name'] . ' Church ' . $inc,
                     "group_status" => "active",
                     "group_type" => "church",
-                    "coaches" => [
+                    "church_reporter" => [
                         "values" => [
                             [ "value" => $post_id ]
                         ]
@@ -648,7 +698,7 @@ class Zume_App_Portal extends DT_Magic_Url_Base {
                     "title" => $title . ' Church ' .$inc,
                     "group_status" => "active",
                     "group_type" => "church",
-                    "coaches" => [
+                    "church_reporter" => [
                         "values" => [
                             [ "value" => $post_id ]
                         ]
@@ -724,11 +774,11 @@ class Zume_App_Portal extends DT_Magic_Url_Base {
                 }
 
                 // custom permission check. Contact must be coaching group to retrieve group
-                if ( ! isset( $group['coaches'] ) || empty( $group['coaches'] ) ) {
+                if ( ! isset( $group['church_reporter'] ) || empty( $group['church_reporter'] ) ) {
                     return new WP_Error( __METHOD__, 'no coaching found for group' );
                 }
                 $found = false;
-                foreach ( $group['coaches'] as $coach ) {
+                foreach ( $group['church_reporter'] as $coach ) {
                     if ( (int) $coach['ID'] === (int) $post_id ) {
                         $found = true;
                     }

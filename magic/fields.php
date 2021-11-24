@@ -53,13 +53,7 @@ class Zume_Public_Map_Fields {
                     "icon" => get_template_directory_uri() . "/dt-assets/images/group-peer.svg?v=2",
                 ];
             }
-//            if ( isset( $fields["milestones"] ) && !isset( $fields["milestones"]["default"]["milestones_reporting"] ) ) {
-//                $fields["milestones"]["default"]["milestones_reporting"] = [
-//                    "label" => __( "Reporting", 'zume-public-heatmaps' ),
-//                    "description" => 'This is a DMM reporting person. This milestone contributes to the Zúme public mapping system.',
-//                    "icon" => get_template_directory_uri() . "/dt-assets/images/socialmedia.svg?v=2",
-//                ];
-//            }
+
             $fields["practitioner_community_name"] = [
                 'name' => __( 'Community Name', 'zume-public-heatmaps' ),
                 'description' => __( "Name for sharing in the community.", 'zume-public-heatmaps' ),
@@ -88,7 +82,31 @@ class Zume_Public_Map_Fields {
                 "in_create_form" => true,
                 'icon' => get_template_directory_uri() . "/dt-assets/images/sign-post.svg?v=2",
             ];
+            $fields["church_reporter"] = [
+                "name" => __( 'Reporter for Churches', 'disciple-tools' ),
+                'description' => _x( 'The person who is reporting on this church.', 'Optional Documentation', 'disciple-tools-streams' ),
+                "type" => "connection",
+                "post_type" => "groups",
+                "p2p_direction" => "from",
+                "p2p_key" => "reporter_to_groups",
+                'tile' => 'other',
+                'icon' => get_template_directory_uri() . '/dt-assets/images/coach.svg',
+                'create-icon' => get_template_directory_uri() . '/dt-assets/images/add-group.svg',
+            ];
 
+        }
+        if ( $post_type === "groups" ) {
+            $fields["church_reporter"] = [
+                "name" => __( 'Church Reporter', 'disciple-tools' ),
+                'description' => _x( 'The person who is reporting on this church.', 'Optional Documentation', 'disciple-tools-streams' ),
+                "type" => "connection",
+                "post_type" => "contacts",
+                "p2p_direction" => "to",
+                "p2p_key" => "reporter_to_groups",
+                'tile' => 'status',
+                'icon' => get_template_directory_uri() . '/dt-assets/images/coach.svg',
+                'create-icon' => get_template_directory_uri() . '/dt-assets/images/add-contact.svg',
+            ];
         }
         return $fields;
     }

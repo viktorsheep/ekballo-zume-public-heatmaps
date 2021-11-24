@@ -46,7 +46,7 @@ DT_Mapbox_API::geocoder_scripts();
     <div id="modal-title"></div>
     <div id="modal-content"></div>
     <button class="close-button" data-close aria-label="Close modal" type="button">
-        <span aria-hidden="true">Save</span>
+        <span aria-hidden="true">Close</span>
     </button>
 </div>
 

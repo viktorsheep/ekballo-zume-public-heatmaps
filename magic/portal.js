@@ -15,9 +15,274 @@ jQuery(document).ready(function() {
   }
 });
 
-/**
+
+/***********************************************************************
+ *
+ * Profile Section
+ *
+ **********************************************************************/
+window.load_profile = () => {
+  jQuery.ajax({
+    type: "POST",
+    data: JSON.stringify({ action: 'get_profile', parts: jsObject.parts }),
+    contentType: "application/json; charset=utf-8",
+    dataType: "json",
+    url: jsObject.root + jsObject.parts.root + '/v1/' + jsObject.parts.type,
+    beforeSend: function (xhr) {
+      xhr.setRequestHeader('X-WP-Nonce', jsObject.nonce )
+    }
+  })
+    .done(function(data){
+      console.log(data)
+      window.write_profile( data )
+      jQuery('.loading-spinner').removeClass('active')
+    })
+    .fail(function(e) {
+      console.log(e)
+      jQuery('#error').html(e)
+      jQuery('.loading-spinner').removeClass('active')
+    })
+}
+
+window.post_profile = ( action, data ) => {
+  return jQuery.ajax({
+    type: "POST",
+    data: JSON.stringify({ action: action, parts: jsObject.parts, data: data }),
+    contentType: "application/json; charset=utf-8",
+    dataType: "json",
+    url: jsObject.root + jsObject.parts.root + '/v1/' + jsObject.parts.type,
+    beforeSend: function (xhr) {
+      xhr.setRequestHeader('X-WP-Nonce', jsObject.nonce )
+    }
+  })
+    .fail(function(e) {
+      console.log(e)
+      jQuery('#error').html(e)
+      jQuery('.loading-spinner').removeClass('active')
+    })
+}
+
+window.write_profile = ( data ) => {
+  let content = jQuery('#wrapper')
+
+  let title = ''
+  if ( typeof data.practitioner_community_name === 'undefined' ){
+    title = data.title
+  } else {
+    title = data.practitioner_community_name
+  }
+
+  let location = {
+    lng: '',
+    lat: '',
+    label: '',
+    grid_meta_id: ''
+  }
+  if ( typeof data.location_grid_meta !== 'undefined' ){
+    location = data.location_grid_meta[0]
+  }
+
+  content.empty().html(
+    `
+    <div class="callout">
+      <div class="grid-x">
+        <div class="cell">
+            <h2>Practitioner Profile</h2>
+        </div>
+        <div class="cell">
+            <div class="section-subheader">
+               Community Name
+            </div>
+            <div class="input-group">
+                <input type="text" placeholder="Name" id="title" data-key="${title}" value="${title}" class="dt-communication-channel input-group-field title" />
+                <div class="input-group-button">
+                     <div class="wrapper-field-spinner"><span class="loading-field-spinner title"></span></div>
+                </div>
+            </div>
+        </div>
+        <div class="cell">
+            <div class="section-subheader">
+               Milestones
+            </div>
+            <div class="small button-group" id="milestone_wrapper" style="display: inline-block"></div>
+        </div>
+        <!-- Email -->
+        <div class="cell">
+            <div class="section-subheader">
+                Email
+            </div>
+            <div id="email-container"></div>
+        </div>
+        <!-- Phone -->
+        <div class="cell">
+            <div class="section-subheader">
+                Phone
+            </div>
+            <div id="phone-container"></div>
+        </div>
+        <!-- location -->
+        <div class="cell" id="mapbox-select">
+            <div class="section-subheader">
+               Location
+            </div>
+            ${location.label}
+            <div id="map-wrapper-edit">
+                <div id='map-edit'></div>
+            </div>
+          <br>
+          <button type="button" onclick="remove_location(${data.ID}, 'contacts')" style="display:none;" class="button primary-button-hollow remove-location">Remove Location</button>
+          <span class="loading-field-spinner profile_location"></span>
+        </div>
+      </div>
+    </div>
+
+    <div class="callout">
+      <div class="grid-x">
+        <div class="cell">
+            <h2>Community Visibility</h2>
+        </div>
+        <div class="cell">
+            <label>Connect me with others in my area or interested in our local work.</label>
+           <div class="switch large">
+            <input class="switch-input" id="connect-with-others" type="checkbox" name="exampleSwitch">
+            <label class="switch-paddle" for="connect-with-others">
+              <span class="show-for-sr">Hide on public map?</span>
+              <span class="switch-active" aria-hidden="true">Yes</span>
+              <span class="switch-inactive" aria-hidden="true">No</span>
+            </label>
+          </div>
+        </div>
+      </div>
+    </div>
+   `)
+
+  window.load_mapbox( location.lng, location.lat, data.ID, 'contacts' )
+
+  // add fields
+  if ( typeof jsObject.post_fields.milestones !== 'undefined' ){
+    let m_wrapper = jQuery('#milestone_wrapper')
+    let m_class = ''
+    jQuery.each(jsObject.post_fields.milestones.default, function(i,v){
+      m_class = 'empty-select-button'
+      if ( typeof data.milestones !== 'undefined' && findValueInArray(i,data.milestones) ){
+        m_class = 'selected-select-button'
+      }
+      m_wrapper.append(`
+        <button id="${i}" type="button" data-field-key="milestones" data-option-key="${i}" class="dt_multi_select ${m_class} select-button button">
+          <img class="dt-icon" src="${v.icon}">
+            ${v.label}
+        </button>
+      `)
+    })
+  }
+
+  let phone_container = jQuery('#phone-container')
+  let phone_value = ''
+  if ( typeof data.contact_phone !== 'undefined' ){
+    phone_value = data.contact_phone[0].value
+  }
+  phone_container.append(`
+    <div class="input-group">
+        <input id="" type="text" data-field="contact_phone" value="${phone_value}" class="dt-communication-channel input-group-field phone" dir="auto">
+        <div class="input-group-button">
+            <div class="wrapper-field-spinner"><span class="loading-field-spinner phone"></span></div>
+        </div>
+    </div>
+  `)
+
+  let email_container = jQuery('#email-container')
+  let email_value = ''
+  if ( typeof data.contact_email !== 'undefined' ){
+    email_value = data.contact_email[0].value
+  }
+  email_container.append(`
+    <div class="input-group">
+        <input id="" type="text" data-field="contact_phone" value="${email_value}" class="dt-communication-channel input-group-field email" dir="auto">
+        <div class="input-group-button">
+            <div class="wrapper-field-spinner"><span class="loading-field-spinner email"></span></div>
+        </div>
+    </div>
+  `)
+
+
+  jQuery('.dt-communication-channel.input-group-field.title').on('change', function(e){
+    jQuery('.loading-field-spinner.title').addClass('active')
+    window.post_profile('update_profile_title', { post_id: data.ID, new_value: e.target.value } )
+      .done(function(result) {
+        console.log(result)
+        if ( typeof result.errors !== 'undefined') {
+          console.log(result)
+        }
+        jQuery('.loading-field-spinner.title').removeClass('active')
+      })
+  })
+  jQuery('.dt_multi_select').on('click', function(e){
+    // jQuery('.loading-field-spinner.title').addClass('active')
+    let key = jQuery(this).data('field-key')
+    let option = jQuery(this).data('option-key')
+    let state = jQuery(this).hasClass('selected-select-button')
+
+    if ( state ) {
+      jQuery(this).removeClass('selected-select-button')
+      jQuery(this).addClass('empty-select-button')
+    } else {
+      jQuery(this).addClass('selected-select-button')
+      jQuery(this).removeClass('empty-select-button')
+    }
+    window.post_profile('update_multiselect', { post_id: data.ID, key: key, option: option, state: state } )
+      .done(function(result) {
+        console.log(result)
+        if ( typeof result.errors !== 'undefined') {
+          console.log(result)
+        }
+        jQuery('.loading-field-spinner.title').removeClass('active')
+      })
+  })
+  jQuery('.dt-communication-channel.input-group-field.email').on('change', function(e){
+    jQuery('.loading-field-spinner.email').addClass('active')
+    window.post_profile('update_profile_email', { post_id: data.ID, new_value: e.target.value } )
+      .done(function(result) {
+        console.log(result)
+        if ( typeof result.errors !== 'undefined') {
+          console.log(result)
+        }
+        jQuery('.loading-field-spinner.email').removeClass('active')
+      })
+  })
+  jQuery('.dt-communication-channel.input-group-field.phone').on('change', function(e){
+    jQuery('.loading-field-spinner.phone').addClass('active')
+    window.post_profile('update_profile_phone', { post_id: data.ID, new_value: e.target.value } )
+      .done(function(result) {
+        console.log(result)
+        if ( typeof result.errors !== 'undefined') {
+          console.log(result)
+        }
+        jQuery('.loading-field-spinner.phone').removeClass('active')
+      })
+  })
+
+}
+
+function findValueInArray(value,arr){
+  var result = false;
+
+  for(var i=0; i<arr.length; i++){
+    var name = arr[i];
+    if(name === value){
+      result = true;
+      break;
+    }
+  }
+
+  return result;
+}
+
+
+/*************************************************************************
+ *
  * List Section
- */
+ *
+ ************************************************************************/
 window.post_item = ( action, data ) => {
   return jQuery.ajax({
     type: "POST",
@@ -39,7 +304,7 @@ window.post_item = ( action, data ) => {
 window.load_tree = () => {
   jQuery.ajax({
     type: "POST",
-    data: JSON.stringify({ action: 'POST', parts: jsObject.parts }),
+    data: JSON.stringify({ action: 'load_tree', parts: jsObject.parts }),
     contentType: "application/json; charset=utf-8",
     dataType: "json",
     url: jsObject.root + jsObject.parts.root + '/v1/' + jsObject.parts.type,
@@ -198,30 +463,32 @@ window.create_group = () => {
 
   console.log( window.new_item )
 
-  window.post_item('create_group', window.new_item )
-    .done(function(response){
-      console.log(response)
-      if ( response ) {
+  // window.post_item('create_group', window.new_item )
+  //   .done(function(response){
+  //     console.log(response)
+  //     if ( response ) {
+  //
+  //       jQuery('#'+ response.temp_id).attr('id', response.id )
+  //       jQuery('#'+response.id).attr('data-prev_parent', response.prev_parent )
+  //       jQuery('#'+response.id + ' .item-name:first').html( response.title )
+  //       jQuery('#'+response.id + ' .item-add:first').on('click', function(e) {
+  //         window.create_group()
+  //       })
+  //       jQuery('#'+response.id + ' .item-edit:first').on('click', function(e) {
+  //         window.open_modal(response.id )
+  //       })
+  //
+  //       response.post.title = ""
+  //       response.post.name = ""
+  //       window.load_modal_content( response.post, response.post_fields )
+  //
+  //     } else {
+  //       console.log(response)
+  //     }
+  //
+  //   })
 
-        jQuery('#'+ response.temp_id).attr('id', response.id )
-        jQuery('#'+response.id).attr('data-prev_parent', response.prev_parent )
-        jQuery('#'+response.id + ' .item-name:first').html( response.title )
-        jQuery('#'+response.id + ' .item-add:first').on('click', function(e) {
-          window.create_group()
-        })
-        jQuery('#'+response.id + ' .item-edit:first').on('click', function(e) {
-          window.open_modal(response.id )
-        })
-
-        response.post.title = ""
-        response.post.name = ""
-        window.load_modal_content( response.post, response.post_fields )
-
-      } else {
-        console.log(response)
-      }
-
-    })
+  window.open_create_modal()
 }
 
 window.create_group_by_map = ( ) => {
@@ -733,61 +1000,88 @@ window.open_create_modal= () => {
 
   title.empty().html(`<h1>Add New Church</h1>`)
   content.html(`
-          <div class="grid-x">
+    <div class="grid-x">
 
-            <!-- title -->
-            <div class="cell">
-              Name <span style="color:red;">*</span><br>
-              <div class="input-group">
-                <input type="text" style="border:0; border-bottom: 1px solid darkgrey;font-size:1.5rem;line-height: 2rem;" id="group_title" placeholder="" value="" autofocus />
-                <div class="input-group-button">
-                     <div><span class="loading-field-spinner group_title"></span></div>
-                </div>
-              </div>
-            </div>
-
-            <!-- start date -->
-            <div class="cell">
-              Start Date<br>
-              <div class="input-group">
-                <input type="date" style="border:0; border-bottom: 1px solid darkgrey;font-size:1.5rem;line-height: 2rem;" id="group_start_date" value="" />
-                <div class="input-group-button">
-                     <div><span class="loading-field-spinner group_start_date"></span></div>
-                </div>
-              </div>
-            </div>
-
-            <!-- members -->
-            <div class="cell">
-              Number of Members<br>
-              <div class="input-group">
-                <input type="number" style="border:0; border-bottom: 1px solid darkgrey;font-size:1.5rem;line-height: 2rem;" id="group_member_count" value="0" />
-                <div class="input-group-button">
-                     <div><span class="loading-field-spinner group_member_count"></span></div>
-                </div>
-              </div>
-            </div>
-
-            <!-- location -->
-            <div class="cell" id="mapbox-select">
-              Location<br>
-              <div id="map-wrapper-edit">
-                  <div id='map-edit'></div>
-              </div>
-              <br>
-              <button type="button" onclick="remove_location(), 'contacts')" style="display:none;" class="button primary-button-hollow remove-location">Remove Location</button>
-              <span class="loading-field-spinner group_location"></span>
-            </div>
-
-            <div class="cell">
-                <button type="button" class="button">Create Church</button>
-            </div>
+      <!-- title -->
+      <div class="cell">
+        Name <span style="color:red;">*</span><br>
+        <div class="input-group">
+          <input id="title" type="text" style="border:0; border-bottom: 1px solid darkgrey;font-size:1.5rem;line-height: 2rem;" placeholder="" value="" autofocus />
+          <div class="input-group-button">
+               <div><span class="loading-field-spinner group_title"></span></div>
           </div>
-        `)
+        </div>
+      </div>
+
+      <!-- start date -->
+      <div class="cell">
+        Start Date<br>
+        <div class="input-group">
+          <input id="date" type="date" style="border:0; border-bottom: 1px solid darkgrey;font-size:1.5rem;line-height: 2rem;"  value="" />
+          <div class="input-group-button">
+               <div><span class="loading-field-spinner group_start_date"></span></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- members -->
+      <div class="cell">
+        Number of Members<br>
+        <div class="input-group">
+          <input id="members" type="number" style="border:0; border-bottom: 1px solid darkgrey;font-size:1.5rem;line-height: 2rem;" value="0" />
+          <div class="input-group-button">
+               <div><span class="loading-field-spinner group_member_count"></span></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- location -->
+      <div class="cell" id="mapbox-select">
+        Location<br>
+        <span id="location-label"></span>
+        <div id="map-wrapper-edit">
+            <div id='map-edit'></div>
+        </div>
+        <br>
+        <button type="button" style="display:none;" class="button primary-button-hollow remove-location">Remove Location</button>
+        <span class="loading-field-spinner group_location"></span>
+      </div>
+
+      <div class="cell">
+          <button type="button" class="button" id="create_church">Create Church</button>
+      </div>
+    </div>
+  `)
 
   jQuery('#edit-modal').foundation('open')
 
+  jQuery('#create_church').on('click', function(e){
+    window.post_new_church()
+  })
+
   window.load_create_mapbox()
+}
+
+window.post_new_church = () => {
+  let title = jQuery('#title').val()
+  let start_date = jQuery('#date').val()
+  let members = jQuery('#members').val()
+
+  let data = {
+    name: title,
+    start_date: start_date,
+    members: members,
+    location_grid_meta: window.location_data.location_grid_meta
+  }
+
+  window.post_item('create_church', data )
+    .done(function(result) {
+      console.log(result)
+      jQuery('.remove-location').hide();
+      jQuery('.loading-field-spinner.group_location').removeClass('active')
+      window.load_mapbox()
+      window.force_values = false
+    })
 }
 
 window.load_create_mapbox = () => {
@@ -837,6 +1131,7 @@ window.load_create_mapbox = () => {
       }
     }
 
+
     // save_new_location( post_id )
   });
 
@@ -848,7 +1143,7 @@ window.load_create_mapbox = () => {
     types: 'country region district locality neighborhood address place',
     mapboxgl: mapboxgl
   });
-  map.addControl(geocoder);
+  map.addControl(geocoder, 'top-left');
   geocoder.on('result', function(e) { // respond to search
     console.log(e)
     if ( window.active_marker ) {
@@ -877,6 +1172,7 @@ window.load_create_mapbox = () => {
       }
     }
 
+    jQuery('#location-label').empty().html(e.result.place_name)
     // save_new_location( post_id )
   })
 
@@ -893,7 +1189,7 @@ window.load_create_mapbox = () => {
     trackUserLocation: false,
     showUserLocation: false
   })
-  map.addControl(userGeocode);
+  map.addControl(userGeocode, 'top-left');
   userGeocode.on('geolocate', function(e) { // respond to search
     console.log(e)
     if ( window.active_marker ) {
@@ -929,7 +1225,7 @@ window.load_create_mapbox = () => {
 
   map.dragRotate.disable();
   map.touchZoomRotate.disableRotation();
-  map.addControl(new mapboxgl.NavigationControl());
+  map.addControl(new mapboxgl.NavigationControl(), 'top-left');
 
 }
 
@@ -937,266 +1233,5 @@ window.load_create_mapbox = () => {
 
 
 
-
-/***********************************************************************
- *
- * Profile Section
- *
- */
-window.load_profile = () => {
-  jQuery.ajax({
-    type: "POST",
-    data: JSON.stringify({ action: 'get_profile', parts: jsObject.parts }),
-    contentType: "application/json; charset=utf-8",
-    dataType: "json",
-    url: jsObject.root + jsObject.parts.root + '/v1/' + jsObject.parts.type,
-    beforeSend: function (xhr) {
-      xhr.setRequestHeader('X-WP-Nonce', jsObject.nonce )
-    }
-  })
-    .done(function(data){
-      console.log(data)
-      window.write_profile( data )
-      jQuery('.loading-spinner').removeClass('active')
-    })
-    .fail(function(e) {
-      console.log(e)
-      jQuery('#error').html(e)
-      jQuery('.loading-spinner').removeClass('active')
-    })
-}
-
-window.post_profile = ( action, data ) => {
-  return jQuery.ajax({
-    type: "POST",
-    data: JSON.stringify({ action: action, parts: jsObject.parts, data: data }),
-    contentType: "application/json; charset=utf-8",
-    dataType: "json",
-    url: jsObject.root + jsObject.parts.root + '/v1/' + jsObject.parts.type,
-    beforeSend: function (xhr) {
-      xhr.setRequestHeader('X-WP-Nonce', jsObject.nonce )
-    }
-  })
-    .fail(function(e) {
-      console.log(e)
-      jQuery('#error').html(e)
-      jQuery('.loading-spinner').removeClass('active')
-    })
-}
-
-window.write_profile = ( data ) => {
-  let content = jQuery('#wrapper')
-
-  let title = ''
-  if ( typeof data.practitioner_community_name === 'undefined' ){
-    title = data.title
-  } else {
-    title = data.practitioner_community_name
-  }
-
-  let location = {
-    lng: '',
-    lat: '',
-    label: '',
-    grid_meta_id: ''
-  }
-  if ( typeof data.location_grid_meta !== 'undefined' ){
-    location = data.location_grid_meta[0]
-  }
-
-  content.empty().html(
-    `
-    <div class="callout">
-      <div class="grid-x">
-        <div class="cell">
-            <h2>Practitioner Profile</h2>
-        </div>
-        <div class="cell">
-            <div class="section-subheader">
-               Community Name
-            </div>
-            <div class="input-group">
-                <input type="text" placeholder="Name" id="title" data-key="${title}" value="${title}" class="dt-communication-channel input-group-field title" />
-                <div class="input-group-button">
-                     <div class="wrapper-field-spinner"><span class="loading-field-spinner title"></span></div>
-                </div>
-            </div>
-        </div>
-        <div class="cell">
-            <div class="section-subheader">
-               Milestones
-            </div>
-            <div class="small button-group" id="milestone_wrapper" style="display: inline-block"></div>
-        </div>
-        <!-- Email -->
-        <div class="cell">
-            <div class="section-subheader">
-                Email
-            </div>
-            <div id="email-container"></div>
-        </div>
-        <!-- Phone -->
-        <div class="cell">
-            <div class="section-subheader">
-                Phone
-            </div>
-            <div id="phone-container"></div>
-        </div>
-        <!-- location -->
-        <div class="cell" id="mapbox-select">
-            <div class="section-subheader">
-               Location
-            </div>
-            ${location.label}
-            <div id="map-wrapper-edit">
-                <div id='map-edit'></div>
-            </div>
-          <br>
-          <button type="button" onclick="remove_location(${data.ID}, 'contacts')" style="display:none;" class="button primary-button-hollow remove-location">Remove Location</button>
-          <span class="loading-field-spinner profile_location"></span>
-        </div>
-      </div>
-    </div>
-
-    <div class="callout">
-      <div class="grid-x">
-        <div class="cell">
-            <h2>Community Visibility</h2>
-        </div>
-        <div class="cell">
-            <label>Connect me with others in my area or interested in our local work.</label>
-           <div class="switch large">
-            <input class="switch-input" id="connect-with-others" type="checkbox" name="exampleSwitch">
-            <label class="switch-paddle" for="connect-with-others">
-              <span class="show-for-sr">Hide on public map?</span>
-              <span class="switch-active" aria-hidden="true">Yes</span>
-              <span class="switch-inactive" aria-hidden="true">No</span>
-            </label>
-          </div>
-        </div>
-      </div>
-    </div>
-   `)
-
-  window.load_mapbox( location.lng, location.lat, data.ID, 'contacts' )
-
-  // add fields
-  if ( typeof jsObject.post_fields.milestones !== 'undefined' ){
-    let m_wrapper = jQuery('#milestone_wrapper')
-    let m_class = ''
-    jQuery.each(jsObject.post_fields.milestones.default, function(i,v){
-      m_class = 'empty-select-button'
-      if ( typeof data.milestones !== 'undefined' && findValueInArray(i,data.milestones) ){
-        m_class = 'selected-select-button'
-      }
-      m_wrapper.append(`
-        <button id="${i}" type="button" data-field-key="milestones" data-option-key="${i}" class="dt_multi_select ${m_class} select-button button">
-          <img class="dt-icon" src="${v.icon}">
-            ${v.label}
-        </button>
-      `)
-    })
-  }
-
-  let phone_container = jQuery('#phone-container')
-  let phone_value = ''
-  if ( typeof data.contact_phone !== 'undefined' ){
-    phone_value = data.contact_phone[0].value
-  }
-  phone_container.append(`
-    <div class="input-group">
-        <input id="" type="text" data-field="contact_phone" value="${phone_value}" class="dt-communication-channel input-group-field phone" dir="auto">
-        <div class="input-group-button">
-            <div class="wrapper-field-spinner"><span class="loading-field-spinner phone"></span></div>
-        </div>
-    </div>
-  `)
-
-  let email_container = jQuery('#email-container')
-  let email_value = ''
-  if ( typeof data.contact_email !== 'undefined' ){
-    email_value = data.contact_email[0].value
-  }
-  email_container.append(`
-    <div class="input-group">
-        <input id="" type="text" data-field="contact_phone" value="${email_value}" class="dt-communication-channel input-group-field email" dir="auto">
-        <div class="input-group-button">
-            <div class="wrapper-field-spinner"><span class="loading-field-spinner email"></span></div>
-        </div>
-    </div>
-  `)
-
-
-  jQuery('.dt-communication-channel.input-group-field.title').on('change', function(e){
-    jQuery('.loading-field-spinner.title').addClass('active')
-    window.post_profile('update_profile_title', { post_id: data.ID, new_value: e.target.value } )
-      .done(function(result) {
-        console.log(result)
-        if ( typeof result.errors !== 'undefined') {
-          console.log(result)
-        }
-        jQuery('.loading-field-spinner.title').removeClass('active')
-      })
-  })
-  jQuery('.dt_multi_select').on('click', function(e){
-    // jQuery('.loading-field-spinner.title').addClass('active')
-    let key = jQuery(this).data('field-key')
-    let option = jQuery(this).data('option-key')
-    let state = jQuery(this).hasClass('selected-select-button')
-
-    if ( state ) {
-      jQuery(this).removeClass('selected-select-button')
-      jQuery(this).addClass('empty-select-button')
-    } else {
-      jQuery(this).addClass('selected-select-button')
-      jQuery(this).removeClass('empty-select-button')
-    }
-    window.post_profile('update_multiselect', { post_id: data.ID, key: key, option: option, state: state } )
-      .done(function(result) {
-        console.log(result)
-        if ( typeof result.errors !== 'undefined') {
-          console.log(result)
-        }
-        jQuery('.loading-field-spinner.title').removeClass('active')
-      })
-  })
-  jQuery('.dt-communication-channel.input-group-field.email').on('change', function(e){
-    jQuery('.loading-field-spinner.email').addClass('active')
-    window.post_profile('update_profile_email', { post_id: data.ID, new_value: e.target.value } )
-      .done(function(result) {
-        console.log(result)
-        if ( typeof result.errors !== 'undefined') {
-          console.log(result)
-        }
-        jQuery('.loading-field-spinner.email').removeClass('active')
-      })
-  })
-  jQuery('.dt-communication-channel.input-group-field.phone').on('change', function(e){
-    jQuery('.loading-field-spinner.phone').addClass('active')
-    window.post_profile('update_profile_phone', { post_id: data.ID, new_value: e.target.value } )
-      .done(function(result) {
-        console.log(result)
-        if ( typeof result.errors !== 'undefined') {
-          console.log(result)
-        }
-        jQuery('.loading-field-spinner.phone').removeClass('active')
-      })
-  })
-
-}
-
-function findValueInArray(value,arr){
-  var result = false;
-
-  for(var i=0; i<arr.length; i++){
-    var name = arr[i];
-    if(name === value){
-      result = true;
-      break;
-    }
-  }
-
-  return result;
-}
 
 
