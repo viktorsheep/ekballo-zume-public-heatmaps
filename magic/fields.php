@@ -60,6 +60,15 @@ class Zume_Public_Map_Fields {
                     "icon" => get_template_directory_uri() . "/dt-assets/images/socialmedia.svg?v=2",
                 ];
             }
+            $fields["practitioner_community_name"] = [
+                'name' => __( 'Community Name', 'zume-public-heatmaps' ),
+                'description' => __( "Name for sharing in the community.", 'zume-public-heatmaps' ),
+                'type' => 'text',
+                'default' => '',
+                "tile" => "details",
+                "in_create_form" => true,
+                'icon' => get_template_directory_uri() . "/dt-assets/images/sign-post.svg?v=2",
+            ];
 
             $fields["practitioner_community_restrictions"] = [
                 'name' => __( 'Community Restrictions', 'zume-public-heatmaps' ),

@@ -774,7 +774,7 @@ window.open_create_modal= () => {
                   <div id='map-edit'></div>
               </div>
               <br>
-              <button type="button" onclick="remove_location(${post.ID}, 'contacts')" style="display:none;" class="button primary-button-hollow remove-location">Remove Location</button>
+              <button type="button" onclick="remove_location(), 'contacts')" style="display:none;" class="button primary-button-hollow remove-location">Remove Location</button>
               <span class="loading-field-spinner group_location"></span>
             </div>
 
@@ -980,21 +980,12 @@ window.write_profile = ( data ) => {
   let content = jQuery('#wrapper')
 
   let title = ''
-  if ( typeof data.title !== 'undefined' ){
+  if ( typeof data.practitioner_community_name === 'undefined' ){
     title = data.title
+  } else {
+    title = data.practitioner_community_name
   }
-  let email_key = ''
-  let email_value = ''
-  if ( typeof data.contact_email !== 'undefined' ){
-    email_key = data.contact_email[0].key
-    email_value = data.contact_email[0].value
-  }
-  let phone_key = ''
-  let phone_value = ''
-  if ( typeof data.contact_phone !== 'undefined' ){
-    phone_key = data.contact_phone[0].key
-    phone_value = data.contact_phone[0].value
-  }
+
   let location = {
     lng: '',
     lat: '',
@@ -1010,13 +1001,36 @@ window.write_profile = ( data ) => {
     <div class="callout">
       <div class="grid-x">
         <div class="cell">
-            <h2>Are you actively being a disciple and making disciples?</h2>
+            <h2>Community profile</h2>
         </div>
         <div class="cell">
+          <label>I have had multiplicative training.</label>
           <div class="switch large">
-            <input class="switch-input" id="yes-no" type="checkbox" name="exampleSwitch">
-            <label class="switch-paddle" for="yes-no">
+            <input class="switch-input" id="has-training" type="checkbox" name="Has Training">
+            <label class="switch-paddle" for="has-training">
               <span class="show-for-sr">Do you like me?</span>
+              <span class="switch-active" aria-hidden="true">Yes</span>
+              <span class="switch-inactive" aria-hidden="true">No</span>
+            </label>
+          </div>
+        </div>
+        <div class="cell">
+          <label>I am actively seeking movement.</label>
+          <div class="switch large">
+            <input class="switch-input" id="is-seeking-movement" type="checkbox" name="exampleSwitch">
+            <label class="switch-paddle" for="is-seeking-movement">
+              <span class="show-for-sr">Do you like me?</span>
+              <span class="switch-active" aria-hidden="true">Yes</span>
+              <span class="switch-inactive" aria-hidden="true">No</span>
+            </label>
+          </div>
+        </div>
+        <div class="cell">
+            <label>Connect me with others in my area or interested in our local work.</label>
+           <div class="switch large">
+            <input class="switch-input" id="connect-with-others" type="checkbox" name="exampleSwitch">
+            <label class="switch-paddle" for="connect-with-others">
+              <span class="show-for-sr">Hide on public map?</span>
               <span class="switch-active" aria-hidden="true">Yes</span>
               <span class="switch-inactive" aria-hidden="true">No</span>
             </label>
@@ -1028,43 +1042,48 @@ window.write_profile = ( data ) => {
     <div class="callout">
       <div class="grid-x">
         <div class="cell">
-            <h2>Is this information about you correct?</h2>
+            <h2>Personal information</h2>
         </div>
         <div class="cell">
-            <label>Name:</label>
+            <div class="section-subheader">
+               Community Profile Name
+            </div>
             <div class="input-group">
-                <input type="text" placeholder="Name" id="profile_title" data-key="${title}" value="${title}"/>
+                <input type="text" placeholder="Name" id="title" data-key="${title}" value="${title}" class="dt-communication-channel input-group-field title" />
                 <div class="input-group-button">
-                     <div><span class="loading-field-spinner profile_title"></span></div>
-                </div>
-              </div>
-        </div>
-        <div class="cell">
-           <label>Email</label>
-            <div class="input-group">
-                <input type="text" id="profile_email" placeholder="Email" data-key="${email_key}" value="${email_value}" />
-                <div class="input-group-button">
-                     <div><span class="loading-field-spinner profile_email"></span></div>
+                     <div class="wrapper-field-spinner"><span class="loading-field-spinner title"></span></div>
                 </div>
             </div>
         </div>
+        <!-- Email -->
         <div class="cell">
-            <label>Phone</label>
-            <div class="input-group">
-                <input type="text" placeholder="Phone" id="profile_phone" data-key="${phone_key}" value="${phone_value}"/>
-                <div class="input-group-button">
-                     <div><span class="loading-field-spinner profile_phone"></span></div>
-                </div>
-              </div>
+            <div class="section-subheader">
+                Email
+                <button data-list-class="contact_email" class="add-button" type="button">
+                    <img src="/wp-content/themes/disciple-tools-theme/dt-assets/images/small-add.svg">
+                </button>
+            </div>
+            <div id="email-container"></div>
+        </div>
+        <!-- Phone -->
+        <div class="cell">
+            <div class="section-subheader">
+                Phone
+                  <button data-list-class="contact_phone" class="add-button" type="button">
+                      <img src="/wp-content/themes/disciple-tools-theme/dt-assets/images/small-add.svg">
+                  </button>
+            </div>
+            <div id="phone-container"></div>
         </div>
         <!-- location -->
         <div class="cell" id="mapbox-select">
-          Location<br>
-          ${location.label}
-          <div id="map-wrapper-edit">
-              <div id='map-edit'></div>
-          </div>
-
+            <div class="section-subheader">
+               Location
+            </div>
+            ${location.label}
+            <div id="map-wrapper-edit">
+                <div id='map-edit'></div>
+            </div>
           <br>
           <button type="button" onclick="remove_location(${data.ID}, 'contacts')" style="display:none;" class="button primary-button-hollow remove-location">Remove Location</button>
           <span class="loading-field-spinner profile_location"></span>
@@ -1072,70 +1091,73 @@ window.write_profile = ( data ) => {
       </div>
     </div>
 
-    <div class="callout">
-      <div class="grid-x">
-        <div class="cell">
-            <h2>Do you have communication concerns?</h2>
-        </div>
-        <div class="cell">
-            <label>Hide my details on the public map?</label>
-           <div class="switch large">
-            <input class="switch-input" id="hide-map" type="checkbox" name="exampleSwitch">
-            <label class="switch-paddle" for="hide-map">
-              <span class="show-for-sr">Hide on public map?</span>
-              <span class="switch-active" aria-hidden="true">Yes</span>
-              <span class="switch-inactive" aria-hidden="true">No</span>
-            </label>
-          </div>
-        </div>
-        <div class="cell">
-            <label>Withhold my details from inquiries? (i.e. only forward requests for information to me)</label>
-           <div class="switch large">
-            <input class="switch-input" id="forward-requests" type="checkbox" name="exampleSwitch">
-            <label class="switch-paddle" for="forward-requests">
-              <span class="show-for-sr">Hide on public map?</span>
-              <span class="switch-active" aria-hidden="true">Yes</span>
-              <span class="switch-inactive" aria-hidden="true">No</span>
-            </label>
-          </div>
-        </div>
-    </div>
-  </div> `
-  )
+   `)
 
   window.load_mapbox( location.lng, location.lat, data.ID, 'contacts' )
 
-  jQuery('#profile_title').on('change', function(e){
-    jQuery('.loading-field-spinner.profile_title').addClass('active')
+  // add fields
+
+  if ( typeof data.contact_email !== 'undefined' ){
+    let email_container = jQuery('#email-container')
+    jQuery.each( data.contact_email, function(i,v) {
+      email_container.append(`
+        <div class="input-group">
+            <input id="${v.key}" type="text" data-field="contact_email" value="${v.value}" class="dt-communication-channel input-group-field email" dir="auto">
+            <div class="input-group-button">
+                <button class="button alert input-height delete-button-style channel-delete-button delete-button" data-field="contact_email" data-key="${v.key}" value="${v.value}">×</button>
+                <div class="wrapper-field-spinner"><span class="loading-field-spinner email"></span></div>
+            </div>
+        </div>
+      `)
+    })
+  }
+  if ( typeof data.contact_phone !== 'undefined' ){
+    let phone_container = jQuery('#phone-container')
+    jQuery.each( data.contact_phone, function(i,v) {
+      phone_container.append(`
+        <div class="input-group">
+            <input id="${v.key}" type="text" data-field="contact_phone" value="${v.value}" class="dt-communication-channel input-group-field phone" dir="auto">
+            <div class="input-group-button">
+                <button class="button alert input-height delete-button-style channel-delete-button delete-button" data-field="contact_phone" data-key="${v.key}" value="${v.value}">×</button>
+                <div class="wrapper-field-spinner"><span class="loading-field-spinner phone"></span></div>
+            </div>
+        </div>
+      `)
+    })
+  }
+
+
+  jQuery('.dt-communication-channel.input-group-field.title').on('change', function(e){
+    jQuery('.loading-field-spinner.title').addClass('active')
     window.post_profile('update_profile_title', { post_id: data.ID, new_value: e.target.value } )
       .done(function(result) {
         console.log(result)
         if ( typeof result.errors !== 'undefined') {
           console.log(result)
         }
-        jQuery('.loading-field-spinner.profile_title').removeClass('active')
+        jQuery('.loading-field-spinner.title').removeClass('active')
       })
   })
-  jQuery('#profile_email').on('change', function(e){
-    jQuery('.loading-field-spinner.profile_email').addClass('active')
+  jQuery('.dt-communication-channel.input-group-field.email').on('change', function(e){
+    jQuery('.loading-field-spinner.email').addClass('active')
     window.post_profile('update_profile_email', { post_id: data.ID, new_value: e.target.value } )
       .done(function(result) {
         console.log(result)
         if ( typeof result.errors !== 'undefined') {
           console.log(result)
         }
-        jQuery('.loading-field-spinner.profile_email').removeClass('active')
+        jQuery('.loading-field-spinner.email').removeClass('active')
       })
   })
-  jQuery('#profile_phone').on('change', function(e){
-    jQuery('.loading-field-spinner.profile_phone').addClass('active')
+  jQuery('.dt-communication-channel.input-group-field.phone').on('change', function(e){
+    jQuery('.loading-field-spinner.phone').addClass('active')
     window.post_profile('update_profile_phone', { post_id: data.ID, new_value: e.target.value } )
       .done(function(result) {
         console.log(result)
         if ( typeof result.errors !== 'undefined') {
           console.log(result)
         }
-        jQuery('.loading-field-spinner.profile_phone').removeClass('active')
+        jQuery('.loading-field-spinner.phone').removeClass('active')
       })
   })
 

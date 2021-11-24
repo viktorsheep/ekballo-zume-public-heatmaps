@@ -230,6 +230,9 @@ class Zume_App_Portal extends DT_Magic_Url_Base {
                 animation: spin 1s infinite linear;
                 display: inline-block;
             }
+            .wrapper-field-spinner {
+                padding: 5px 5px 0;
+            }
             #initial-loading-spinner {
                 padding-top: 10px;
             }
@@ -237,9 +240,7 @@ class Zume_App_Portal extends DT_Magic_Url_Base {
                 width:100% !important;
                 margin:10px !important;
             }
-            .input-group-button {
-                padding:8px 0 0 5px !important;
-            }
+
             #map-edit, #map-wrapper-edit  {
                 height: 300px !important;
             }
@@ -803,6 +804,8 @@ class Zume_App_Portal extends DT_Magic_Url_Base {
         }
         $params = dt_recursive_sanitize_array( $params );
 
+        dt_write_log($params);
+
         $post_id = $params["parts"]["post_id"];
         $post = DT_Posts::get_post( $this->post_type, $post_id, true, false );
 
@@ -812,6 +815,14 @@ class Zume_App_Portal extends DT_Magic_Url_Base {
             case 'get_profile':
                 return $post;
             case 'update_profile_phone':
+
+//                $fields = [
+//                    "contact_phone" => [
+//                        ["value" => "94 39 29 39"], //create
+//                        ["key" => "contact_phone_123", "delete" => true] //delete
+//                    ]
+//                ];
+//                $result = DT_Posts::update_post( 'contacts', $post_id, $fields, false, false );
                 return $post;
             case 'update_profile_email':
                 return $post;
