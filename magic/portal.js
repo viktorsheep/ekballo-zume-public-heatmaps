@@ -66,29 +66,16 @@ window.write_profile = ( data ) => {
   let content = jQuery('#wrapper')
 
   let title = ''
-  if ( typeof data.practitioner_community_name === 'undefined' ){
+  if ( typeof data.nickname === 'undefined' ){
     title = data.title
   } else {
-    title = data.practitioner_community_name
-  }
-
-  let location = {
-    lng: '',
-    lat: '',
-    label: '',
-    grid_meta_id: ''
-  }
-  if ( typeof data.location_grid_meta !== 'undefined' ){
-    location = data.location_grid_meta[0]
+    title = data.nickname
   }
 
   content.empty().html(
     `
     <div class="callout">
       <div class="grid-x">
-        <div class="cell">
-            <h2>Practitioner Profile</h2>
-        </div>
         <div class="cell">
             <div class="section-subheader">
                Community Name
@@ -125,13 +112,13 @@ window.write_profile = ( data ) => {
             <div class="section-subheader">
                Location
             </div>
-            ${location.label}
+            <span id="location-label"></span>
             <div id="map-wrapper-edit">
                 <div id='map-edit'></div>
             </div>
           <br>
-          <button type="button" onclick="remove_location(${data.ID}, 'contacts')" style="display:none;" class="button primary-button-hollow remove-location">Remove Location</button>
-          <span class="loading-field-spinner profile_location"></span>
+          <button type="button"  style="display:none;" class="button primary-button-hollow remove-location">Remove Location</button>
+          <span class="loading-field-spinner location"></span>
         </div>
       </div>
     </div>
@@ -139,43 +126,50 @@ window.write_profile = ( data ) => {
     <div class="callout">
       <div class="grid-x">
         <div class="cell">
-            <h2>Community Visibility</h2>
+            <h2>Security</h2>
         </div>
-        <div class="cell">
-            <label>Connect me with others in my area or interested in our local work.</label>
-           <div class="switch large">
-            <input class="switch-input" id="connect-with-others" type="checkbox" name="exampleSwitch">
-            <label class="switch-paddle" for="connect-with-others">
-              <span class="show-for-sr">Hide on public map?</span>
-              <span class="switch-active" aria-hidden="true">Yes</span>
-              <span class="switch-inactive" aria-hidden="true">No</span>
-            </label>
-          </div>
+         <div class="cell">
+            <div class="small button-group" id="restrictions_wrapper" style="display: inline-block"></div>
         </div>
       </div>
     </div>
    `)
 
-  window.load_mapbox( location.lng, location.lat, data.ID, 'contacts' )
-
-  // add fields
-  if ( typeof jsObject.post_fields.milestones !== 'undefined' ){
+  /* SETUP */
+  /* milestones */
+  if ( typeof jsObject.post_fields.leader_milestones !== 'undefined' ){
     let m_wrapper = jQuery('#milestone_wrapper')
     let m_class = ''
-    jQuery.each(jsObject.post_fields.milestones.default, function(i,v){
+    jQuery.each(jsObject.post_fields.leader_milestones.default, function(i,v){
       m_class = 'empty-select-button'
-      if ( typeof data.milestones !== 'undefined' && findValueInArray(i,data.milestones) ){
+      if ( typeof data.leader_milestones !== 'undefined' && findValueInArray(i,data.leader_milestones) ){
         m_class = 'selected-select-button'
       }
       m_wrapper.append(`
-        <button id="${i}" type="button" data-field-key="milestones" data-option-key="${i}" class="dt_multi_select ${m_class} select-button button">
+        <button id="${i}" type="button" data-field-key="leader_milestones" data-option-key="${i}" class="dt_multi_select ${m_class} select-button button">
           <img class="dt-icon" src="${v.icon}">
             ${v.label}
         </button>
       `)
     })
   }
-
+  if ( typeof jsObject.post_fields.leader_community_restrictions !== 'undefined' ){
+    let m_wrapper = jQuery('#restrictions_wrapper')
+    let m_class = ''
+    jQuery.each(jsObject.post_fields.leader_community_restrictions.default, function(i,v){
+      m_class = 'empty-select-button'
+      if ( typeof data.leader_community_restrictions !== 'undefined' && findValueInArray(i,data.leader_community_restrictions) ){
+        m_class = 'selected-select-button'
+      }
+      m_wrapper.append(`
+        <button id="${i}" type="button" data-field-key="leader_community_restrictions" data-option-key="${i}" class="dt_multi_select ${m_class} select-button button">
+          <img class="dt-icon" src="${v.icon}">
+            ${v.label}
+        </button>
+      `)
+    })
+  }
+  /* phone */
   let phone_container = jQuery('#phone-container')
   let phone_value = ''
   if ( typeof data.contact_phone !== 'undefined' ){
@@ -189,7 +183,7 @@ window.write_profile = ( data ) => {
         </div>
     </div>
   `)
-
+  /* email */
   let email_container = jQuery('#email-container')
   let email_value = ''
   if ( typeof data.contact_email !== 'undefined' ){
@@ -203,8 +197,25 @@ window.write_profile = ( data ) => {
         </div>
     </div>
   `)
+  /* location */
+  let location = {
+    lng: '',
+    lat: '',
+    label: '',
+    grid_meta_id: ''
+  }
+  if ( typeof data.location_grid_meta !== 'undefined' ){
+    location = data.location_grid_meta[0]
+    jQuery('#location-label').html(data.location_grid_meta[0].label)
+    jQuery('.remove-location').show().on('click', function(){
+      console.log('remove')
+      remove_location( data.ID, 'contacts' )
+    })
+  }
+  window.load_mapbox( location.lng, location.lat, data.ID, 'contacts', true )
 
 
+  /* LISTENERS */
   jQuery('.dt-communication-channel.input-group-field.title').on('change', function(e){
     jQuery('.loading-field-spinner.title').addClass('active')
     window.post_profile('update_profile_title', { post_id: data.ID, new_value: e.target.value } )
@@ -276,6 +287,271 @@ function findValueInArray(value,arr){
 
   return result;
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+/*************************************************************************
+ *
+ * Location
+ *
+ ************************************************************************/
+
+window.load_mapbox = (lng,lat, post_id, post_type, save_immediately = false ) => {
+
+  let center, zoom
+  if ( lng ) {
+    center = [lng, lat]
+  } else {
+    center = [-20, 30]
+  }
+
+  /***********************************
+   * Map
+   ***********************************/
+  mapboxgl.accessToken = jsObject.map_key;
+  var map = new mapboxgl.Map({
+    container: 'map-edit',
+    style: 'mapbox://styles/mapbox/light-v10',
+    center: center,
+    zoom: 1
+  });
+
+  window.force_values = false
+  if ( lng ) {
+    let marker_center = new mapboxgl.LngLat(lng, lat)
+    window.active_marker = new mapboxgl.Marker()
+      .setLngLat(marker_center)
+      .addTo(map);
+    map.flyTo({
+      center: center,
+      zoom: 12,
+      bearing: 0,
+      speed: 2, // make the flying slow
+      curve: 1, // change the speed at which it zooms out
+      easing: (t) => t,
+      essential: true
+    });
+    window.force_values = true // wipe out previous location data on the record
+    jQuery('.remove-location').show() // show the removal button
+  }
+
+
+  /***********************************
+   * Click
+   ***********************************/
+  map.on('click', function (e) {
+    console.log(e)
+
+    let lng = e.lngLat.lng
+    let lat = e.lngLat.lat
+    window.active_lnglat = [lng,lat]
+
+    // add marker
+    if ( window.active_marker ) {
+      window.active_marker.remove()
+    }
+    window.active_marker = new mapboxgl.Marker()
+      .setLngLat(e.lngLat )
+      .addTo(map);
+
+    jQuery('#location-label').empty()
+    jQuery('.remove-location').hide()
+
+    window.location_data = {
+      location_grid_meta: {
+        values: [
+          {
+            lng: lng,
+            lat: lat,
+            source: 'user'
+          }
+        ],
+        force_values: window.force_values
+      }
+    }
+    if ( save_immediately ) {
+      save_new_location( post_id, post_type )
+    }
+
+  });
+
+  /***********************************
+   * Search
+   ***********************************/
+  var geocoder = new MapboxGeocoder({
+    accessToken: mapboxgl.accessToken,
+    types: 'country region district locality neighborhood address place',
+    mapboxgl: mapboxgl
+  });
+  map.addControl(geocoder, 'top-left' );
+  geocoder.on('result', function(e) { // respond to search
+    console.log(e)
+    if ( window.active_marker ) {
+      window.active_marker.remove()
+    }
+    window.active_marker = new mapboxgl.Marker()
+      .setLngLat(e.result.center)
+      .addTo(map);
+    geocoder._removeMarker()
+
+    jQuery('#location-label').html(e.result.place_name)
+    jQuery('.remove-location').hide()
+
+    window.location_data = {
+      location_grid_meta: {
+        values: [
+          {
+            lng: e.result.center[0],
+            lat: e.result.center[1],
+            level: e.result.place_type[0],
+            label: e.result.place_name,
+            source: 'user'
+          }
+        ],
+        force_values: window.force_values
+      }
+    }
+
+    if ( save_immediately ) {
+      save_new_location( post_id, post_type )
+    }
+  })
+
+  /***********************************
+   * Geolocate Browser
+   ***********************************/
+  let userGeocode = new mapboxgl.GeolocateControl({
+    positionOptions: {
+      enableHighAccuracy: true
+    },
+    marker: {
+      color: 'orange'
+    },
+    trackUserLocation: false,
+    showUserLocation: false
+  })
+  map.addControl(userGeocode, 'top-left' );
+  userGeocode.on('geolocate', function(e) { // respond to search
+    console.log(e)
+    if ( window.active_marker ) {
+      window.active_marker.remove()
+    }
+
+    let lat = e.coords.latitude
+    let lng = e.coords.longitude
+
+    window.active_lnglat = [lng,lat]
+    window.active_marker = new mapboxgl.Marker()
+      .setLngLat([lng,lat])
+      .addTo(map);
+
+    jQuery('#location-label').empty()
+    jQuery('.remove-location').hide()
+
+    window.location_data = {
+      location_grid_meta: {
+        values: [
+          {
+            lng: lng,
+            lat: lat,
+            source: 'user'
+          }
+        ],
+        force_values: window.force_values
+      }
+    }
+
+    if ( save_immediately ) {
+      save_new_location( post_id, post_type )
+    }
+  })
+
+  let navControl = new mapboxgl.NavigationControl();
+  map.addControl( navControl, 'top-left' );
+  map.touchZoomRotate.disableRotation();
+  map.dragRotate.disable();
+
+}
+
+function activate_geolocation() {
+  jQuery(".mapboxgl-ctrl-geolocate").click();
+}
+
+function save_new_location( id, post_type = 'groups' ) {
+  if ( typeof window.location_data === undefined || window.location_data === false ) {
+    jQuery('#result_display').html(`You haven't selected anything yet. Click, search, or allow auto location.`)
+    return;
+  }
+  jQuery('.loading-field-spinner.location').addClass('active')
+
+  console.log(window.location_data)
+  window.post_item('update_location', {
+    post_id: id,
+    post_type: post_type,
+    location_data: window.location_data,
+    delete: window.force_values
+  })
+    .done(function (result) {
+      console.log(result)
+      jQuery('#location-label').html(result.location_grid_meta[0].label)
+      jQuery('.remove-location').show();
+      jQuery('.loading-field-spinner.location').removeClass('active')
+      window.force_values = true
+
+      // reload flat map
+      if (jsObject.parts.action === 'map') {
+        window.get_grid_data('grid_data', 0)
+          .done(function (x) {
+            jsObject.grid_data = x
+          })
+      }
+    })
+}
+
+function remove_location( id, post_type = 'groups' ) {
+  jQuery('.loading-field-spinner.location').addClass('active')
+  window.post_item('delete_location', { post_id: id, post_type: post_type } )
+    .done(function(result) {
+      console.log(result)
+      jQuery('.remove-location').hide();
+      jQuery('.loading-field-spinner.location').removeClass('active')
+      window.force_values = false
+      window.location_data = {}
+      jQuery('#location-label').empty()
+      window.load_mapbox(null, null, id, post_type )
+    })
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 /*************************************************************************
@@ -740,255 +1016,7 @@ window.load_modal_content = ( post, post_fields ) => {
   jQuery('.loading-spinner').removeClass('active')
 }
 
-window.load_mapbox = (lng,lat, post_id, post_type = 'groups' ) => {
 
-  let center, zoom
-  if ( lng ) {
-    center = [lng, lat]
-  } else {
-    center = [-20, 30]
-  }
-
-  /***********************************
-   * Map
-   ***********************************/
-  mapboxgl.accessToken = jsObject.map_key;
-  var map = new mapboxgl.Map({
-    container: 'map-edit',
-    style: 'mapbox://styles/mapbox/light-v10',
-    center: center,
-    zoom: 1
-  });
-
-  window.force_values = false
-  if ( lng ) {
-    let marker_center = new mapboxgl.LngLat(lng, lat)
-    window.active_marker = new mapboxgl.Marker()
-      .setLngLat(marker_center)
-      .addTo(map);
-    map.flyTo({
-      center: center,
-      zoom: 12,
-      bearing: 0,
-      speed: 2, // make the flying slow
-      curve: 1, // change the speed at which it zooms out
-      easing: (t) => t,
-      essential: true
-    });
-    window.force_values = true // wipe out previous location data on the record
-    jQuery('.remove-location').show() // show the removal button
-  }
-
-
-  /***********************************
-   * Click
-   ***********************************/
-  map.on('click', function (e) {
-    console.log(e)
-
-    let lng = e.lngLat.lng
-    let lat = e.lngLat.lat
-    window.active_lnglat = [lng,lat]
-
-    // add marker
-    if ( window.active_marker ) {
-      window.active_marker.remove()
-    }
-    window.active_marker = new mapboxgl.Marker()
-      .setLngLat(e.lngLat )
-      .addTo(map);
-
-    jQuery('#result_display').html(`Save Clicked Location`)
-    jQuery('.remove-location').hide()
-
-    window.location_data = {
-      location_grid_meta: {
-        values: [
-          {
-            lng: lng,
-            lat: lat,
-            source: 'user'
-          }
-        ],
-        force_values: window.force_values
-      }
-    }
-
-    save_new_location( post_id, post_type )
-  });
-
-  /***********************************
-   * Search
-   ***********************************/
-  var geocoder = new MapboxGeocoder({
-    accessToken: mapboxgl.accessToken,
-    types: 'country region district locality neighborhood address place',
-    mapboxgl: mapboxgl
-  });
-  map.addControl(geocoder, 'top-left' );
-  geocoder.on('result', function(e) { // respond to search
-    console.log(e)
-    if ( window.active_marker ) {
-      window.active_marker.remove()
-    }
-    window.active_marker = new mapboxgl.Marker()
-      .setLngLat(e.result.center)
-      .addTo(map);
-    geocoder._removeMarker()
-
-    jQuery('#result_display').html(`Save Searched Location`)
-    jQuery('.remove-location').hide()
-
-    window.location_data = {
-      location_grid_meta: {
-        values: [
-          {
-            lng: e.result.center[0],
-            lat: e.result.center[1],
-            level: e.result.place_type[0],
-            label: e.result.place_name,
-            source: 'user'
-          }
-        ],
-        force_values: window.force_values
-      }
-    }
-
-    save_new_location( post_id, post_type )
-  })
-
-  /***********************************
-   * Geolocate Browser
-   ***********************************/
-  let userGeocode = new mapboxgl.GeolocateControl({
-    positionOptions: {
-      enableHighAccuracy: true
-    },
-    marker: {
-      color: 'orange'
-    },
-    trackUserLocation: false,
-    showUserLocation: false
-  })
-  map.addControl(userGeocode, 'top-left' );
-  userGeocode.on('geolocate', function(e) { // respond to search
-    console.log(e)
-    if ( window.active_marker ) {
-      window.active_marker.remove()
-    }
-
-    let lat = e.coords.latitude
-    let lng = e.coords.longitude
-
-    window.active_lnglat = [lng,lat]
-    window.active_marker = new mapboxgl.Marker()
-      .setLngLat([lng,lat])
-      .addTo(map);
-
-    jQuery('#result_display').html(`Save Current Location`)
-    jQuery('.remove-location').hide()
-
-    window.location_data = {
-      location_grid_meta: {
-        values: [
-          {
-            lng: lng,
-            lat: lat,
-            source: 'user'
-          }
-        ],
-        force_values: window.force_values
-      }
-    }
-
-    save_new_location( post_id, post_type )
-  })
-
-  let navControl = new mapboxgl.NavigationControl();
-  map.addControl( navControl, 'top-left' );
-  map.touchZoomRotate.disableRotation();
-  map.dragRotate.disable();
-
-}
-
-function activate_geolocation() {
-  jQuery(".mapboxgl-ctrl-geolocate").click();
-}
-
-function save_new_location( id, post_type ) {
-  if ( typeof window.location_data === undefined || window.location_data === false ) {
-    jQuery('#result_display').html(`You haven't selected anything yet. Click, search, or allow auto location.`)
-    return;
-  }
-  jQuery('.loading-field-spinner.group_location').addClass('active')
-
-  console.log(window.location_data)
-
-  if ( 'groups' === post_type ) {
-    window.post_item('update_group_location', {
-      post_id: id,
-      location_data: window.location_data,
-      delete: window.force_values
-    })
-      .done(function (result) {
-        console.log(result)
-        jQuery('.remove-location').show();
-        jQuery('.loading-field-spinner.group_location').removeClass('active')
-        window.force_values = true
-
-        // reload flat map
-        if (jsObject.parts.action === 'map') {
-          window.get_grid_data('grid_data', 0)
-            .done(function (x) {
-              jsObject.grid_data = x
-            })
-        }
-      })
-  } else if ( 'contacts' === post_type ) {
-    window.post_profile('update_profile_location', {
-      post_id: id,
-      location_data: window.location_data,
-      delete: window.force_values
-    })
-      .done(function (result) {
-        console.log(result)
-        jQuery('.remove-location').show();
-        jQuery('.loading-field-spinner.group_location').removeClass('active')
-        window.force_values = true
-
-        // reload flat map
-        if (jsObject.parts.action === 'map') {
-          window.get_grid_data('grid_data', 0)
-            .done(function (x) {
-              jsObject.grid_data = x
-            })
-        }
-      })
-  }
-}
-
-function remove_location( id, post_type = 'groups' ) {
-  jQuery('.loading-field-spinner.group_location').addClass('active')
-  if ( 'groups' === post_type ) {
-    window.post_item('delete_group_location', { post_id: id } )
-      .done(function(result) {
-        console.log(result)
-        jQuery('.remove-location').hide();
-        jQuery('.loading-field-spinner.group_location').removeClass('active')
-        window.load_mapbox()
-        window.force_values = false
-      })
-  } else if ( 'contacts' === post_type ) {
-    window.post_profile('delete_profile_location', { post_id: id } )
-      .done(function(result) {
-        console.log(result)
-        jQuery('.remove-location').hide();
-        jQuery('.loading-field-spinner.profile_location').removeClass('active')
-        window.load_mapbox()
-        window.force_values = false
-      })
-  }
-}
 
 /**
  * Save New Church

@@ -488,6 +488,34 @@ class Zume_App_Portal extends DT_Magic_Url_Base {
         $action = sanitize_text_field( wp_unslash( $params['action'] ) );
 
         switch ( $action ) {
+            // profile support
+            case 'get_profile':
+            case 'update_profile_title':
+            case 'update_profile_phone':
+            case 'update_profile_email':
+            case 'update_profile_location':
+            case 'delete_profile_location':
+            case 'update_multiselect':
+                return $this->_endpoint_profile( $params );
+
+            case 'update_location':
+            case 'delete_location':
+                return $this->_endpoint_location( $params );
+
+            // list and church modal
+            case 'create_church':
+            case 'create_group':
+            case 'create_group_by_map':
+            case 'onItemRemoved':
+            case 'onItemDrop':
+            case 'get_group':
+            case 'update_group_title':
+            case 'update_group_member_count':
+            case 'update_group_start_date':
+            case 'update_group_status':
+                return $this->_endpoint_update_list( $params);
+            case 'load_tree':
+                return $this->_endpoint_load_tree( $params);
 
             // mapping
             case 'self':
@@ -506,42 +534,108 @@ class Zume_App_Portal extends DT_Magic_Url_Base {
             case 'grid_data':
                 $grid_totals = Zume_App_Heatmap::query_church_grid_totals();
                 return Zume_App_Heatmap::_initial_polygon_value_list( $grid_totals, $this->global_div, $this->us_div );
+            default:
+                return new WP_Error( __METHOD__, "Missing valid action", [ 'status' => 400 ] );
+        }
+    }
 
-            // list support
-            case 'load_tree':
-                return $this->_endpoint_get_list( $params);
+    public function _endpoint_location( $params ) {
+        if ( !isset( $params["parts"]["post_type"], $params["parts"]["post_id"] ) ) {
+            return new WP_Error( __METHOD__, "Missing parameters", [ 'status' => 400, 'data' => $params ] );
+        }
+        $post_id = $params["parts"]["post_id"];
+        $post_type = $params["parts"]["post_type"];
+        $action = sanitize_text_field( wp_unslash( $params['action'] ) );
 
-            // update support
-            case 'create_church':
-            case 'create_group':
-            case 'create_group_by_map':
-            case 'onItemRemoved':
-            case 'onItemDrop':
-            case 'get_group':
-            case 'update_group_title':
-            case 'update_group_member_count':
-            case 'update_group_start_date':
-            case 'update_group_status':
-            case 'update_group_location':
-            case 'delete_group_location':
-                return $this->_endpoint_update_list( $params);
+        switch ( $action ) {
+            case 'update_location':
 
-            // profile support
+                $location_data = $params['data']['location_data'];
+
+                delete_post_meta( $post_id, 'location_grid' );
+                delete_post_meta( $post_id, 'location_grid_meta' );
+                Location_Grid_Meta::delete_location_grid_meta( $post_id, 'all', 0 );
+
+                $result = DT_Posts::update_post( $post_type, $post_id, $location_data, false, false );
+
+                if ( 'contacts' === $post_type ) {
+                    Zume_App_Heatmap::clear_practitioner_grid_totals();
+                } else {
+                    Zume_App_Heatmap::clear_church_grid_totals();
+                }
+
+                return $result;
+
+            case 'delete_location':
+                delete_post_meta( $post_id, 'location_grid' );
+                delete_post_meta( $post_id, 'location_grid_meta' );
+
+                Location_Grid_Meta::delete_location_grid_meta( $post_id, 'all', 0 );
+
+                if ( 'contacts' === $post_type ) {
+                    Zume_App_Heatmap::clear_practitioner_grid_totals();
+                } else {
+                    Zume_App_Heatmap::clear_church_grid_totals();
+                }
+
+                return DT_Posts::get_post( $post_type, $post_id, false, false );
+            default:
+                return new WP_Error( __METHOD__, "Missing valid action", [ 'status' => 400 ] );
+
+        }
+    }
+
+    public function _endpoint_profile( $params ) {
+
+        $post_id = $params["parts"]["post_id"];
+        $post = DT_Posts::get_post( $this->post_type, $post_id, true, false );
+
+        $action = sanitize_text_field( wp_unslash( $params['action'] ) );
+
+        switch ( $action ) {
             case 'get_profile':
+                return $post;
             case 'update_profile_title':
+                $fields = [
+                    "nickname" => $params['data']['new_value']
+                ];
+                return DT_Posts::update_post( 'contacts', $post_id, $fields, false, false );
             case 'update_profile_phone':
+                $fields = [
+                    "contact_phone" => [
+                        "values" => [
+                            [ "value" => $params['data']['new_value']],
+                        ],
+                        "force_values" => true
+                    ]
+                ];
+                return DT_Posts::update_post( 'contacts', $post_id, $fields, false, false );
             case 'update_profile_email':
-            case 'update_profile_location':
-            case 'delete_profile_location':
+                $fields = [
+                    "contact_email" => [
+                        "values" => [
+                            [ "value" => $params['data']['new_value']],
+                        ],
+                        "force_values" => true
+                    ]
+                ];
+                return DT_Posts::update_post( 'contacts', $post_id, $fields, false, false );
             case 'update_multiselect':
-                return $this->_endpoint_profile( $params );
+                $fields = [
+                    $params['data']['key'] => [
+                        "values" => [
+                            [ "value" => $params['data']['option'], "delete" => $params['data']['state'] ],
+                        ],
+                    ]
+                ];
+                return DT_Posts::update_post( 'contacts', $post_id, $fields, false, false );
 
             default:
                 return new WP_Error( __METHOD__, "Missing valid action", [ 'status' => 400 ] );
         }
     }
 
-    public function _endpoint_get_list( $params) {
+    public function _endpoint_load_tree( $params) {
         $tree = [];
         $title_list = [];
         $pre_tree = [];
@@ -818,110 +912,9 @@ class Zume_App_Portal extends DT_Magic_Url_Base {
 
                 return DT_Posts::update_post( 'groups', $post_id, [ 'group_status' => trim( $new_value ) ], false, false );
 
-            case 'update_group_location':
 
-                $post_id = $params['data']['post_id'];
-                $location_data = $params['data']['location_data'];
-                $delete = $params['data']['delete'];
-
-                if ( $delete ) {
-                    delete_post_meta( $post_id, 'location_grid' );
-                    delete_post_meta( $post_id, 'location_grid_meta' );
-                    Location_Grid_Meta::delete_location_grid_meta( $post_id, 'all', 0 );
-                }
-
-                $result = DT_Posts::update_post( 'groups', $post_id, $location_data, false, false );
-
-                Zume_App_Heatmap::clear_church_grid_totals();
-
-                return $result;
-
-            case 'delete_group_location':
-                $post_id = $params['data']['post_id'];
-                delete_post_meta( $post_id, 'location_grid' );
-                delete_post_meta( $post_id, 'location_grid_meta' );
-
-                Zume_App_Heatmap::clear_church_grid_totals();
-
-                return Location_Grid_Meta::delete_location_grid_meta( $post_id, 'all', 0 );
         }
         return false;
-    }
-
-    public function _endpoint_profile( $params ) {
-
-        $post_id = $params["parts"]["post_id"];
-        $post = DT_Posts::get_post( $this->post_type, $post_id, true, false );
-
-        $action = sanitize_text_field( wp_unslash( $params['action'] ) );
-
-        switch ( $action ) {
-            case 'get_profile':
-                return $post;
-            case 'update_profile_title':
-                 $fields = [
-                      "practitioner_community_name" => $params['data']['new_value']
-                 ];
-                return DT_Posts::update_post( 'contacts', $post_id, $fields, false, false );
-            case 'update_profile_phone':
-                $fields = [
-                    "contact_phone" => [
-                        "values" => [
-                            [ "value" => $params['data']['new_value']],
-                        ],
-                        "force_values" => true
-                    ]
-                ];
-                return DT_Posts::update_post( 'contacts', $post_id, $fields, false, false );
-            case 'update_profile_email':
-                $fields = [
-                    "contact_email" => [
-                        "values" => [
-                            [ "value" => $params['data']['new_value']],
-                        ],
-                        "force_values" => true
-                    ]
-                ];
-                return DT_Posts::update_post( 'contacts', $post_id, $fields, false, false );
-            case 'update_multiselect':
-                $fields = [
-                    $params['data']['key'] => [
-                        "values" => [
-                            [ "value" => $params['data']['option'], "delete" => $params['data']['state'] ],
-                        ],
-                    ]
-                ];
-                return DT_Posts::update_post( 'contacts', $post_id, $fields, false, false );
-            case 'update_profile_location':
-
-                $post_id = $params['data']['post_id'];
-                $location_data = $params['data']['location_data'];
-                $delete = $params['data']['delete'];
-
-                if ( $delete ) {
-                    delete_post_meta( $post_id, 'location_grid' );
-                    delete_post_meta( $post_id, 'location_grid_meta' );
-                    Location_Grid_Meta::delete_location_grid_meta( $post_id, 'all', 0 );
-                }
-
-                $result = DT_Posts::update_post( 'contacts', $post_id, $location_data, false, false );
-
-                Zume_App_Heatmap::clear_practitioner_grid_totals();
-
-                return $result;
-
-            case 'delete_profile_location':
-                $post_id = $params['data']['post_id'];
-                delete_post_meta( $post_id, 'location_grid' );
-                delete_post_meta( $post_id, 'location_grid_meta' );
-
-                Zume_App_Heatmap::clear_practitioner_grid_totals();
-
-                return Location_Grid_Meta::delete_location_grid_meta( $post_id, 'all', 0 );
-
-            default:
-                return new WP_Error( __METHOD__, "Missing valid action", [ 'status' => 400 ] );
-        }
     }
 
     public function get_custom_map_markers( $post_id ) {

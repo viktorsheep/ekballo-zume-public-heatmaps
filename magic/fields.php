@@ -36,35 +36,59 @@ class Zume_Public_Map_Fields {
         //check if we are dealing with a contact
         if ( $post_type === "contacts" ) {
             if ( isset( $fields["overall_status"] ) && !isset( $fields["overall_status"]["default"]["reporting_only"] ) ) {
-                $fields["overall_status"]["default"]["reporting_only"] = __( "Reporting Only", 'zume-public-heatmaps' );
+                $fields["overall_status"]["default"]["reporting_only"] = [
+                    'label' => 'Reporting Only',
+                    'description' => 'Contact is a practitioner reporting on church progress.',
+                    'color' => '#F43636'
+                    ];
             }
-
-            if ( isset( $fields["milestones"] ) && !isset( $fields["milestones"]["default"]["milestones_trained"] ) ) {
-                $fields["milestones"]["default"]["milestones_trained"] = [
-                    "label" => __( "DMM Trained", 'zume-public-heatmaps' ),
-                    "description" => 'This is a DMM trained person. This milestone contributes to the Zúme public mapping system.',
-                    "icon" => get_template_directory_uri() . "/dt-assets/images/coach.svg?v=2",
-                ];
-            }
-            if ( isset( $fields["milestones"] ) && !isset( $fields["milestones"]["default"]["milestones_practicing"] ) ) {
-                $fields["milestones"]["default"]["milestones_practicing"] = [
-                    "label" => __( "DMM Practicing", 'zume-public-heatmaps' ),
-                    "description" => 'This is a DMM practitioner. This milestone contributes to the Zúme public mapping system.',
-                    "icon" => get_template_directory_uri() . "/dt-assets/images/group-peer.svg?v=2",
+            if ( isset( $fields["sources"] ) && !isset( $fields["sources"]["default"]["self_registered_reporter"] ) ) {
+                $fields["sources"]["default"]["self_registered_reporter"] = [
+                    'label' => 'Self-Registered Reporter',
+                    'key' => 'self_registered_reporter',
+                    'type' => 'other',
+                    'description' => 'Contact came from self-registration portal as a church reporter.',
+                    'enabled' => 1
                 ];
             }
 
-            $fields["practitioner_community_name"] = [
-                'name' => __( 'Community Name', 'zume-public-heatmaps' ),
-                'description' => __( "Name for sharing in the community.", 'zume-public-heatmaps' ),
-                'type' => 'text',
-                'default' => '',
-                "tile" => "details",
+            $fields["leader_milestones"] = [
+                'name' => __( 'Leader Milestones', 'zume-public-heatmaps' ),
+                'description' => __( "This is a leader/practitioner working towards movement.", 'zume-public-heatmaps' ),
+                'type' => 'multi_select',
+                'default' => [
+                    'trained' => [
+                        'label' => __( 'Trained', 'zume-public-heatmaps' ),
+                        'description' => _x( 'Trained in disciple multiplication.', 'field description', 'zume-public-heatmaps' ),
+                        "icon" => get_template_directory_uri() . '/dt-assets/images/coach.svg?v=2'
+                    ],
+                    'practicing' => [
+                        'label' => __( 'Practicing', 'zume-public-heatmaps' ),
+                        'description' => _x( 'Actively practicing disciple multiplication.', 'field description', 'zume-public-heatmaps' ),
+                        "icon" => get_template_directory_uri() . '/dt-assets/images/group-peer.svg?v=2'
+                    ],
+                    'baptizing' => [
+                        'label' => __( 'Baptizing', 'zume-public-heatmaps' ),
+                        'description' => _x( 'Actively practicing disciple multiplication.', 'field description', 'zume-public-heatmaps' ),
+                        "icon" => get_template_directory_uri() . '/dt-assets/images/group-peer.svg?v=2'
+                    ],
+                    'planting_churches' => [
+                        'label' => __( 'Planting Churches', 'zume-public-heatmaps' ),
+                        'description' => _x( 'Has started a simple church and is working to start others.', 'field description', 'zume-public-heatmaps' ),
+                        "icon" => get_template_directory_uri() . '/dt-assets/images/stream.svg?v=2'
+                    ],
+                    'coaching_leaders' => [
+                        'label' => __( 'Coaching Leaders', 'zume-public-heatmaps' ),
+                        'description' => _x( 'Has experience and can coach other practicing leaders.', 'field description', 'zume-public-heatmaps' ),
+                        "icon" => get_template_directory_uri() . '/dt-assets/images/connection-people.svg?v=2'
+                    ],
+                ],
+                "tile" => "faith",
                 "in_create_form" => true,
                 'icon' => get_template_directory_uri() . "/dt-assets/images/sign-post.svg?v=2",
             ];
 
-            $fields["practitioner_community_restrictions"] = [
+            $fields["leader_community_restrictions"] = [
                 'name' => __( 'Community Restrictions', 'zume-public-heatmaps' ),
                 'description' => __( "Restrictions for communication and publicity of information in the community/coalition/network.", 'zume-public-heatmaps' ),
                 'type' => 'multi_select',
@@ -72,10 +96,12 @@ class Zume_Public_Map_Fields {
                     'no_inquiries' => [
                         'label' => __( 'No Inquiries', 'zume-public-heatmaps' ),
                         'description' => _x( 'Do not connect me with other community members or forward inquiries to me.', 'field description', 'zume-public-heatmaps' ),
+                        "icon" => get_template_directory_uri() . '/dt-assets/images/alert-circle-exc.svg?v=2'
                     ],
                     'no_public_map' => [
                         'label' => __( 'No Public Map', 'zume-public-heatmaps' ),
                         'description' => _x( 'Do not add my location to the public map. Internal maps can have my location.', 'field description', 'zume-public-heatmaps' ),
+                        "icon" => get_template_directory_uri() . '/dt-assets/images/alert-circle-exc.svg?v=2'
                     ]
                 ],
                 "tile" => "details",
@@ -93,6 +119,13 @@ class Zume_Public_Map_Fields {
                 'icon' => get_template_directory_uri() . '/dt-assets/images/coach.svg',
                 'create-icon' => get_template_directory_uri() . '/dt-assets/images/add-group.svg',
             ];
+            $fields["zume_app_portal_magic_key"] = [
+                'name' => __( 'Portal Magic Key', 'zume-public-heatmaps' ),
+                'type' => 'text',
+                'default' => dt_create_unique_key(),
+                "hidden" => true,
+            ];
+//            dt_write_log($fields);
 
         }
         if ( $post_type === "groups" ) {

@@ -50,13 +50,6 @@ jQuery(document).ready(function($){
                     <span id="phone-error" class="form-error">You're phone is required.</span>
                 </div>
 
-                <div class="cell">
-                    <label for="inquiry_permission">Community Permission</label>
-                    <select name="inquiry_permission" id="inquiry_permission">
-                        <option value="yes">(Default) Community inquiries about my reports can be safely forwarded to me</option>
-                        <option value="no">I want to report, but prefer to not be forwarded inquiries</option>
-                    </select>
-                </div>
                 <div class="cell center">
                     <button class="button" id="submit-new">Register</button> <span class="loading-spinner"></span><br>
                     <a class="show-first">back</a>
@@ -169,13 +162,11 @@ jQuery(document).ready(function($){
       return;
     }
 
-    let inquiry_permission = $('#inquiry_permission').val()
 
     let form_data = {
       name: name,
       email: email,
       phone: phone,
-      inquiry_permission: inquiry_permission
     }
 
     window.new_report( 'new_registration', form_data )
@@ -184,13 +175,13 @@ jQuery(document).ready(function($){
         let new_panel = $('#new-panel')
         if ( response.status === 'EMAILED' ) {
           new_panel.empty().html(`
-            Excellent! Check your email for a direct link to your portal.<br><br>
+            Excellent! Check your email for a direct link to your reporting portal.<br><br>
           `)
         }
         else if ( response.status === 'CREATED' ) {
           new_panel.empty().html(`
-            Excellent! You've been sent an email with your personal reporting link.<br><br>
-            <a class="button" href="${response.link}" target="_parent">Open Personal Reporting Portal</a>
+            Excellent! You've been sent an email with your reporting link. Please, complete your remaining community profile.<br><br>
+            <a class="button" href="${response.link}" target="_parent">Open Reporting Portal</a>
           `)
         }
         else if ( response.status === 'FAIL' ) {
