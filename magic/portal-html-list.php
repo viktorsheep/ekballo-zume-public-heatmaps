@@ -17,7 +17,7 @@
 
 <div id="wrapper">
     <div class="dd" id="domenu-0">
-        <button class="dd-new-item">+</button>
+        <button class="dd-new-item" style="font-weight:300;font-size: 1.25rem;display:none;"><i class="fi-plus"></i> ADD NEW CHURCH</button>
         <div id="initial-loading-spinner"><span class="loading-spinner active"></span></div>
         <li class="dd-item-blueprint" id="" data-prev_parent="domenu-0">
             <button class="collapse" data-action="collapse" type="button" style="display: none;">–</button>
@@ -45,10 +45,10 @@
     <div id="modal-title"></div>
     <div id="modal-content"></div>
     <button class="close-button" data-close aria-label="Close modal" type="button">
-        <span aria-hidden="true">Save</span>
+        <span aria-hidden="true">x</span>
     </button>
 </div>
 
-<!--<div class="float dd-new-item">-->
-<!--    <i class="fi fi-plus floating small"></i>-->
-<!--</div>-->
+<div class="float">
+    <i class="fi fi-plus floating small"></i>
+</div>

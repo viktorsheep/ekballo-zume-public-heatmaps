@@ -75,7 +75,7 @@ window.write_profile = ( data ) => {
   content.empty().html(
     `
     <div class="callout">
-      <div class="grid-x">
+      <div class="grid-x" id="profile-form">
         <div class="cell">
             <div class="section-subheader">
                Community Name
@@ -212,7 +212,7 @@ window.write_profile = ( data ) => {
       remove_location( data.ID, 'contacts' )
     })
   }
-  window.load_mapbox( location.lng, location.lat, data.ID, 'contacts', true )
+  window.load_mapbox( 'contacts', true, location.lng, location.lat, data.ID )
 
 
   /* LISTENERS */
@@ -309,7 +309,7 @@ function findValueInArray(value,arr){
  *
  ************************************************************************/
 
-window.load_mapbox = (lng,lat, post_id, post_type, save_immediately = false ) => {
+window.load_mapbox = ( post_type, save_immediately, lng, lat, post_id ) => {
 
   let center, zoom
   if ( lng ) {
@@ -490,7 +490,7 @@ function activate_geolocation() {
   jQuery(".mapboxgl-ctrl-geolocate").click();
 }
 
-function save_new_location( id, post_type = 'groups' ) {
+function save_new_location( post_id, post_type = 'groups' ) {
   if ( typeof window.location_data === undefined || window.location_data === false ) {
     jQuery('#result_display').html(`You haven't selected anything yet. Click, search, or allow auto location.`)
     return;
@@ -499,9 +499,9 @@ function save_new_location( id, post_type = 'groups' ) {
 
   console.log(window.location_data)
   window.post_item('update_location', {
-    post_id: id,
+    post_id: post_id,
     post_type: post_type,
-    location_data: window.location_data,
+    fields: window.location_data,
     delete: window.force_values
   })
     .done(function (result) {
@@ -521,9 +521,9 @@ function save_new_location( id, post_type = 'groups' ) {
     })
 }
 
-function remove_location( id, post_type = 'groups' ) {
+function remove_location( post_id, post_type = 'groups' ) {
   jQuery('.loading-field-spinner.location').addClass('active')
-  window.post_item('delete_location', { post_id: id, post_type: post_type } )
+  window.post_item('delete_location', { post_id: post_id, post_type: post_type, fields: {} } )
     .done(function(result) {
       console.log(result)
       jQuery('.remove-location').hide();
@@ -531,7 +531,7 @@ function remove_location( id, post_type = 'groups' ) {
       window.force_values = false
       window.location_data = {}
       jQuery('#location-label').empty()
-      window.load_mapbox(null, null, id, post_type )
+      window.load_mapbox(post_type, ( 'contacts' ===  post_type ), null, null, post_id )
     })
 }
 
@@ -542,6 +542,134 @@ function remove_location( id, post_type = 'groups' ) {
 
 
 
+
+/*************************************************************************
+ *
+ * New Group Modal
+ *
+ ************************************************************************/
+
+window.open_create_modal = () => {
+  let title = jQuery('#modal-title')
+  let content = jQuery('#modal-content')
+
+  title.empty().html(`<h1>Add New Church</h1>`)
+  content.html(`
+    <div class="grid-x" id="church-modal">
+
+      <!-- title -->
+      <div class="cell">
+        <div class="section-subheader">
+           Name <span style="color:red;">*</span>
+        </div>
+        <div class="input-group">
+          <input id="title" type="text" style="border:0; border-bottom: 1px solid darkgrey;font-size:1.5rem;line-height: 2rem;" placeholder="" value="" autofocus />
+          <div class="input-group-button">
+               <div><span class="loading-field-spinner group_title"></span></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- start date -->
+      <div class="cell">
+        <div class="section-subheader">
+           Start Date
+        </div>
+        <div class="input-group">
+          <input id="date" type="date" style="border:0; border-bottom: 1px solid darkgrey;font-size:1.5rem;line-height: 2rem;"  value="" />
+          <div class="input-group-button">
+               <div><span class="loading-field-spinner group_start_date"></span></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- members -->
+      <div class="cell">
+       <div class="section-subheader">
+           Number of Members
+        </div>
+        <div class="input-group">
+          <input id="members" type="number" style="border:0; border-bottom: 1px solid darkgrey;font-size:1.5rem;line-height: 2rem;" value="0" />
+          <div class="input-group-button">
+               <div><span class="loading-field-spinner group_member_count"></span></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- location -->
+      <div class="cell">
+          <div class="section-subheader">
+             Location
+          </div>
+          <span id="location-label"></span>
+          <div id="map-wrapper-edit">
+              <div id='map-edit'></div>
+          </div>
+        <br>
+        <button type="button"  style="display:none;" class="button primary-button-hollow remove-location">Remove Location</button>
+        <span class="loading-field-spinner location"></span>
+      </div>
+
+      <div class="cell">
+          <button type="button" class="button" id="create_church">Create Church</button> <span class="loading-spinner"></span>
+      </div>
+    </div>
+  `)
+
+  jQuery('#edit-modal').foundation('open')
+
+  jQuery('#create_church').on('click', function(e){
+    let title = jQuery('#title').val()
+    let start_date = jQuery('#date').val()
+    let members = jQuery('#members').val()
+
+    let data = {
+      name: title,
+      start_date: start_date,
+      members: members,
+      location_grid_meta: window.location_data.location_grid_meta
+    }
+
+    window.post_item('create_church', data )
+      .done(function(result) {
+        console.log(result)
+        jQuery('#modal-title').empty()
+        jQuery('#modal-content').empty()
+        jQuery('#edit-modal').foundation('close')
+      })
+  })
+
+  window.load_mapbox( 'groups' )
+}
+jQuery('.float').on('click', function(){
+  window.open_create_modal()
+})
+
+
+
+window.post_item = ( action, data ) => {
+  jQuery('.loading-spinner').addClass('active')
+  return jQuery.ajax({
+    type: "POST",
+    data: JSON.stringify({ action: action, parts: jsObject.parts, data: data }),
+    contentType: "application/json; charset=utf-8",
+    dataType: "json",
+    url: jsObject.root + jsObject.parts.root + '/v1/' + jsObject.parts.type,
+    beforeSend: function (xhr) {
+      xhr.setRequestHeader('X-WP-Nonce', jsObject.nonce )
+    }
+  })
+    .done(function(e) {
+      console.log(e)
+      jQuery('#error').html(e)
+      jQuery('.loading-spinner').removeClass('active')
+    })
+    .fail(function(e) {
+      console.log(e)
+      jQuery('#error').html(e)
+      jQuery('.loading-spinner').removeClass('active')
+    })
+}
 
 
 
@@ -559,24 +687,6 @@ function remove_location( id, post_type = 'groups' ) {
  * List Section
  *
  ************************************************************************/
-window.post_item = ( action, data ) => {
-  return jQuery.ajax({
-    type: "POST",
-    data: JSON.stringify({ action: action, parts: jsObject.parts, data: data }),
-    contentType: "application/json; charset=utf-8",
-    dataType: "json",
-    url: jsObject.root + jsObject.parts.root + '/v1/' + jsObject.parts.type,
-    beforeSend: function (xhr) {
-      xhr.setRequestHeader('X-WP-Nonce', jsObject.nonce )
-    }
-  })
-    .fail(function(e) {
-      console.log(e)
-      jQuery('#error').html(e)
-      jQuery('.loading-spinner').removeClass('active')
-    })
-}
-
 window.load_tree = () => {
   jQuery.ajax({
     type: "POST",
@@ -720,11 +830,11 @@ window.load_domenu = ( data ) => {
   })
   // add listener to top add item box
   jQuery('.dd-new-item').on('click', function() {
-    window.create_group()
+    window.open_create_modal()
   })
   // set listener for add submenu items
   jQuery('#domenu-0 .item-add').on('click', function(e) {
-    window.create_group()
+    window.open_create_modal()
   })
   // set listener for edit button
   jQuery('#domenu-0 .item-edit').on('click', function(e) {
@@ -763,7 +873,7 @@ window.create_group = () => {
   //     }
   //
   //   })
-
+console.log('here')
   window.open_create_modal()
 }
 
@@ -817,9 +927,7 @@ window.open_empty_modal= () => {
 }
 
 
-jQuery('.float').on('click', function(){
-  window.open_create_modal()
-})
+
 
 window.open_modal = ( id ) => {
   let title = jQuery('#modal-title')
@@ -1021,96 +1129,6 @@ window.load_modal_content = ( post, post_fields ) => {
 /**
  * Save New Church
  */
-
-window.open_create_modal= () => {
-  let title = jQuery('#modal-title')
-  let content = jQuery('#modal-content')
-
-  title.empty().html(`<h1>Add New Church</h1>`)
-  content.html(`
-    <div class="grid-x">
-
-      <!-- title -->
-      <div class="cell">
-        Name <span style="color:red;">*</span><br>
-        <div class="input-group">
-          <input id="title" type="text" style="border:0; border-bottom: 1px solid darkgrey;font-size:1.5rem;line-height: 2rem;" placeholder="" value="" autofocus />
-          <div class="input-group-button">
-               <div><span class="loading-field-spinner group_title"></span></div>
-          </div>
-        </div>
-      </div>
-
-      <!-- start date -->
-      <div class="cell">
-        Start Date<br>
-        <div class="input-group">
-          <input id="date" type="date" style="border:0; border-bottom: 1px solid darkgrey;font-size:1.5rem;line-height: 2rem;"  value="" />
-          <div class="input-group-button">
-               <div><span class="loading-field-spinner group_start_date"></span></div>
-          </div>
-        </div>
-      </div>
-
-      <!-- members -->
-      <div class="cell">
-        Number of Members<br>
-        <div class="input-group">
-          <input id="members" type="number" style="border:0; border-bottom: 1px solid darkgrey;font-size:1.5rem;line-height: 2rem;" value="0" />
-          <div class="input-group-button">
-               <div><span class="loading-field-spinner group_member_count"></span></div>
-          </div>
-        </div>
-      </div>
-
-      <!-- location -->
-      <div class="cell" id="mapbox-select">
-        Location<br>
-        <span id="location-label"></span>
-        <div id="map-wrapper-edit">
-            <div id='map-edit'></div>
-        </div>
-        <br>
-        <button type="button" style="display:none;" class="button primary-button-hollow remove-location">Remove Location</button>
-        <span class="loading-field-spinner group_location"></span>
-      </div>
-
-      <div class="cell">
-          <button type="button" class="button" id="create_church">Create Church</button>
-      </div>
-    </div>
-  `)
-
-  jQuery('#edit-modal').foundation('open')
-
-  jQuery('#create_church').on('click', function(e){
-    window.post_new_church()
-  })
-
-  window.load_create_mapbox()
-}
-
-window.post_new_church = () => {
-  let title = jQuery('#title').val()
-  let start_date = jQuery('#date').val()
-  let members = jQuery('#members').val()
-
-  let data = {
-    name: title,
-    start_date: start_date,
-    members: members,
-    location_grid_meta: window.location_data.location_grid_meta
-  }
-
-  window.post_item('create_church', data )
-    .done(function(result) {
-      console.log(result)
-      jQuery('.remove-location').hide();
-      jQuery('.loading-field-spinner.group_location').removeClass('active')
-      window.load_mapbox()
-      window.force_values = false
-    })
-}
 
 window.load_create_mapbox = () => {
 

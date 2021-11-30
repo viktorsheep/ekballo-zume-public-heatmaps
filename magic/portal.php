@@ -256,6 +256,7 @@ class Zume_App_Portal extends DT_Magic_Url_Base {
                 text-align:center;
                 box-shadow: 2px 2px 3px #999;
                 z-index:100;
+                cursor: pointer;
             }
             .floating.fi-plus:before {
                 margin-top:22px;
@@ -265,7 +266,7 @@ class Zume_App_Portal extends DT_Magic_Url_Base {
                 color:white !important;
                 border: 1px solid #3f729b !important;
                 box-shadow: 2px 2px 3px #999;
-                border-radius: 20px !important;
+                border-radius: 5px !important;
             }
 
         </style>
@@ -470,7 +471,7 @@ class Zume_App_Portal extends DT_Magic_Url_Base {
                     'callback' => [ $this, 'endpoint' ],
                     'permission_callback' => function( WP_REST_Request $request ){
                         $magic = new DT_Magic_URL( $this->root );
-                        return $magic->verify_rest_endpoint_permissions_on_post( $request );
+                        return $magic->verify_rest_endpoint_permissions_on_post( $request ); // verify magic permission
                     },
                 ],
             ]
@@ -502,8 +503,11 @@ class Zume_App_Portal extends DT_Magic_Url_Base {
             case 'delete_location':
                 return $this->_endpoint_location( $params );
 
+
+
             // list and church modal
             case 'create_church':
+                return $this->_endpoint_create_church( $params );
             case 'create_group':
             case 'create_group_by_map':
             case 'onItemRemoved':
@@ -516,6 +520,8 @@ class Zume_App_Portal extends DT_Magic_Url_Base {
                 return $this->_endpoint_update_list( $params);
             case 'load_tree':
                 return $this->_endpoint_load_tree( $params);
+
+
 
             // mapping
             case 'self':
@@ -540,23 +546,44 @@ class Zume_App_Portal extends DT_Magic_Url_Base {
     }
 
     public function _endpoint_location( $params ) {
-        if ( !isset( $params["parts"]["post_type"], $params["parts"]["post_id"] ) ) {
+        if ( !isset( $params["data"]["post_type"], $params["data"]["post_id"], $params["parts"]["post_id"], $params["data"]["fields"] ) ) {
             return new WP_Error( __METHOD__, "Missing parameters", [ 'status' => 400, 'data' => $params ] );
         }
-        $post_id = $params["parts"]["post_id"];
-        $post_type = $params["parts"]["post_type"];
+
+        // permission check for groups
+        $contact_id = $params["parts"]["post_id"];
+        if ( 'groups' === $params["data"]["post_type"] ) {
+            // verify contact is a reporter on the contact
+            $contact = DT_Posts::get_post( 'contacts', $contact_id, true, false );
+            if ( is_wp_error( $contact ) || empty( $contact ) || ! isset( $contact['church_reporter'] ) ) {
+                return new WP_Error( __METHOD__, "No group found", [ 'status' => 400, 'data' => $params ] );
+            }
+            $has_permission = false;
+            foreach( $contact['church_reporter'] as $value ) {
+                if ( $params["data"]["post_id"] === $value['ID'] ) {
+                    $has_permission = true;
+                }
+            }
+            if ( ! $has_permission ) {
+                return new WP_Error( __METHOD__, "Contact not listed as a reporter on this group.", [ 'status' => 400, 'data' => $params ] );
+            }
+        }
+
+        // build vars for action
+        $post_id = $params["data"]["post_id"];
+        $post_type = $params["data"]["post_type"];
         $action = sanitize_text_field( wp_unslash( $params['action'] ) );
 
         switch ( $action ) {
             case 'update_location':
 
-                $location_data = $params['data']['location_data'];
+                $fields = $params['data']['fields'];
 
                 delete_post_meta( $post_id, 'location_grid' );
                 delete_post_meta( $post_id, 'location_grid_meta' );
                 Location_Grid_Meta::delete_location_grid_meta( $post_id, 'all', 0 );
 
-                $result = DT_Posts::update_post( $post_type, $post_id, $location_data, false, false );
+                $result = DT_Posts::update_post( $post_type, $post_id, $fields, false, false );
 
                 if ( 'contacts' === $post_type ) {
                     Zume_App_Heatmap::clear_practitioner_grid_totals();
@@ -567,6 +594,7 @@ class Zume_App_Portal extends DT_Magic_Url_Base {
                 return $result;
 
             case 'delete_location':
+
                 delete_post_meta( $post_id, 'location_grid' );
                 delete_post_meta( $post_id, 'location_grid_meta' );
 
@@ -583,6 +611,64 @@ class Zume_App_Portal extends DT_Magic_Url_Base {
                 return new WP_Error( __METHOD__, "Missing valid action", [ 'status' => 400 ] );
 
         }
+    }
+
+    public function _endpoint_create_church( $params )
+    {
+        if (!isset($params["data"]["name"], $params["data"]["members"], $params["data"]["start_date"], $params["data"]["location_grid_meta"] ) ) {
+            return new WP_Error(__METHOD__, "Missing parameters", ['status' => 400, 'data' => $params]);
+        }
+
+        $post_id = $params["parts"]["post_id"]; //has been verified in verify_rest_endpoint_permissions_on_post()
+//        $post = DT_Posts::get_post( $this->post_type, $post_id, true, false );
+
+//                $inc = $params['data']['inc'];
+//                $temp_id = $params['data']['temp_id'];
+//                $parent_id = $params['data']['parent_id'];
+
+        $fields = [
+            "title" => $params["data"]['name'],
+            "group_status" => "active",
+            "group_type" => "church",
+            "church_reporter" => [
+                "values" => [
+                    [ "value" => $post_id ]
+                ]
+            ],
+            'member_count' => $params['data']['members'],
+            "start_date" => $params['data']['start_date'],
+            "church_start_date" => $params['data']['start_date'],
+            'location_grid_meta' => $params['data']['location_grid_meta']
+        ];
+
+//                if ( 'domenu-0' !== $parent_id && is_numeric( $parent_id ) ) {
+//                    $fields["parent_groups"] = [
+//                        "values" => [
+//                            [ "value" => $parent_id ]
+//                        ]
+//                    ];
+//                }
+
+        $new_post = DT_Posts::create_post( 'groups', $fields, true, false );
+        if ( ! is_wp_error( $new_post ) ) {
+            // clear cash on church grid totals
+            Zume_App_Heatmap::clear_church_grid_totals();
+
+            return [
+                'id' => $new_post['ID'],
+                'title' => $new_post['name'],
+//                        'prev_parent' => $parent_id,
+//                        'temp_id' => $temp_id,
+                'post' => $new_post,
+                'post_fields' => DT_Posts::get_post_field_settings( 'groups', true, false ),
+                'custom_marks' => self::get_custom_map_markers( $post_id ),
+            ];
+        }
+        else {
+            dt_write_log( $new_post );
+            return false;
+        }
+
     }
 
     public function _endpoint_profile( $params ) {

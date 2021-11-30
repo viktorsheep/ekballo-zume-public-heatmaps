@@ -26,16 +26,3 @@ DT_Mapbox_API::geocoder_scripts();
 <div id="wrapper">
     <span class="loading-spinner active"></span>
 </div>
-
-<div class="reveal large" id="edit-modal" data-v-offset="0" data-close-on-click="false" data-reveal>
-    <div id="modal-title"></div>
-    <div id="modal-content"></div>
-    <button class="close-button" data-close aria-label="Close modal" type="button">
-        <span aria-hidden="true">Save</span>
-    </button>
-</div>
-
-<div class="float">
-    <i class="fi fi-plus floating small"></i>
-</div>
-

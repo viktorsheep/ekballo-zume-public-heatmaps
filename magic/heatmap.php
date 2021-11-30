@@ -2112,7 +2112,7 @@ class Zume_App_Heatmap {
                         FROM $wpdb->postmeta as pm
                         JOIN $wpdb->posts as p ON p.ID=pm.post_id AND p.post_type = 'contacts'
                         JOIN $wpdb->postmeta as pm2 ON pm2.post_id=pm.post_id AND pm2.meta_key = 'overall_status' AND pm2.meta_value != 'closed'
-                        JOIN $wpdb->postmeta as pm3 ON pm3.post_id=pm.post_id AND pm3.meta_key = 'milestones' AND pm3.meta_value = 'milestones_practicing'
+                        JOIN $wpdb->postmeta as pm3 ON pm3.post_id=pm.post_id AND pm3.meta_key = 'leader_milestones' AND pm3.meta_value = 'practicing'
                         LEFT JOIN $wpdb->dt_location_grid as lg ON pm.meta_value=lg.grid_id
                         WHERE pm.meta_key = 'location_grid'
                     ) as t0
@@ -2127,7 +2127,7 @@ class Zume_App_Heatmap {
                         FROM $wpdb->postmeta as pm
                         JOIN $wpdb->posts as p ON p.ID=pm.post_id AND p.post_type = 'contacts'
                         JOIN $wpdb->postmeta as pm2 ON pm2.post_id=pm.post_id AND pm2.meta_key = 'overall_status' AND pm2.meta_value != 'closed'
-                        JOIN $wpdb->postmeta as pm3 ON pm3.post_id=pm.post_id AND pm3.meta_key = 'milestones' AND pm3.meta_value = 'milestones_practicing'
+                        JOIN $wpdb->postmeta as pm3 ON pm3.post_id=pm.post_id AND pm3.meta_key = 'leader_milestones' AND pm3.meta_value = 'practicing'
                         LEFT JOIN $wpdb->dt_location_grid as lg ON pm.meta_value=lg.grid_id
                         WHERE pm.meta_key = 'location_grid'
                     ) as t1
@@ -2142,7 +2142,7 @@ class Zume_App_Heatmap {
                         FROM $wpdb->postmeta as pm
                         JOIN $wpdb->posts as p ON p.ID=pm.post_id AND p.post_type = 'contacts'
                         JOIN $wpdb->postmeta as pm2 ON pm2.post_id=pm.post_id AND pm2.meta_key = 'overall_status' AND pm2.meta_value != 'closed'
-                        JOIN $wpdb->postmeta as pm3 ON pm3.post_id=pm.post_id AND pm3.meta_key = 'milestones' AND pm3.meta_value = 'milestones_practicing'
+                        JOIN $wpdb->postmeta as pm3 ON pm3.post_id=pm.post_id AND pm3.meta_key = 'leader_milestones' AND pm3.meta_value = 'practicing'
                         LEFT JOIN $wpdb->dt_location_grid as lg ON pm.meta_value=lg.grid_id
                         WHERE pm.meta_key = 'location_grid'
                     ) as t2
@@ -2157,7 +2157,7 @@ class Zume_App_Heatmap {
                         FROM $wpdb->postmeta as pm
                         JOIN $wpdb->posts as p ON p.ID=pm.post_id AND p.post_type = 'contacts'
                         JOIN $wpdb->postmeta as pm2 ON pm2.post_id=pm.post_id AND pm2.meta_key = 'overall_status' AND pm2.meta_value != 'closed'
-                        JOIN $wpdb->postmeta as pm3 ON pm3.post_id=pm.post_id AND pm3.meta_key = 'milestones' AND pm3.meta_value = 'milestones_practicing'
+                        JOIN $wpdb->postmeta as pm3 ON pm3.post_id=pm.post_id AND pm3.meta_key = 'leader_milestones' AND pm3.meta_value = 'practicing'
                         LEFT JOIN $wpdb->dt_location_grid as lg ON pm.meta_value=lg.grid_id
                         WHERE pm.meta_key = 'location_grid'
                     ) as t3
@@ -2173,7 +2173,7 @@ class Zume_App_Heatmap {
                             FROM $wpdb->postmeta as pm
                             JOIN $wpdb->posts as p ON p.ID=pm.post_id AND p.post_type = 'contacts'
                             JOIN $wpdb->postmeta as pm2 ON pm2.post_id=pm.post_id AND pm2.meta_key = 'overall_status' AND pm2.meta_value != 'closed'
-                            JOIN $wpdb->postmeta as pm3 ON pm3.post_id=pm.post_id AND pm3.meta_key = 'milestones' AND pm3.meta_value = 'milestones_practicing'
+                            JOIN $wpdb->postmeta as pm3 ON pm3.post_id=pm.post_id AND pm3.meta_key = 'leader_milestones' AND pm3.meta_value = 'practicing'
                             LEFT JOIN $wpdb->dt_location_grid as lg ON pm.meta_value=lg.grid_id
                             WHERE pm.meta_key = 'location_grid'
                          ) as tw
@@ -2188,7 +2188,7 @@ class Zume_App_Heatmap {
                         FROM $wpdb->postmeta as pm
                         JOIN $wpdb->posts as p ON p.ID=pm.post_id AND p.post_type = 'contacts'
                         JOIN $wpdb->postmeta as pm2 ON pm2.post_id=pm.post_id AND pm2.meta_key = 'overall_status' AND pm2.meta_value != 'closed'
-                        JOIN $wpdb->postmeta as pm3 ON pm3.post_id=pm.post_id AND pm3.meta_key = 'milestones' AND pm3.meta_value = 'milestones_practicing'
+                        JOIN $wpdb->postmeta as pm3 ON pm3.post_id=pm.post_id AND pm3.meta_key = 'leader_milestones' AND pm3.meta_value = 'practicing'
                         LEFT JOIN $wpdb->dt_location_grid as lg ON pm.meta_value=lg.grid_id
                         WHERE pm.meta_key = 'location_grid'
                     ) as t0
@@ -2200,7 +2200,7 @@ class Zume_App_Heatmap {
                         FROM $wpdb->postmeta as pm
                         JOIN $wpdb->posts as p ON p.ID=pm.post_id AND p.post_type = 'contacts'
                         JOIN $wpdb->postmeta as pm2 ON pm2.post_id=pm.post_id AND pm2.meta_key = 'overall_status' AND pm2.meta_value != 'closed'
-                        JOIN $wpdb->postmeta as pm3 ON pm3.post_id=pm.post_id AND pm3.meta_key = 'milestones' AND pm3.meta_value = 'milestones_practicing'
+                        JOIN $wpdb->postmeta as pm3 ON pm3.post_id=pm.post_id AND pm3.meta_key = 'leader_milestones' AND pm3.meta_value = 'practicing'
                         LEFT JOIN $wpdb->dt_location_grid as lg ON pm.meta_value=lg.grid_id
                         WHERE pm.meta_key = 'location_grid'
                     ) as t1
@@ -2212,7 +2212,7 @@ class Zume_App_Heatmap {
                         FROM $wpdb->postmeta as pm
                         JOIN $wpdb->posts as p ON p.ID=pm.post_id AND p.post_type = 'contacts'
                         JOIN $wpdb->postmeta as pm2 ON pm2.post_id=pm.post_id AND pm2.meta_key = 'overall_status' AND pm2.meta_value != 'closed'
-                        JOIN $wpdb->postmeta as pm3 ON pm3.post_id=pm.post_id AND pm3.meta_key = 'milestones' AND pm3.meta_value = 'milestones_practicing'
+                        JOIN $wpdb->postmeta as pm3 ON pm3.post_id=pm.post_id AND pm3.meta_key = 'leader_milestones' AND pm3.meta_value = 'practicing'
                         LEFT JOIN $wpdb->dt_location_grid as lg ON pm.meta_value=lg.grid_id
                         WHERE pm.meta_key = 'location_grid'
                     ) as t2
@@ -2224,7 +2224,7 @@ class Zume_App_Heatmap {
                         FROM $wpdb->postmeta as pm
                         JOIN $wpdb->posts as p ON p.ID=pm.post_id AND p.post_type = 'contacts'
                         JOIN $wpdb->postmeta as pm2 ON pm2.post_id=pm.post_id AND pm2.meta_key = 'overall_status' AND pm2.meta_value != 'closed'
-                        JOIN $wpdb->postmeta as pm3 ON pm3.post_id=pm.post_id AND pm3.meta_key = 'milestones' AND pm3.meta_value = 'milestones_practicing'
+                        JOIN $wpdb->postmeta as pm3 ON pm3.post_id=pm.post_id AND pm3.meta_key = 'leader_milestones' AND pm3.meta_value = 'practicing'
                         LEFT JOIN $wpdb->dt_location_grid as lg ON pm.meta_value=lg.grid_id
                         WHERE pm.meta_key = 'location_grid'
                     ) as t3
@@ -2236,7 +2236,7 @@ class Zume_App_Heatmap {
                                 FROM $wpdb->postmeta as pm
                                 JOIN $wpdb->posts as p ON p.ID=pm.post_id AND p.post_type = 'contacts'
                                 JOIN $wpdb->postmeta as pm2 ON pm2.post_id=pm.post_id AND pm2.meta_key = 'overall_status' AND pm2.meta_value != 'closed'
-                                JOIN $wpdb->postmeta as pm3 ON pm3.post_id=pm.post_id AND pm3.meta_key = 'milestones' AND pm3.meta_value = 'milestones_practicing'
+                                JOIN $wpdb->postmeta as pm3 ON pm3.post_id=pm.post_id AND pm3.meta_key = 'leader_milestones' AND pm3.meta_value = 'practicing'
                                 LEFT JOIN $wpdb->dt_location_grid as lg ON pm.meta_value=lg.grid_id
                                 WHERE pm.meta_key = 'location_grid'
                          ) as tw
@@ -2251,7 +2251,7 @@ class Zume_App_Heatmap {
                             FROM $wpdb->postmeta as pm
                             JOIN $wpdb->posts as p ON p.ID=pm.post_id AND p.post_type = 'contacts'
                             JOIN $wpdb->postmeta as pm2 ON pm2.post_id=pm.post_id AND pm2.meta_key = 'overall_status' AND pm2.meta_value != 'closed'
-                            JOIN $wpdb->postmeta as pm3 ON pm3.post_id=pm.post_id AND pm3.meta_key = 'milestones' AND pm3.meta_value = 'milestones_practicing'
+                            JOIN $wpdb->postmeta as pm3 ON pm3.post_id=pm.post_id AND pm3.meta_key = 'leader_milestones' AND pm3.meta_value = 'practicing'
                             LEFT JOIN $wpdb->dt_location_grid as lg ON pm.meta_value=lg.grid_id
                             WHERE pm.meta_key = 'location_grid'
                         ) as t0
@@ -2263,7 +2263,7 @@ class Zume_App_Heatmap {
                             FROM $wpdb->postmeta as pm
                             JOIN $wpdb->posts as p ON p.ID=pm.post_id AND p.post_type = 'contacts'
                             JOIN $wpdb->postmeta as pm2 ON pm2.post_id=pm.post_id AND pm2.meta_key = 'overall_status' AND pm2.meta_value != 'closed'
-                            JOIN $wpdb->postmeta as pm3 ON pm3.post_id=pm.post_id AND pm3.meta_key = 'milestones' AND pm3.meta_value = 'milestones_practicing'
+                            JOIN $wpdb->postmeta as pm3 ON pm3.post_id=pm.post_id AND pm3.meta_key = 'leader_milestones' AND pm3.meta_value = 'practicing'
                             LEFT JOIN $wpdb->dt_location_grid as lg ON pm.meta_value=lg.grid_id
                             WHERE pm.meta_key = 'location_grid'
                         ) as t1
@@ -2275,7 +2275,7 @@ class Zume_App_Heatmap {
                             FROM $wpdb->postmeta as pm
                             JOIN $wpdb->posts as p ON p.ID=pm.post_id AND p.post_type = 'contacts'
                             JOIN $wpdb->postmeta as pm2 ON pm2.post_id=pm.post_id AND pm2.meta_key = 'overall_status' AND pm2.meta_value != 'closed'
-                            JOIN $wpdb->postmeta as pm3 ON pm3.post_id=pm.post_id AND pm3.meta_key = 'milestones' AND pm3.meta_value = 'milestones_practicing'
+                            JOIN $wpdb->postmeta as pm3 ON pm3.post_id=pm.post_id AND pm3.meta_key = 'leader_milestones' AND pm3.meta_value = 'practicing'
                             LEFT JOIN $wpdb->dt_location_grid as lg ON pm.meta_value=lg.grid_id
                             WHERE pm.meta_key = 'location_grid'
                         ) as t2
@@ -2287,7 +2287,7 @@ class Zume_App_Heatmap {
                             FROM $wpdb->postmeta as pm
                             JOIN $wpdb->posts as p ON p.ID=pm.post_id AND p.post_type = 'contacts'
                             JOIN $wpdb->postmeta as pm2 ON pm2.post_id=pm.post_id AND pm2.meta_key = 'overall_status' AND pm2.meta_value != 'closed'
-                            JOIN $wpdb->postmeta as pm3 ON pm3.post_id=pm.post_id AND pm3.meta_key = 'milestones' AND pm3.meta_value = 'milestones_practicing'
+                            JOIN $wpdb->postmeta as pm3 ON pm3.post_id=pm.post_id AND pm3.meta_key = 'leader_milestones' AND pm3.meta_value = 'practicing'
                             LEFT JOIN $wpdb->dt_location_grid as lg ON pm.meta_value=lg.grid_id
                             WHERE pm.meta_key = 'location_grid'
                         ) as t3
