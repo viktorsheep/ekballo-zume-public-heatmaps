@@ -176,7 +176,7 @@ function load_map() {
   jQuery('#initialize-screen').hide()
 
   // set title
-  $('#panel-type-title').html(jsObject.trans.title)
+  $('#panel-type-title').html(jsObject.translation.title)
 
   $('.loading-spinner').removeClass('active')
 

@@ -15,6 +15,35 @@ jQuery(document).ready(function() {
   }
 });
 
+window.post_item = ( action, data ) => {
+  jQuery('.loading-spinner').addClass('active')
+  return jQuery.ajax({
+    type: "POST",
+    data: JSON.stringify({ action: action, parts: jsObject.parts, data: data }),
+    contentType: "application/json; charset=utf-8",
+    dataType: "json",
+    url: jsObject.root + jsObject.parts.root + '/v1/' + jsObject.parts.type,
+    beforeSend: function (xhr) {
+      xhr.setRequestHeader('X-WP-Nonce', jsObject.nonce )
+    }
+  })
+    .done(function(e) {
+      console.log(e)
+      jQuery('#error').html(e)
+      jQuery('.loading-spinner').removeClass('active')
+    })
+    .fail(function(e) {
+      console.log(e)
+      jQuery('#error').html(e)
+      jQuery('.loading-spinner').removeClass('active')
+    })
+}
+
+
+
+
+
+
 
 /***********************************************************************
  *
@@ -512,7 +541,7 @@ function save_new_location( post_id, post_type = 'groups' ) {
       window.force_values = true
 
       // reload flat map
-      if (jsObject.parts.action === 'map') {
+      if ( 'map' === jsObject.parts.action || 'goals_map' === jsObject.parts.action ) {
         window.get_grid_data('grid_data', 0)
           .done(function (x) {
             jsObject.grid_data = x
@@ -563,7 +592,7 @@ window.open_create_modal = () => {
            Name <span style="color:red;">*</span>
         </div>
         <div class="input-group">
-          <input id="title" type="text" style="border:0; border-bottom: 1px solid darkgrey;font-size:1.5rem;line-height: 2rem;" placeholder="" value="" autofocus />
+          <input id="create-title" type="text"  placeholder="" value="" autofocus />
           <div class="input-group-button">
                <div><span class="loading-field-spinner group_title"></span></div>
           </div>
@@ -573,10 +602,10 @@ window.open_create_modal = () => {
       <!-- start date -->
       <div class="cell">
         <div class="section-subheader">
-           Start Date
+           Start Date <span style="color:red;">*</span>
         </div>
         <div class="input-group">
-          <input id="date" type="date" style="border:0; border-bottom: 1px solid darkgrey;font-size:1.5rem;line-height: 2rem;"  value="" />
+          <input id="create-date" type="date" value="" />
           <div class="input-group-button">
                <div><span class="loading-field-spinner group_start_date"></span></div>
           </div>
@@ -586,10 +615,10 @@ window.open_create_modal = () => {
       <!-- members -->
       <div class="cell">
        <div class="section-subheader">
-           Number of Members
+           Number of Members <span style="color:red;">*</span>
         </div>
         <div class="input-group">
-          <input id="members" type="number" style="border:0; border-bottom: 1px solid darkgrey;font-size:1.5rem;line-height: 2rem;" value="0" />
+          <input id="create-members" type="number"  value="0" />
           <div class="input-group-button">
                <div><span class="loading-field-spinner group_member_count"></span></div>
           </div>
@@ -599,7 +628,7 @@ window.open_create_modal = () => {
       <!-- location -->
       <div class="cell">
           <div class="section-subheader">
-             Location
+             Location <span style="color:red;">*</span>
           </div>
           <span id="location-label"></span>
           <div id="map-wrapper-edit">
@@ -610,18 +639,26 @@ window.open_create_modal = () => {
         <span class="loading-field-spinner location"></span>
       </div>
 
+      <!-- parent -->
       <div class="cell">
-          <button type="button" class="button" id="create_church">Create Church</button> <span class="loading-spinner"></span>
+       <div class="section-subheader">
+           Parent Church
+        </div>
+        <div id="create-parent"></div>
+      </div>
+
+      <div class="cell" id="map-action-buttons">
+          <button type="button" class="button" id="create-church">Create Church</button> <span class="loading-spinner"></span>
       </div>
     </div>
   `)
 
   jQuery('#edit-modal').foundation('open')
 
-  jQuery('#create_church').on('click', function(e){
-    let title = jQuery('#title').val()
-    let start_date = jQuery('#date').val()
-    let members = jQuery('#members').val()
+  jQuery('#create-church').on('click', function(e){
+    let title = jQuery('#create-title').val()
+    let start_date = jQuery('#create-date').val()
+    let members = jQuery('#create-members').val()
 
     let data = {
       name: title,
@@ -633,9 +670,23 @@ window.open_create_modal = () => {
     window.post_item('create_church', data )
       .done(function(result) {
         console.log(result)
-        jQuery('#modal-title').empty()
-        jQuery('#modal-content').empty()
-        jQuery('#edit-modal').foundation('close')
+        if ( result ) {
+          jQuery('#modal-title').empty()
+          jQuery('#modal-content').empty()
+          jQuery('#edit-modal').foundation('close')
+
+          jsObject.post = result.contact_post
+
+          // reload current page
+          if ( 'map' === jsObject.parts.action || 'goals_map' === jsObject.parts.action ) {
+            jsObject.custom_marks = result.custom_marks
+            load_map()
+            jQuery('#offCanvasNestedPush').foundation('close')
+
+          } else if ( 'list' === jsObject.parts.action ) {
+            window.load_tree()
+          }
+        }
       })
   })
 
@@ -646,30 +697,6 @@ jQuery('.float').on('click', function(){
 })
 
 
-
-window.post_item = ( action, data ) => {
-  jQuery('.loading-spinner').addClass('active')
-  return jQuery.ajax({
-    type: "POST",
-    data: JSON.stringify({ action: action, parts: jsObject.parts, data: data }),
-    contentType: "application/json; charset=utf-8",
-    dataType: "json",
-    url: jsObject.root + jsObject.parts.root + '/v1/' + jsObject.parts.type,
-    beforeSend: function (xhr) {
-      xhr.setRequestHeader('X-WP-Nonce', jsObject.nonce )
-    }
-  })
-    .done(function(e) {
-      console.log(e)
-      jQuery('#error').html(e)
-      jQuery('.loading-spinner').removeClass('active')
-    })
-    .fail(function(e) {
-      console.log(e)
-      jQuery('#error').html(e)
-      jQuery('.loading-spinner').removeClass('active')
-    })
-}
 
 
 
@@ -688,28 +715,34 @@ window.post_item = ( action, data ) => {
  *
  ************************************************************************/
 window.load_tree = () => {
-  jQuery.ajax({
-    type: "POST",
-    data: JSON.stringify({ action: 'load_tree', parts: jsObject.parts }),
-    contentType: "application/json; charset=utf-8",
-    dataType: "json",
-    url: jsObject.root + jsObject.parts.root + '/v1/' + jsObject.parts.type,
-    beforeSend: function (xhr) {
-      xhr.setRequestHeader('X-WP-Nonce', jsObject.nonce )
-    }
-  })
+  jQuery('#wrapper').html(`
+    <div class="dd" id="domenu-0">
+        <button class="dd-new-item" style="font-weight:300;font-size: 1.25rem;display:none;"><i class="fi-plus"></i> ADD NEW CHURCH</button>
+        <li class="dd-item-blueprint" id="" data-prev_parent="domenu-0">
+            <button class="collapse" data-action="collapse" type="button" style="display: none;">–</button>
+            <button class="expand" data-action="expand" type="button" style="display: none;">+</button>
+            <div class="dd-handle dd3-handle">&nbsp;</div>
+            <div class="dd3-content">
+                <div class="item-name">[item_name]</div>
+                <div class="dd-button-container">
+                    <button class="item-edit">✎</button>
+                    <button class="item-add">+</button>
+                    <button class="item-remove" style="display:none;">&times;</button>
+                </div>
+                <div class="dd-edit-box" style="display: none;">
+                    <input type="text" name="title" autocomplete="off" placeholder="Item"
+                           data-placeholder="Any nice idea for the title?"
+                           data-default-value="Saving New Church {?numeric.increment}">
+                </div>
+            </div>
+        </li>
+        <ol class="dd-list"></ol>
+    </div>
+  `)
+  window.post_item( 'load_tree', {} )
     .done(function(data){
-      console.log(data)
-
       window.load_domenu(data)
-
-      jQuery('.loading-spinner').removeClass('active')
       jQuery('#initial-loading-spinner').hide()
-    })
-    .fail(function(e) {
-      console.log(e)
-      jQuery('#error').html(e)
-      jQuery('.loading-spinner').removeClass('active')
     })
 }
 
@@ -838,16 +871,124 @@ window.load_domenu = ( data ) => {
   })
   // set listener for edit button
   jQuery('#domenu-0 .item-edit').on('click', function(e) {
-    window.open_modal(e.currentTarget.parentNode.parentNode.parentNode.id)
+    window.open_edit_modal(e.currentTarget.parentNode.parentNode.parentNode.id)
+    // window.open_modal(e.currentTarget.parentNode.parentNode.parentNode.id)
   })
 }
 
-window.create_group = () => {
-  console.log('create_group')
-  jQuery('.loading-spinner').addClass('active')
+window.open_edit_modal = ( group_id ) => {
   window.open_empty_modal()
 
-  console.log( window.new_item )
+  window.post_item('get_group', { post_id: group_id } )
+    .done( function( data ) {
+
+      // load
+      window.open_create_modal()
+
+      // fill
+      jQuery('#modal-title').html(`<h1>Edit Church</h1>`)
+      jQuery('#map-action-buttons').html(`
+        <button type="button" class="button" id="edit-church">Save Church Edits</button> <span class="loading-spinner"></span>
+      `)
+      if ( typeof data.post.title !== 'undefined' ) {
+        jQuery('#create-title').val( data.post.title )
+      }
+      if ( typeof data.post.church_start_date.formatted !== 'undefined' ) {
+        jQuery('#create-date').val( data.post.church_start_date.formatted )
+      }
+      if ( typeof data.post.member_count !== 'undefined' ) {
+        jQuery('#create-members').val(data.post.member_count )
+      }
+      let location = {
+        lng: '',
+        lat: '',
+        label: '',
+        grid_meta_id: ''
+      }
+      if ( typeof data.post.location_grid_meta !== 'undefined' ){
+        location = data.post.location_grid_meta[0]
+        jQuery('#location-label').html(data.post.location_grid_meta[0].label)
+        jQuery('.remove-location').show().on('click', function(){
+          console.log('remove')
+          window.location_data = {
+            lng: '',
+            lat: '',
+            label: '',
+            grid_meta_id: ''
+          }
+        })
+      }
+      window.location_data = location
+      window.load_mapbox( 'groups', false, location.lng, location.lat, data.post.ID )
+
+      // listener
+      jQuery('#edit-church').on('click', function(e) {
+        let title = jQuery('#create-title').val()
+        let start_date = jQuery('#create-date').val()
+        let members = jQuery('#create-members').val()
+        let group_status = 'active' // jQuery('#create-group-status').val()
+        let parent_id = 0// jQuery('#create-parent-id').val()
+
+        let fields = {
+          title: title,
+          group_status: group_status,
+          church_start_date: start_date,
+          member_count: members,
+          location_grid_meta: window.location_data.location_grid_meta,
+          parent_groups: {
+            values: [
+              { value: parent_id }
+            ],
+            force_values: true
+          }
+        }
+
+        window.post_item('update_church', { post_id: data.post.ID, fields: fields } )
+          .done(function(result) {
+            console.log(result)
+            if ( result ) {
+              jQuery('#modal-title').empty()
+              jQuery('#modal-content').empty()
+              jQuery('#edit-modal').foundation('close')
+
+              jsObject.post = result.contact_post
+
+              // reload current page
+              if ( 'map' === jsObject.parts.action || 'goals_map' === jsObject.parts.action ) {
+                jsObject.custom_marks = result.custom_marks
+                load_map()
+                jQuery('#offCanvasNestedPush').foundation('close')
+
+              } else if ( 'list' === jsObject.parts.action ) {
+                window.load_tree()
+              }
+            }
+          })
+      })
+
+    })
+    .fail(function(e) {
+      jQuery('#modal-content').html(`Sorry. No group found. Refresh the page and try again.`)
+    })
+
+}
+
+window.open_empty_modal = () => {
+  let title = jQuery('#modal-title')
+  let content = jQuery('#modal-content')
+
+  title.empty().html(`<span class="loading-spinner active"></span>`)
+  content.empty()
+  jQuery('#edit-modal').foundation('open')
+}
+
+
+// window.create_group = () => {
+//   console.log('create_group')
+//   jQuery('.loading-spinner').addClass('active')
+//   window.open_empty_modal()
+//
+//   console.log( window.new_item )
 
   // window.post_item('create_group', window.new_item )
   //   .done(function(response){
@@ -873,58 +1014,12 @@ window.create_group = () => {
   //     }
   //
   //   })
-console.log('here')
-  window.open_create_modal()
-}
+// console.log('here')
+//   window.open_create_modal()
+// }
 
-window.create_group_by_map = ( ) => {
-  console.log('create_group')
-  jQuery('.loading-spinner').addClass('active')
-  window.open_empty_modal()
 
-  let title = jQuery('#report-modal-title').val()
-  let grid_id = jQuery('#report-grid-id').val()
 
-  window.new_inc++
-
-  window.new_item = {
-    inc:  window.new_inc,
-    grid_id: grid_id,
-    title: title
-  }
-
-  window.post_item('create_group_by_map', { inc:  window.new_inc, grid_id: grid_id, title: title } )
-    .done(function(response){
-      console.log(response)
-      if ( response ) {
-
-        // reload mapdata when new church is added
-        window.get_grid_data( 'grid_data', 0)
-          .done(function(x){
-            console.log('updated grid_data')
-            jsObject.grid_data = x
-          })
-
-        response.post.title = ""
-        response.post.name = ""
-        jsObject.custom_marks = response.custom_marks
-        window.load_modal_content( response.post, response.post_fields )
-
-      } else {
-        console.log(response)
-      }
-
-    })
-}
-
-window.open_empty_modal= () => {
-  let title = jQuery('#modal-title')
-  let content = jQuery('#modal-content')
-
-  title.empty().html(`<span class="loading-spinner active"></span>`)
-  content.empty()
-  jQuery('#edit-modal').foundation('open')
-}
 
 
 
@@ -1130,150 +1225,150 @@ window.load_modal_content = ( post, post_fields ) => {
  * Save New Church
  */
 
-window.load_create_mapbox = () => {
-
-  /***********************************
-   * Map
-   ***********************************/
-  mapboxgl.accessToken = jsObject.map_key;
-  var map = new mapboxgl.Map({
-    container: 'map-edit',
-    style: 'mapbox://styles/mapbox/light-v10',
-    center: [-20, 30],
-    zoom: 1
-  });
-
-  /***********************************
-   * Click
-   ***********************************/
-  map.on('click', function (e) {
-    console.log(e)
-
-    let lng = e.lngLat.lng
-    let lat = e.lngLat.lat
-    window.active_lnglat = [lng,lat]
-
-    // add marker
-    if ( window.active_marker ) {
-      window.active_marker.remove()
-    }
-    window.active_marker = new mapboxgl.Marker()
-      .setLngLat(e.lngLat )
-      .addTo(map);
-
-    jQuery('#result_display').html(`Save Clicked Location`)
-    jQuery('.remove-location').hide()
-
-    window.location_data = {
-      location_grid_meta: {
-        values: [
-          {
-            lng: lng,
-            lat: lat,
-            source: 'user'
-          }
-        ],
-        force_values: window.force_values
-      }
-    }
-
-
-    // save_new_location( post_id )
-  });
-
-  /***********************************
-   * Search
-   ***********************************/
-  var geocoder = new MapboxGeocoder({
-    accessToken: mapboxgl.accessToken,
-    types: 'country region district locality neighborhood address place',
-    mapboxgl: mapboxgl
-  });
-  map.addControl(geocoder, 'top-left');
-  geocoder.on('result', function(e) { // respond to search
-    console.log(e)
-    if ( window.active_marker ) {
-      window.active_marker.remove()
-    }
-    window.active_marker = new mapboxgl.Marker()
-      .setLngLat(e.result.center)
-      .addTo(map);
-    geocoder._removeMarker()
-
-    jQuery('#result_display').html(`Save Searched Location`)
-    jQuery('.remove-location').hide()
-
-    window.location_data = {
-      location_grid_meta: {
-        values: [
-          {
-            lng: e.result.center[0],
-            lat: e.result.center[1],
-            level: e.result.place_type[0],
-            label: e.result.place_name,
-            source: 'user'
-          }
-        ],
-        force_values: window.force_values
-      }
-    }
-
-    jQuery('#location-label').empty().html(e.result.place_name)
-    // save_new_location( post_id )
-  })
-
-  /***********************************
-   * Geolocate Browser
-   ***********************************/
-  let userGeocode = new mapboxgl.GeolocateControl({
-    positionOptions: {
-      enableHighAccuracy: true
-    },
-    marker: {
-      color: 'orange'
-    },
-    trackUserLocation: false,
-    showUserLocation: false
-  })
-  map.addControl(userGeocode, 'top-left');
-  userGeocode.on('geolocate', function(e) { // respond to search
-    console.log(e)
-    if ( window.active_marker ) {
-      window.active_marker.remove()
-    }
-
-    let lat = e.coords.latitude
-    let lng = e.coords.longitude
-
-    window.active_lnglat = [lng,lat]
-    window.active_marker = new mapboxgl.Marker()
-      .setLngLat([lng,lat])
-      .addTo(map);
-
-    jQuery('#result_display').html(`Save Current Location`)
-    jQuery('.remove-location').hide()
-
-    window.location_data = {
-      location_grid_meta: {
-        values: [
-          {
-            lng: lng,
-            lat: lat,
-            source: 'user'
-          }
-        ],
-        force_values: window.force_values
-      }
-    }
-
-    // save_new_location( post_id )
-  })
-
-  map.dragRotate.disable();
-  map.touchZoomRotate.disableRotation();
-  map.addControl(new mapboxgl.NavigationControl(), 'top-left');
-
-}
+// window.load_create_mapbox = () => {
+//
+//   /***********************************
+//    * Map
+//    ***********************************/
+//   mapboxgl.accessToken = jsObject.map_key;
+//   var map = new mapboxgl.Map({
+//     container: 'map-edit',
+//     style: 'mapbox://styles/mapbox/light-v10',
+//     center: [-20, 30],
+//     zoom: 1
+//   });
+//
+//   /***********************************
+//    * Click
+//    ***********************************/
+//   map.on('click', function (e) {
+//     console.log(e)
+//
+//     let lng = e.lngLat.lng
+//     let lat = e.lngLat.lat
+//     window.active_lnglat = [lng,lat]
+//
+//     // add marker
+//     if ( window.active_marker ) {
+//       window.active_marker.remove()
+//     }
+//     window.active_marker = new mapboxgl.Marker()
+//       .setLngLat(e.lngLat )
+//       .addTo(map);
+//
+//     jQuery('#result_display').html(`Save Clicked Location`)
+//     jQuery('.remove-location').hide()
+//
+//     window.location_data = {
+//       location_grid_meta: {
+//         values: [
+//           {
+//             lng: lng,
+//             lat: lat,
+//             source: 'user'
+//           }
+//         ],
+//         force_values: window.force_values
+//       }
+//     }
+//
+//
+//     // save_new_location( post_id )
+//   });
+//
+//   /***********************************
+//    * Search
+//    ***********************************/
+//   var geocoder = new MapboxGeocoder({
+//     accessToken: mapboxgl.accessToken,
+//     types: 'country region district locality neighborhood address place',
+//     mapboxgl: mapboxgl
+//   });
+//   map.addControl(geocoder, 'top-left');
+//   geocoder.on('result', function(e) { // respond to search
+//     console.log(e)
+//     if ( window.active_marker ) {
+//       window.active_marker.remove()
+//     }
+//     window.active_marker = new mapboxgl.Marker()
+//       .setLngLat(e.result.center)
+//       .addTo(map);
+//     geocoder._removeMarker()
+//
+//     jQuery('#result_display').html(`Save Searched Location`)
+//     jQuery('.remove-location').hide()
+//
+//     window.location_data = {
+//       location_grid_meta: {
+//         values: [
+//           {
+//             lng: e.result.center[0],
+//             lat: e.result.center[1],
+//             level: e.result.place_type[0],
+//             label: e.result.place_name,
+//             source: 'user'
+//           }
+//         ],
+//         force_values: window.force_values
+//       }
+//     }
+//
+//     jQuery('#location-label').empty().html(e.result.place_name)
+//     // save_new_location( post_id )
+//   })
+//
+//   /***********************************
+//    * Geolocate Browser
+//    ***********************************/
+//   let userGeocode = new mapboxgl.GeolocateControl({
+//     positionOptions: {
+//       enableHighAccuracy: true
+//     },
+//     marker: {
+//       color: 'orange'
+//     },
+//     trackUserLocation: false,
+//     showUserLocation: false
+//   })
+//   map.addControl(userGeocode, 'top-left');
+//   userGeocode.on('geolocate', function(e) { // respond to search
+//     console.log(e)
+//     if ( window.active_marker ) {
+//       window.active_marker.remove()
+//     }
+//
+//     let lat = e.coords.latitude
+//     let lng = e.coords.longitude
+//
+//     window.active_lnglat = [lng,lat]
+//     window.active_marker = new mapboxgl.Marker()
+//       .setLngLat([lng,lat])
+//       .addTo(map);
+//
+//     jQuery('#result_display').html(`Save Current Location`)
+//     jQuery('.remove-location').hide()
+//
+//     window.location_data = {
+//       location_grid_meta: {
+//         values: [
+//           {
+//             lng: lng,
+//             lat: lat,
+//             source: 'user'
+//           }
+//         ],
+//         force_values: window.force_values
+//       }
+//     }
+//
+//     // save_new_location( post_id )
+//   })
+//
+//   map.dragRotate.disable();
+//   map.touchZoomRotate.disableRotation();
+//   map.addControl(new mapboxgl.NavigationControl(), 'top-left');
+//
+// }
 
 
 

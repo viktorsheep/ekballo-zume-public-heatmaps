@@ -9,10 +9,11 @@ class Zume_App_Portal extends DT_Magic_Url_Base {
 
     public $magic = false;
     public $parts = false;
-    public $page_title = 'Practitioner Portal';
-    public $page_description = 'This is a portal for reporting church multiplication and practitioner profile.';
+    public $page_title = 'Reporting Portal';
+    public $page_description = 'This is a portal for reporting church multiplication and community practitioner profile.';
     public $root = "zume_app";
     public $type = 'portal';
+    public $root_url;
     public $post_type = 'contacts';
     private $meta_key = '';
     public $type_actions = [
@@ -20,6 +21,7 @@ class Zume_App_Portal extends DT_Magic_Url_Base {
         'profile' => "Profile",
         'list' => "List View",
         'map' => "Map View",
+        'goals_map' => "Goals Map View",
     ];
     public $us_div = 2500; // this is 2 for every 5000
     public $global_div = 25000; // this equals 2 for every 50000
@@ -54,12 +56,16 @@ class Zume_App_Portal extends DT_Magic_Url_Base {
         }
 
         // load if valid url
+        $this->root_url = site_url() . '/' . $this->parts['root'] . '/' . $this->parts['type'] . '/' . $this->parts['public_key'] . '/';
 
         if ( 'list' === $this->parts['action'] ) {
             add_action( 'dt_blank_body', [ $this, 'list_body' ] );
         }
         else if ( 'map' === $this->parts['action'] ) {
             add_action( 'dt_blank_body', [ $this, 'map_body' ] );
+        }
+        else if ( 'goals_map' === $this->parts['action'] ) {
+            add_action( 'dt_blank_body', [ $this, 'goals_map_body' ] );
         }
         else if ( 'profile' === $this->parts['action'] ) {
             add_action( 'dt_blank_body', [ $this, 'profile_body' ] );
@@ -89,6 +95,10 @@ class Zume_App_Portal extends DT_Magic_Url_Base {
             $allowed_js[] = 'heatmap-js';
             $allowed_js[] = 'mapbox-cookie';
         }
+        else if ( 'goals_map' === $this->parts['action'] ) {
+            $allowed_js[] = 'heatmap-js';
+            $allowed_js[] = 'mapbox-cookie';
+        }
         else if ( 'list' === $this->parts['action'] ) {
             $allowed_js[] = 'portal-app-domenu-js';
         }
@@ -103,6 +113,9 @@ class Zume_App_Portal extends DT_Magic_Url_Base {
         $allowed_css[] = 'portal';
 
         if ( 'map' === $this->parts['action'] ) {
+            $allowed_css[] = 'heatmap-css';
+        }
+        else if ( 'goals_map' === $this->parts['action'] ) {
             $allowed_css[] = 'heatmap-css';
         }
         else if ( 'list' === $this->parts['action'] ) {
@@ -142,6 +155,17 @@ class Zume_App_Portal extends DT_Magic_Url_Base {
 
             wp_enqueue_script( 'mapbox-cookie', trailingslashit( get_stylesheet_directory_uri() ) . 'dt-mapping/geocode-api/mapbox-cookie.js', [ 'jquery', 'jquery-cookie' ], '3.0.0' );
         }
+        else if ( 'goals_map' === $this->parts['action'] ) {
+
+            /* heatmap */
+            wp_enqueue_script( 'heatmap-js', trailingslashit( plugin_dir_url( __FILE__ ) ) . 'heatmap.js', [],
+                filemtime( trailingslashit( plugin_dir_path( __FILE__ ) ) .'heatmap.js' ), true );
+
+            wp_enqueue_style( 'heatmap-css', trailingslashit( plugin_dir_url( __FILE__ ) ) . 'heatmap.css', [],
+                filemtime( trailingslashit( plugin_dir_path( __FILE__ ) ) .'heatmap.css' ) );
+
+            wp_enqueue_script( 'mapbox-cookie', trailingslashit( get_stylesheet_directory_uri() ) . 'dt-mapping/geocode-api/mapbox-cookie.js', [ 'jquery', 'jquery-cookie' ], '3.0.0' );
+        }
         else if ( 'list' === $this->parts['action'] ) {
 
             /* domenu */
@@ -154,38 +178,8 @@ class Zume_App_Portal extends DT_Magic_Url_Base {
 
     }
 
-    /**
-     * @param $filters
-     * @param $post_type
-     * @return mixed
-     *
-     * @todo not currently working
-     */
-    public static function dt_user_list_filters( $filters, $post_type ) {
-        if ($post_type === 'contacts') {
-            $filters["filters"][] = [
-                'ID' => 'active_reporter',
-                'visible' => "1",
-                'type' => 'default',
-                'tab' => 'default',
-                'name' => __( 'Active Reporter', 'disciple_tools' ),
-                'count' => 0,
-                'query' => [
-                    "overall_status" => [ "active_reporter" ]
-                ],
-                'labels' => [
-                    [
-                        'id' => 'active_reporter',
-                        'name' => __( 'Active Reporter', 'disciple_tools' ),
-                        'field' => 'overall_status',
-                    ],
-                ],
-            ];
-        }
-        return $filters;
-    }
-
     public function header_style(){
+        DT_Mapbox_API::geocoder_scripts();
         ?>
         <style>
             body {
@@ -198,10 +192,6 @@ class Zume_App_Portal extends DT_Magic_Url_Base {
             }
             #offCanvasLeft ul {
                 list-style-type: none;
-            }
-            .link {
-                cursor: pointer;
-                color: #3f729b;
             }
             #location-status {
                 height:1.5rem;
@@ -216,7 +206,6 @@ class Zume_App_Portal extends DT_Magic_Url_Base {
                 0% {
                     transform: rotate(0deg);
                 }
-
                 100% {
                     transform: rotate(360deg);
                 }
@@ -240,33 +229,31 @@ class Zume_App_Portal extends DT_Magic_Url_Base {
                 width:100% !important;
                 margin:10px !important;
             }
-
             #map-edit, #map-wrapper-edit  {
                 height: 300px !important;
             }
             .float{
                 position:fixed;
-                width:60px;
-                height:60px;
-                bottom:30px;
-                right:30px;
-                background-color:#3f729b;
+                width: 40px;
+                height: 40px;
+                top: 10px;
+                border: 1px solid white;
+                background-color: #4CAF50;
                 color:#FFF;
                 border-radius:50px;
                 text-align:center;
                 box-shadow: 2px 2px 3px #999;
-                z-index:100;
+                z-index:10;
                 cursor: pointer;
             }
             .floating.fi-plus:before {
-                margin-top:22px;
+                margin-top: 12px;
             }
-            .dd .dd-new-item {
-                background: #3f729b !important;
-                color:white !important;
-                border: 1px solid #3f729b !important;
-                box-shadow: 2px 2px 3px #999;
-                border-radius: 5px !important;
+            .fi-plus.add-new-green {
+                border: 1px solid white;
+                border-radius: 50px;
+                padding:5px 9px;
+                background-color: #4CAF50;
             }
 
         </style>
@@ -279,6 +266,14 @@ class Zume_App_Portal extends DT_Magic_Url_Base {
      * @see DT_Magic_Url_Base()->footer_javascript() for default state
      */
     public function footer_javascript(){
+        $post_id = $this->parts["post_id"];
+        $post = DT_Posts::get_post( $this->post_type, $post_id, true, false );
+        if ( is_wp_error( $post ) ){
+            return;
+        }
+        $translation = [
+            'add' => __( 'Add Magic', 'disciple_tools' ),
+        ];
 
         if ( 'map' === $this->parts['action'] ) {
             ?>
@@ -291,11 +286,64 @@ class Zume_App_Portal extends DT_Magic_Url_Base {
                     'nonce' => wp_create_nonce( 'wp_rest' ),
                     'intro_images' => trailingslashit( plugin_dir_url( __FILE__ ) ) . 'images/',
                     'parts' => $this->parts,
+                    'post' => [],
+                    'post_fields' => [],
                     'post_type' => 'groups',
-                    'trans' => [
-                        'add' => __( 'Add Magic', 'disciple_tools' ),
-                    ],
-                    'grid_data' => ['data' => [], 'highest_value' => 1 ],
+                    'translation' => $translation,
+                    'grid_data' => ['data' => [], 'highest_value' => 1 ], // placeholder. filled by api call
+                    'custom_marks' => $this->get_custom_map_markers( $this->parts['post_id'] )
+                ]) ?>][0]
+
+                /* custom content */
+                function load_self_content( data ) {
+                    let pop_div = data.population_division_int * 2
+                    jQuery('#custom-paragraph').html(`
+                          <span class="self_name ucwords temp-spinner bold">${data.name}</span> is one of <span class="self_peers  bold">${data.peers}</span>
+                          administrative divisions in <span class="parent_name ucwords bold">${data.parent_name}</span> and it has a population of
+                          <span class="self_population  bold">${data.population}</span>.
+                          In order to reach the community goal of 2 churches for every <span class="population_division  bold">${pop_div.toLocaleString("en-US")}</span> people,
+                          <span class="self_name ucwords  bold">${data.name}</span> needs
+                          <span class="self_needed bold">${data.needed}</span> new churches.
+                    `)
+                }
+                /* custom level content */
+                function load_level_content( data, level ) {
+                    let gl = jQuery('#'+level+'-list-item')
+                    gl.empty()
+                    if ( false !== data ) {
+                        gl.append(`
+                        <div class="cell">
+                          <strong>${data.name}</strong><br>
+                          Population: <span>${data.population}</span><br>
+                          Churches Needed: <span>${data.needed}</span><br>
+                          Churches Reported: <span class="reported_number">${data.reported}</span><br>
+                          Goal Reached: <span>${data.percent}</span>%
+                          <meter class="meter" value="${data.percent}" min="0" low="33" high="66" optimum="100" max="100"></meter>
+                        </div>
+                    `)
+                    }
+                }
+            </script>
+            <?php
+
+            $this->customized_welcome_script();
+        }
+        else if ( 'goals_map' === $this->parts['action'] ) {
+            ?>
+            <script>
+                let jsObject = [<?php echo json_encode([
+                    'map_key' => DT_Mapbox_API::get_key(),
+                    'mirror_url' => dt_get_location_grid_mirror( true ),
+                    'theme_uri' => trailingslashit( get_stylesheet_directory_uri() ),
+                    'root' => esc_url_raw( rest_url() ),
+                    'nonce' => wp_create_nonce( 'wp_rest' ),
+                    'intro_images' => trailingslashit( plugin_dir_url( __FILE__ ) ) . 'images/',
+                    'parts' => $this->parts,
+                    'post' => [],
+                    'post_fields' => [],
+                    'post_type' => 'groups',
+                    'translation' => $translation,
+                    'grid_data' => ['data' => [], 'highest_value' => 1 ], // placeholder. filled by api call
                     'custom_marks' => $this->get_custom_map_markers( $this->parts['post_id'] )
                 ]) ?>][0]
 
@@ -334,11 +382,6 @@ class Zume_App_Portal extends DT_Magic_Url_Base {
             $this->customized_welcome_script();
         }
         else if ( 'list' === $this->parts['action'] ) {
-            $post_id = $this->parts["post_id"];
-            $post = DT_Posts::get_post( $this->post_type, $post_id, true, false );
-            if ( is_wp_error( $post ) ){
-                return;
-            }
             ?>
             <script>
                 let jsObject = [<?php echo json_encode([
@@ -349,21 +392,17 @@ class Zume_App_Portal extends DT_Magic_Url_Base {
                     'intro_images' => trailingslashit( plugin_dir_url( __FILE__ ) ) . 'images/',
                     'parts' => $this->parts,
                     'post' => $post,
-                    'translations' => [
-                        'add' => __( 'Add Magic', 'disciple-tools-contact-portal' ),
-                    ],
-                    'grid_data' => ['data' => [], 'highest_value' => 1 ],
+                    'post_fields' => [],
+                    'translation' => $translation,
+                    'grid_data' => ['data' => [], 'highest_value' => 1 ], // placeholder. filled by api call
+                    'custom_marks' => [],
+                    'title_list' => $this->get_title_list()
                 ]) ?>][0]
 
             </script>
             <?php
         }
         else if ( 'profile' === $this->parts['action'] ) {
-            $post_id = $this->parts["post_id"];
-            $post = DT_Posts::get_post( $this->post_type, $post_id, true, false );
-            if ( is_wp_error( $post ) ){
-                return;
-            }
             $post_fields = DT_Posts::get_post_field_settings( $this->post_type );
             ?>
             <script>
@@ -376,23 +415,14 @@ class Zume_App_Portal extends DT_Magic_Url_Base {
                     'parts' => $this->parts,
                     'post' => $post,
                     'post_fields' => $post_fields,
-                    'translations' => [
-                        'add' => __( 'Add Magic', 'disciple-tools-contact-portal' ),
-                    ],
-                    'grid_data' => ['data' => [], 'highest_value' => 1 ],
+                    'translation' => $translation,
+                    'grid_data' => ['data' => [], 'highest_value' => 1 ], // placeholder. filled by api call
+                    'custom_marks' => []
                 ]) ?>][0]
-
-
             </script>
             <?php
         }
         else if ( '' === $this->parts['action'] ) {
-            $post_id = $this->parts["post_id"];
-            $post = DT_Posts::get_post( $this->post_type, $post_id, true, false );
-            if ( is_wp_error( $post ) ){
-                return;
-            }
-
             ?>
             <script>
                 let jsObject = [<?php echo json_encode([
@@ -403,10 +433,10 @@ class Zume_App_Portal extends DT_Magic_Url_Base {
                     'intro_images' => trailingslashit( plugin_dir_url( __FILE__ ) ) . 'images/',
                     'parts' => $this->parts,
                     'post' => $post,
-                    'translations' => [
-                        'add' => __( 'Add Magic', 'disciple-tools-contact-portal' ),
-                    ],
-                    'grid_data' => ['data' => [], 'highest_value' => 1 ],
+                    'post_fields' => [],
+                    'translation' => $translation,
+                    'grid_data' => ['data' => [], 'highest_value' => 1 ], // placeholder. filled by api call
+                    'custom_marks' => []
                 ]) ?>][0]
 
                 jQuery('.loading-spinner').removeClass('active')
@@ -415,20 +445,381 @@ class Zume_App_Portal extends DT_Magic_Url_Base {
         }
     }
 
-    public function list_body(){
-        require_once( 'portal-html-list.php' );
-    }
+    public function home_body(){
+        ?>
+        <!-- title -->
+        <div class="grid-x">
+            <div class="cell padding-1" >
+                <button type="button" style="margin:1em .5em 1em;" id="menu-icon" data-open="offCanvasLeft"><i class="fi-list" style="font-size:2em;"></i></button>
+                <span style="font-size:1.5rem;font-weight: bold;">Home</span>
+                <?php if ( ! wp_is_mobile() ) : ?>
+                    <span class="loading-spinner active"></span>
+                <?php endif; ?>
+            </div>
+        </div>
 
-    public function map_body(){
-        require_once( 'portal-html-map.php' );
+        <!-- nav -->
+        <?php $this->nav(); ?>
+
+        <div id="wrapper">
+            <div class="grid-x">
+                <div class="cell top-message"></div>
+                <div class="cell">
+                    <a class="button large expanded" href="<?php echo esc_url( $this->root_url . 'profile' ) ?>"><i class="fi-torso"></i> COMMUNITY PROFILE</a>
+                </div>
+                <div class="cell">
+                    <a class="button large expanded" href="<?php echo esc_url( $this->root_url . 'list' ) ?>"><i class="fi-list-thumbnails"></i> EDIT CHURCH LIST</a>
+                </div>
+                <div class="cell">
+                    <a class="button large expanded" href="<?php echo esc_url( $this->root_url . 'map' ) ?>"><i class="fi-map"></i> MAP</a>
+                </div>
+                <div class="cell">
+                    <a class="button large expanded" onclick="window.open_create_modal()"><i class="fi-plus add-new-green"></i> ADD NEW CHURCH</a>
+                </div>
+            </div>
+        </div>
+
+        <?php
+        $this->create_modal();
     }
 
     public function profile_body(){
-        require_once( 'portal-html-profile.php' );
+        ?>
+        <!-- title -->
+        <div class="grid-x">
+            <div class="cell padding-1" >
+                <button type="button" style="margin:1em .5em 1em;" id="menu-icon" data-open="offCanvasLeft"><i class="fi-list" style="font-size:2em;"></i></button>
+                <a style="margin:1em 1em 1em 0; color:black;" href="<?php echo esc_url( $this->root_url  ) ?>"><i class="fi-home" style="font-size:2em;"></i></a>
+                <span style="font-size:1.5rem;font-weight: bold;">Community Profile</span>
+                <?php if ( ! wp_is_mobile() ) : ?>
+                    <span class="loading-spinner active"></span>
+                <?php endif; ?>
+            </div>
+        </div>
+
+        <!-- nav -->
+        <?php $this->nav(); ?>
+
+        <div id="wrapper">
+            <span class="loading-spinner active"></span>
+        </div>
+        <?php
     }
 
-    public function home_body(){
-        require_once( 'portal-html-home.php' );
+    public function list_body(){
+        ?>
+        <!--title -->
+        <div class="grid-x">
+            <div class="cell padding-1" >
+                <button type="button" style="margin:1em .5em 1em;" id="menu-icon" data-open="offCanvasLeft"><i class="fi-list" style="font-size:2em;"></i></button>
+                <a style="margin:1em 1em 1em 0; color:black;" href="<?php echo esc_url( $this->root_url ) ?>"><i class="fi-home" style="font-size:2em;"></i></a>
+                <span style="font-size:1.5rem;font-weight: bold;">Edit Church List</span>
+                <?php if ( ! wp_is_mobile() ) : ?>
+                    <span class="loading-spinner active"></span>
+                <?php endif; ?>
+            </div>
+        </div>
+
+        <!-- nav -->
+        <?php $this->nav(); ?>
+
+        <!-- body-->
+        <div id="wrapper"></div>
+
+        <!-- modal -->
+        <?php $this->create_modal();
+    }
+
+    public function map_body(){
+        ?>
+        <!-- title -->
+        <div class="grid-x">
+            <div class="cell padding-1" >
+                <button type="button" style="margin:1em .5em 1em;" id="menu-icon" data-open="offCanvasLeft"><i class="fi-list" style="font-size:2em;"></i></button>
+                <a style="margin:1em 1em 1em 0; color:black;" href="<?php echo esc_url( $this->root_url ) ?>"><i class="fi-home" style="font-size:2em;"></i></a>
+                <span style="font-size:1.5rem;font-weight: bold;">Map</span>
+                <?php if ( ! wp_is_mobile() ) : ?>
+                    <span class="loading-spinner active"></span>
+                <?php endif; ?>
+            </div>
+        </div>
+
+        <!-- nav -->
+        <?php $this->nav(); ?>
+
+        <style id="custom-style-portal">
+            #wrapper {
+                height: 2000px !important;
+            }
+            #map-wrapper {
+                height: 2000px !important;
+            }
+            #map {
+                height: 2000px !important;
+            }
+        </style>
+
+        <div id="initialize-screen">
+            <div id="initialize-spinner-wrapper" class="center">
+                <progress class="success initialize-progress" max="46" value="0"></progress><br>
+                Loading the planet ...<br>
+                <span id="initialize-people" style="display:none;">Locating world population...</span><br>
+                <span id="initialize-activity" style="display:none;">Calculating movement activity...</span><br>
+                <span id="initialize-coffee" style="display:none;">Shamelessly brewing coffee...</span><br>
+                <span id="initialize-dothis" style="display:none;">Let's do this...</span><br>
+            </div>
+        </div>
+
+        <div class="large reveal" id="welcome-modal" data-v-offset="10px" data-reveal>
+            <div id="welcome-content" data-close></div>
+            <div class="center"><button class="button" id="welcome-close-button" data-close>Get Started!</button></div>
+        </div>
+
+        <div class="grid-x">
+            <div class="cell medium-9" >
+                <div id="map-wrapper">
+                    <span class="loading-spinner active"></span>
+                    <div id='map'></div>
+                </div>
+            </div>
+            <div class="cell medium-3" id="map-sidebar-wrapper">
+                <!-- details panel -->
+                <div id="details-panel">
+                    <div class="grid-x grid-padding-x" >
+                        <div class="cell">
+                            <h1 id="title"></h1>
+                            <h3>Population: <span id="population">0</span></h3>
+                            <hr>
+                        </div>
+                        <div class="cell">
+                            <h2 id="panel-type-title">Churches</h2>
+                        </div>
+                        <div class="cell" id="needed-row">
+                            <h3>Needed: <span id="needed">0</span></h3>
+                        </div>
+                        <div class="cell">
+                            <h3>Reported: <span id="reported">0</span></h3>
+                        </div>
+                        <div class="cell">
+                            <hr>
+                        </div>
+                        <div class="cell" id="goal-row">
+                            <h2>Goal: <span id="saturation-goal">0</span>%</h2>
+                            <meter id="meter" class="meter" value="30" min="0" low="33" high="66" optimum="100" max="100"></meter>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- start screen training-->
+                <div id="training-start-screen" class="training-content"></div>
+                <div id="training-help-screen" class="training-content" style="display:none;"><hr></div>
+                <div class="center"><i class="fi-info" id="help-toggle-icon" onclick="jQuery('#training-help-screen').toggle()"></i></div>
+            </div>
+        </div>
+
+
+        <!-- modal -->
+        <div class="off-canvas position-right is-closed" id="offCanvasNestedPush" data-transition-time=".3s" data-off-canvas>
+            <input type="hidden" id="report-modal-title" />
+            <input type="hidden" id="report-grid-id" />
+            <div class="grid-x" id="canvas_panel">
+                <div class="cell">
+                    <div class="grid-x">
+                        <div class="cell">
+                            <h1 id="modal_tile"></h1>
+                            <h3>Population: <span id="modal_population">0</span></h3>
+                        </div>
+                    </div>
+                    <hr>
+                </div>
+                <div class="cell" id="slider-content">
+                    <div class="grid-x grid-padding-x">
+                        <div class="cell medium-6">
+                            <div class="grid-x">
+                                <div class="cell">
+                                    <h3>PROGRESS</h3>
+                                </div>
+                                <div class="cell" id="progress-content">
+                                    <div class="grid-x">
+                                        <div class="cell">
+                                            <p id="custom-paragraph" class="temp-spinner"></p>
+                                        </div>
+                                        <div class="cell"><hr></div>
+                                        <div class="cell temp-spinner" id="a3-list-item"></div>
+                                        <div class="cell temp-spinner" id="a2-list-item"></div>
+                                        <div class="cell temp-spinner" id="a1-list-item"></div>
+                                        <div class="cell temp-spinner" id="a0-list-item"></div>
+                                        <div class="cell temp-spinner" id="world-list-item"></div>
+
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="cell medium-6">
+                            <div class="grid-x">
+                                <div class="cell">
+                                    <h3>ACTIVITY</h3>
+                                </div>
+                                <div class="cell"><hr></div>
+                                <div class="cell temp-spinner" id="activity-content"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <button class="close-button" data-close aria-label="Close modal" type="button">
+                <span aria-hidden="true">&times;</span>
+            </button>
+        </div>
+
+        <?php $this->create_modal() ?>
+        <?php
+    }
+
+    public function goals_map_body(){
+        ?>
+        <!-- title -->
+        <div class="grid-x">
+            <div class="cell padding-1" >
+                <button type="button" style="margin:1em .5em 1em;" id="menu-icon" data-open="offCanvasLeft"><i class="fi-list" style="font-size:2em;"></i></button>
+                <a style="margin:1em 1em 1em 0; color:black;" href="<?php echo esc_url( $this->root_url ) ?>"><i class="fi-home" style="font-size:2em;"></i></a>
+                <span style="font-size:1.5rem;font-weight: bold;">Map</span>
+                <?php if ( ! wp_is_mobile() ) : ?>
+                    <span class="loading-spinner active"></span>
+                <?php endif; ?>
+            </div>
+        </div>
+
+        <!-- nav -->
+        <?php $this->nav(); ?>
+
+        <style id="custom-style-portal">
+            #wrapper {
+                height: 2000px !important;
+            }
+            #map-wrapper {
+                height: 2000px !important;
+            }
+            #map {
+                height: 2000px !important;
+            }
+        </style>
+
+        <div id="initialize-screen">
+            <div id="initialize-spinner-wrapper" class="center">
+                <progress class="success initialize-progress" max="46" value="0"></progress><br>
+                Loading the planet ...<br>
+                <span id="initialize-people" style="display:none;">Locating world population...</span><br>
+                <span id="initialize-activity" style="display:none;">Calculating movement activity...</span><br>
+                <span id="initialize-coffee" style="display:none;">Shamelessly brewing coffee...</span><br>
+                <span id="initialize-dothis" style="display:none;">Let's do this...</span><br>
+            </div>
+        </div>
+
+        <div class="large reveal" id="welcome-modal" data-v-offset="10px" data-reveal>
+            <div id="welcome-content" data-close></div>
+            <div class="center"><button class="button" id="welcome-close-button" data-close>Get Started!</button></div>
+        </div>
+
+        <div class="grid-x">
+            <div class="cell medium-9" >
+                <div id="map-wrapper">
+                    <span class="loading-spinner active"></span>
+                    <div id='map'></div>
+                </div>
+            </div>
+            <div class="cell medium-3" id="map-sidebar-wrapper">
+                <!-- details panel -->
+                <div id="details-panel">
+                    <div class="grid-x grid-padding-x" >
+                        <div class="cell">
+                            <h1 id="title"></h1>
+                            <h3>Population: <span id="population">0</span></h3>
+                            <hr>
+                        </div>
+                        <div class="cell">
+                            <h2 id="panel-type-title">Churches</h2>
+                        </div>
+                        <div class="cell" id="needed-row">
+                            <h3>Needed: <span id="needed">0</span></h3>
+                        </div>
+                        <div class="cell">
+                            <h3>Reported: <span id="reported">0</span></h3>
+                        </div>
+                        <div class="cell">
+                            <hr>
+                        </div>
+                        <div class="cell" id="goal-row">
+                            <h2>Goal: <span id="saturation-goal">0</span>%</h2>
+                            <meter id="meter" class="meter" value="30" min="0" low="33" high="66" optimum="100" max="100"></meter>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- start screen training-->
+                <div id="training-start-screen" class="training-content"></div>
+                <div id="training-help-screen" class="training-content" style="display:none;"><hr></div>
+                <div class="center"><i class="fi-info" id="help-toggle-icon" onclick="jQuery('#training-help-screen').toggle()"></i></div>
+            </div>
+        </div>
+
+
+        <!-- modal -->
+        <div class="off-canvas position-right is-closed" id="offCanvasNestedPush" data-transition-time=".3s" data-off-canvas>
+            <input type="hidden" id="report-modal-title" />
+            <input type="hidden" id="report-grid-id" />
+            <div class="grid-x" id="canvas_panel">
+                <div class="cell">
+                    <div class="grid-x">
+                        <div class="cell">
+                            <h1 id="modal_tile"></h1>
+                            <h3>Population: <span id="modal_population">0</span></h3>
+                        </div>
+                    </div>
+                    <hr>
+                </div>
+                <div class="cell" id="slider-content">
+                    <div class="grid-x grid-padding-x">
+                        <div class="cell medium-6">
+                            <div class="grid-x">
+                                <div class="cell">
+                                    <h3>PROGRESS</h3>
+                                </div>
+                                <div class="cell" id="progress-content">
+                                    <div class="grid-x">
+                                        <div class="cell">
+                                            <p id="custom-paragraph" class="temp-spinner"></p>
+                                        </div>
+                                        <div class="cell"><hr></div>
+                                        <div class="cell temp-spinner" id="a3-list-item"></div>
+                                        <div class="cell temp-spinner" id="a2-list-item"></div>
+                                        <div class="cell temp-spinner" id="a1-list-item"></div>
+                                        <div class="cell temp-spinner" id="a0-list-item"></div>
+                                        <div class="cell temp-spinner" id="world-list-item"></div>
+
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="cell medium-6">
+                            <div class="grid-x">
+                                <div class="cell">
+                                    <h3>ACTIVITY</h3>
+                                </div>
+                                <div class="cell"><hr></div>
+                                <div class="cell temp-spinner" id="activity-content"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <button class="close-button" data-close aria-label="Close modal" type="button">
+                <span aria-hidden="true">&times;</span>
+            </button>
+        </div>
+
+        <?php $this->create_modal() ?>
+        <?php
     }
 
     public function nav() {
@@ -442,10 +833,10 @@ class Zume_App_Portal extends DT_Magic_Url_Base {
                 </button>
                 <div class="grid-x grid-padding-x" style="padding:1em">
                     <div class="cell"><br><br></div>
-                    <div class="cell"><a href="<?php echo esc_url( site_url() . '/' . $this->parts['root'] . '/' . $this->parts['type'] . '/' . $this->parts['public_key'] . '/' ) ?>"><h3><i class="fi-home"></i> Home</h3></a></div>
-                    <div class="cell"><a href="<?php echo esc_url( site_url() . '/' . $this->parts['root'] . '/' . $this->parts['type'] . '/' . $this->parts['public_key'] . '/profile' ) ?>"><h3><i class="fi-torso"></i> Community Profile</h3></a></div>
-                    <div class="cell"><a href="<?php echo esc_url( site_url() . '/' . $this->parts['root'] . '/' . $this->parts['type'] . '/' . $this->parts['public_key'] . '/list' ) ?>"><h3><i class="fi-list-thumbnails"></i> Edit Church List</h3></a></div>
-                    <div class="cell"><a href="<?php echo esc_url( site_url() . '/' . $this->parts['root'] . '/' . $this->parts['type'] . '/' . $this->parts['public_key'] . '/map' ) ?>"><h3><i class="fi-map"></i> Map</h3></a></div>
+                    <div class="cell"><a href="<?php echo esc_url( $this->root_url ) ?>"><h3><i class="fi-home"></i> Home</h3></a></div>
+                    <div class="cell"><a href="<?php echo esc_url( $this->root_url . 'profile' ) ?>"><h3><i class="fi-torso"></i> Community Profile</h3></a></div>
+                    <div class="cell"><a href="<?php echo esc_url( $this->root_url . 'list' ) ?>"><h3><i class="fi-list-thumbnails"></i> Edit Church List</h3></a></div>
+                    <div class="cell"><a href="<?php echo esc_url( $this->root_url . 'map' ) ?>"><h3><i class="fi-map"></i> Map</h3></a></div>
                     <br><br>
                 </div>
                 <div class="center" style="position: absolute; bottom: 10px; width:100%;">
@@ -453,6 +844,27 @@ class Zume_App_Portal extends DT_Magic_Url_Base {
                 </div>
             </div>
         </div>
+        <?php
+    }
+
+    public function create_modal() {
+        ?>
+        <div class="reveal large" id="edit-modal" data-v-offset="0" data-close-on-click="false" data-reveal>
+            <div id="modal-title"></div>
+            <div id="modal-content"></div>
+            <button class="close-button" data-close aria-label="Close modal" type="button">
+                <span aria-hidden="true">x</span>
+            </button>
+        </div>
+
+        <div class="float">
+            <i class="fi fi-plus floating small"></i>
+        </div>
+        <script>
+            jQuery(document).ready(function(){
+                jQuery('.float').css('left', window.innerWidth - 50 )
+            })
+        </script>
         <?php
     }
 
@@ -508,8 +920,6 @@ class Zume_App_Portal extends DT_Magic_Url_Base {
             // list and church modal
             case 'create_church':
                 return $this->_endpoint_create_church( $params );
-            case 'create_group':
-            case 'create_group_by_map':
             case 'onItemRemoved':
             case 'onItemDrop':
             case 'get_group':
@@ -517,7 +927,9 @@ class Zume_App_Portal extends DT_Magic_Url_Base {
             case 'update_group_member_count':
             case 'update_group_start_date':
             case 'update_group_status':
+            case 'update_church':
                 return $this->_endpoint_update_list( $params);
+
             case 'load_tree':
                 return $this->_endpoint_load_tree( $params);
 
@@ -628,6 +1040,7 @@ class Zume_App_Portal extends DT_Magic_Url_Base {
 
         $fields = [
             "title" => $params["data"]['name'],
+            "assigned_to" => 0,
             "group_status" => "active",
             "group_type" => "church",
             "church_reporter" => [
@@ -653,14 +1066,20 @@ class Zume_App_Portal extends DT_Magic_Url_Base {
         if ( ! is_wp_error( $new_post ) ) {
             // clear cash on church grid totals
             Zume_App_Heatmap::clear_church_grid_totals();
+            $grid_id = 0;
+            if ( $new_post['location_grid_meta'] ) {
+                $grid_id = $new_post['location_grid_meta']['grid_id'];
+            }
 
             return [
                 'id' => $new_post['ID'],
                 'title' => $new_post['name'],
+                'grid_id' => $grid_id,
+
 //                        'prev_parent' => $parent_id,
 //                        'temp_id' => $temp_id,
-                'post' => $new_post,
-                'post_fields' => DT_Posts::get_post_field_settings( 'groups', true, false ),
+                'contact_post' => DT_Posts::get_post( 'contacts', $post_id, true, false ),
+                'new_church_post' => $new_post,
                 'custom_marks' => self::get_custom_map_markers( $post_id ),
             ];
         }
@@ -757,158 +1176,59 @@ class Zume_App_Portal extends DT_Magic_Url_Base {
         ];
     }
 
+    public function get_title_list() {
+        $title_list = [];
+        $post_id = $this->parts['post_id'];
+        $list = DT_Posts::list_posts('groups', [
+            'fields_to_return' => [],
+            'church_reporter' => [ $post_id ]
+        ], false );
+
+        if ( ! empty( $list['posts'] ) ) {
+            foreach ( $list['posts'] as $p ) {
+                $title_list[$p['ID']] = $p['name'];
+            }
+        }
+        return $title_list;
+    }
+
     public function _endpoint_update_list( $params ) {
 
-        $post_id = $params["parts"]["post_id"]; //has been verified in verify_rest_endpoint_permissions_on_post()
-        $post = DT_Posts::get_post( $this->post_type, $post_id, true, false );
+        $contact_id = $params["parts"]["post_id"]; //has been verified in verify_rest_endpoint_permissions_on_post()
+        $group_id = $params['data']['post_id'];
 
-//        $args = [];
-//        if ( !is_user_logged_in() ){
-//            $args["comment_author"] = $post['name'];
-//            wp_set_current_user( 0 );
-//            $current_user = wp_get_current_user();
-//            $current_user->add_cap( "create_contact" );
-//            $current_user->display_name = $post['name'];
-//        }
 
         switch ( $params['action'] ) {
-            case 'create_church':
-                dt_write_log( 'create_church' );
+            case 'get_group':
+                $group = DT_Posts::get_post( 'groups', $group_id, true, false );
+                if ( empty( $group ) || is_wp_error( $group ) ) {
+                    return new WP_Error( __METHOD__, 'no group found with that id', ['status' => 400, 'data' => $params] );
+                }
 
-//                $inc = $params['data']['inc'];
-//                $temp_id = $params['data']['temp_id'];
-//                $parent_id = $params['data']['parent_id'];
+                // custom permission check. Contact must be coaching group to retrieve group
+                if ( ! isset( $group['church_reporter'] ) || empty( $group['church_reporter'] ) ) {
+                    return new WP_Error( __METHOD__, 'no reporting found for group' );
+                }
+                $found = false;
+                foreach ( $group['church_reporter'] as $coach ) {
+                    if ( (int) $coach['ID'] === (int) $contact_id ) {
+                        $found = true;
+                    }
+                }
 
-                $fields = [
-                    "title" => $post['name'],
-                    "group_status" => "active",
-                    "group_type" => "church",
-                    "church_reporter" => [
-                        "values" => [
-                            [ "value" => $post_id ]
-                        ]
-                    ],
-                    'member_count' => $params['data']['members'],
-                    "start_date" => $params['data']['start_date'],
-                    "church_start_date" => $params['data']['start_date'],
-                    'location_grid_meta' => $params['data']['location_grid_meta']
-                ];
-
-//                if ( 'domenu-0' !== $parent_id && is_numeric( $parent_id ) ) {
-//                    $fields["parent_groups"] = [
-//                        "values" => [
-//                            [ "value" => $parent_id ]
-//                        ]
-//                    ];
-//                }
-
-                $new_post = DT_Posts::create_post( 'groups', $fields, true, false );
-                if ( ! is_wp_error( $new_post ) ) {
-                    // clear cash on church grid totals
-                    Zume_App_Heatmap::clear_church_grid_totals();
-
+                if ( $found ) {
+                    $group_fields = DT_Posts::get_post_field_settings( 'groups', true, false );
                     return [
-                        'id' => $new_post['ID'],
-                        'title' => $new_post['name'],
-//                        'prev_parent' => $parent_id,
-//                        'temp_id' => $temp_id,
-                        'post' => $new_post,
-                        'post_fields' => DT_Posts::get_post_field_settings( 'groups', true, false ),
-                        'custom_marks' => self::get_custom_map_markers( $post_id ),
+                        'post' => $group,
+                        'post_fields' => $group_fields,
                     ];
-                }
-                else {
-                    dt_write_log( $new_post );
-                    return false;
-                }
-            case 'create_group':
-                dt_write_log( 'create_group' );
-
-                $inc = $params['data']['inc'];
-                $temp_id = $params['data']['temp_id'];
-                $parent_id = $params['data']['parent_id'];
-
-                $fields = [
-                    "title" => $post['name'] . ' Church ' . $inc,
-                    "group_status" => "active",
-                    "group_type" => "church",
-                    "church_reporter" => [
-                        "values" => [
-                            [ "value" => $post_id ]
-                        ]
-                    ],
-                ];
-
-                if ( 'domenu-0' !== $parent_id && is_numeric( $parent_id ) ) {
-                    $fields["parent_groups"] = [
-                        "values" => [
-                            [ "value" => $parent_id ]
-                        ]
-                    ];
+                } else {
+                    return new WP_Error( __METHOD__, 'no reporting connection found', ['status' => 400, 'data' => $params] );
                 }
 
-                $new_post = DT_Posts::create_post( 'groups', $fields, true, false );
-                if ( ! is_wp_error( $new_post ) ) {
-                    // clear cash on church grid totals
-                    Zume_App_Heatmap::clear_church_grid_totals();
-
-                    return [
-                        'id' => $new_post['ID'],
-                        'title' => $new_post['name'],
-                        'prev_parent' => $parent_id,
-                        'temp_id' => $temp_id,
-                        'post' => $new_post,
-                        'post_fields' => DT_Posts::get_post_field_settings( 'groups', true, false ),
-                        'custom_marks' => self::get_custom_map_markers( $post_id ),
-                    ];
-                }
-                else {
-                    dt_write_log( $new_post );
-                    return false;
-                }
-
-            case 'create_group_by_map':
-                dt_write_log( 'create_group_by_map' );
-
-                $inc = $params['data']['inc'];
-                $grid_id = $params['data']['grid_id'];
-                $title = $params['data']['title'];
-
-                $fields = [
-                    "title" => $title . ' Church ' .$inc,
-                    "group_status" => "active",
-                    "group_type" => "church",
-                    "church_reporter" => [
-                        "values" => [
-                            [ "value" => $post_id ]
-                        ]
-                    ],
-                    "location_grid_meta" => [
-                        "values" => [
-                            [
-                                "grid_id" => $grid_id
-                            ]
-                        ]
-                    ]
-                ];
-
-                $new_post = DT_Posts::create_post( 'groups', $fields, true, false );
-                if ( ! is_wp_error( $new_post ) ) {
-                    // clear cash on church grid totals
-                    Zume_App_Heatmap::clear_church_grid_totals();
-
-                    return [
-                        'id' => $new_post['ID'],
-                        'title' => $new_post['name'],
-                        'post' => $new_post,
-                        'post_fields' => DT_Posts::get_post_field_settings( 'groups', true, false ),
-                        'custom_marks' => self::get_custom_map_markers( $post_id ),
-                    ];
-                }
-                else {
-                    dt_write_log( $new_post );
-                    return false;
-                }
+            case 'update_church':
+                $fields =  $params['data']['fields'];
+                return DT_Posts::update_post( 'groups', $group_id, $fields, false, false );
 
             case 'onItemRemoved':
                 dt_write_log( 'onItemRemoved' );
@@ -945,58 +1265,25 @@ class Zume_App_Portal extends DT_Magic_Url_Base {
                     ", $params['data']['self'], $params['data']['new_parent'] ) );
                 return true;
 
-            case 'get_group':
-                $id = $params['data']['id'];
-
-                $group = DT_Posts::get_post( 'groups', $id, true, false );
-                if ( empty( $group ) || is_wp_error( $group ) ) {
-                    return new WP_Error( __METHOD__, 'no group found with that id' );
-                }
-
-                // custom permission check. Contact must be coaching group to retrieve group
-                if ( ! isset( $group['church_reporter'] ) || empty( $group['church_reporter'] ) ) {
-                    return new WP_Error( __METHOD__, 'no coaching found for group' );
-                }
-                $found = false;
-                foreach ( $group['church_reporter'] as $coach ) {
-                    if ( (int) $coach['ID'] === (int) $post_id ) {
-                        $found = true;
-                    }
-                }
-
-                if ( $found ) {
-                    $group_fields = DT_Posts::get_post_field_settings( 'groups', true, false );
-                    return [
-                        'post_fields' => $group_fields,
-                        'post' => $group,
-                    ];
-                } else {
-                    return new WP_Error( __METHOD__, 'no coaching connection found' );
-                }
-
             case 'update_group_title':
-                $post_id = $params['data']['post_id'];
                 $new_value = $params['data']['new_value'];
 
-                return DT_Posts::update_post( 'groups', $post_id, [ 'title' => trim( $new_value ) ], false, false );
+                return DT_Posts::update_post( 'groups', $group_id, [ 'title' => trim( $new_value ) ], false, false );
 
             case 'update_group_member_count':
-                $post_id = $params['data']['post_id'];
                 $new_value = $params['data']['new_value'];
 
-                return DT_Posts::update_post( 'groups', $post_id, [ 'member_count' => trim( $new_value ) ], false, false );
+                return DT_Posts::update_post( 'groups', $group_id, [ 'member_count' => trim( $new_value ) ], false, false );
 
             case 'update_group_start_date':
-                $post_id = $params['data']['post_id'];
                 $new_value = $params['data']['new_value'];
 
-                return DT_Posts::update_post( 'groups', $post_id, [ 'church_start_date' => trim( $new_value ) ], false, false );
+                return DT_Posts::update_post( 'groups', $group_id, [ 'church_start_date' => trim( $new_value ) ], false, false );
 
             case 'update_group_status':
-                $post_id = $params['data']['post_id'];
                 $new_value = $params['data']['new_value'];
 
-                return DT_Posts::update_post( 'groups', $post_id, [ 'group_status' => trim( $new_value ) ], false, false );
+                return DT_Posts::update_post( 'groups', $group_id, [ 'group_status' => trim( $new_value ) ], false, false );
 
 
         }
@@ -1008,9 +1295,9 @@ class Zume_App_Portal extends DT_Magic_Url_Base {
         $list = $wpdb->get_results($wpdb->prepare( "
             SELECT lgm.lng, lgm.lat, p.post_title
             FROM $wpdb->p2p as p2p
-            LEFT JOIN $wpdb->dt_location_grid_meta as lgm ON lgm.post_id = p2p.p2p_from
-            LEFT JOIN $wpdb->posts as p ON p.ID = p2p.p2p_from
-            WHERE p2p.p2p_to = %s
+            LEFT JOIN $wpdb->dt_location_grid_meta as lgm ON lgm.post_id = p2p.p2p_to
+            LEFT JOIN $wpdb->posts as p ON p.ID = p2p.p2p_to
+            WHERE p2p.p2p_from = %s AND p2p.p2p_type = 'reporter_to_groups'
         ", $post_id), ARRAY_A );
 
         if ( ! empty( $list ) ) {
