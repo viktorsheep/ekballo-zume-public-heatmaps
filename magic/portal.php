@@ -14,6 +14,8 @@ class Zume_App_Portal extends DT_Magic_Url_Base {
     public $root = "zume_app";
     public $type = 'portal';
     public $root_url;
+    public $post_id;
+    public $post;
     public $post_type = 'contacts';
     private $meta_key = '';
     public $type_actions = [
@@ -73,6 +75,12 @@ class Zume_App_Portal extends DT_Magic_Url_Base {
         else if ( '' === $this->parts['action'] ) {
             add_action( 'dt_blank_body', [ $this, 'home_body' ] );
         } else {
+            return;
+        }
+
+        $this->post_id = $this->parts["post_id"];
+        $this->post = DT_Posts::get_post( $this->post_type, $this->parts["post_id"], true, false );
+        if ( is_wp_error( $this->post ) ){
             return;
         }
 
@@ -266,11 +274,7 @@ class Zume_App_Portal extends DT_Magic_Url_Base {
      * @see DT_Magic_Url_Base()->footer_javascript() for default state
      */
     public function footer_javascript(){
-        $post_id = $this->parts["post_id"];
-        $post = DT_Posts::get_post( $this->post_type, $post_id, true, false );
-        if ( is_wp_error( $post ) ){
-            return;
-        }
+        $post = $this->post;
         $translation = [
             'add' => __( 'Add Magic', 'disciple_tools' ),
         ];
@@ -446,6 +450,7 @@ class Zume_App_Portal extends DT_Magic_Url_Base {
     }
 
     public function home_body(){
+        $post = $this->post;
         ?>
         <!-- title -->
         <div class="grid-x">
@@ -460,6 +465,16 @@ class Zume_App_Portal extends DT_Magic_Url_Base {
 
         <!-- nav -->
         <?php $this->nav(); ?>
+
+        <?php if ( isset( $post['title'] ) ) : ?>
+        <div class="grid-x center">
+            <div class="cell">
+                <h1 style="margin-bottom:0;">Welcome <?php echo $post['title'] ?></h1>
+                <a style="font-size: .8rem;" href="<?php echo esc_url( site_url() . '/' . $this->root . '/reporter_manager/' ) ?>">Not <?php echo $post['title'] ?>?</a>
+            </div>
+        </div>
+        <hr>
+        <?php endif; ?>
 
         <div id="wrapper">
             <div class="grid-x">
@@ -478,6 +493,11 @@ class Zume_App_Portal extends DT_Magic_Url_Base {
                 </div>
             </div>
         </div>
+        <?php if ( isset( $post['title'] ) ) : ?>
+            <div class="grid-x center">
+
+            </div>
+        <?php endif; ?>
 
         <?php
         $this->create_modal();
