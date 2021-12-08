@@ -105,8 +105,8 @@ class Zume_Public_Heatmaps_Cluster_Streams extends DT_Magic_Url_Base {
                 'root' => esc_url_raw( rest_url() ),
                 'nonce' => wp_create_nonce( 'wp_rest' ),
                 'parts' => $this->parts,
-                'trans' => [
-                    'map_title' => 'Streams'
+                'translation' => [
+                    'title' => 'Streams'
                 ]
             ]) ?>][0]
             /* <![CDATA[ */

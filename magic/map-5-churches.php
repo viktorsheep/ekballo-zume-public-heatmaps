@@ -89,7 +89,7 @@ class Zume_Public_Heatmap_Churches extends DT_Magic_Url_Base
                 'nonce' => wp_create_nonce( 'wp_rest' ),
                 'parts' => $this->parts,
                 'post_type' => $this->post_type,
-                'trans' => [
+                'translation' => [
                     'add' => __( 'Zume', 'disciple_tools' ),
                     'title' => 'Churches'
                 ],

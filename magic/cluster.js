@@ -77,7 +77,7 @@ jQuery(document).ready(function(){
         <div class="medium-9 cell">
             <div id="map-wrapper">
                 <div id='map'></div>
-                <div id="map-header"><h3>${jsObject.trans.map_title}</h3></div>
+                <div id="map-header"><h3>${jsObject.translation.title}</h3></div>
                 <div id="map-spinner" class="loading-spinner-map-center active"></div>
             </div>
         </div>

@@ -500,9 +500,7 @@ class Zume_App_Portal extends DT_Magic_Url_Base {
         <!-- nav -->
         <?php $this->nav(); ?>
 
-        <div id="wrapper">
-            <span class="loading-spinner active"></span>
-        </div>
+        <div id="wrapper"></div>
         <?php
     }
 
@@ -522,6 +520,8 @@ class Zume_App_Portal extends DT_Magic_Url_Base {
 
         <!-- nav -->
         <?php $this->nav(); ?>
+
+        <hr style="padding: 0; margin: 0;">
 
         <!-- body-->
         <div id="wrapper"></div>
@@ -546,6 +546,8 @@ class Zume_App_Portal extends DT_Magic_Url_Base {
 
         <!-- nav -->
         <?php $this->nav(); ?>
+
+        <hr style="padding: 0; margin: 0;">
 
         <style id="custom-style-portal">
             #wrapper {
@@ -1032,11 +1034,6 @@ class Zume_App_Portal extends DT_Magic_Url_Base {
         }
 
         $post_id = $params["parts"]["post_id"]; //has been verified in verify_rest_endpoint_permissions_on_post()
-//        $post = DT_Posts::get_post( $this->post_type, $post_id, true, false );
-
-//                $inc = $params['data']['inc'];
-//                $temp_id = $params['data']['temp_id'];
-//                $parent_id = $params['data']['parent_id'];
 
         $fields = [
             "title" => $params["data"]['name'],
@@ -1054,13 +1051,13 @@ class Zume_App_Portal extends DT_Magic_Url_Base {
             'location_grid_meta' => $params['data']['location_grid_meta']
         ];
 
-//                if ( 'domenu-0' !== $parent_id && is_numeric( $parent_id ) ) {
-//                    $fields["parent_groups"] = [
-//                        "values" => [
-//                            [ "value" => $parent_id ]
-//                        ]
-//                    ];
-//                }
+        if ( 'none' !== $params['data']['parent'] ) {
+           $fields["parent_groups"]  = [
+                "values" => [
+                  [ "value" => $params['data']['parent'] ],
+                ],
+            ];
+        }
 
         $new_post = DT_Posts::create_post( 'groups', $fields, true, false );
         if ( ! is_wp_error( $new_post ) ) {
@@ -1068,19 +1065,18 @@ class Zume_App_Portal extends DT_Magic_Url_Base {
             Zume_App_Heatmap::clear_church_grid_totals();
             $grid_id = 0;
             if ( $new_post['location_grid_meta'] ) {
-                $grid_id = $new_post['location_grid_meta']['grid_id'];
+                $grid_id = $new_post['location_grid_meta'][0]['grid_id'];
             }
 
             return [
                 'id' => $new_post['ID'],
                 'title' => $new_post['name'],
                 'grid_id' => $grid_id,
-
-//                        'prev_parent' => $parent_id,
-//                        'temp_id' => $temp_id,
                 'contact_post' => DT_Posts::get_post( 'contacts', $post_id, true, false ),
                 'new_church_post' => $new_post,
                 'custom_marks' => self::get_custom_map_markers( $post_id ),
+                //                        'prev_parent' => $parent_id,
+                //                        'temp_id' => $temp_id,
             ];
         }
         else {
@@ -1237,7 +1233,7 @@ class Zume_App_Portal extends DT_Magic_Url_Base {
                 Zume_App_Heatmap::clear_church_grid_totals();
 
                 if ( ! is_wp_error( $deleted_post ) ) {
-                    return true;
+                    return $params['data']['id'];
                 }
                 else {
                     return false;
