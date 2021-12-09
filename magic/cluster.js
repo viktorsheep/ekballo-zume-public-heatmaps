@@ -319,10 +319,11 @@ jQuery(document).ready(function(){
   load_map_activity()
 
   function get_filters() {
+    let current_time_zone = Intl.DateTimeFormat().resolvedOptions().timeZone || 'America/Chicago'
     window.current_bounds = map.getBounds()
     return {
       bounds: { 'n_lat': window.current_bounds._ne.lat, 's_lat': window.current_bounds._sw.lat, 'e_lng': window.current_bounds._ne.lng, 'w_lng': window.current_bounds._sw.lng},
-      timezone: 'America/Denver',
+      timezone: current_time_zone,
       zoom: map.getZoom()
     }
   }

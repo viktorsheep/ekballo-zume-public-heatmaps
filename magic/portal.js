@@ -12,7 +12,10 @@ jQuery(document).ready(function() {
     window.load_tree()
   } else if ( 'profile' === jsObject.parts.action ) {
     window.load_profile()
+  } else if ( 'map' === jsObject.parts.action ) {
+    window.load_basic_map()
   }
+
 });
 
 window.post_item = ( action, data ) => {
@@ -146,7 +149,7 @@ window.write_profile = ( data ) => {
                 <div id='map-edit'></div>
             </div>
           <br>
-          <button type="button"  style="display:none;" class="button primary-button-hollow remove-location">Remove Location</button>
+          <button type="button"  style="display:none;" class="button primary-button-hollow alert small remove-location">Remove Location</button>
           <span class="loading-field-spinner location"></span>
         </div>
       </div>
@@ -343,8 +346,10 @@ window.load_mapbox = ( post_type, save_immediately, lng, lat, post_id ) => {
   let center, zoom
   if ( lng ) {
     center = [lng, lat]
+    zoom = 5
   } else {
     center = [-20, 30]
+    zoom = 1
   }
 
   /***********************************
@@ -355,7 +360,7 @@ window.load_mapbox = ( post_type, save_immediately, lng, lat, post_id ) => {
     container: 'map-edit',
     style: 'mapbox://styles/mapbox/light-v10',
     center: center,
-    zoom: 1
+    zoom: zoom
   });
 
   window.force_values = false
@@ -633,7 +638,7 @@ window.open_create_modal = ( parent_id ) => {
               <div id='map-edit'></div>
           </div>
         <br>
-        <button type="button"  style="display:none;" class="button primary-button-hollow remove-location">Remove Location</button>
+        <button type="button"  style="display:none;" class="button primary-button-hollow alert small remove-location">Remove Location</button>
         <span class="loading-field-spinner location"></span>
       </div>
 
@@ -643,13 +648,15 @@ window.open_create_modal = ( parent_id ) => {
            Parent Church
         </div>
         <div>
-            <select id="create-parent"></select>
+            <select id="create-parent">
+                <option value="none"></option>
+            </select>
         </div>
       </div>
 
         <!-- submit -->
       <div class="cell" id="map-action-buttons">
-          <button type="button" class="button" id="create-church">Create Church</button> <span class="loading-spinner"></span>
+          <button type="button" class="button" id="create-church">Create Church</button> <span class="loading-spinner"></span> <span id="error"></span>
       </div>
     </div>
   `)
@@ -657,10 +664,18 @@ window.open_create_modal = ( parent_id ) => {
   jQuery('#edit-modal').foundation('open')
 
   jQuery('#create-church').on('click', function(e){
+    let button = jQuery('#create-church')
+    button.prop('disabled', true )
     let title = jQuery('#create-title').val()
     let start_date = jQuery('#create-date').val()
     let members = jQuery('#create-members').val()
     let parent = jQuery('#create-parent').val()
+
+    if ( typeof window.location_data === 'undefined' || window.location_data === '' ) {
+      jQuery('#location-label').html('<span style="color:red;">Must add a location for the church.</span>')
+      jQuery('#create-church').prop('disabled', false )
+      return
+    }
 
     let data = {
       name: title,
@@ -672,7 +687,6 @@ window.open_create_modal = ( parent_id ) => {
 
     window.post_item('create_church', data )
       .done(function(result) {
-        console.log(result)
         if ( result ) {
           jQuery('#modal-title').empty()
           jQuery('#modal-content').empty()
@@ -681,16 +695,21 @@ window.open_create_modal = ( parent_id ) => {
           jsObject.post = result.contact_post
 
           // reload current page
-          if ( 'map' === jsObject.parts.action || 'goals_map' === jsObject.parts.action ) {
+          if ( 'goals_map' === jsObject.parts.action ) {
             jsObject.custom_marks = result.custom_marks
             load_map()
             jQuery('#offCanvasNestedPush').foundation('close')
-
-          } else if ( 'list' === jsObject.parts.action ) {
+          }
+          else if ( 'map' === jsObject.parts.action ) {
+            jsObject.custom_marks = result.custom_marks
+            window.load_basic_map()
+          }
+          else if ( 'list' === jsObject.parts.action ) {
             window.load_tree()
           }
         }
       })
+
   })
 
   window.load_mapbox( 'groups' )
@@ -698,7 +717,6 @@ window.open_create_modal = ( parent_id ) => {
   if ( typeof jsObject.post.church_reporter !== 'undefined' ) {
     let key_select = jQuery('#create-parent')
     let selected_attr
-    key_select.append(`<option value="none"></option>`)
     jQuery.each( jsObject.post.church_reporter, function(i,v) {
       selected_attr = ''
       if ( parseInt(parent_id) === parseInt(v.ID) ) {
@@ -898,42 +916,57 @@ window.open_edit_modal = ( group_id ) => {
       if ( typeof data.post.title !== 'undefined' ) {
         jQuery('#create-title').val( data.post.title )
       }
-      if ( typeof data.post.church_start_date.formatted !== 'undefined' ) {
+      if ( typeof data.post.church_start_date !== 'undefined' ) {
         jQuery('#create-date').val( data.post.church_start_date.formatted )
       }
       if ( typeof data.post.member_count !== 'undefined' ) {
         jQuery('#create-members').val(data.post.member_count )
       }
-      let location = {
-        lng: '',
-        lat: '',
-        label: '',
-        grid_meta_id: ''
-      }
+      window.location_data = {}
       if ( typeof data.post.location_grid_meta !== 'undefined' ){
-        location = data.post.location_grid_meta[0]
+        window.location_data = {
+          location_grid_meta: {
+            values: [
+              {
+                lng: data.post.location_grid_meta[0].lng,
+                lat: data.post.location_grid_meta[0].lat,
+                level: data.post.location_grid_meta[0].level,
+                label: data.post.location_grid_meta[0].label,
+                source: 'user'
+              }
+            ],
+            force_values: window.force_values
+          }
+        }
         jQuery('#location-label').html(data.post.location_grid_meta[0].label)
         jQuery('.remove-location').show().on('click', function(){
           console.log('remove')
-          window.location_data = {
-            lng: '',
-            lat: '',
-            label: '',
-            grid_meta_id: ''
-          }
+          window.location_data = {}
+          jQuery('#location-label').empty()
+          jQuery('.remove-location').hide()
+          window.load_mapbox( 'groups', false, null, null, data.post.ID )
         })
+        window.load_mapbox( 'groups', false, data.post.location_grid_meta[0].lng, data.post.location_grid_meta[0].lat, data.post.ID )
       }
-      window.location_data = location
-      window.load_mapbox( 'groups', false, location.lng, location.lat, data.post.ID )
+      else {
+        window.load_mapbox( 'groups', false, null, null, data.post.ID )
+      }
 
       jQuery('#parent-cell').empty()
 
       // listener
       jQuery('#edit-church').on('click', function(e) {
+        jQuery('#edit-church').prop('disabled', true )
         let title = jQuery('#create-title').val()
         let start_date = jQuery('#create-date').val()
         let members = jQuery('#create-members').val()
         let group_status = 'active' // jQuery('#create-group-status').val()
+
+        if ( typeof window.location_data === 'undefined' || typeof window.location_data.location_grid_meta === 'undefined' ) {
+          jQuery('#location-label').html('<span style="color:red;">Must add a location for the church.</span>')
+          jQuery('#edit-church').prop('disabled', false )
+          return
+        }
 
         let fields = {
           title: title,
@@ -945,21 +978,23 @@ window.open_edit_modal = ( group_id ) => {
 
         window.post_item('update_church', { post_id: data.post.ID, fields: fields } )
           .done(function(result) {
-            console.log(result)
             if ( result ) {
               jQuery('#modal-title').empty()
               jQuery('#modal-content').empty()
               jQuery('#edit-modal').foundation('close')
 
-              jsObject.post = result.contact_post
+              jsObject.post = result
 
               // reload current page
-              if ( 'map' === jsObject.parts.action || 'goals_map' === jsObject.parts.action ) {
+              if ( 'goals_map' === jsObject.parts.action ) {
                 jsObject.custom_marks = result.custom_marks
                 load_map()
                 jQuery('#offCanvasNestedPush').foundation('close')
-
-              } else if ( 'list' === jsObject.parts.action ) {
+              }
+              else if ( 'map' === jsObject.parts.action ) {
+                window.load_basic_map()
+              }
+              else if ( 'list' === jsObject.parts.action ) {
                 window.load_tree()
               }
             }
@@ -980,4 +1015,201 @@ window.open_empty_modal = () => {
   title.empty().html(`<span class="loading-spinner active"></span>`)
   content.empty()
   jQuery('#edit-modal').foundation('open')
+}
+
+
+
+
+/*************************************************************************
+ *
+ * Simple Map Section
+ *
+ ************************************************************************/
+window.load_basic_map = () => {
+
+  window.activity_list = {}
+  window.activity_geojson = {
+    "type": "FeatureCollection",
+    "features": []
+  }
+
+  // Add html and map
+  let map_height = window.innerHeight - 65
+  if ( isMobile && window.innerWidth < 640 ) {
+    map_height = window.innerHeight / 2
+  }
+  jQuery('#custom-map-style').append(`
+      <style>
+          #church-list-wrapper {
+              height: ${window.innerHeight - 130}px !important;
+              overflow: scroll;
+              padding-right:1rem;
+              padding-left: 1rem;
+          }
+
+          #church-list-wrapper .callout {
+             border-radius: 10px;
+          }
+          #church-list-wrapper h2 {
+              font-size:1.2em;
+              font-weight:bold;
+          }
+          #map-wrapper {
+              height: ${map_height}px !important;
+          }
+          #map {
+              height: ${map_height}px !important;
+          }
+           #map-header {
+                position: absolute;
+                top:10px;
+                left:10px;
+                z-index: 20;
+                background-color: white;
+                padding:1em;
+                opacity: 0.8;
+                border-radius: 5px;
+            }
+      </style>
+  `)
+
+  mapboxgl.accessToken = jsObject.map_key;
+  var map = new mapboxgl.Map({
+    container: 'map',
+    style: 'mapbox://styles/mapbox/light-v10',
+    center: [-98, 38.88],
+    minZoom: 1,
+    maxZoom: 15,
+    zoom: 1
+  });
+
+  // disable map rotation using right click + drag
+  map.dragRotate.disable();
+  map.touchZoomRotate.disableRotation();
+
+  if ( ! ( isMobile && window.innerWidth < 640 ) ) {
+    map.addControl(
+      new MapboxGeocoder({
+        accessToken: mapboxgl.accessToken,
+        mapboxgl: mapboxgl
+      })
+    );
+  }
+
+  map.on('load', function() {
+    initialize_cluster_map()
+  });
+
+  map.on('zoomend', function(e){
+    write_list( map.queryRenderedFeatures() )
+  })
+  map.on('dragend', function(e){
+    write_list( map.queryRenderedFeatures() )
+  })
+
+
+  function initialize_cluster_map() {
+    map.addSource('layer-source-basic-map', {
+      type: 'geojson',
+      data: window.activity_geojson,
+      cluster: true,
+      clusterMaxZoom: 7,
+      clusterRadius: 50
+    });
+    map.addLayer({
+      id: 'clusters',
+      type: 'circle',
+      source: 'layer-source-basic-map',
+      filter: ['has', 'point_count'],
+      paint: {
+        'circle-color': [
+          'step',
+          ['get', 'point_count'],
+          '#00d9ff',
+          20,
+          '#00aeff',
+          150,
+          '#90C741'
+        ],
+        'circle-radius': [
+          'step',
+          ['get', 'point_count'],
+          20,
+          100,
+          30,
+          750,
+          40
+        ]
+      }
+    });
+    map.addLayer({
+      id: 'cluster-count-basic-map',
+      type: 'symbol',
+      source: 'layer-source-basic-map',
+      filter: ['has', 'point_count'],
+      layout: {
+        'text-field': '{point_count_abbreviated}',
+        'text-font': ['DIN Offc Pro Medium', 'Arial Unicode MS Bold'],
+        'text-size': 12
+      }
+    });
+    map.addLayer({
+      id: 'unclustered-point-basic-map',
+      type: 'circle',
+      source: 'layer-source-basic-map',
+      filter: ['!', ['has', 'point_count']],
+      paint: {
+        'circle-color': '#00d9ff',
+        'circle-radius':12,
+        'circle-stroke-width': 1,
+        'circle-stroke-color': '#fff'
+      }
+    });
+
+
+    window.post_item('get_geojson', {} )
+      .done( data => {
+        "use strict";
+        window.activity_geojson = data
+
+        var mapSource= map.getSource('layer-source-basic-map');
+        if( typeof mapSource !== 'undefined') {
+          map.getSource('layer-source-basic-map').setData(window.activity_geojson);
+        }
+
+        var bounds = new mapboxgl.LngLatBounds();
+        window.activity_geojson.features.forEach(function(feature) {
+          bounds.extend(feature.geometry.coordinates);
+        });
+        map.fitBounds(bounds, { padding: {top: 20, bottom:20, left: 20, right: 20 } });
+
+      })
+  }
+
+  function write_list( features ) {
+    let wrapper = jQuery('#church-list-wrapper')
+    wrapper.empty()
+    jQuery.each( features, function(i,v){
+      if ( v.source === 'layer-source-basic-map' && v.layer.id !== 'cluster-count-basic-map' && v.layer.id !== 'clusters' ) {
+        wrapper.append(`
+          <div class="callout">
+              <h2>${v.properties.title} <i class="fi-pencil" onclick="window.open_edit_modal(${v.properties.ID})" style="cursor:pointer; float:right;"></i> </h2>
+              <div>Church Start: ${v.properties.church_start_date}</div>
+              <div>Members: ${v.properties.member_count}</div>
+              <div>Location: ${v.properties.location_title}</div>
+              <div>Parent: ${v.properties.parent_title}</div>
+          </div>
+        `)
+      }
+      if ( v.source === 'layer-source-basic-map'  && v.layer.id === 'cluster-count-basic-map' ) {
+        wrapper.append(`
+          <div class="callout">
+              <h2>Cluster of ${v.properties.point_count_abbreviated}</h2>
+          </div>
+        `)
+      }
+    })
+  }
+
+
 }
