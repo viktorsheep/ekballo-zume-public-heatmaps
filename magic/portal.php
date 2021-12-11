@@ -41,7 +41,7 @@ class Zume_App_Portal extends DT_Magic_Url_Base {
         parent::__construct();
 
         add_action( 'rest_api_init', [ $this, 'add_endpoints' ] );
-        add_filter( 'dt_settings_apps_list', [ $this, 'dt_settings_apps_list' ], 10, 1 );
+
 
         /**
          * tests if other URL
@@ -1336,19 +1336,5 @@ class Zume_App_Portal extends DT_Magic_Url_Base {
         </script>
         <?php
     }
-
-    /**
-     * Post Type Tile Examples
-     */
-    public function dt_settings_apps_list( $apps_list ) {
-        $apps_list[$this->meta_key] = [
-            'key' => $this->meta_key,
-            'url_base' => $this->root. '/'. $this->type,
-            'label' => $this->page_title,
-            'description' => $this->page_description,
-        ];
-        return $apps_list;
-    }
-
 }
 Zume_App_Portal::instance();
