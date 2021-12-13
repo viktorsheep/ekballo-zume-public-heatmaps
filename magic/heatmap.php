@@ -3784,10 +3784,16 @@ class Zume_App_Heatmap {
 
     public static function get_activity_geojson() {
         $results = self::query_activity_list();
+        if ( empty( $results ) ) {
+            $results = [];
+        }
 
         $countries = [];
         $languages = [];
         $types = [];
+
+
+
 
         $features = [];
         foreach ( $results as $result ) {
@@ -3865,6 +3871,7 @@ class Zume_App_Heatmap {
             'countries' => $countries,
             'languages' => $languages,
             'types' => $types,
+            'total' => count( $results ),
             'features' => $features,
         );
 

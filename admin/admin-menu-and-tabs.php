@@ -149,23 +149,39 @@ class Zume_Public_Heatmaps_Tab_General {
             </tr>
             <tr>
                 <td>
+                    Last 100 Hours<br>
+                    <a href="<?php echo esc_url( site_url() ) ?>/zume_app/last100_hours"><?php echo esc_url( site_url() ) ?>/zume_app/last100_hours</a>
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    Church Heatmap<br>
+                    <a href="<?php echo esc_url( site_url() ) ?>/zume_app/heatmap_practitioners"><?php echo esc_url( site_url() ) ?>/zume_app/heatmap_practitioners</a>
+                </td>
+            </tr>
+            <tr>
+                <td>
                     Church Heatmap<br>
                     <a href="<?php echo esc_url( site_url() ) ?>/zume_app/heatmap_churches"><?php echo esc_url( site_url() ) ?>/zume_app/heatmap_churches</a>
                 </td>
             </tr>
-
-            <!-- Network Dashboard -->
             <tr>
                 <td>
-                    Last 100 Hours<br>
-                    <a href="<?php echo esc_url( site_url() ) ?>/zume_app/last100_hours"><?php echo esc_url( site_url() ) ?>/zume_app/last100_hours</a>
+                    Trainings Cluster Map<br>
+                    <a href="<?php echo esc_url( site_url() ) ?>/zume_app/cluster_trainings"><?php echo esc_url( site_url() ) ?>/zume_app/cluster_trainings</a>
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    Streams Cluster Map<br>
+                    <a href="<?php echo esc_url( site_url() ) ?>/zume_app/cluster_streams"><?php echo esc_url( site_url() ) ?>/zume_app/cluster_streams</a>
                 </td>
             </tr>
 
             <!-- Zume -->
             <tr>
                 <td>
-                    Registrations Map<br>
+                    Network Activities Map<br>
                     <a href="<?php echo esc_url( site_url() ) ?>/zume_app/heatmap_activity"><?php echo esc_url( site_url() ) ?>/zume_app/heatmap_activity</a>
                 </td>
             </tr>
