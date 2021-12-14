@@ -13,6 +13,9 @@ class Zume_App_Portal extends DT_Magic_Url_Base {
     public $page_description = 'This is a portal for reporting church multiplication and community practitioner profile.';
     public $root = "zume_app";
     public $type = 'portal';
+    public $type_name = 'Reporting Portal';
+    public $show_bulk_send = true;
+    public $show_app_tile = true;
     public $root_url;
     public $post_id;
     public $post;
@@ -150,10 +153,10 @@ class Zume_App_Portal extends DT_Magic_Url_Base {
 
             /* heatmap */
             wp_enqueue_script( 'heatmap-js', trailingslashit( plugin_dir_url( __FILE__ ) ) . 'heatmap.js', [],
-                filemtime( trailingslashit( plugin_dir_path( __FILE__ ) ) .'heatmap.js' ), true );
+            filemtime( trailingslashit( plugin_dir_path( __FILE__ ) ) .'heatmap.js' ), true );
 
             wp_enqueue_style( 'heatmap-css', trailingslashit( plugin_dir_url( __FILE__ ) ) . 'heatmap.css', [],
-                filemtime( trailingslashit( plugin_dir_path( __FILE__ ) ) .'heatmap.css' ) );
+            filemtime( trailingslashit( plugin_dir_path( __FILE__ ) ) .'heatmap.css' ) );
 
             wp_enqueue_script( 'mapbox-cookie', trailingslashit( get_stylesheet_directory_uri() ) . 'dt-mapping/geocode-api/mapbox-cookie.js', [ 'jquery', 'jquery-cookie' ], '3.0.0' );
         }
@@ -245,6 +248,10 @@ class Zume_App_Portal extends DT_Magic_Url_Base {
                 border-radius: 50px;
                 padding:5px 9px;
                 background-color: #4CAF50;
+            }
+            .fi-list {
+                font-size:2em;
+                color:black;
             }
 
         </style>
@@ -422,7 +429,7 @@ class Zume_App_Portal extends DT_Magic_Url_Base {
         <!-- title -->
         <div class="grid-x">
             <div class="cell padding-1" >
-                <button type="button" style="margin:1em .5em 1em;" id="menu-icon" data-open="offCanvasLeft"><i class="fi-list" style="font-size:2em;"></i></button>
+                <button type="button" style="margin:1em .5em 1em; color: black;" id="menu-icon" data-open="offCanvasLeft"><i class="fi-list"></i></button>
                 <span style="font-size:1.5rem;font-weight: bold;">Home</span>
                 <?php if ( ! wp_is_mobile() ) : ?>
                     <span class="loading-spinner active"></span>
@@ -475,8 +482,8 @@ class Zume_App_Portal extends DT_Magic_Url_Base {
         <!-- title -->
         <div class="grid-x">
             <div class="cell padding-1" >
-                <button type="button" style="margin:1em .5em 1em;" id="menu-icon" data-open="offCanvasLeft"><i class="fi-list" style="font-size:2em;"></i></button>
-                <a style="margin:1em 1em 1em 0; color:black;" href="<?php echo esc_url( $this->root_url  ) ?>"><i class="fi-home" style="font-size:2em;"></i></a>
+                <button type="button" style="margin:1em .5em 1em;" id="menu-icon" data-open="offCanvasLeft"><i class="fi-list"></i></button>
+                <a style="margin:1em 1em 1em 0; color:black;" href="<?php echo esc_url( $this->root_url ) ?>"><i class="fi-home" style="font-size:2em;"></i></a>
                 <span style="font-size:1.5rem;font-weight: bold;">Community Profile</span>
                 <span class="loading-spinner active"></span>
             </div>
@@ -494,7 +501,7 @@ class Zume_App_Portal extends DT_Magic_Url_Base {
         <!--title -->
         <div class="grid-x">
             <div class="cell padding-1" >
-                <button type="button" style="margin:1em .5em 1em;" id="menu-icon" data-open="offCanvasLeft"><i class="fi-list" style="font-size:2em;"></i></button>
+                <button type="button" style="margin:1em .5em 1em;" id="menu-icon" data-open="offCanvasLeft"><i class="fi-list"></i></button>
                 <a style="margin:1em 1em 1em 0; color:black;" href="<?php echo esc_url( $this->root_url ) ?>"><i class="fi-home" style="font-size:2em;"></i></a>
                 <span style="font-size:1.5rem;font-weight: bold;">Edit Church List</span>
                 <span class="loading-spinner active"></span>
@@ -518,7 +525,7 @@ class Zume_App_Portal extends DT_Magic_Url_Base {
         <!-- title -->
         <div class="grid-x">
             <div class="cell padding-1" >
-                <button type="button" style="margin:1em .5em 1em;" id="menu-icon" data-open="offCanvasLeft"><i class="fi-list" style="font-size:2em;"></i></button>
+                <button type="button" style="margin:1em .5em 1em;" id="menu-icon" data-open="offCanvasLeft"><i class="fi-list"></i></button>
                 <a style="margin:1em 1em 1em 0; color:black;" href="<?php echo esc_url( $this->root_url ) ?>"><i class="fi-home" style="font-size:2em;"></i></a>
                 <span style="font-size:1.5rem;font-weight: bold;">Map</span> <a class="button small hollow" style="margin:0 0 5px 10px;padding:.5em;" href="<?php echo esc_url( $this->root_url ) ?>/goals_map">Show Goals</a>
 
@@ -802,10 +809,10 @@ class Zume_App_Portal extends DT_Magic_Url_Base {
             case 'update_group_start_date':
             case 'update_group_status':
             case 'update_church':
-                return $this->_endpoint_update_list( $params);
+                return $this->_endpoint_update_list( $params );
 
             case 'load_tree':
-                return $this->_endpoint_load_tree( $params);
+                return $this->_endpoint_load_tree( $params );
 
 
             // location
@@ -852,7 +859,7 @@ class Zume_App_Portal extends DT_Magic_Url_Base {
                 return new WP_Error( __METHOD__, "No group found", [ 'status' => 400, 'data' => $params ] );
             }
             $has_permission = false;
-            foreach( $contact['church_reporter'] as $value ) {
+            foreach ( $contact['church_reporter'] as $value ) {
                 if ( $params["data"]["post_id"] === $value['ID'] ) {
                     $has_permission = true;
                 }
@@ -907,16 +914,15 @@ class Zume_App_Portal extends DT_Magic_Url_Base {
         }
     }
 
-    public function _endpoint_create_church( $params )
-    {
-        if (!isset($params["data"]["name"], $params["data"]["members"], $params["data"]["start_date"], $params["data"]["location_grid_meta"] ) ) {
-            return new WP_Error(__METHOD__, "Missing parameters", ['status' => 400, 'data' => $params]);
+    public function _endpoint_create_church( $params ) {
+        if ( !isset( $params["data"]["name"], $params["data"]["members"], $params["data"]["start_date"], $params["data"]["location_grid_meta"] ) ) {
+            return new WP_Error( __METHOD__, "Missing parameters", ['status' => 400, 'data' => $params] );
         }
 
         $post_id = $params["parts"]["post_id"]; //has been verified in verify_rest_endpoint_permissions_on_post()
 
         if ( empty( $params['data']['start_date'] ) ){
-            $params['data']['start_date'] = gmdate('Y-m-d');
+            $params['data']['start_date'] = gmdate( 'Y-m-d' );
         }
 
         $fields = [
@@ -936,7 +942,7 @@ class Zume_App_Portal extends DT_Magic_Url_Base {
         ];
 
         if ( 'none' !== $params['data']['parent'] ) {
-           $fields["parent_groups"]  = [
+            $fields["parent_groups"]  = [
                 "values" => [
                   [ "value" => $params['data']['parent'] ],
                 ],
@@ -962,7 +968,7 @@ class Zume_App_Portal extends DT_Magic_Url_Base {
             ];
         }
         else {
-            dt_write_log($new_post);
+            dt_write_log( $new_post );
             return $new_post;
         }
 
@@ -987,7 +993,7 @@ class Zume_App_Portal extends DT_Magic_Url_Base {
                 $fields = [
                     "contact_phone" => [
                         "values" => [
-                            [ "value" => $params['data']['new_value']],
+                            [ "value" => $params['data']['new_value'] ],
                         ],
                         "force_values" => true
                     ]
@@ -997,7 +1003,7 @@ class Zume_App_Portal extends DT_Magic_Url_Base {
                 $fields = [
                     "contact_email" => [
                         "values" => [
-                            [ "value" => $params['data']['new_value']],
+                            [ "value" => $params['data']['new_value'] ],
                         ],
                         "force_values" => true
                     ]
@@ -1093,7 +1099,7 @@ class Zume_App_Portal extends DT_Magic_Url_Base {
                 }
 
             case 'update_church':
-                $fields =  $params['data']['fields'];
+                $fields = $params['data']['fields'];
                 return DT_Posts::update_post( 'groups', $group_id, $fields, false, false );
 
             case 'onItemRemoved':
@@ -1171,7 +1177,7 @@ class Zume_App_Portal extends DT_Magic_Url_Base {
         $features = [];
         $missing_location = [];
         if ( isset( $list['posts'] ) && ! empty( $list['posts'] ) ) {
-            foreach( $list['posts'] as $item ) {
+            foreach ( $list['posts'] as $item ) {
                 if ( ! isset( $item['location_grid_meta'] ) ) {
                     $missing_location[] = [
                         'ID' => $item['ID'],

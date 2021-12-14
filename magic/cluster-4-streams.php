@@ -74,7 +74,7 @@ class Zume_Public_Heatmaps_Cluster_Streams extends DT_Magic_Url_Base {
     public function scripts() {
         wp_enqueue_script( 'lodash' );
         wp_enqueue_script( 'cluster-js', trailingslashit( plugin_dir_url( __FILE__ ) ) . 'cluster.js', [ 'jquery' ],
-            filemtime( trailingslashit( plugin_dir_path( __FILE__ ) ) .'cluster.js' ), true );
+        filemtime( trailingslashit( plugin_dir_path( __FILE__ ) ) .'cluster.js' ), true );
     }
 
     /**
@@ -243,7 +243,7 @@ class Zume_Public_Heatmaps_Cluster_Streams extends DT_Magic_Url_Base {
         $empty = 0;
         foreach ( $flat_grid as $i => $v ){
             if ( isset( $grid_totals[$v['grid_id']] ) && ! empty( $grid_totals[$v['grid_id']] ) ){
-                $list[] =  $v['full_name'] . ' (' . $grid_totals[$v['grid_id']] . ')';
+                $list[] = $v['full_name'] . ' (' . $grid_totals[$v['grid_id']] . ')';
             }
             else {
                 $empty++;

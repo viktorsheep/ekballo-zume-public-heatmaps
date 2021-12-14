@@ -169,7 +169,7 @@ class Zume_Public_Reporter_Manager extends DT_Magic_Url_Base
 
         // prepare contact for creation
         $key = dt_create_unique_key();
-        $link =  trailingslashit( site_url() ) . $this->portal_url . $key ;
+        $link = trailingslashit( site_url() ) . $this->portal_url . $key;
 
         $fields = [
             'title' => $data['name'],
@@ -228,7 +228,7 @@ class Zume_Public_Reporter_Manager extends DT_Magic_Url_Base
 
         // email contact new magic link
         $subject = 'Church Reporting Link';
-        $message_plain_text =  'Follow this link to access your reporting portal. Please, complete your remaining community profile.
+        $message_plain_text = 'Follow this link to access your reporting portal. Please, complete your remaining community profile.
 
 '      . $link;
         dt_send_email( $data['email'], $subject, $message_plain_text );

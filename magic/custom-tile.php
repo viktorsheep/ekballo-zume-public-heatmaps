@@ -19,9 +19,9 @@ class Zume_Public_Portal_Fields {
     } // End instance()
 
     public function __construct() {
-        add_filter( 'dt_details_additional_tiles', [ $this, 'dt_details_additional_tiles' ], 10, 2 );
-        add_action( 'dt_details_additional_section', [ $this, 'dt_details_additional_section' ], 30, 2 );
-        add_filter( 'dt_settings_apps_list', [ $this, 'dt_settings_apps_list' ], 10, 1 );
+//        add_filter( 'dt_details_additional_tiles', [ $this, 'dt_details_additional_tiles' ], 10, 2 );
+//        add_action( 'dt_details_additional_section', [ $this, 'dt_details_additional_section' ], 30, 2 );
+//        add_filter( 'dt_settings_apps_list', [ $this, 'dt_settings_apps_list' ], 10, 1 );
         add_filter( 'dt_custom_fields_settings', [ $this, 'dt_custom_fields_settings' ], 50, 2 );
     }
 
@@ -36,6 +36,8 @@ class Zume_Public_Portal_Fields {
     }
 
     public function dt_details_additional_section( $section, $post_type ) {
+
+
         if ( $section === "apps" && $post_type === "contacts" ) {
             $record = DT_Posts::get_post( $post_type, get_the_ID() );
             if ( isset( $record[$this->meta_key] )) {
@@ -93,8 +95,8 @@ class Zume_Public_Portal_Fields {
                         jQuery('#modal-small-content').empty().html(`<button type="button" class="button <?php echo esc_attr( $this->meta_key ); ?> delete-and-reset">Delete and replace the app link</button> <span class="loading-spinner"></span>`)
                         jQuery('#modal-small').foundation('open')
                         jQuery('.button.<?php echo esc_attr( $this->meta_key ); ?>.delete-and-reset').on('click', function(e){
-                            jQuery('.button.<?php echo esc_attr($this->meta_key); ?>.delete-and-reset').prop('disable', true)
-                            window.API.update_post('<?php echo esc_attr( $post_type ); ?>', <?php echo esc_attr( get_the_ID()); ?>, { ['<?php echo esc_attr( $this->meta_key ); ?>']: window.sha256(Date.now()) })
+                            jQuery('.button.<?php echo esc_attr( $this->meta_key ); ?>.delete-and-reset').prop('disable', true)
+                            window.API.update_post('<?php echo esc_attr( $post_type ); ?>', <?php echo esc_attr( get_the_ID() ); ?>, { ['<?php echo esc_attr( $this->meta_key ); ?>']: window.sha256(Date.now()) })
                                 .done( newPost => {
                                     console.log( newPost )
                                     jQuery('#modal-small').foundation('close')
