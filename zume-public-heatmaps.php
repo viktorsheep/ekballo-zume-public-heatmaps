@@ -95,11 +95,6 @@ class Zume_Public_Heatmaps {
         require_once( 'magic/cluster-3-trainings.php' );
         require_once( 'magic/cluster-4-streams.php' );
 
-        require_once( 'magic/reporter.php' );
-        require_once( 'magic/portal.php' );
-
-        require_once( 'magic/custom-tile.php' );
-
         require_once( 'charts/charts-loader.php' );
 
         if ( is_admin() ) {
@@ -338,21 +333,3 @@ if ( ! function_exists( 'persecuted_countries' ) ){
         ];
     }
 }
-
-function movement_maps_stats_plugin_must_be_multisite() {
-    $message = __( "'Movement Maps & Stats' plugin must be run on a multisite server with a network dashboard enabled disciple tools system. Please disable plugin.", "dt_dashboard_plugin" );
-    ?>
-    <div class="notice notice-error notice-dt-dashboard is-dismissible" data-notice="dt-dashboard">
-        <p><?php echo esc_html( $message );?></p>
-    </div>
-    <?php
-}
-function movement_maps_stats_plugin_must_not_be_disciple_tools() {
-    $message = __( "'Movement Maps & Stats' plugin is to be installed on a non-disciple tools website on a multisite server with a network dashboard enabled disciple tools system.", "dt_dashboard_plugin" );
-    ?>
-    <div class="notice notice-error notice-dt-dashboard is-dismissible" data-notice="dt-dashboard">
-        <p><?php echo esc_html( $message );?></p>
-    </div>
-    <?php
-}
-

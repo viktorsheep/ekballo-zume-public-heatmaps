@@ -155,7 +155,7 @@ class Zume_Public_Heatmaps_Tab_General {
             </tr>
             <tr>
                 <td>
-                    Church Heatmap<br>
+                    Practitioners Heatmap<br>
                     <a href="<?php echo esc_url( site_url() ) ?>/zume_app/heatmap_practitioners"><?php echo esc_url( site_url() ) ?>/zume_app/heatmap_practitioners</a>
                 </td>
             </tr>
