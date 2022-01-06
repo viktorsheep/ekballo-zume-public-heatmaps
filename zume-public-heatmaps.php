@@ -5,7 +5,7 @@
  * Description: This plugin creates the public facing heatmaps that show trainings and churches and are embedded into public websites.
  * Text Domain: zume-public-heatmaps
  * Domain Path: /languages
- * Version:  0.2
+ * Version:  0.3
  * Author URI: https://github.com/ZumeProject
  * GitHub Plugin URI: https://github.com/ZumeProject/zume-public-heatmaps
  * Requires at least: 4.7.0
