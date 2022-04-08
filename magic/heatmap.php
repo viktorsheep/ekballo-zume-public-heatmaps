@@ -1651,7 +1651,7 @@ class Zume_App_Heatmap {
             }
         }
 
-        set_transient( __METHOD__ . $administrative_level, $list, HOUR_IN_SECONDS . 6 );
+        set_transient( __METHOD__ . $administrative_level, $list, HOUR_IN_SECONDS );
 
         return $list;
     }
