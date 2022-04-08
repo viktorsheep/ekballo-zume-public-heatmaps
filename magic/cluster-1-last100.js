@@ -93,7 +93,7 @@ jQuery(document).ready(function(){
   mapboxgl.accessToken = jsObject.map_key;
   var map = new mapboxgl.Map({
     container: 'map',
-    style: 'mapbox://styles/mapbox/light-v10',
+    style: 'mapbox://styles/discipletools/cl1qp8vuf002l15ngm5a7up59',
     center: [-98, 38.88],
     minZoom: 1,
     maxZoom: 15,

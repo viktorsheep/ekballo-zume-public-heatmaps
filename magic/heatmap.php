@@ -2777,8 +2777,8 @@ class Zume_App_Heatmap {
             }
             $level['needed'] = $needed;
             if ( $administrative_level === 'world' ) {
-                $world_population = 7860000000;
-                $us_population = 331000000;
+                $world_population = 7974493405;
+                $us_population = 335701430;
                 $global_pop_block = $global_div;
                 $us_pop_block = $us_div;
                 $world_population_without_us = $world_population - $us_population;
@@ -2806,13 +2806,23 @@ class Zume_App_Heatmap {
         return $data;
     }
 
-    public static function endpoint_get_activity_level( $grid_id, $administrative_level, $global_div, $us_div ) {
+    public static function endpoint_get_activity_level( $grid_id, $administrative_level, $list, $global_div, $us_div ) {
 
-        // add levels
-        $list = self::query_activity_grid_totals( $administrative_level ); // get list of training counts
         $flat_grid = self::query_flat_grid_by_level( $administrative_level, $us_div, $global_div );
+//        $flat_grid_limited = self::_limit_counts( $flat_grid, $list ); // limit counts to no larger than needed per location.
+        $flat_grid_limited = [];
+        foreach ( $flat_grid as $value ) {
+            $flat_grid_limited[$value['grid_id']] = $value;
 
-        $flat_grid_limited = self::_limit_counts( $flat_grid, $list ); // limit counts to no larger than needed per location.
+            if ( isset( $list[$value['grid_id']] ) && ! empty( $list[$value['grid_id']] ) ) {
+                $flat_grid_limited[$value['grid_id']]['reported'] = $list[$value['grid_id']];
+//                if ( $list[$value['grid_id']] <= $value['needed'] ) {
+//                    $flat_grid_limited[$value['grid_id']]['reported'] = $list[$value['grid_id']];
+//                } else {
+//                    $flat_grid_limited[$value['grid_id']]['reported'] = $value['needed'];
+//                }
+            }
+        }
 
         $grid = self::query_grid_elements( $grid_id ); // get level ids for grid_id
 
@@ -2823,12 +2833,12 @@ class Zume_App_Heatmap {
             return false;
         }
 
-        $percent = ceil( $level['reported'] / $level['needed'] * 100 );
-        if ( 100 < $percent ) {
-            $percent = 100;
-        } else {
-            $percent = number_format_i18n( $percent, 2 );
-        }
+//        $percent = $level['reported'] / $level['needed'] * 100;
+//        if ( 100 < $percent ) {
+//            $percent = 100;
+//        } else {
+//            $percent = number_format_i18n( $percent, 2 );
+//        }
 
         if ( isset( $flat_grid[$grid[$administrative_level]] ) && ! empty( $flat_grid[$grid[$administrative_level]] ) ) {
             $raw_level = $flat_grid[$grid[$administrative_level]];
@@ -2836,7 +2846,6 @@ class Zume_App_Heatmap {
         } else {
             $raw_reported = $level['reported'];
         }
-
 
         /**
          * @todo temp cover for populations
@@ -2853,14 +2862,15 @@ class Zume_App_Heatmap {
             }
             $level['needed'] = $needed;
             if ( $administrative_level === 'world' ) {
-                $world_population = 7860000000;
-                $us_population = 331000000;
+                $world_population = 7974493405;
+                $us_population = 335701430;
                 $global_pop_block = $global_div;
                 $us_pop_block = $us_div;
                 $world_population_without_us = $world_population - $us_population;
                 $needed_without_us = $world_population_without_us / $global_pop_block;
                 $needed_in_the_us = $us_population / $us_pop_block;
                 $level['needed'] = $needed_without_us + $needed_in_the_us;
+                $percent = $level['reported'] / $level['needed'] * 100;
             }
         }
         // @todo end temp cover for populations
@@ -2873,9 +2883,9 @@ class Zume_App_Heatmap {
             'name' => $level['name'],
             'grid_id' => (int) $level['grid_id'],
             'population' => number_format_i18n( $level['population'] ),
-            'needed' => number_format_i18n( $level['needed'] ),
+//            'needed' => number_format_i18n( $level['needed'] ),
             'reported' => number_format_i18n( $raw_reported ),
-            'percent' => $percent,
+//            'percent' => number_format_i18n( $percent, 2 ),
         ];
 
         return $data;

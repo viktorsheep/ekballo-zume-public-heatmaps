@@ -189,7 +189,7 @@ function load_map() {
   mapboxgl.accessToken = jsObject.map_key;
   let map = new mapboxgl.Map({
     container: 'map',
-    style: 'mapbox://styles/mapbox/light-v10',
+    style: 'mapbox://styles/discipletools/cl1qp8vuf002l15ngm5a7up59',
     center: center,
     minZoom: 2,
     maxZoom: maxzoom,
@@ -309,10 +309,10 @@ function load_map() {
             'paint': {
               'fill-color': {
                 property: 'value',
-                stops: [[0, 'rgba(0, 0, 0, 0)'], [0.01, 'rgb(155, 200, 254)'], [jsObject.grid_data.highest_value, 'rgb(37, 82, 154)']]
+                stops: [[0, 'rgba(0, 0, 0, 0)'], [0.01, 'rgb(50,205,50)'], [jsObject.grid_data.highest_value, 'rgb(0,128,0)']]
               },
               'fill-opacity': 0.75,
-              'fill-outline-color': '#707070'
+              'fill-outline-color': '#006400'
             }
           })
           /**********/

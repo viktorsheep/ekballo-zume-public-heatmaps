@@ -95,7 +95,7 @@ class Zume_Public_Heatmap_Activity extends DT_Magic_Url_Base
                 ],
                 'grid_data' => ['data' => [], 'highest_value' => 1 ],
                 'custom_marks' => [],
-                'zoom' => 8
+                'zoom' => 12
             ]) ?>][0]
 
             /* custom content */
@@ -197,7 +197,7 @@ class Zume_Public_Heatmap_Activity extends DT_Magic_Url_Base
             case 'a0':
             case 'world':
                 $list = Zume_App_Heatmap::query_activity_grid_totals( $action );
-                return Zume_App_Heatmap::endpoint_get_level( $params['grid_id'], $action, $list, $this->global_div, $this->us_div );
+                return Zume_App_Heatmap::endpoint_get_activity_level( $params['grid_id'], $action, $list, $this->global_div, $this->us_div );
             case 'activity_data':
                 $grid_id = sanitize_text_field( wp_unslash( $params['grid_id'] ) );
                 $offset = sanitize_text_field( wp_unslash( $params['offset'] ) );
