@@ -95,6 +95,10 @@ class Zume_Public_Heatmaps {
         require_once( 'magic/cluster-3-trainings.php' );
         require_once( 'magic/cluster-4-streams.php' );
 
+
+        require_once( 'magic/stats-1-trainees.php' );
+        require_once( 'magic/stats-2-churches.php' );
+
         require_once( 'charts/charts-loader.php' );
 
         if ( is_admin() ) {

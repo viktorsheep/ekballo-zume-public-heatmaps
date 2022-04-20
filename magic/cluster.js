@@ -164,7 +164,7 @@ jQuery(document).ready(function(){
       source: 'layer-source-contacts',
       filter: ['has', 'point_count'],
       layout: {
-        'text-field': '{point_count_abbreviated}',
+        // 'text-field': '{point_count_abbreviated}',
         'text-font': ['DIN Offc Pro Medium', 'Arial Unicode MS Bold'],
         'text-size': 12
       }
@@ -176,7 +176,7 @@ jQuery(document).ready(function(){
       filter: ['!', ['has', 'point_count']],
       paint: {
         'circle-color': '#00d9ff',
-        'circle-radius':12,
+        'circle-radius':20,
         'circle-stroke-width': 1,
         'circle-stroke-color': '#fff'
       }
@@ -234,7 +234,7 @@ jQuery(document).ready(function(){
       filter: ['!', ['has', 'point_count']],
       paint: {
         'circle-color': '#a9a9a9',
-        'circle-radius':12,
+        'circle-radius':20,
         'circle-stroke-width': 1,
         'circle-stroke-color': '#fff'
       }
