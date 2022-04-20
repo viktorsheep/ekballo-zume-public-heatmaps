@@ -144,7 +144,7 @@ class Zume_Public_Stats_Trainings extends DT_Magic_Url_Base {
                 chart.empty().append(
                     `<div class="grid-x grid-padding-x">
                         <div class="cell medium-3 text-center callout">
-                            <h2>Total Trainees Who Finished</h2>
+                            <h2>Total Trainees Who Finished Zume</h2>
                             <span class="hero_number" id="total_trainings">0</span>
                             <p>This is the number of trainees who have used the groups feature in zume.training and have indicated that they have completed at least one training to session 9 or 10.</p>
                         </div>
@@ -165,14 +165,12 @@ class Zume_Public_Stats_Trainings extends DT_Magic_Url_Base {
                             font-size: 2em;
                             font-weight:bold;
                         }
-
                         .callout {
                             margin:.5em;
                             border-radius: 10px;
                         }
                     </style>
                 `)
-
 
                 jQuery('#total_trainings').html(jsObject.stats.total_trainings)
                 jQuery('#unique_locations_with_trainings').html(jsObject.stats.unique_locations_with_trainings)

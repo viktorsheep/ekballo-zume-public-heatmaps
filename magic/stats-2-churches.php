@@ -146,7 +146,7 @@ class Zume_Public_Stats_Churches extends DT_Magic_Url_Base {
                         <div class="cell medium-3 text-center callout">
                             <h2>Total Churches</h2>
                             <span class="hero_number" id="total_churches">0</span>
-                            <p>This is the number of trainings that were created with the zume.training system and have reached the 9-10 session mark.</p>
+                            <p>This is the number of churches recorded in the zume.training/coaches system by coaches.</p>
                         </div>
                         <div class="medium-3 cell text-center callout">
                             <h2>Total Unique Locations With A Church</h2>
@@ -165,14 +165,12 @@ class Zume_Public_Stats_Churches extends DT_Magic_Url_Base {
                             font-size: 2em;
                             font-weight:bold;
                         }
-
                         .callout {
                             margin:.5em;
                             border-radius: 10px;
                         }
                     </style>
                 `)
-
 
                 jQuery('#total_churches').html(jsObject.stats.total_churches)
                 jQuery('#unique_locations_with_churches').html(jsObject.stats.unique_locations_with_churches)
