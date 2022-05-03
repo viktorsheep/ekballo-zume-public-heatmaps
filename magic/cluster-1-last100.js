@@ -66,7 +66,7 @@ jQuery(document).ready(function(){
             </div>
         </div>
         <div class="medium-3 cell">
-            <div class="grid-x grid-padding-x">
+            <div class="grid-x grid-padding-x" style="margin-top:10px;">
                 <div class="cell">
                     <div>
                         <select name="type" id="type-dropdown" class="input-filter">
