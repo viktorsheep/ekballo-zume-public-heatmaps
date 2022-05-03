@@ -15,8 +15,10 @@ jQuery(document).ready(function(){
 
   // Add html and map
   let map_height = window.innerHeight
+  let mobile_show = 'inherit'
   if ( isMobile && window.innerWidth < 640 ) {
     map_height = window.innerHeight / 2
+    mobile_show = 'none'
   }
   chartDiv.empty().html(`
       <style>
@@ -52,12 +54,15 @@ jQuery(document).ready(function(){
                 opacity: 0.8;
                 border-radius: 5px;
             }
+           .mapboxgl-ctrl-geocoder.mapboxgl-ctrl {
+                display: ${mobile_show};
+           }
       </style>
       <div class="grid-x">
         <div class="medium-9 cell">
             <div id="map-wrapper">
                 <div id='map'></div>
-                <div id="map-header"><h3>Last 100 Hours of Movement Activity</h3></div>
+                <div id="map-header"><h3>Last 100 Hours of Movement Activity</h3>Countries: <span id="country_count">0</span> | Languages: <span id="languages_count">0</span></div>
             </div>
         </div>
         <div class="medium-3 cell">
@@ -197,6 +202,7 @@ jQuery(document).ready(function(){
         load_countries_dropdown()
         load_languages_dropdown()
         load_type_dropdown()
+        load_title_stats()
       })
   }
 
@@ -378,5 +384,9 @@ jQuery(document).ready(function(){
       jQuery('.dd.'+v.code).val(v.code).html(`${v.name} (${v.count})`)
       jQuery('.stats.'+v.code).html(`${v.name}: ${v.count}`)
     })
+  }
+  function load_title_stats() {
+    jQuery('#country_count').html(window.activity_geojson.countries_count)
+    jQuery('#languages_count').html(window.activity_geojson.languages_count)
   }
 })

@@ -3879,7 +3879,9 @@ class Zume_App_Heatmap {
         $new_data = array(
             'type' => 'FeatureCollection',
             'countries' => $countries,
+            'countries_count' => count( $countries ),
             'languages' => $languages,
+            'languages_count' => count( $languages ),
             'types' => $types,
             'total' => count( $results ),
             'features' => $features,
