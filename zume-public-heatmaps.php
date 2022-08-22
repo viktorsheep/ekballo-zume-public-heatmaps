@@ -89,6 +89,7 @@ class Zume_Public_Heatmaps {
         require_once( 'magic/map-2-network-activities.php' );
         require_once( 'magic/map-3-practitioners.php' );
         require_once( 'magic/map-5-churches.php' );
+        require_once( 'magic/map-6-churches-1000.php' );
         // cluster heat
         require_once( 'magic/cluster-1-last100.php' );
         require_once( 'magic/cluster-2-all-time-activity.php' );

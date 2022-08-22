@@ -149,7 +149,7 @@ class Zume_Public_Stats_Trainings extends DT_Magic_Url_Base {
                             <p>This is the number of trainees who have used the groups feature in zume.training and have indicated that they have completed at least one training to session 9 or 10.</p>
                         </div>
                         <div class="medium-3 cell text-center callout">
-                            <h2>Total Unique Locations With A Trainee</h2>
+                            <h2>Total Unique Locations With An Active Trainee</h2>
                             <p class="hero_number" id="unique_locations_with_trainings">0</p>
                             <p class="hero_subdetail">out of 44,141</p>
                             <p>These are unique locations out of the 44,141 unique county level locations in the saturation grid which have a church reported and geocoded in it.</p>
