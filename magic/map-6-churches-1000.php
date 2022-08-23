@@ -13,8 +13,8 @@ class Zume_Public_Heatmap_Churches_1000 extends DT_Magic_Url_Base
     public $type_name = '';
     public $post_type = 'groups';
     private $meta_key = '';
-    public $us_div = 1000; // goal for
-    public $global_div = 1000; // this equals 2 for every 50000
+    public $us_div = 500; // goal for
+    public $global_div = 500; // this equals 2 for every 50000
 
     private static $_instance = null;
     public static function instance() {

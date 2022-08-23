@@ -2097,9 +2097,9 @@ class Zume_App_Heatmap {
 
     public static function query_practitioner_grid_totals( $administrative_level = null ) {
 
-//        if ( false !== ( $value = get_transient( __METHOD__ . $administrative_level ) ) ) { // phpcs:ignore
-//            return $value;
-//        }
+        if ( false !== ( $value = get_transient( __METHOD__ . $administrative_level ) ) ) { // phpcs:ignore
+            return $value;
+        }
 
         global $wpdb;
 
