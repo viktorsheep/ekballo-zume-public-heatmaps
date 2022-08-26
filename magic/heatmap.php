@@ -1709,10 +1709,12 @@ class Zume_App_Heatmap {
     }
 
     public static function query_training_grid_totals( $administrative_level = null ) {
-        if ( false !== ( $value = get_transient( __METHOD__ . $administrative_level ) ) ) { // phpcs:ignore
-            return $value;
-        }
         global $wpdb;
+
+        // @note temp removed caching
+//        if ( false !== ( $value = get_transient( __METHOD__ . $administrative_level ) ) ) { // phpcs:ignore
+//            return $value;
+//        }
 
         switch ( $administrative_level ) {
             case 'a0':
@@ -1897,9 +1899,9 @@ class Zume_App_Heatmap {
     }
 
     public static function query_streams_grid_totals( $administrative_level = null ) {
-        if ( false !== ( $value = get_transient( __METHOD__ . $administrative_level ) ) ) { // phpcs:ignore
-            return $value;
-        }
+//        if ( false !== ( $value = get_transient( __METHOD__ . $administrative_level ) ) ) { // phpcs:ignore
+//            return $value;
+//        }
         global $wpdb;
 
         switch ( $administrative_level ) {
@@ -2097,9 +2099,9 @@ class Zume_App_Heatmap {
 
     public static function query_practitioner_grid_totals( $administrative_level = null ) {
 
-        if ( false !== ( $value = get_transient( __METHOD__ . $administrative_level ) ) ) { // phpcs:ignore
-            return $value;
-        }
+//        if ( false !== ( $value = get_transient( __METHOD__ . $administrative_level ) ) ) { // phpcs:ignore
+//            return $value;
+//        }
 
         global $wpdb;
 
@@ -2327,9 +2329,9 @@ class Zume_App_Heatmap {
 
     public static function query_church_grid_totals( $administrative_level = null ) {
 
-        if ( false !== ( $value = get_transient( __METHOD__ . $administrative_level ) ) ) { // phpcs:ignore
-            return $value;
-        }
+//        if ( false !== ( $value = get_transient( __METHOD__ . $administrative_level ) ) ) { // phpcs:ignore
+//            return $value;
+//        }
 
         global $wpdb;
 
