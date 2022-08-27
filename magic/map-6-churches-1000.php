@@ -107,7 +107,7 @@ class Zume_Public_Heatmap_Churches_1000 extends DT_Magic_Url_Base
                   <span class="self_population  bold">${data.population}</span>.
                   In order to reach the community goal of 1 church for every <span class="population_division  bold">${pop_div.toLocaleString("en-US")}</span> people,
                   <span class="self_name ucwords  bold">${data.name}</span> needs
-                  <span class="self_needed bold">${data.needed}</span> new churches.
+                  <span class="self_needed bold">${data.needed / 2}</span> new churches.
                 `)
             }
             /* custom level content */
