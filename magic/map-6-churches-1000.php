@@ -120,7 +120,7 @@ class Zume_Public_Heatmap_Churches_1000 extends DT_Magic_Url_Base
                           <strong>${data.name}</strong><br>
                           Population: <span>${data.population}</span><br>
                           Churches Needed: <span>${(data.needed.toString().replace(/,/g, '') / 2).toLocaleString('en-US')}</span><br>
-                          Churches Reported: <span class="reported_number">${data.reported}</span><br>
+                          <?php if( is_user_logged_in() ) { echo '<a href="/groups" target="_blank" rel="noopener noreferrer">Churches Reported</a>'; } else { echo 'Churches Reported'; } ?> <span class="reported_number">${data.reported}</span><br>
                           Goal Reached: <span>${data.percent}</span>%
                           <meter class="meter" value="${data.percent}" min="0" low="33" high="66" optimum="100" max="100"></meter>
                         </div>
