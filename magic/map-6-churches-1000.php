@@ -115,14 +115,17 @@ class Zume_Public_Heatmap_Churches_1000 extends DT_Magic_Url_Base
                 let gl = jQuery('#'+level+'-list-item')
                 gl.empty()
                 if ( false !== data ) {
+                    const churchNeeded = Math.ceil(data.needed.toString().replace(/,/g, '') / 2)
+                    const goalReached = ((data.reported / churchNeeded) * 150).toFixed(2)
+
                     gl.append(`
                         <div class="cell">
                           <strong>${data.name}</strong><br>
                           Population: <span>${data.population}</span><br>
                           Churches Needed: <span>${(Math.ceil(data.needed.toString().replace(/,/g, '') / 2)).toLocaleString('en-US')}</span><br>
                           <?php if( is_user_logged_in() ) { echo '<a href="/groups" target="_blank" rel="noopener noreferrer">Churches Reported</a>'; } else { echo 'Churches Reported'; } ?> <span class="reported_number">${data.reported}</span><br>
-                          Goal Reached: <span>${data.percent}</span>%
-                          <meter class="meter" value="${data.percent}" min="0" low="33" high="66" optimum="100" max="100"></meter>
+                          Goal Reached: <span>${goalReached}</span>%
+                          <meter class="meter" value="${goalReached > 100 ? '100' : goalReached }" min="0" low="33" high="66" optimum="100" max="100"></meter>
                         </div>
                     `)
                 }

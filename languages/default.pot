@@ -2,7 +2,7 @@
 msgid ""
 msgstr ""
 "Plural-Forms: nplurals=INTEGER; plural=EXPRESSION;\n"
-"Project-Id-Version: Zume - Public Heatmaps\n"
+"Project-Id-Version: Ekballo Zume - Public Heatmaps\n"
 "POT-Creation-Date: 2020-05-07 10:44+0100\n"
 "PO-Revision-Date: 2018-01-29 05:53-0700\n"
 "Last-Translator: \n"
@@ -24,7 +24,7 @@ msgstr ""
 
 #: zume-public-heatmaps.php:316
 msgid ""
-"'Zume - Public Heatmaps' plugin requires 'Disciple Tools' theme to "
+"'Ekballo Zume - Public Heatmaps' plugin requires 'Disciple Tools' theme to "
 "work. Please activate 'Disciple Tools' theme or make sure it is latest "
 "version."
 msgstr ""

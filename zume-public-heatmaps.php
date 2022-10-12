@@ -1,13 +1,13 @@
 <?php
 /**
- * Plugin Name: Zume - Public Heatmaps
- * Plugin URI: https://github.com/ZumeProject/zume-public-heatmaps
+ * Plugin Name: Ekballo Zume - Public Heatmaps
+ * Plugin URI: https://github.com/viktorsheep/zume-public-heatmaps
  * Description: This plugin creates the public facing heatmaps that show trainings and churches and are embedded into public websites.
- * Text Domain: zume-public-heatmaps
+ * Text Domain: ekballo-zume-public-heatmaps
  * Domain Path: /languages
- * Version:  0.4.3
- * Author URI: https://github.com/ZumeProject
- * GitHub Plugin URI: https://github.com/ZumeProject/zume-public-heatmaps
+ * Version:  0.4.4
+ * Author URI: https://github.com/viktorsheep
+ * GitHub Plugin URI: https://github.com/viktorsheep/zume-public-heatmaps
  * Requires at least: 4.7.0
  * (Requires 4.7+ because of the integration of the REST API at 4.7 and the security requirements of this milestone version.)
  * Tested up to: 5.6
@@ -223,7 +223,7 @@ if ( ! function_exists( 'zume_public_heatmaps_hook_admin_notice' ) ) {
         global $zume_public_heatmaps_required_dt_theme_version;
         $wp_theme = wp_get_theme();
         $current_version = $wp_theme->version;
-        $message = "'Zume - Public Heatmaps' plugin requires 'Disciple Tools' theme to work. Please activate 'Disciple Tools' theme or make sure it is latest version.";
+        $message = "'Ekballo Zume - Public Heatmaps' plugin requires 'Disciple Tools' theme to work. Please activate 'Disciple Tools' theme or make sure it is latest version.";
         if ( $wp_theme->get_template() === "disciple-tools-theme" ){
             $message .= ' ' . sprintf( esc_html( 'Current Disciple Tools version: %1$s, required version: %2$s' ), esc_html( $current_version ), esc_html( $zume_public_heatmaps_required_dt_theme_version ) );
         }
