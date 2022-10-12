@@ -122,7 +122,7 @@ class Zume_Public_Heatmaps {
             // You can still use `array_unshift()` to add links at the beginning.
 
             $links_array[] = '<a href="https://disciple.tools">Disciple.Tools Community</a>';
-            $links_array[] = '<a href="https://github.com/ZumeProject/zume-public-heatmaps">Github Project</a>';
+            $links_array[] = '<a href="https://github.com/viktorsheep/zume-public-heatmaps">Github Project</a>';
         }
 
         return $links_array;
