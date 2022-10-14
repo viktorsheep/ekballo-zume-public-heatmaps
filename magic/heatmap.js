@@ -358,7 +358,7 @@ function load_map() {
               $('#reported').html(reported)
 
               let needed = jsObject.grid_data.data[e.features[0].properties.grid_id].needed
-              $('#needed').html(needed)
+              $('#needed').html(Math.ceil(needed.toString().replace(/,/g, '') / 2)).toLocaleString('en-US')
             }
           });
           map.on('click', i.toString()+'fills', function (e) {
