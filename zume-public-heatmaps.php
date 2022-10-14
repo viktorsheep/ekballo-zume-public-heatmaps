@@ -1,13 +1,13 @@
 <?php
 /**
  * Plugin Name: Ekballo Zume - Public Heatmaps
- * Plugin URI: https://github.com/viktorsheep/zume-public-heatmaps
+ * Plugin URI: https://github.com/viktorsheep/ekballo-zume-public-heatmaps
  * Description: This plugin creates the public facing heatmaps that show trainings and churches and are embedded into public websites.
  * Text Domain: ekballo-zume-public-heatmaps
  * Domain Path: /languages
  * Version:  0.4.6
  * Author URI: https://github.com/viktorsheep
- * GitHub Plugin URI: https://github.com/viktorsheep/zume-public-heatmaps
+ * GitHub Plugin URI: https://github.com/viktorsheep/ekball-zume-public-heatmaps
  * Requires at least: 4.7.0
  * (Requires 4.7+ because of the integration of the REST API at 4.7 and the security requirements of this milestone version.)
  * Tested up to: 5.6
@@ -122,7 +122,7 @@ class Zume_Public_Heatmaps {
             // You can still use `array_unshift()` to add links at the beginning.
 
             $links_array[] = '<a href="https://disciple.tools">Disciple.Tools Community</a>';
-            $links_array[] = '<a href="https://github.com/viktorsheep/zume-public-heatmaps">Github Project</a>';
+            $links_array[] = '<a href="https://github.com/viktorsheep/ekballo-zume-public-heatmaps">Github Project</a>';
         }
 
         return $links_array;
@@ -275,7 +275,7 @@ add_action( 'plugins_loaded', function (){
             Puc_v4_Factory::buildUpdateChecker(
                 'https://raw.githubusercontent.com/viktorsheep/ekballo-zume-public-heatmaps/master/version-control.json',
                 __FILE__,
-                'zume-public-heatmaps'
+                'ekballo-zume-public-heatmaps'
             );
         }
     }
