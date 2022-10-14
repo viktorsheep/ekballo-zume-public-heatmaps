@@ -275,7 +275,7 @@ add_action( 'plugins_loaded', function (){
             Puc_v4_Factory::buildUpdateChecker(
                 'https://raw.githubusercontent.com/viktorsheep/ekballo-zume-public-heatmaps/master/version-control.json',
                 __FILE__,
-                'ekballo-zume-public-heatmaps'
+                'zume-public-heatmaps'
             );
         }
     }

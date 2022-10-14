@@ -116,7 +116,7 @@ class Zume_Public_Heatmap_Churches_1000 extends DT_Magic_Url_Base
                 gl.empty()
                 if ( false !== data ) {
                     const churchNeeded = Math.ceil(data.needed.toString().replace(/,/g, '') / 2)
-                    const goalReached = ((data.reported.toString().replace(/,/g, '') / churchNeeded) * 150).toFixed(2)
+                    const goalReached = ((data.reported.toString().replace(/,/g, '') / churchNeeded) * 100).toFixed(2)
 
                     gl.append(`
                         <div class="cell">

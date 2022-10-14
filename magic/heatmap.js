@@ -346,19 +346,43 @@ function load_map() {
                 {hover: true}
               );
               $('#title').html(e.features[0].properties.full_name)
-              $('#meter').val(jsObject.grid_data.data[e.features[0].properties.grid_id].percent)
-              $('#saturation-goal').html(jsObject.grid_data.data[e.features[0].properties.grid_id].percent)
+
+              // obselete, to be deleted
+              let needed = jsObject.grid_data.data[e.features[0].properties.grid_id].needed
+              let reported = jsObject.grid_data.data[e.features[0].properties.grid_id].reported
+
+              // get stat values from jsObject and format
+              const stats = {
+                needed: Math.ceil((jsObject.grid_data.data[e.features[0].properties.grid_id].needed).toString().replace(/,/g, '') / 2),
+                reported: (jsObject.grid_data.data[e.features[0].properties.grid_id].reported).toString().replace(/,/g, ''),
+                get percent() {
+                  return ((this.reported / this.needed) * 100).toFixed(2)
+                },
+
+                get progress() {
+                  return this.percent > 100 ? '100' : this.percent
+                }
+              }
+
+              // Population
               $('#population').html(jsObject.grid_data.data[e.features[0].properties.grid_id].population)
+              
+              // Needed
+              $('#needed').html(stats.needed.toLocaleString('en-US'))
+
+              // Reported 
+              $('#reported').html(parseInt(stats.reported).toLocaleString('en-US'))
+              
+              // Goal
+              $('#saturation-goal').html(stats.percent + '%')
+
+              // Progress Bar
+              $('#meter').val(stats.progress)
 
               //report
               $('#report-modal-title').val(e.features[0].properties.full_name)
               $('#report-grid-id').val(e.features[0].properties.grid_id)
 
-              let reported = jsObject.grid_data.data[e.features[0].properties.grid_id].reported
-              $('#reported').html(reported)
-
-              let needed = jsObject.grid_data.data[e.features[0].properties.grid_id].needed
-              $('#needed').html(Math.ceil(needed.toString().replace(/,/g, '') / 2)).toLocaleString('en-US')
             }
           });
           map.on('click', i.toString()+'fills', function (e) {
