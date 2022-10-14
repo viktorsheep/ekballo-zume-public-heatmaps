@@ -374,7 +374,7 @@ function load_map() {
               $('#reported').html(parseInt(stats.reported).toLocaleString('en-US'))
               
               // Goal
-              $('#saturation-goal').html(stats.percent + '%')
+              $('#saturation-goal').html(stats.percent)
 
               // Progress Bar
               $('#meter').val(stats.progress)
