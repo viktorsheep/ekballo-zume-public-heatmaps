@@ -126,6 +126,12 @@ jQuery(document).ready(function($){
       console.log('Error getting grid data')
       jsObject.grid_data = {'data': {}, 'highest_value': 1 }
     })
+  
+  window.geoJSONs = {
+    type: 'FeatureCollection',
+    features: []
+  }
+
   jQuery.each(asset_list, function(i,v) {
     jQuery.ajax({
       url: jsObject.mirror_url + 'tiles/world/saturation/' + v,
@@ -139,6 +145,8 @@ jQuery(document).ready(function($){
       }
     })
       .done(function(x){
+        window.geoJSONs.features.push(...x.features)
+
         loop++
         initialize_screen.val(loop)
 
@@ -173,7 +181,7 @@ jQuery(document).ready(function($){
  * Load map when precache is complete
  **************************/
 function load_map() {
-  jQuery('#initialize-screen').hide()
+  let geojsons = window.geoJSONs
 
   // set title
   $('#panel-type-title').html(jsObject.translation.title)
@@ -187,6 +195,7 @@ function load_map() {
   // }
 
   mapboxgl.accessToken = jsObject.map_key;
+
   let map = new mapboxgl.Map({
     container: 'map',
     style: 'mapbox://styles/discipletools/cl1qp8vuf002l15ngm5a7up59',
@@ -195,6 +204,7 @@ function load_map() {
     maxZoom: maxzoom,
     zoom: 3
   });
+
   if ( ! isMobile ) {
     map.addControl(
       new MapboxGeocoder({
@@ -220,18 +230,225 @@ function load_map() {
       })
     );
   }
+
   map.dragRotate.disable();
   map.touchZoomRotate.disableRotation();
-
 
   if ( get_map_start( 'heatmap_zoom_memory' ) ) {
     map.fitBounds(get_map_start( 'heatmap_zoom_memory' ))
   }
+
   map.on('zoomend', function(){
     set_map_start( 'heatmap_zoom_memory', map.getBounds() )
   })
 
   window.previous_hover = false
+
+  // add features
+  jQuery.each(geojsons.features, function (i, v) {
+    if (typeof jsObject.grid_data.data[v.id] !== 'undefined') {
+      let percentageCalculation = parseInt((((jsObject.grid_data.data[v.id].reported).toString().replace(/,/g, '') / Math.ceil((jsObject.grid_data.data[v.id].needed).toString().replace(/,/g, '') / 2)) * 100).toFixed())
+      geojsons.features[i].properties.value = percentageCalculation > 100 ? 100 : percentageCalculation
+    } else {
+      geojsons.features[i].properties.value = 0
+    }
+  });
+
+  // Map on Load
+  map.on('load', function () {
+    jQuery('#initialize-loadingmap').show()
+
+    // Add Source
+    map.addSource('churches', {
+      'type': 'geojson',
+      'data': geojsons
+    });
+
+    // Add Default Layer
+    map.addLayer({
+      'id': 'default-line',
+      'type': 'line',
+      'source': 'churches',
+      'paint': {
+        'line-color': 'grey',
+        'line-width': .5
+      }
+    }); // e.o Add Default Layer
+
+    // Add Hover Layer
+    map.addLayer({
+      'id': 'hover-fills',
+      'type': 'fill',
+      'source': 'churches',
+      'paint': {
+        'fill-color': 'black',
+        'fill-opacity': [
+          'case',
+          ['boolean', ['feature-state', 'hover'], false],
+          .8,
+          0
+        ]
+      }
+    }) // e.o Add Hover Layer
+
+    // Add Saturation Layer
+    map.addLayer({
+      'id': 'satuation-fills',
+      'type': 'fill',
+      'source': 'churches',
+      'paint': {
+        'fill-color': {
+          property: 'value',
+          stops: [
+            [0, '#ffffff'],
+            [20, '#ba1200'],
+            [40, '#cc441c'],
+            [60, '#f7c162'],
+            [80, '#78945f'],
+            [100, '#4a7c59'],
+
+            /*
+            [0, 'rgba(50, 205, 50, 0)'],
+            [10, 'rgba(50,205,50, .1)'],
+            [20, 'rgba(50,205,50, .2)'],
+            [30, 'rgba(50,205,50, .3)'],
+            [40, 'rgba(50,205,50, .4)'],
+            [50, 'rgba(50,205,50, .5)'],
+            [60, 'rgba(50,205,50, .6)'],
+            [70, 'rgba(50,205,50, .7)'],
+            [80, 'rgba(50,205,50, .8)'],
+            [90, 'rgba(50,205,50, .9)'],
+            [100, 'rgba(50,205,50, 10)']
+            */
+          ]
+        },
+        'fill-opacity': 0.75,
+        'fill-outline-color': '#777777'
+      }
+    }) // e.o Add Satuation Layer
+
+    // Set Custom Marks
+    if ( jsObject.custom_marks.length > 0 ) {
+      jQuery.each( jsObject.custom_marks, function(i,v) {
+        new mapboxgl.Marker()
+          .setLngLat([v.lng, v.lat])
+          .addTo(map);
+      })
+    } // e.o Set Custom Marks
+
+    // On Mouse Hover / Move
+    map.on('mousemove', 'hover-fills', function (e) {
+      if ( window.previous_hover ) {
+        map.setFeatureState(
+          window.previous_hover,
+          { hover: false }
+        )
+        hide_details_panel()
+      }
+
+      window.previous_hover = { source: 'churches', id: e.features[0].id }
+
+      if (e.features.length > 0) {
+        show_details_panel()
+        map.setFeatureState(
+          window.previous_hover,
+          {hover: true}
+        );
+        $('#title').html(e.features[0].properties.full_name)
+
+        // get stat values from jsObject and format
+        const stats = {
+          needed: Math.ceil((jsObject.grid_data.data[e.features[0].properties.grid_id].needed).toString().replace(/,/g, '') / 2),
+          reported: (jsObject.grid_data.data[e.features[0].properties.grid_id].reported).toString().replace(/,/g, ''),
+          get percent() {
+            return ((this.reported / this.needed) * 100).toFixed(2)
+          },
+
+          get progress() {
+            return this.percent > 100 ? '100' : this.percent
+          }
+        }
+
+        // Population
+        $('#population').html(jsObject.grid_data.data[e.features[0].properties.grid_id].population)
+        
+        // Needed
+        $('#needed').html(stats.needed.toLocaleString('en-US'))
+
+        // Reported 
+        $('#reported').html(parseInt(stats.reported).toLocaleString('en-US'))
+        
+        // Goal
+        $('#saturation-goal').html(stats.percent)
+
+        // Progress Bar
+        $('#meter').val(stats.progress)
+
+        //report
+        $('#report-modal-title').val(e.features[0].properties.full_name)
+        $('#report-grid-id').val(e.features[0].properties.grid_id)
+
+      }
+    }); // e.o On Mouse Hover / Move
+
+    // On Mouse Click
+    map.on('click', 'hover-fills', function (e) {
+      $('#modal_tile').html(e.features[0].properties.full_name)
+      $('#modal_population').html(jsObject.grid_data.data[e.features[0].properties.grid_id].population)
+
+      jQuery('.temp-spinner').html(`<span class="loading-spinner active"></span>`)
+
+      window.get_grid_data( 'self', e.features[0].properties.grid_id )
+        .done(function(data){
+          load_self_content( data )
+        })
+      window.get_grid_data( 'a0', e.features[0].properties.grid_id )
+        .done(function(data){
+          load_level_content( data, 'a0' )
+        })
+      window.get_grid_data( 'a1', e.features[0].properties.grid_id )
+        .done(function(data){
+          load_level_content( data, 'a1' )
+        })
+      window.get_grid_data( 'a2', e.features[0].properties.grid_id )
+        .done(function(data){
+          load_level_content( data, 'a2' )
+        })
+      window.get_grid_data( 'a3', e.features[0].properties.grid_id )
+        .done(function(data){
+          load_level_content( data, 'a3' )
+        })
+      window.get_grid_data( 'world', e.features[0].properties.grid_id )
+        .done(function(data){
+          load_level_content( data, 'world' )
+        })
+
+      let ac = $('#activity-content')
+      ac.html('<span class="loading-spinner active"></span>')
+      window.get_activity_data(e.features[0].properties.grid_id)
+        .done(function(data){
+          ac.empty()
+          if ( data.length < 1 ) {
+            ac.append(`<div>No Movement Activity</div>`)
+          } else {
+            $.each(data, function(i,v){
+              if ( typeof v.message !== 'undefined' ){
+                ac.append(`<div><div style="float:left;width:180px;"><strong>${v.formatted_time}</strong></div> <span>${v.message}</span></div>`)
+              }
+            })
+          }
+        })
+
+      $('#offCanvasNestedPush').foundation('toggle', e);
+    }); // e.o On Mouse Click
+  }); // e.o Map on Load
+
+  // Show when map loaded
+  map.on('idle', function () {
+    jQuery('#initialize-screen').fadeOut();
+  }); // e.o Show when map loaded
+
+  return;
 
   let asset_list = []
   var i = 1;
@@ -259,7 +476,13 @@ function load_map() {
 
           jQuery.each(geojson.features, function (i, v) {
             if (typeof jsObject.grid_data.data[v.id] !== 'undefined' ) {
-              geojson.features[i].properties.value = parseInt(jsObject.grid_data.data[v.id].percent)
+              let needed = Math.ceil((jsObject.grid_data.data[v.id].needed).toString().replace(/,/g, '') / 2)
+              let reported = (jsObject.grid_data.data[v.id].reported).toString().replace(/,/g, '')
+              let calcx = (((jsObject.grid_data.data[v.id].reported).toString().replace(/,/g, '') / Math.ceil((jsObject.grid_data.data[v.id].needed).toString().replace(/,/g, '') / 2)) * 100).toFixed(2)
+              let perc = calcx > 100 ? 100 : calcx
+
+              // geojson.features[i].properties.value = parseInt(jsObject.grid_data.data[v.id].percent)
+              geojson.features[i].properties.value = perc
             } else {
               geojson.features[i].properties.value = 0
             }
@@ -307,10 +530,13 @@ function load_map() {
             'type': 'fill',
             'source': i.toString(),
             'paint': {
+              /*
               'fill-color': {
                 property: 'value',
                 stops: [[0, 'rgba(0, 0, 0, 0)'], [0.01, 'rgb(50,205,50)'], [jsObject.grid_data.highest_value, 'rgb(0,128,0)']]
               },
+              */
+             'fill-color': '#ccc',
               'fill-opacity': 0.75,
               'fill-outline-color': '#006400'
             }
@@ -347,10 +573,6 @@ function load_map() {
               );
               $('#title').html(e.features[0].properties.full_name)
 
-              // obselete, to be deleted
-              let needed = jsObject.grid_data.data[e.features[0].properties.grid_id].needed
-              let reported = jsObject.grid_data.data[e.features[0].properties.grid_id].reported
-
               // get stat values from jsObject and format
               const stats = {
                 needed: Math.ceil((jsObject.grid_data.data[e.features[0].properties.grid_id].needed).toString().replace(/,/g, '') / 2),
@@ -385,6 +607,7 @@ function load_map() {
 
             }
           });
+
           map.on('click', i.toString()+'fills', function (e) {
             $('#modal_tile').html(e.features[0].properties.full_name)
             $('#modal_population').html(jsObject.grid_data.data[e.features[0].properties.grid_id].population)
