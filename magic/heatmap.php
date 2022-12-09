@@ -12,6 +12,8 @@ class Zume_App_Heatmap {
      *
      * @return array
      */
+
+
     public static function query_saturation_list() : array {
 
         if ( false !== ( $value = get_transient( __METHOD__ ) ) ) { // phpcs:ignore
@@ -22,19 +24,18 @@ class Zume_App_Heatmap {
 
         global $wpdb;
         $results = $wpdb->get_results("
-
             SELECT
             lg1.grid_id, lg1.population, lg1.country_code
             FROM $wpdb->dt_location_grid lg1
             WHERE lg1.level = 0
-			AND lg1.grid_id NOT IN ( SELECT lg11.admin0_grid_id FROM $wpdb->dt_location_grid lg11 WHERE lg11.level = 1 AND lg11.admin0_grid_id = lg1.grid_id )
- 			#'China', 'India', 'France', 'Spain', 'Pakistan', 'Bangladesh'
+            AND lg1.grid_id NOT IN ( SELECT lg11.admin0_grid_id FROM $wpdb->dt_location_grid lg11 WHERE lg11.level = 1 AND lg11.admin0_grid_id = lg1.grid_id )
+            #'China', 'India', 'France', 'Spain', 'Pakistan', 'Bangladesh'
             AND lg1.admin0_grid_id NOT IN (100050711,100219347, 100089589,100074576,100259978,100018514)
             #'Romania', 'Estonia', 'Bhutan', 'Croatia', 'Solomon Islands', 'Guyana', 'Iceland', 'Vanuatu', 'Cape Verde', 'Samoa', 'Faroe Islands', 'Norway', 'Uruguay', 'Mongolia', 'United Arab Emirates', 'Slovenia', 'Bulgaria', 'Honduras', 'Columbia', 'Namibia', 'Switzerland', 'Western Sahara'
             AND lg1.admin0_grid_id NOT IN (100314737,100083318,100041128,100133112,100341242,100132648,100222839,100379914,100055707,100379993,100130389,100255271,100363975,100248845,100001527,100342458,100024289,100132795,100054605,100253456,100342975,100074571)
-			# above admin 0 (22)
+            # above admin 0 (22)
 
-			UNION ALL
+            UNION ALL
             --
             # admin 1 locations that have no level 2 (768)
             --
@@ -42,17 +43,17 @@ class Zume_App_Heatmap {
             lg2.grid_id, lg2.population, lg2.country_code
             FROM $wpdb->dt_location_grid lg2
             WHERE lg2.level = 1
-			AND lg2.grid_id NOT IN ( SELECT lg22.admin1_grid_id FROM $wpdb->dt_location_grid lg22 WHERE lg22.level = 2 AND lg22.admin1_grid_id = lg2.grid_id )
-             #'China', 'India', 'France', 'Spain', 'Pakistan', 'Bangladesh'
+            AND lg2.grid_id NOT IN ( SELECT lg22.admin1_grid_id FROM $wpdb->dt_location_grid lg22 WHERE lg22.level = 2 AND lg22.admin1_grid_id = lg2.grid_id )
+            #'China', 'India', 'France', 'Spain', 'Pakistan', 'Bangladesh'
             AND lg2.admin0_grid_id NOT IN (100050711,100219347, 100089589,100074576,100259978,100018514)
             #'Romania', 'Estonia', 'Bhutan', 'Croatia', 'Solomon Islands', 'Guyana', 'Iceland', 'Vanuatu', 'Cape Verde', 'Samoa', 'Faroe Islands', 'Norway', 'Uruguay', 'Mongolia', 'United Arab Emirates', 'Slovenia', 'Bulgaria', 'Honduras', 'Columbia', 'Namibia', 'Switzerland', 'Western Sahara'
             AND lg2.admin0_grid_id NOT IN (100314737,100083318,100041128,100133112,100341242,100132648,100222839,100379914,100055707,100379993,100130389,100255271,100363975,100248845,100001527,100342458,100024289,100132795,100054605,100253456,100342975,100074571)
 
-			UNION ALL
-			--
+            UNION ALL
+            --
             # admin 2 all countries (37100)
             --
-			SELECT
+            SELECT
             lg3.grid_id, lg3.population,  lg3.country_code
             FROM $wpdb->dt_location_grid lg3
             WHERE lg3.level = 2
@@ -61,7 +62,7 @@ class Zume_App_Heatmap {
             #'Romania', 'Estonia', 'Bhutan', 'Croatia', 'Solomon Islands', 'Guyana', 'Iceland', 'Vanuatu', 'Cape Verde', 'Samoa', 'Faroe Islands', 'Norway', 'Uruguay', 'Mongolia', 'United Arab Emirates', 'Slovenia', 'Bulgaria', 'Honduras', 'Columbia', 'Namibia', 'Switzerland', 'Western Sahara'
             AND lg3.admin0_grid_id NOT IN (100314737,100083318,100041128,100133112,100341242,100132648,100222839,100379914,100055707,100379993,100130389,100255271,100363975,100248845,100001527,100342458,100024289,100132795,100054605,100253456,100342975,100074571)
 
-			UNION ALL
+            UNION ALL
             --
             # admin 1 for little highly divided countries (352)
             --
@@ -74,10 +75,10 @@ class Zume_App_Heatmap {
             #'Romania', 'Estonia', 'Bhutan', 'Croatia', 'Solomon Islands', 'Guyana', 'Iceland', 'Vanuatu', 'Cape Verde', 'Samoa', 'Faroe Islands', 'Norway', 'Uruguay', 'Mongolia', 'United Arab Emirates', 'Slovenia', 'Bulgaria', 'Honduras', 'Columbia', 'Namibia', 'Switzerland', 'Western Sahara'
             AND lg4.admin0_grid_id IN (100314737,100083318,100041128,100133112,100341242,100132648,100222839,100379914,100055707,100379993,100130389,100255271,100363975,100248845,100001527,100342458,100024289,100132795,100054605,100253456,100342975,100074571)
 
-			UNION ALL
+            UNION ALL
 
- 			--
-            # admin 3 for big countries (6153)
+            --
+             # admin 3 for big countries (6153)
             --
             SELECT
             lg5.grid_id, lg5.population, lg5.country_code
@@ -88,10 +89,8 @@ class Zume_App_Heatmap {
             AND lg5.admin0_grid_id IN (100050711,100219347, 100089589,100074576,100259978,100018514)
             #'Romania', 'Estonia', 'Bhutan', 'Croatia', 'Solomon Islands', 'Guyana', 'Iceland', 'Vanuatu', 'Cape Verde', 'Samoa', 'Faroe Islands', 'Norway', 'Uruguay', 'Mongolia', 'United Arab Emirates', 'Slovenia', 'Bulgaria', 'Honduras', 'Columbia', 'Namibia', 'Switzerland', 'Western Sahara'
             AND lg5.admin0_grid_id NOT IN (100314737,100083318,100041128,100133112,100341242,100132648,100222839,100379914,100055707,100379993,100130389,100255271,100363975,100248845,100001527,100342458,100024289,100132795,100054605,100253456,100342975,100074571)
-
-			# Total Records (44395)
-
-       ", ARRAY_A );
+            # Total Records (44395)
+        ", ARRAY_A );
 
         $list = [];
         if ( is_array( $results ) ) {
@@ -264,7 +263,6 @@ class Zume_App_Heatmap {
     }
 
     public static function query_saturation_list_with_filters( $filters ) : array {
-
         $additional_where = '';
         if ( ! empty( $filters['bounds'] ) && is_array( $filters['bounds'] ) && $filters['zoom'] > 1.5 ) {
             if ( isset( $filters['bounds']['n_lat'] )
@@ -1712,9 +1710,9 @@ class Zume_App_Heatmap {
         global $wpdb;
 
         // @note temp removed caching
-//        if ( false !== ( $value = get_transient( __METHOD__ . $administrative_level ) ) ) { // phpcs:ignore
-//            return $value;
-//        }
+        //  if ( false !== ( $value = get_transient( __METHOD__ . $administrative_level ) ) ) { // phpcs:ignore
+        //      return $value;
+        //  }
 
         switch ( $administrative_level ) {
             case 'a0':
@@ -1899,9 +1897,9 @@ class Zume_App_Heatmap {
     }
 
     public static function query_streams_grid_totals( $administrative_level = null ) {
-//        if ( false !== ( $value = get_transient( __METHOD__ . $administrative_level ) ) ) { // phpcs:ignore
-//            return $value;
-//        }
+        //        if ( false !== ( $value = get_transient( __METHOD__ . $administrative_level ) ) ) { // phpcs:ignore
+        //            return $value;
+        //        }
         global $wpdb;
 
         switch ( $administrative_level ) {
@@ -2099,9 +2097,9 @@ class Zume_App_Heatmap {
 
     public static function query_practitioner_grid_totals( $administrative_level = null ) {
 
-//        if ( false !== ( $value = get_transient( __METHOD__ . $administrative_level ) ) ) { // phpcs:ignore
-//            return $value;
-//        }
+        //        if ( false !== ( $value = get_transient( __METHOD__ . $administrative_level ) ) ) { // phpcs:ignore
+        //            return $value;
+        //        }
 
         global $wpdb;
 
@@ -2327,11 +2325,173 @@ class Zume_App_Heatmap {
         delete_transient( 'Zume_App_Heatmap::query_church_grid_totalsfull' );
     }
 
+    public static function query_church_grid_totals_by_regions($regions, $administrative_level = null) {
+        global $wpdb;
+
+        $ids = implode("','", $regions);
+
+        /*
+        $results  = $wpdb->get_results("
+            SELECT 
+                ( CASE
+                    WHEN t0.level = 0 THEN t0.admin0_grid_id
+                    WHEN t0.level = 1 THEN t0.admin1_grid_id
+                    WHEN t0.level = 2 THEN t0.admin2_grid_id
+                    WHEN t0.level = 3 THEN t0.admin3_grid_id
+                    WHEN t0.level = 4 THEN t0.admin4_grid_id
+                    WHEN t0.level = 5 THEN t0.admin5_grid_id
+                    ELSE 1
+                    END
+                ) as grid_id,
+                t0.admin0_grid_id,
+                t0.admin1_grid_id,
+                t0.admin2_grid_id,
+                t0.admin3_grid_id,
+                t0.admin4_grid_id,
+                t0.admin5_grid_id,
+                t0.name,
+                t0.population,
+                t0.country_code,
+                t0.level,
+                count(t0.admin0_grid_id) as reported
+            FROM (
+            SELECT lg.*
+                FROM $wpdb->postmeta as pm
+                JOIN $wpdb->posts as p ON p.ID=pm.post_id AND p.post_type = 'groups'
+                JOIN $wpdb->postmeta as pm2 ON pm2.post_id=pm.post_id AND pm2.meta_key = 'group_type' AND pm2.meta_value = 'church'
+                LEFT JOIN $wpdb->dt_location_grid as lg ON pm.meta_value=lg.grid_id
+                WHERE pm.meta_key = 'location_grid' AND lg.admin0_grid_id IN (SELECT grid_id FROM wp_dt_location_grid WHERE name IN ('$ids'))
+            ) as t0
+            GROUP BY 
+                ( CASE
+                    WHEN t0.level = 0 THEN t0.admin0_grid_id
+                    WHEN t0.level = 1 THEN t0.admin1_grid_id
+                    WHEN t0.level = 2 THEN t0.admin2_grid_id
+                    WHEN t0.level = 3 THEN t0.admin3_grid_id
+                    WHEN t0.level = 4 THEN t0.admin4_grid_id
+                    WHEN t0.level = 5 THEN t0.admin5_grid_id
+                    ELSE 1
+                END )
+            ", ARRAY_A);
+        */
+
+        /*
+        $results  = $wpdb->get_results("
+            SELECT 
+                ( CASE
+                    WHEN t0.level = 0 THEN t0.admin0_grid_id
+                    WHEN t0.level = 1 THEN t0.admin1_grid_id
+                    WHEN t0.level = 2 THEN t0.admin2_grid_id
+                    WHEN t0.level = 3 THEN t0.admin3_grid_id
+                  END
+                ) as grid_id,
+                t0.admin0_grid_id,
+                t0.admin1_grid_id,
+                t0.admin2_grid_id,
+                t0.admin3_grid_id,
+                t0.name,
+                t0.population,
+                t0.country_code,
+                t0.level,
+                count(
+                  ( CASE
+                      WHEN t0.level = 0 THEN t0.admin0_grid_id
+                      WHEN t0.level = 1 THEN t0.admin1_grid_id
+                      WHEN t0.level = 2 THEN t0.admin2_grid_id
+                      WHEN t0.level = 3 THEN t0.admin3_grid_id
+                    END
+                  )
+                ) as reported
+              FROM (
+               SELECT lg.*
+                  FROM $wpdb->postmeta as pm
+                  JOIN $wpdb->posts as p ON p.ID=pm.post_id AND p.post_type = 'groups'
+                  JOIN $wpdb->postmeta as pm2 ON pm2.post_id=pm.post_id AND pm2.meta_key = 'group_type' AND pm2.meta_value = 'church'
+                  LEFT JOIN $wpdb->dt_location_grid as lg ON pm.meta_value=lg.grid_id
+                  WHERE pm.meta_key = 'location_grid' AND lg.admin0_grid_id IN (SELECT grid_id FROM wp_dt_location_grid WHERE name IN ('$ids'))
+              ) as t0
+              GROUP BY t0.admin3_grid_id
+                ( CASE
+                  WHEN t0.level = 0 THEN t0.admin0_grid_id
+                  WHEN t0.level = 1 THEN t0.admin1_grid_id
+                  WHEN t0.level = 2 THEN t0.admin2_grid_id
+                  WHEN t0.level = 3 THEN t0.admin3_grid_id
+                END )
+                
+            ", ARRAY_A);
+        */
+
+        $results  = $wpdb->get_results("
+            SELECT t0.admin0_grid_id as grid_id, count(t0.admin0_grid_id) as reported, t0.name, t0.population, t0.country_code, t0.level
+            FROM (
+             SELECT lg.*
+                FROM $wpdb->postmeta as pm
+                JOIN $wpdb->posts as p ON p.ID=pm.post_id AND p.post_type = 'groups'
+                JOIN $wpdb->postmeta as pm2 ON pm2.post_id=pm.post_id AND pm2.meta_key = 'group_type' AND pm2.meta_value = 'church'
+                LEFT JOIN $wpdb->dt_location_grid as lg ON pm.meta_value=lg.grid_id
+                WHERE pm.meta_key = 'location_grid' AND lg.admin0_grid_id IN (SELECT grid_id FROM wp_dt_location_grid WHERE name IN ('$ids'))
+            ) as t0
+            GROUP BY t0.admin0_grid_id
+            UNION ALL
+            SELECT t1.admin1_grid_id as grid_id, count(t1.admin1_grid_id) as reported, t1.name, t1.population, t1.country_code, t1.level
+            FROM (
+                SELECT lg.*
+                FROM $wpdb->postmeta as pm
+                JOIN $wpdb->posts as p ON p.ID=pm.post_id AND p.post_type = 'groups'
+                JOIN $wpdb->postmeta as pm2 ON pm2.post_id=pm.post_id AND pm2.meta_key = 'group_type' AND pm2.meta_value = 'church'
+                LEFT JOIN $wpdb->dt_location_grid as lg ON pm.meta_value=lg.grid_id
+                WHERE pm.meta_key = 'location_grid' AND lg.admin0_grid_id IN (SELECT grid_id FROM wp_dt_location_grid WHERE name IN ('$ids'))
+            ) as t1
+            GROUP BY t1.admin1_grid_id
+            UNION ALL
+            SELECT t2.admin2_grid_id as grid_id, count(t2.admin2_grid_id) as reported, t2.name, t2.population, t2.country_code, t2.level
+            FROM (
+                SELECT lg.*
+                FROM $wpdb->postmeta as pm
+                JOIN $wpdb->posts as p ON p.ID=pm.post_id AND p.post_type = 'groups'
+                JOIN $wpdb->postmeta as pm2 ON pm2.post_id=pm.post_id AND pm2.meta_key = 'group_type' AND pm2.meta_value = 'church'
+                LEFT JOIN $wpdb->dt_location_grid as lg ON pm.meta_value=lg.grid_id
+                WHERE pm.meta_key = 'location_grid' AND lg.admin0_grid_id IN (SELECT grid_id FROM wp_dt_location_grid WHERE name IN ('$ids'))
+            ) as t2
+            GROUP BY t2.admin2_grid_id
+            UNION ALL
+            SELECT t3.admin3_grid_id as grid_id, count(t3.admin3_grid_id) as reported, t3.name, t3.population, t3.country_code, t3.level
+            FROM (
+                SELECT lg.*
+                FROM $wpdb->postmeta as pm
+                JOIN $wpdb->posts as p ON p.ID=pm.post_id AND p.post_type = 'groups'
+                JOIN $wpdb->postmeta as pm2 ON pm2.post_id=pm.post_id AND pm2.meta_key = 'group_type' AND pm2.meta_value = 'church'
+                LEFT JOIN $wpdb->dt_location_grid as lg ON pm.meta_value=lg.grid_id
+                WHERE pm.meta_key = 'location_grid' AND lg.admin0_grid_id IN (SELECT grid_id FROM wp_dt_location_grid WHERE name IN ('$ids'))
+            ) as t3
+            GROUP BY t3.admin3_grid_id
+        ", ARRAY_A );
+
+        $list = [];
+
+        if ( is_array( $results ) ) {
+            foreach ( $results as $result ) {
+                if ( empty( $result['grid_id'] ) ) {
+                    continue;
+                }
+                if ( empty( $result['count'] ) ) {
+                    continue;
+                }
+
+                $list[$result['grid_id']] = $result['count'];
+            }
+        }
+
+        // set_transient( __METHOD__ . $administrative_level, $list, HOUR_IN_SECONDS . 6 );
+
+        return $results;
+    }
+
     public static function query_church_grid_totals( $administrative_level = null ) {
 
-//        if ( false !== ( $value = get_transient( __METHOD__ . $administrative_level ) ) ) { // phpcs:ignore
-//            return $value;
-//        }
+       //  if ( false !== ( $value = get_transient( __METHOD__ . $administrative_level ) ) ) { // phpcs:ignore
+       //      return $value;
+       //  }
 
         global $wpdb;
 
@@ -2667,6 +2827,8 @@ class Zume_App_Heatmap {
                 $data[$v['grid_id']]['percent'] = 0;
                 $data[$v['grid_id']]['reported'] = 0;
                 $data[$v['grid_id']]['needed'] = $needed;
+                $data[$v['grid_id']]['foundreported'] = 'not found';
+                $data[$v['grid_id']]['gridid'] = $grid_totals[$v['grid_id']];
             }
 
             if ( $highest_value < $data[$v['grid_id']]['reported'] ){
@@ -2811,18 +2973,18 @@ class Zume_App_Heatmap {
     public static function endpoint_get_activity_level( $grid_id, $administrative_level, $list, $global_div, $us_div ) {
 
         $flat_grid = self::query_flat_grid_by_level( $administrative_level, $us_div, $global_div );
-//        $flat_grid_limited = self::_limit_counts( $flat_grid, $list ); // limit counts to no larger than needed per location.
+        //  $flat_grid_limited = self::_limit_counts( $flat_grid, $list ); // limit counts to no larger than needed per location.
         $flat_grid_limited = [];
         foreach ( $flat_grid as $value ) {
             $flat_grid_limited[$value['grid_id']] = $value;
 
             if ( isset( $list[$value['grid_id']] ) && ! empty( $list[$value['grid_id']] ) ) {
                 $flat_grid_limited[$value['grid_id']]['reported'] = $list[$value['grid_id']];
-//                if ( $list[$value['grid_id']] <= $value['needed'] ) {
-//                    $flat_grid_limited[$value['grid_id']]['reported'] = $list[$value['grid_id']];
-//                } else {
-//                    $flat_grid_limited[$value['grid_id']]['reported'] = $value['needed'];
-//                }
+                //                if ( $list[$value['grid_id']] <= $value['needed'] ) {
+                //                    $flat_grid_limited[$value['grid_id']]['reported'] = $list[$value['grid_id']];
+                //                } else {
+                //                    $flat_grid_limited[$value['grid_id']]['reported'] = $value['needed'];
+                //                }
             }
         }
 
@@ -2835,12 +2997,12 @@ class Zume_App_Heatmap {
             return false;
         }
 
-//        $percent = $level['reported'] / $level['needed'] * 100;
-//        if ( 100 < $percent ) {
-//            $percent = 100;
-//        } else {
-//            $percent = number_format_i18n( $percent, 2 );
-//        }
+        //        $percent = $level['reported'] / $level['needed'] * 100;
+        //        if ( 100 < $percent ) {
+        //            $percent = 100;
+        //        } else {
+        //            $percent = number_format_i18n( $percent, 2 );
+        //        }
 
         if ( isset( $flat_grid[$grid[$administrative_level]] ) && ! empty( $flat_grid[$grid[$administrative_level]] ) ) {
             $raw_level = $flat_grid[$grid[$administrative_level]];
@@ -2885,9 +3047,9 @@ class Zume_App_Heatmap {
             'name' => $level['name'],
             'grid_id' => (int) $level['grid_id'],
             'population' => number_format_i18n( $level['population'] ),
-//            'needed' => number_format_i18n( $level['needed'] ),
+            //  'needed' => number_format_i18n( $level['needed'] ),
             'reported' => number_format_i18n( $raw_reported ),
-//            'percent' => number_format_i18n( $percent, 2 ),
+            //'percent' => number_format_i18n( $percent, 2 ),
         ];
 
         return $data;
@@ -3332,22 +3494,22 @@ class Zume_App_Heatmap {
 
         // @todo remove the precision reduction
 
-//        $restricted = self::_persecuted_countries();
-//
-//        if ( ! isset( $payload['country'] ) ) { // if country is not set, reduce precision to 111km
-//            $location['lng'] = round( $location['lng'], 0 );
-//            $location['lat'] = round( $location['lat'], 0 );
-//            $location['label'] = '';
-//        }
-//        else if ( in_array( $payload['country'], $restricted ) ) { // if persecuted country, reduce precision to 111km
-//            $location['label'] = ' (' . $payload['country'] . ')';
-//            $location['lng'] = round( $location['lng'], 0 );
-//            $location['lat'] = round( $location['lat'], 0 );
-//        } else { // if non-persecuted country, reduce precision to 11km
-//            $location['label'] = ' (' . $location['label'] . ')';
-//            $location['lng'] = round( $location['lng'], 3 );
-//            $location['lat'] = round( $location['lat'], 3 );
-//        }
+        //        $restricted = self::_persecuted_countries();
+        //
+        //        if ( ! isset( $payload['country'] ) ) { // if country is not set, reduce precision to 111km
+        //            $location['lng'] = round( $location['lng'], 0 );
+        //            $location['lat'] = round( $location['lat'], 0 );
+        //            $location['label'] = '';
+        //        }
+        //        else if ( in_array( $payload['country'], $restricted ) ) { // if persecuted country, reduce precision to 111km
+        //            $location['label'] = ' (' . $payload['country'] . ')';
+        //            $location['lng'] = round( $location['lng'], 0 );
+        //            $location['lat'] = round( $location['lat'], 0 );
+        //        } else { // if non-persecuted country, reduce precision to 11km
+        //            $location['label'] = ' (' . $location['label'] . ')';
+        //            $location['lng'] = round( $location['lng'], 3 );
+        //            $location['lat'] = round( $location['lat'], 3 );
+        //        }
 
         return $location;
     }

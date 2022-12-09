@@ -27,7 +27,6 @@
     <div class="center"><button class="button" id="welcome-close-button" data-close>Get Started!</button></div>
 </div>
 
-
 <div id="wrapper">
     <div class="grid-x">
         <div class="cell medium-9" id="map-container">
@@ -69,9 +68,75 @@
             <div id="training-help-screen" class="training-content" style="display:none;"><hr></div>
             <div class="center"><i class="fi-info" id="help-toggle-icon" onclick="jQuery('#training-help-screen').toggle()"></i></div>
         </div>
+
+        <style id="controlStyle">
+        	.wrap-controls {
+        		position: absolute;
+        		top: 10px;
+        		left: 10px;
+        		z-index: 9;
+        	}
+        
+        	.wrap-controls .btn-burger {
+        		width: 30px;
+        		height: 30px;
+        		background: white;
+        		border-radius: 20px;
+        		text-align: center;
+        		line-height: 32px;
+        		box-shadow: 0 0 5px rgba(0,0,0,0.5);
+        		opacity: 0.8;
+        	}
+        
+        	.wrap-controls .btn-burger:hover {
+        		opacity: 1;
+        	}
+        
+        	.wrap-controls .control-board {
+        		background: white;
+        		min-width: 300px; 
+        		margin-top: 20px;
+        		max-height: calc(100vh - 100px);
+        		border-radius: 20px;
+        		padding: 10px;
+        		box-shadow: 0 0 10px rgba(0,0,0,0.2);
+        		display: none;
+        	}
+        
+        	.wrap-controls .control-board.show {
+        		display: block;
+        	}
+        </style>
+
+        <div class="wrap-controls">
+            <div id="btnBurger" class="btn-burger">
+                <i class="fi-map" ></i>
+            </div>
+        
+            <div class="control-board show">
+                <div>Select Region</div>
+                <select id="selRegion">
+                    <option value="asia">Asia</option>
+                    <option value="middle-east">Middle East / North Africa</option>
+                    <option value="europe">Europe</option>
+                    <option value="north-america">North America</option>
+                    <option value="central-america">Central America</option>
+                    <option value="south-america">South America</option>
+                    <option value="africa">Africa</option>
+                    <option value="australia">Australia & Oceania</option>
+                </select>
+            
+                <div>
+                    <span id="spnTotalChurch" />
+                </div>
+            
+                <button id="btnGetGridData" style="border: 1px solid #ccc; margin-top: 10px; padding: 10px; width: 100%; border-radius: px;">
+                    Get Church Data
+                </button>
+            </div>
+        </div>
     </div>
 </div>
-
 
 <!-- modal -->
 <div class="off-canvas position-right is-closed" id="offCanvasNestedPush" data-transition-time=".3s" data-off-canvas>
@@ -87,7 +152,7 @@
         </div>
         <div class="cell" id="slider-content">
             <div class="grid-x grid-padding-x">
-                <div class="cell medium-6">
+              <div class="cell medium-12">
                     <div class="grid-x">
                         <div class="cell">
                             <h3>PROGRESS</h3>
@@ -107,7 +172,7 @@
                         </div>
                     </div>
                 </div>
-                <div class="cell medium-6">
+                <div class="cell medium-6" style="display: none;">
                     <div class="grid-x">
                         <div class="cell">
                             <h3>ACTIVITY</h3>
@@ -160,7 +225,6 @@
     </button>
 </div>
 
-
 <!-- report modal -->
 <div class="reveal" id="report-modal" data-v-offset="10px" data-close-on-click="false" data-reveal>
     <div>
@@ -170,4 +234,39 @@
     <button class="close-button" data-close aria-label="Close modal" type="button">
         <span aria-hidden="true">&times;</span>
     </button>
+</div>
+
+<style id="loaderStyle">
+    #loader {
+      position: absolute;
+      top: 0;
+      width: 100%;
+      height: 100vh;
+      z-index: 99999999;
+      background: rgba(255,255,255,0.3);
+      opacity: 0;
+      visibility: hidden;
+      transition: all 300ms ease-in-out;
+    }
+    
+    #loader.show {
+      backdrop-filter: blur(10px);
+      visibility: visible;
+      opacity: 1;
+    }
+    
+    #loader #loaderText {
+      position: absolute;
+      width: 100%;
+      height: 100vh;
+      line-height: 100vh;
+      text-align: center;
+      font-size: 20px;
+      font-weight: bolder;
+      color: #454545;
+    }
+</style>
+
+<div id="loader">
+  <div id="loaderText" />
 </div>
