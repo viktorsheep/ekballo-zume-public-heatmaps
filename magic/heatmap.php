@@ -2692,6 +2692,142 @@ class Zume_App_Heatmap {
         return $list;
     }
 
+    public static function query_church_grid_totals_v2( $administrative_level = null ) {
+
+        if ( false !== ( $value = get_transient( __METHOD__ . $administrative_level ) ) ) { // phpcs:ignore
+            return $value;
+        }
+
+      global $wpdb;
+
+      switch ( $administrative_level ) {
+          case 'a0':
+              $results = $wpdb->get_results( "
+                  SELECT lg.grid_id, lg.admin0_grid_id, lg.admin1_grid_id, lg.admin2_grid_id, lg.admin3_grid_id, lg.admin4_grid_id, lg.admin5_grid_id, count(lg.grid_id) as count
+                      FROM $wpdb->dt_location_grid_meta as pm
+                      LEFT JOIN $wpdb->posts as p ON p.ID=pm.post_id AND p.post_type = 'groups'
+                      LEFT JOIN $wpdb->postmeta as pm2 ON pm2.post_id=pm.post_id AND pm2.meta_key = 'group_type' AND pm2.meta_value = 'church'
+                      LEFT JOIN $wpdb->dt_location_grid as lg ON pm.grid_id=lg.grid_id
+                      GROUP BY lg.grid_id;
+                  ", ARRAY_A );
+              break;
+          case 'a1':
+              $results = $wpdb->get_results( "
+                  SELECT lg.grid_id, lg.admin0_grid_id, lg.admin1_grid_id, lg.admin2_grid_id, lg.admin3_grid_id, lg.admin4_grid_id, lg.admin5_grid_id, count(lg.grid_id) as count
+                      FROM $wpdb->dt_location_grid_meta as pm
+                      LEFT JOIN $wpdb->posts as p ON p.ID=pm.post_id AND p.post_type = 'groups'
+                      LEFT JOIN $wpdb->postmeta as pm2 ON pm2.post_id=pm.post_id AND pm2.meta_key = 'group_type' AND pm2.meta_value = 'church'
+                      LEFT JOIN $wpdb->dt_location_grid as lg ON pm.grid_id=lg.grid_id
+                      GROUP BY lg.grid_id;
+                  ", ARRAY_A );
+              break;
+          case 'a2':
+              $results = $wpdb->get_results( "
+                  SELECT lg.grid_id, lg.admin0_grid_id, lg.admin1_grid_id, lg.admin2_grid_id, lg.admin3_grid_id, lg.admin4_grid_id, lg.admin5_grid_id, count(lg.grid_id) as count
+                      FROM $wpdb->dt_location_grid_meta as pm
+                      LEFT JOIN $wpdb->posts as p ON p.ID=pm.post_id AND p.post_type = 'groups'
+                      LEFT JOIN $wpdb->postmeta as pm2 ON pm2.post_id=pm.post_id AND pm2.meta_key = 'group_type' AND pm2.meta_value = 'church'
+                      LEFT JOIN $wpdb->dt_location_grid as lg ON pm.grid_id=lg.grid_id
+                      GROUP BY lg.grid_id;
+                  ", ARRAY_A );
+              break;
+          case 'a3':
+              $results = $wpdb->get_results( "
+                  SELECT lg.grid_id, lg.admin0_grid_id, lg.admin1_grid_id, lg.admin2_grid_id, lg.admin3_grid_id, lg.admin4_grid_id, lg.admin5_grid_id, count(lg.grid_id) as count
+                      FROM $wpdb->dt_location_grid_meta as pm
+                      LEFT JOIN $wpdb->posts as p ON p.ID=pm.post_id AND p.post_type = 'groups'
+                      LEFT JOIN $wpdb->postmeta as pm2 ON pm2.post_id=pm.post_id AND pm2.meta_key = 'group_type' AND pm2.meta_value = 'church'
+                      LEFT JOIN $wpdb->dt_location_grid as lg ON pm.grid_id=lg.grid_id
+                      GROUP BY lg.grid_id;
+                  ", ARRAY_A );
+              break;
+          case 'world':
+              $results = $wpdb->get_results( "
+                  SELECT lg.grid_id, lg.admin0_grid_id, lg.admin1_grid_id, lg.admin2_grid_id, lg.admin3_grid_id, lg.admin4_grid_id, lg.admin5_grid_id, count(lg.grid_id) as count
+                      FROM $wpdb->dt_location_grid_meta as pm
+                      LEFT JOIN $wpdb->posts as p ON p.ID=pm.post_id AND p.post_type = 'groups'
+                      LEFT JOIN $wpdb->postmeta as pm2 ON pm2.post_id=pm.post_id AND pm2.meta_key = 'group_type' AND pm2.meta_value = 'church'
+                      LEFT JOIN $wpdb->dt_location_grid as lg ON pm.grid_id=lg.grid_id
+                      GROUP BY lg.grid_id;
+                  ", ARRAY_A );
+              break;
+          case 'full': // full query including world
+              $results = $wpdb->get_results( "
+                  SELECT lg.grid_id, lg.admin0_grid_id, lg.admin1_grid_id, lg.admin2_grid_id, lg.admin3_grid_id, lg.admin4_grid_id, lg.admin5_grid_id, count(lg.grid_id) as count
+                      FROM $wpdb->postmeta as pm
+                      LEFT JOIN $wpdb->posts as p ON p.ID=pm.post_id AND p.post_type = 'groups'
+                      LEFT JOIN $wpdb->postmeta as pm2 ON pm2.post_id=pm.post_id AND pm2.meta_key = 'group_type' AND pm2.meta_value = 'church'
+                      LEFT JOIN $wpdb->dt_location_grid as lg ON pm.meta_value=lg.grid_id
+                      WHERE pm.meta_key = 'location_grid'
+                      GROUP BY lg.grid_id
+                  UNION ALL
+                  SELECT 1 as grid_id, null as admin0_grid_id, null as admin1_grid_id, null as admin2_grid_id, null as admin3_grid_id, null as admin4_grid_id, null as admin5_grid_id, count(grid_id) as count
+                       FROM $wpdb->postmeta as pm
+                        JOIN $wpdb->posts as p ON p.ID=pm.post_id AND p.post_type = 'groups'
+                        JOIN $wpdb->postmeta as pm2 ON pm2.post_id=pm.post_id AND pm2.meta_key = 'group_type' AND pm2.meta_value = 'church'
+                        LEFT JOIN $wpdb->dt_location_grid as lg ON pm.meta_value=lg.grid_id
+                       WHERE pm.meta_key = 'location_grid';
+                  ", ARRAY_A );
+              break;
+          default:
+              $results = $wpdb->get_results( "
+                      SELECT lg.grid_id, lg.admin0_grid_id, lg.admin1_grid_id, lg.admin2_grid_id, lg.admin3_grid_id, lg.admin4_grid_id, lg.admin5_grid_id, count(lg.grid_id) as count
+                      FROM $wpdb->dt_location_grid_meta as pm
+                      LEFT JOIN $wpdb->posts as p ON p.ID=pm.post_id AND p.post_type = 'groups'
+                      LEFT JOIN $wpdb->postmeta as pm2 ON pm2.post_id=pm.post_id AND pm2.meta_key = 'group_type' AND pm2.meta_value = 'church'
+                      LEFT JOIN $wpdb->dt_location_grid as lg ON pm.grid_id=lg.grid_id
+                      GROUP BY lg.grid_id;
+                      ", ARRAY_A );
+              break;
+      }
+
+
+      $list = [];
+      if ( is_array( $results ) ) {
+          foreach ( $results as $result ) {
+              if( empty( $result['count'] ) ) {
+                  continue;
+              }
+              if( ! isset( $list[$result['admin0_grid_id']] ) ) {
+                  $list[$result['admin0_grid_id']] = 0;
+              }
+              if( ! isset( $list[$result['admin1_grid_id']] ) ) {
+                  $list[$result['admin1_grid_id']] = 0;
+              }
+              if( ! isset( $list[$result['admin2_grid_id']] ) ) {
+                  $list[$result['admin2_grid_id']] = 0;
+              }
+              if( ! isset( $list[$result['admin3_grid_id']] ) ) {
+                  $list[$result['admin3_grid_id']] = 0;
+              }
+              if( ! isset( $list[$result['admin4_grid_id']] ) ) {
+                  $list[$result['admin4_grid_id']] = 0;
+              }
+
+              if ( ! is_null( $list[$result['admin0_grid_id']] ) ) {
+                  $list[$result['admin0_grid_id']] = $list[$result['admin0_grid_id']] + (int) $result['count'];
+              }
+              if ( ! is_null( $list[$result['admin1_grid_id']] ) ) {
+                  $list[$result['admin1_grid_id']] = $list[$result['admin1_grid_id']] + (int) $result['count'];
+              }
+              if ( ! is_null( $list[$result['admin2_grid_id']] ) ) {
+                  $list[$result['admin2_grid_id']] = $list[$result['admin2_grid_id']] + (int) $result['count'];
+              }
+              if ( ! is_null( $list[$result['admin3_grid_id']] ) ) {
+                  $list[$result['admin3_grid_id']] = $list[$result['admin3_grid_id']] + (int) $result['count'];
+              }
+              if ( ! is_null( $list[$result['admin4_grid_id']] ) ) {
+                  $list[$result['admin4_grid_id']] = $list[$result['admin4_grid_id']] + (int) $result['count'];
+              }
+
+          }
+      }
+
+      set_transient( __METHOD__ . $administrative_level, $list, HOUR_IN_SECONDS . 6 );
+
+      return $list;
+  }
+
     public static function query_grid_elements( $grid_id ) {
         global $wpdb;
 
