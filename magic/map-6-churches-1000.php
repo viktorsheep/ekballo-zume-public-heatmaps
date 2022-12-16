@@ -131,6 +131,33 @@ class Zume_Public_Heatmap_Churches_1000 extends DT_Magic_Url_Base
                     `)
                 }
             }
+
+            function loadPopulation(population, grid_id) {
+              const loggedIn = <?php if( is_user_logged_in() ) { echo 'true'; } else { echo 'false'; } ?>;
+              let elm = population.toLocaleString('en-US');
+              const mdlPop = $('#modal_population');
+
+              if (loggedIn) {
+                elm = elm + ' <i class="fi-page-edit" onclick="fns.pop.update.show(' + population + ', ' + grid_id + ')"></i>';
+
+                if ($('#wrapMdlPopEdit').length < 1) {
+                  $('#wrapMdlPop').after(`
+                    <div id="wrapMdlPopEdit" class="wrap-popedit">
+                      <div class="wrap-input"  style="width: calc(100% - 75px);">
+                        <input id="txtPopEdit" type="text" value="${population}">
+                      </div>
+                      <i class="fi-check icons confirm" onclick="fns.pop.update.confirm()"></i>
+                      <i class="fi-x icons cancel" onclick="fns.pop.update.hide()"></i>
+                      <div id="loadingMdlPopEdit" class="loader"> Updating Population... </div>
+                    </div>
+                  `);
+                }
+              } else {
+              }
+
+              mdlPop.html(elm)
+              fns.pop.update.hide()
+            }
         </script>
         <?php
 
@@ -213,10 +240,16 @@ class Zume_Public_Heatmap_Churches_1000 extends DT_Magic_Url_Base
                 $offset = sanitize_text_field( wp_unslash( $params['offset'] ) );
                 return Zume_App_Heatmap::query_activity_data( $grid_id, $offset );
             case 'grid_data':
-                $grid_totals = Zume_App_Heatmap::query_church_grid_totals();
+                $grid_totals = Zume_App_Heatmap::query_church_grid_totals_v2();
                 return Zume_App_Heatmap::_initial_polygon_value_list( $grid_totals, $this->global_div, $this->us_div );
             case 'by_region':
                 return Zume_App_Heatmap::query_church_grid_totals_by_regions($params['grid_id']);
+            case 'update_population':
+                if ( ! isset( $params['grid_id'], $params['population'] ) ) {
+                    return new WP_Error( __METHOD__, "Missing parameters", [ 'status' => 400 ] );
+                }
+
+                return Zume_App_Heatmap::update_population($params['grid_id'], $params['population']);
             default:
                 return new WP_Error( __METHOD__, "Missing valid action", [ 'status' => 400 ] );
         }

@@ -2487,6 +2487,23 @@ class Zume_App_Heatmap {
         return $results;
     }
 
+    public static function update_population($grid_id, $population) {
+      global $wpdb;
+
+      $execute = $wpdb->query
+        ("
+          UPDATE $wpdb->dt_location_grid
+          SET `population` = $population, `alt_population` = $population
+          WHERE `grid_id` = $grid_id
+        ");
+
+      delete_transient( 'Zume_App_Heatmap::query_church_grid_totals_v2grid_data' );
+      delete_transient( 'Zume_App_Heatmap::query_saturation_list' );
+
+      return $execute;
+      //return ['g' => $grid_id, 'p' => $population];
+    }
+
     public static function query_church_grid_totals( $administrative_level = null ) {
 
        //  if ( false !== ( $value = get_transient( __METHOD__ . $administrative_level ) ) ) { // phpcs:ignore
@@ -2694,9 +2711,11 @@ class Zume_App_Heatmap {
 
     public static function query_church_grid_totals_v2( $administrative_level = null ) {
 
-        if ( false !== ( $value = get_transient( __METHOD__ . $administrative_level ) ) ) { // phpcs:ignore
-            return $value;
-        }
+      if( $administrative_level === null) { $administrative_level = 'grid_data'; }
+
+      if ( false !== ( $value = get_transient( __METHOD__ . $administrative_level ) ) ) { // phpcs:ignore
+        return $value;
+      }
 
       global $wpdb;
 

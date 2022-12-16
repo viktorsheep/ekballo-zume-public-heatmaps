@@ -16,7 +16,6 @@ window.get_grid_data = ( action, grid_id) => {
     url: jsObject.root + jsObject.parts.root + '/v1/' + jsObject.parts.type,
     beforeSend: function (xhr) {
       xhr.setRequestHeader('X-WP-Nonce', jsObject.nonce )
-      console.log(jsObject.root + jsObject.parts.root + '/v1/' + jsObject.parts.type)
 
       if(action === 'by_region') {
         jQuery('#selRegion').prop('disabled', true)
@@ -58,6 +57,7 @@ window.selectedGeoJSONs = {
 }
 
 window.regionGridData = []
+window.gridData = {}
 
 window.countryRegions = [
   { name: 'Bangladesh', region: 'asia'},
@@ -325,11 +325,82 @@ window.regionData = [
 
 window.map = null
 
+window.fns = {
+  pop: {
+    update: {
+      confirm() {
+        const payload = {
+          grid_id: this.data.current.grid_id,
+          population: $('#txtPopEdit').val()
+        }
+
+        if(payload.population === '') { return }
+
+        jQuery.ajax({
+          type: "POST",
+          url: jsObject.root + jsObject.parts.root + '/v1/' + jsObject.parts.type,
+          contentType: "application/json; charset=utf-8",
+          dataType: 'json',
+          data: JSON.stringify({
+            action: 'update_population',
+            parts: jsObject.parts,
+            grid_id: payload.grid_id,
+            population: payload.population
+          }),
+          cache: true,
+          beforeSend: function (xhr) {
+            xhr.setRequestHeader('X-WP-Nonce', jsObject.nonce )
+
+            $('#loadingMdlPopEdit').addClass('show')
+          }
+        })
+        .done(function(x){
+          window.geoJSONs.features.find(x => x.id === payload.grid_id.toString()).properties.population = payload.population.toLocaleString('en-US')
+          $('#loadingMdlPopEdit').removeClass('show')
+          $('#modal_population').html(payload.population.toLocaleString('en-US') + ' <i class="fi-page-edit" onclick="fns.pop.update.show(' + payload.population + ', ' + payload.grid_id + ')"></i>');
+          $('#population').html(payload.population.toLocaleString('en-US'))
+          window.fns.pop.update.hide()
+          refreshMapLayer()
+        })
+        .fail(function(err, sss, et) {
+          console.log(err)
+          console.log(sss)
+          console.log(et)
+        })
+
+      },
+
+      show(population, grid_id) {
+        $('#wrapMdlPop').hide()
+        $('#wrapMdlPopEdit').show()
+        $('#txtPopEdit').val(population)
+
+        this.data.current = {
+          population,
+          grid_id
+        }
+      },
+
+      hide() {
+        $('#wrapMdlPop').show()
+        $('#wrapMdlPopEdit').hide()
+      },
+
+      data: {
+        current: {
+          population: 0,
+          grid_id: 0
+        },
+      }
+    }
+  }
+}
+
 /* Document Ready && Precache */
 jQuery(document).ready(function($){
   clearInterval(window.fiveMinuteTimer)
 
-  let slider_width = window.innerWidth * .70
+  let slider_width = 335
   if ( isMobile ) {
     slider_width = window.innerWidth * .95
   }
@@ -360,7 +431,7 @@ jQuery(document).ready(function($){
     }
 
     .js-off-canvas-overlay.is-overlay-fixed {
-      backdrop-filter: blur(10px);
+      //backdrop-filter: blur(10px);
     }
 
   `)
@@ -406,7 +477,7 @@ jQuery(document).ready(function($){
   });
 
   jQuery('#selRegion').change(function(value) {
-    configSelectedRegion()
+    // configSelectedRegion()
   });
 
   let initialize_screen = jQuery('.initialize-progress')
@@ -459,7 +530,8 @@ jQuery(document).ready(function($){
         }
 
         if ( 40 === loop ) {
-          jQuery('#initialize-dothis').show()
+          //jQuery('#initialize-dothis').show()
+          jQuery('#initialize-churchdata').show()
         }
 
         if ( loop > 44 && list > 0 && window.load_map_triggered !== 1 ) {
@@ -468,8 +540,7 @@ jQuery(document).ready(function($){
         }
 
         if(loaded) {
-          jQuery('#initialize-screen').fadeOut();
-          configGeoJSONRegions(true);
+          getGridData()
         }
 
       })
@@ -481,13 +552,19 @@ jQuery(document).ready(function($){
 
 function getGridData() {
   const grid_id = window.countryRegions.filter(cr => cr.region === jQuery('#selRegion').val()).map(cr => cr.name)
-  window.get_grid_data( 'by_region', grid_id)
+  window.get_grid_data( 'grid_data', grid_id)
     .done(function(x){
-      console.log(x)
+      window.gridData = { ...x }
+      jQuery('#initialize-dothis').show()
+      configGeoJSONRegions(true)
+
+      setTimeout(function() {
+        jQuery('#initialize-screen').fadeOut();
+      }, 300)
     })
     .fail(function(err){
       console.group('Error getting grid data')
-      console.log(err)
+      console.log(err.responseText)
       console.groupEnd()
 
       jsObject.grid_data = {'data': {}, 'highest_value': 1 }
@@ -529,6 +606,7 @@ function getGridDataByRegion() {
 }
 
 function configGeoJSONRegions(init = false) {
+  console.log('config geo json regions')
   window.geoJSONs.features.forEach((gj) => {
     let country = gj.properties.full_name.split(',').pop().trim()
 
@@ -550,7 +628,7 @@ function configGeoJSONRegions(init = false) {
     }
   })
 
-  configSelectedRegion(init)
+  configHeat()
 }
 
 function configSelectedRegion(init = false) {
@@ -558,41 +636,36 @@ function configSelectedRegion(init = false) {
     ...window.geoJSONs.features.filter((gj) => gj.properties.region === jQuery('#selRegion').val())
   ]
 
-  if(init) {
-    getGridDataByRegion()
-  }
+  refreshMapLayer()
+  flyMap()
 }
 
 function configHeat() {
-  const geojsons = window.selectedGeoJSONs
+  console.log('config heat')
+  const geojsons = window.geoJSONs
 
   const rgd = window.regionGridData // region grid data
+  const gridData = window.gridData.data
 
-  jQuery('#spnTotalChurch').text(rgd.length + ' churches found.')
+  geojsons.features = geojsons.features.map(gj => {
+    const gd = gridData[gj.id]
 
-  geojsons.features.forEach(gj => {
-    const gd = rgd.find(gd => gd.grid_id === gj.id)
+    const population = parseInt(gd.population.replace(/,/g, ''))
+    const needed = Math.ceil(population / 1000)
+    const percentage = (gd.reported / needed * 100).toFixed()
 
-    if(gd !== undefined) {
-      gd.needed = Math.ceil(gd.population / 1000)
-      gd.percentage = ((parseInt(gd.reported) / gd.needed) * 100).toFixed()
-      gj.properties.value = gd.percentage > 100 ? 100 : parseInt(gd.percentage)
-
-      gj.properties.reported = parseInt(gd.reported)
-      gj.properties.name = gd.name
-      gj.properties.population= parseInt(gd.population)
-      gj.properties.country_code= gd.country_code
-      gj.properties.level= parseInt(gd.level)
-      gj.properties.needed= parseInt(gd.needed)
-      gj.properties.percentage= parseInt(gd.percentage)
-
-    } else {
-      gj.properties.value = 0
-    }
+    gj.properties.value = percentage > 100 ? 100 : parseInt(percentage)
+    gj.properties.reported = parseInt(gd.reported)
+    gj.properties.population = population
+    gj.properties.needed = needed
+    gj.properties.percentage = parseInt(percentage)
+    
+    return gj
   })
 
   refreshMapLayer()
-  flyMap()
+
+  // configSelectedRegion()
 }
 
 function checkGeoJSONLoaded(al) {
@@ -646,7 +719,8 @@ function refreshMapLayer() {
       map.removeSource('churches')
     }
   
-    const geoJSONs = window.selectedGeoJSONs 
+    //const geoJSONs = window.selectedGeoJSONs 
+    const geoJSONs = window.geoJSONs 
   
     map.addSource('churches', {
       'type': 'geojson',
@@ -670,7 +744,7 @@ function refreshMapLayer() {
       'type': 'fill',
       'source': 'churches',
       'paint': {
-        'fill-color': 'black',
+        'fill-color': '#ffffff',
         'fill-opacity': [
           'case',
           ['boolean', ['feature-state', 'hover'], false],
@@ -699,7 +773,7 @@ function refreshMapLayer() {
         },
   
         'fill-opacity': 0.75,
-        'fill-outline-color': '#777777'
+        'fill-outline-color': '#888888'
       }
     })
   }
@@ -827,7 +901,7 @@ function configMap() {
         }
 
         // Population
-        $('#population').html(prop.population)
+        $('#population').html(prop.population.toLocaleString('en-US'))
         
         // Needed
         $('#needed').html(stats.needed.toLocaleString('en-US'))
@@ -853,9 +927,10 @@ function configMap() {
       const cgd = e.features[0]
       const prop = cgd.properties
 
-      //return
       $('#modal_tile').html(e.features[0].properties.full_name)
-      $('#modal_population').html(prop.population)
+      $('#modal_population').html(prop.population.toLocaleString('en-US'))
+
+      loadPopulation(prop.population, prop.grid_id)
 
       jQuery('.temp-spinner').html(`<span class="loading-spinner active"></span>`)
 
@@ -906,6 +981,10 @@ function configMap() {
     });
   })
 }
+
+function updatePop() {
+}
+
 
 // e.o Config : Map
 
