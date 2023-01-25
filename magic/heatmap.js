@@ -325,6 +325,12 @@ window.regionData = [
 
 window.map = null
 
+window.d = {
+	setting: {
+		isSynced: false
+	}
+}
+
 window.fns = {
   pop: {
     update: {
@@ -398,6 +404,9 @@ window.fns = {
 
 /* Document Ready && Precache */
 jQuery(document).ready(function($){
+  // updating zume setting sync 
+	window.d.setting.isSynced = jsObject.zumeSettings.find(s => s.name === 'is_synced').value === 'true' ? true : false
+
   clearInterval(window.fiveMinuteTimer)
 
   let slider_width = 335
@@ -417,7 +426,8 @@ jQuery(document).ready(function($){
       height: ${window.innerHeight}px !important;
     }
     .off-canvas.position-right {
-      width:${slider_width}px;
+	    width: ${slider_width}${ isMobile ? 'px' : '%' };
+      width: ${slider_width}px;
       background-color:white;
     }
     #initialize-screen {
@@ -552,9 +562,12 @@ jQuery(document).ready(function($){
 
 function getGridData() {
   const grid_id = window.countryRegions.filter(cr => cr.region === jQuery('#selRegion').val()).map(cr => cr.name)
-  window.get_grid_data( 'grid_data', grid_id)
+	const action = d.setting.isSynced ? 'get_zume_church_counts' : 'grid_data'
+	//const action = 'grid_data'
+  window.get_grid_data( action, grid_id)
     .done(function(x){
-      window.gridData = { ...x }
+			window.gridData = d.setting.isSynced ? { highest_value: '', data: [ ...JSON.parse(x) ] } : { ...x }
+
       jQuery('#initialize-dothis').show()
       configGeoJSONRegions(true)
 
@@ -648,9 +661,10 @@ function configHeat() {
   const gridData = window.gridData.data
 
   geojsons.features = geojsons.features.map(gj => {
-    const gd = gridData[gj.id]
+    const gd = d.setting.isSynced ? gridData.find(g => g.grid_id === gj.id) : gridData[gj.id]
 
-    const population = parseInt(gd.population.replace(/,/g, ''))
+		const intPopulation = parseInt(gd.population.replace(/,/g, ''))
+    const population = intPopulation === 0 ? 1 : intPopulation
     const needed = Math.ceil(population / 1000)
     const percentage = (gd.reported / needed * 100).toFixed()
 
@@ -1483,6 +1497,3 @@ function show_details_panel(){
 function hide_details_panel(){
   $('#details-panel').hide()
 }
-
-
-

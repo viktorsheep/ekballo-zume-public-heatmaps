@@ -13,6 +13,81 @@ class Zume_App_Heatmap {
      * @return array
      */
 
+	public static function get_zume_settings() {
+		global $wpdb;
+		$settingTableName = $wpdb->prefix . 'euzume_settings';
+		$result = $wpdb->get_results("SELECT * FROM $settingTableName ;", ARRAY_A);
+		return $result;
+	}
+
+	public static function get_zume_church_counts() {
+		global $wpdb;
+		$tableName = $wpdb->prefix . 'euzume_church_count';
+		$result = $wpdb->get_results("SELECT * FROM $tableName ;", ARRAY_A);
+		return $result;
+	}
+
+	public static function get_zume_church_count() {
+		global $wpdb;
+		$churchTableName = $wpdb->prefix . 'euzume_church_count';
+		$result = $wpdb->get_results("SELECT count(*) AS count FROM $churchTableName ;", ARRAY_A);
+		return $result;
+	}
+
+	public static function sync_church_count($batch){
+		$result = true;
+
+		try {
+      global $wpdb;
+
+			foreach($batch as $b) {
+
+				$wpdb->insert('wp_euzume_church_count', array(
+					'name' => $b['name'],
+					'grid_id' => $b['grid_id'],
+					'population' => $b['population'],
+					'reported' => $b['reported']
+				));
+			}
+
+			$result = self::get_zume_church_count();
+		} catch(Exception $e) {
+			$result = $e;
+		}
+
+		return $result;
+	}
+
+	public static function update_sync_completion_setting() {
+		$result = true; 
+		try {
+			global $wpdb;
+
+			$wpdb->update('wp_euzume_settings', array('value' => 'true'), array('name' => 'is_synced'));
+			$wpdb->update('wp_euzume_settings', array('value' => date("m/d/Y")), array('name' => 'last_synced_date'));
+
+		} catch(Exception $e) {
+			$result = $e->getMessage();
+		}
+
+		return $result;
+	}
+
+	public static function reset_sync_completion_setting() {
+		$result = true; 
+		try {
+			global $wpdb;
+
+			$wpdb->query('TRUNCATE TABLE wp_euzume_church_count');
+			$wpdb->update('wp_euzume_settings', array('value' => 'false'), array('name' => 'is_synced'));
+			$wpdb->update('wp_euzume_settings', array('value' => ''), array('name' => 'last_synced_date'));
+
+		} catch(Exception $e) {
+			$result = $e->getMessage();
+		}
+
+		return $result;
+	}
 
     public static function query_saturation_list() : array {
 
@@ -2500,7 +2575,15 @@ class Zume_App_Heatmap {
       delete_transient( 'Zume_App_Heatmap::query_church_grid_totals_v2grid_data' );
       delete_transient( 'Zume_App_Heatmap::query_saturation_list' );
 
-      return $execute;
+      // update church count population if exists
+      $checkIfChurchCountExists = $wpdb->query("SELECT ID from wp_euzume_church_count WHERE grid_id = $grid_id");
+
+      if($checkIfChurchCountExists !== NULL) {
+        $wpdb->update('wp_euzume_church_count', array('population' => $population), array('grid_id' => $grid_id));
+      }
+      // e.o update church count population if exists
+
+      return $checkIfChurchCountExists;
       //return ['g' => $grid_id, 'p' => $population];
     }
 

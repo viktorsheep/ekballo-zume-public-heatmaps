@@ -96,7 +96,8 @@ class Zume_Public_Heatmap_Churches_1000 extends DT_Magic_Url_Base
                 ],
                 'grid_data' => ['data' => [], 'highest_value' => 1 ],
                 'custom_marks' => [],
-                'zoom' => 8
+                'zoom' => 8,
+                'zumeSettings' => Zume_App_Heatmap::get_zume_settings()
             ]) ?>][0]
 
             /* custom content */
@@ -250,9 +251,31 @@ class Zume_Public_Heatmap_Churches_1000 extends DT_Magic_Url_Base
                 }
 
                 return Zume_App_Heatmap::update_population($params['grid_id'], $params['population']);
+						case 'sync':
+							if ( ! isset(
+								$params['batch']
+							)) {
+								return new WP_Error( __METHOD__, "Missing parameters", [ 'status' => 400 ] );
+							}
+
+							return Zume_App_Heatmap::sync_church_count(
+								$params['batch']
+							);
+
+						case 'get_zume_settings':
+							return json_encode(Zume_App_Heatmap::get_zume_settings());
+
+						case 'update_sync_completion_setting':
+							return Zume_App_Heatmap::update_sync_completion_setting();
+
+						case 'reset':
+							return Zume_App_Heatmap::reset_sync_completion_setting();
+
+						case 'get_zume_church_counts':
+							return json_encode(Zume_App_Heatmap::get_zume_church_counts());
+
             default:
                 return new WP_Error( __METHOD__, "Missing valid action", [ 'status' => 400 ] );
         }
     }
-
 }

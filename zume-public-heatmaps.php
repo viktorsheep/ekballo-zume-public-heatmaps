@@ -138,6 +138,60 @@ class Zume_Public_Heatmaps {
      */
     public static function activation() {
         // add elements here that need to fire on activation
+      global $wpdb;
+
+			// Prepping sql
+			$zumeTablePrefix = "euzume_";
+      $syncTableName = $wpdb->prefix . $zumeTablePrefix . "church_count";
+      $settingTableName = $wpdb->prefix . $zumeTablePrefix . "settings";
+      $charset_collate = $wpdb->get_charset_collate();
+
+      /*
+      $sql = "CREATE TABLE IF NOT EXISTS $table_name(
+        id BIGINT(20) UNSIGNED NOT NULL AUTO_INCREMENT,
+        `name` TEXT, grid_id BIGINT UNSIGNED DEFAULT 0, population BIGINT UNSIGNED DEFAULT 0, church_count BIGINT UNSIGNED DEFAULT 0, PRIMARY KEY id(id))";
+        */
+
+      $createSyncTable = "CREATE TABLE IF NOT EXISTS $syncTableName (
+        id bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT,
+        name text,
+        grid_id bigint UNSIGNED DEFAULT 0,
+        population text,
+        reported bigint UNSIGNED DEFAULT 0,
+        PRIMARY KEY id (id)
+        ) $charset_collate;";
+
+			$createSettingsTable = "CREATE TABLE IF NOT EXISTS $settingTableName (
+				id bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT,
+				name text,
+				value text,
+				type text,
+				PRIMARY KEY id (id)
+				) $charset_collate;";
+			
+
+      require_once(ABSPATH . 'wp-admin/includes/upgrade.php');
+      
+      dbDelta($createSyncTable);
+			dbDelta($createSettingsTable);
+
+			// ADD SETTINGS
+
+			// is synced
+			$wpdb->insert('wp_euzume_settings', array(
+				'name' => 'is_synced',
+				'value' => 'false',
+				'type' => 'boolean'
+			));
+
+			// last synced date
+			$wpdb->insert('wp_euzume_settings', array(
+				'name' => 'last_synced_date',
+				'value' => '',
+				'type' => 'datetime'
+			));
+
+			// e.o ADD SETTINGS
     }
 
     /**

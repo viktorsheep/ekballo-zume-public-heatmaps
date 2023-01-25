@@ -1,0 +1,88 @@
+#wrapSyncProgress {
+	padding: 20px;
+	background: #fff;
+	border-radius: 6px;
+	margin: 10px auto;
+	box-shadow: 0 2px 5px 0 rgba(0,0,0,0.05);
+	display: none;
+}
+
+.wrap-sync .wrap-controls {
+	padding-top: 10px;
+	padding-bottom: 10px;
+}
+
+#wrapSyncProgress .overview {
+	float: left;
+	width: calc(50% - 1px);
+}
+
+#wrapSyncProgress .progress {
+	float: right;
+	width: calc(50% - 1px);
+	min-height: 10px;
+}
+
+#txtCurrentProgress {
+	padding: 5px;
+	color: #454545;
+	font-family: monospace;
+}
+
+#txtCurrentProgress::before {
+	content: '>';
+	padding-right: 5px;
+	font-family: monospace;
+}
+
+#txtProgressLog {
+	background: #eee;
+	border-radius: 6px;
+	padding: 10px;
+	color: #777;
+	height: 100px;
+	overflow-y: scroll;
+}
+
+.synopsis {
+	padding-bottom: 20px;
+	font-style: italic;
+}
+
+.wrap-detail {
+	position: relative;
+}
+
+.wrap-detail .loader {
+	position: absolute;
+	left: 0;
+	right: 0;
+	top: 0;
+	bottom: 0;
+	background: rgba(255,255,255,0.9);
+	text-align: center;
+	display: none;
+}
+
+.wrap-detail .loader span {
+	height: 100%;
+	vertical-align: middle;
+	display: inline-block;
+}
+.wrap-detail .loader .content {
+	margin: 0;
+	vertical-align: middle;
+	display: inline-block;
+}
+
+.tbl-data {
+	border-spacing: 0px;
+	border-collapse: collapse;
+	width: 100%;
+	margin-top: 10px;
+}
+
+.tbl-data td {
+	border: 1px solid #ddd;
+	padding: 10px;
+}

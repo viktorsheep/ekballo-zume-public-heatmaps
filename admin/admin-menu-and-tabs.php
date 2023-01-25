@@ -74,8 +74,8 @@ class Zume_Public_Heatmaps_Menu {
         <div class="wrap">
             <h2>Zume Map/Report</h2>
             <h2 class="nav-tab-wrapper">
-                <a href="<?php echo esc_attr( $link ) . 'general' ?>"
-                   class="nav-tab <?php echo esc_html( ( $tab == 'general' || !isset( $tab ) ) ? 'nav-tab-active' : '' ); ?>">General</a>
+                <a href="<?php echo esc_attr( $link ) . 'general' ?>" class="nav-tab <?php echo esc_html( ( $tab == 'general' || !isset( $tab ) ) ? 'nav-tab-active' : '' ); ?>">General</a>
+                <a href="<?php echo esc_attr( $link ) . 'sync' ?>" class="nav-tab <?php echo esc_html( ( $tab == 'sync' || !isset( $tab ) ) ? 'nav-tab-active' : '' ); ?>">Sync</a>
             </h2>
 
             <?php
@@ -84,6 +84,11 @@ class Zume_Public_Heatmaps_Menu {
                     $object = new Zume_Public_Heatmaps_Tab_General();
                     $object->content();
                     break;
+
+                case "sync":
+                  $object = new Zume_Public_Heatmaps_Tab_Sync();
+                  $object->content();
+                  break;
 
                 default:
                     break;
@@ -215,6 +220,132 @@ class Zume_Public_Heatmaps_Tab_General {
         <!-- End Box -->
         <?php
     }
+}
+
+class Zume_Public_Heatmaps_Tab_Sync {
+
+	public function getSetting() {
+		$result = '';
+		try {
+			global $wpdb;
+
+			$settingTableName = $wpdb->prefix . '_euzume_settings';
+			$result = $wpdb->get_results("SELECT count(*) FROM $settingTableName WHERE name = 'is_synced'", ARRAY_A);
+		} catch(Exception $e) {
+			$result = $e->getMessage();
+		}
+
+		return $result;
+	}
+
+  public function content() {
+  ?>
+		<script>
+			<?php require('sync-scripts.js'); ?>
+		</script>
+
+		<script>
+		let settings = <?php
+			$settings = Zume_App_Heatmap::get_zume_settings();
+			echo json_encode($settings);
+		?>
+
+		const syncCount = <?php
+			$count = Zume_App_Heatmap::get_zume_church_count();
+			echo json_encode($count);
+		?>
+
+		const jsObject = <?php
+			echo json_encode([
+				'mirror' => dt_get_location_grid_mirror( true ),
+        'root' => esc_url_raw( rest_url() ),
+        'nonce' => wp_create_nonce( 'wp_rest' ),
+        'parts' => $this->parts,
+        'post_type' => 'groups'
+			]);
+		?>
+		</script>
+
+  <div class="wrap-sync">
+    <h2>Sync Church Count</h2>
+
+		<div class="synopsis"> Syncronizing churches' count tally to each geoJsons to load the map faster.</div>
+
+		<div class="wrap-detail">
+			<table class="tbl-data">
+				<tr>
+					<td>
+						<div><span id="txtChurchCountSyncStatus"></span></div>
+					</td>
+					<td>
+						<div><b>Last synced</b> : <span id="txtLastSynced"></span></div>
+					</td>
+				</tr>
+			</table>
+
+			<div class="loader"><span></span><div class="content"><img src="<?php echo esc_url( get_admin_url() . 'images/loading.gif' ); ?>" /> Loading...</div></div>
+		</div>
+
+		<div class="wrap-controls">
+	    <button id="btnSync" type="button" class="button button-success" onclick="handleBtnSyncClicked()">
+	      Sync Now
+	    </button>
+	
+			<!--
+			<button type="button" class="button" onclick="getChurchData()">
+				Get Church Data
+			</button>
+			-->
+
+			<button id="btnReset" type="button" class="button" onclick="resetSyncData()">
+				Reset Sync
+			</button>
+
+			<!--
+			<button id="btnGetChurchCountData" type="button" class="button" onclick="getChurchCountData()">		
+				Get Church Count Data
+			</button>
+
+			<button id="btnGetZumeSettings" type="button" class="button" onclick="getZumeSettings()">
+				Get Zume Settings
+			</button>
+			-->
+
+		</div>
+
+		<div id="wrapSyncProgress">
+			<div class="overview">
+				<div id="progressOverview">
+					<div id="progGetGeoJson"><span>Get grid data (geojsons)</span></div>
+					<div id="progGetChurchData"><span>Get church data</span></div>
+					<div id="progSync"><span>Sync church data with grid data</span></div>
+				</div>
+			</div>
+			<div class="progress">
+				<div id="txtCurrentProgress">Commencing Synchronization</div>
+				<div id="txtProgressLog">Starting...</div>
+			</div>
+			<div style="clear: both;"></div>
+
+			<div style="text-align: center; margin-top: 10px;">
+				<button type="button" class="button button-primary" id="btnCloseSyncProgress" style="display:none;" onclick="closeSyncProgress()">
+					Close
+				</button>
+			</div>
+		</div>
+
+		<div id="wrapChurchCountData"></div>
+
+  </div> 
+
+		<style>
+			<?php require('sync-styles.css'); ?>
+		</style>
+
+
+  <?php
+  }
+
 }
 
 /**
