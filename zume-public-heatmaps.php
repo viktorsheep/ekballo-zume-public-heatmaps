@@ -5,7 +5,7 @@
  * Description: This plugin creates the public facing heatmaps that show trainings and churches and are embedded into public websites.
  * Text Domain: ekballo-zume-public-heatmaps
  * Domain Path: /languages
- * Version:  0.6.16
+ * Version:  0.7.17
  * Author URI: https://github.com/viktorsheep
  * GitHub Plugin URI: https://github.com/viktorsheep/ekballo-zume-public-heatmaps
  * Requires at least: 4.7.0
