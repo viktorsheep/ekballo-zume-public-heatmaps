@@ -15,10 +15,13 @@ window.d = {
 		locations: 0,
 		log: 0,
 		updated: 0
-	}
+	},
+	urls: {}
 }
 
 jQuery(document).ready(function($){
+	// set api url
+	d.urls.api = `${jsObject.baseURL}${jsObject.api}/${jsObject.version}/${jsObject.part}`
 	updateBtnSyncText()
 	setLastSyncedDate()
 });
@@ -114,10 +117,9 @@ function getChurchData() {
 		}),
     contentType: "application/json; charset=utf-8",
     dataType: "json",
-		cache: true,
-    url: 'https://mappingthegdv.wpengine.com/wp-json/zume_app/v1/heatmap_1000',
+		url: d.urls.api,
     beforeSend: function (xhr) {
-      xhr.setRequestHeader('X-WP-Nonce', jsObject.nonce )
+      // xhr.setRequestHeader('X-WP-Nonce', jsObject.nonce )
 			updateProgressText('Getting church data. This might take some minutes.')
     }
   })
@@ -200,9 +202,9 @@ function sync() {
 		}),
     contentType: "application/json; charset=utf-8",
     dataType: "json",
-    url: 'https://mappingthegdv.wpengine.com/wp-json/zume_app/v1/heatmap_1000',
+		url: d.urls.api,
     beforeSend: function (xhr) {
-      xhr.setRequestHeader('X-WP-Nonce', jsObject.nonce )
+      // xhr.setRequestHeader('X-WP-Nonce', jsObject.nonce )
 			updateProgressText('===')
 			updateProgressText(`Updating batch ${(d.counts.batch.current + 1)} / ${d.counts.batch.total}` )
     }
@@ -268,10 +270,9 @@ function updateSyncCompletionSetting() {
 		}),
     contentType: "application/json; charset=utf-8",
     dataType: "json",
-		cache: true,
-    url: 'https://mappingthegdv.wpengine.com/wp-json/zume_app/v1/heatmap_1000',
+		url: d.urls.api,
     beforeSend: function (xhr) {
-      xhr.setRequestHeader('X-WP-Nonce', jsObject.nonce )
+      // xhr.setRequestHeader('X-WP-Nonce', jsObject.nonce )
 			updateProgressText('Updating sync setting.')
     }
   })
@@ -312,9 +313,9 @@ function resetSyncData() {
 		}),
     contentType: "application/json; charset=utf-8",
     dataType: "json",
-    url: 'https://mappingthegdv.wpengine.com/wp-json/zume_app/v1/heatmap_1000',
+		url: d.urls.api,
     beforeSend: function (xhr) {
-      xhr.setRequestHeader('X-WP-Nonce', jsObject.nonce )
+      // xhr.setRequestHeader('X-WP-Nonce', jsObject.nonce )
 			jQuery('#btnReset').prop('disabled', true)
     }
   })
@@ -353,9 +354,9 @@ function getZumeSettings() {
 		}),
     contentType: "application/json; charset=utf-8",
     dataType: "json",
-    url: 'https://mappingthegdv.wpengine.com/wp-json/zume_app/v1/heatmap_1000',
+		url: d.urls.api,
     beforeSend: function (xhr) {
-      xhr.setRequestHeader('X-WP-Nonce', jsObject.nonce )
+      // xhr.setRequestHeader('X-WP-Nonce', jsObject.nonce )
 			jQuery('#btnGetZumeSettings').prop('disabled', true)
 			jQuery('.wrap-detail .loader').show()
     }
@@ -426,9 +427,9 @@ function getChurchCountData() {
 		}),
     contentType: "application/json; charset=utf-8",
     dataType: "json",
-    url: 'https://mappingthegdv.wpengine.com/wp-json/zume_app/v1/heatmap_1000',
+		url: d.urls.api,
     beforeSend: function (xhr) {
-      xhr.setRequestHeader('X-WP-Nonce', jsObject.nonce )
+      // xhr.setRequestHeader('X-WP-Nonce', jsObject.nonce )
 			jQuery('#btnGetChurchCountData').prop('disabled', true)
 			jQuery('.wrap-detail .loader').show()
     }

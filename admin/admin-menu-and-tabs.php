@@ -257,11 +257,14 @@ class Zume_Public_Heatmaps_Tab_Sync {
 
 		const jsObject = <?php
 			echo json_encode([
-				'mirror' => dt_get_location_grid_mirror( true ),
-        'root' => esc_url_raw( rest_url() ),
-        'nonce' => wp_create_nonce( 'wp_rest' ),
-        'parts' => $this->parts,
-        'post_type' => 'groups'
+				'mirror'    => dt_get_location_grid_mirror( true ),
+                'baseURL'   => esc_url_raw(rest_url()),
+                'api'       => 'zume_app',
+                'version'   => 'v1',
+                'part'      => 'heatmap_1000',
+                'nonce'     => wp_create_nonce( 'wp_rest' ),
+                'parts'     => $this->parts,
+                'post_type' => 'groups'
 			]);
 		?>
 		</script>
