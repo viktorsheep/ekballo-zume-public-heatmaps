@@ -5,7 +5,7 @@
  * Description: This plugin creates the public facing heatmaps that show trainings and churches and are embedded into public websites.
  * Text Domain: ekballo-zume-public-heatmaps
  * Domain Path: /languages
- * Version:  0.7.17
+ * Version:  0.7.19
  * Author URI: https://github.com/viktorsheep
  * GitHub Plugin URI: https://github.com/viktorsheep/ekballo-zume-public-heatmaps
  * Requires at least: 4.7.0
@@ -178,18 +178,26 @@ class Zume_Public_Heatmaps {
 			// ADD SETTINGS
 
 			// is synced
-			$wpdb->insert('wp_euzume_settings', array(
-				'name' => 'is_synced',
-				'value' => 'false',
-				'type' => 'boolean'
-			));
+			$isSyncedExists = $wpdb->get_row( "SELECT * FROM wp_euzume_settings WHERE name = 'is_synced'");
+
+			if(!isset($isSyncedExists)) {
+    			$wpdb->insert('wp_euzume_settings', array(
+    				'name' => 'is_synced',
+    				'value' => 'false',
+    				'type' => 'boolean'
+    			));
+            }
 
 			// last synced date
-			$wpdb->insert('wp_euzume_settings', array(
-				'name' => 'last_synced_date',
-				'value' => '',
-				'type' => 'datetime'
-			));
+			$lastSyncedDateExists = $wpdb->get_row( "SELECT * FROM wp_euzume_settings WHERE name = 'last_synced_date'");
+
+			if(!isset($lastSyncedDateExists)) {
+    			$wpdb->insert('wp_euzume_settings', array(
+    				'name' => 'last_synced_date',
+    				'value' => '',
+    				'type' => 'datetime'
+    			));
+            }
 
 			// e.o ADD SETTINGS
     }
@@ -393,3 +401,93 @@ if ( ! function_exists( 'persecuted_countries' ) ){
         ];
     }
 }
+
+// increase church count after church post and it's meta are added
+if ( ! function_exists( 'zume_hook_on_church_added' ) ){
+
+	function zume_hook_on_church_added($mid, $object_id, $meta_key, $meta_value) {
+		global $wpdb;
+
+		if($meta_key === 'location_grid_meta') {
+
+			$location_grid_meta = $wpdb->get_results("SELECT * FROM wp_postmeta WHERE meta_id = $mid;", ARRAY_A);
+			$post_id = $location_grid_meta[0]['post_id'];
+
+			$wpdb->insert('wp_euzume_settings', array(
+				'name' => $mid,
+				'value' => 'post_id',
+				'type' => $post_id
+			));
+
+			$sqlGetGroupType = "SELECT * FROM wp_postmeta WHERE post_id = $post_id AND meta_key = 'group_type'";
+			if($wpdb->get_var($sqlGetGroupType)) {
+
+				// get group_type
+				$gt = $wpdb->get_results($sqlGetGroupType, ARRAY_A);
+
+				if($gt[0]['meta_value'] === 'church') {
+
+					// get location_grid from post meta
+					$lgpm = $wpdb->get_results("SELECT * FROM wp_postmeta WHERE post_id = $post_id AND meta_key = 'location_grid'", ARRAY_A);
+					$lggid = $lgpm[0]['meta_value'];
+					$lg = $wpdb->get_results("SELECT * FROM wp_dt_location_grid WHERE grid_id = $lggid", ARRAY_A);
+
+					$grid_id = $lg[0]['grid_id'];
+					$a0 = $lg[0]['admin0_grid_id'];
+					$a1 = $lg[0]['admin1_grid_id'];
+					$a2 = $lg[0]['admin2_grid_id'];
+					$a3 = $lg[0]['admin3_grid_id'];
+
+					$sqlChurchCount = "SELECT * FROM wp_euzume_church_count WHERE grid_id = $grid_id OR grid_id = $a3 OR grid_id = $a2 OR grid_id = $a1 OR grid_id = $a0";
+					$churchCount = $wpdb->get_results($sqlChurchCount, ARRAY_A);
+
+					$reported = $churchCount[0]['reported'];
+					$newReported = (int)((int)$reported + 1);
+
+					$wpdb->update('wp_euzume_church_count', array('reported' => $newReported), array('grid_id' => $churchCount[0]['grid_id']));
+				}
+			}
+		}
+	}
+}
+
+add_action( 'added_post_meta', 'zume_hook_on_church_added', 10, 4 );
+
+// reduce church count before the church post is deleted
+if ( ! function_exists( 'zume_hook_on_before_church_delete' ) ){
+
+	function zume_hook_on_before_church_delete($post_id, $post) {
+		global $wpdb;
+
+		$sqlGetGroupType = "SELECT * FROM wp_postmeta WHERE post_id = $post_id AND meta_key = 'group_type'";
+		if($wpdb->get_var($sqlGetGroupType)) {
+			$gt = $wpdb->get_results($sqlGetGroupType, ARRAY_A);
+
+			if($gt[0]['meta_value'] === 'church') {
+
+                // location grid from post meta
+				$lgpm = $wpdb->get_results("SELECT * FROM wp_postmeta WHERE post_id = $post_id AND meta_key = 'location_grid'", ARRAY_A);
+				$lggid = $lgpm[0]['meta_value'];
+
+                // location grid from location grid table
+				$lg = $wpdb->get_results("SELECT * FROM wp_dt_location_grid WHERE grid_id = $lggid", ARRAY_A);
+
+				$grid_id = $lg[0]['grid_id'];
+				$a0 = $lg[0]['admin0_grid_id'];
+				$a1 = $lg[0]['admin1_grid_id'];
+				$a2 = $lg[0]['admin2_grid_id'];
+				$a3 = $lg[0]['admin3_grid_id'];
+
+				$sqlChurchCount = "SELECT * FROM wp_euzume_church_count WHERE grid_id = $grid_id OR grid_id = $a3 OR grid_id = $a2 OR grid_id = $a1 OR grid_id = $a0";
+				$churchCount = $wpdb->get_results($sqlChurchCount, ARRAY_A);
+
+				$reported = $churchCount[0]['reported'];
+				$newReported = (int)((int)$reported - 1);
+
+				$wpdb->update('wp_euzume_church_count', array('reported' => $newReported), array('grid_id' => $churchCount[0]['grid_id']));
+			}
+		}
+	}
+}
+
+add_action( 'before_delete_post', 'zume_hook_on_before_church_delete', 10, 2 );
