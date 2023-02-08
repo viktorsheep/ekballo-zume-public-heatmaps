@@ -409,7 +409,7 @@ jQuery(document).ready(function($){
 
   clearInterval(window.fiveMinuteTimer)
 
-  let slider_width = 335
+  let slider_width = 25
   if ( isMobile ) {
     slider_width = window.innerWidth * .95
   }
@@ -427,7 +427,6 @@ jQuery(document).ready(function($){
     }
     .off-canvas.position-right {
 	    width: ${slider_width}${ isMobile ? 'px' : '%' };
-      width: ${slider_width}px;
       background-color:white;
     }
     #initialize-screen {
@@ -457,7 +456,6 @@ jQuery(document).ready(function($){
       height: ${window.innerHeight-60}px !important;
     }
     .off-canvas.position-right {
-      width:${slider_width}px;
       background-color:white;
     }
     #initialize-screen {
