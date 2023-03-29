@@ -169,9 +169,13 @@ function sync() {
 
 	batchData.forEach((bd, idx) => {
 		const churchData = window.d.churchData.find(cd => cd.grid_id === parseInt(bd.id))
+		let population = '1'
+		let reported = 0
 
-		const population = churchData.population === '' ? '1' : churchData.population
-		const reported = churchData.reported === 'undefined' ? 0 : churchData.reported
+		if(typeof churchData !== 'undefined') {
+			population = churchData.population === '' ? '1' : churchData.population
+			reported = churchData.reported === 'undefined' ? 0 : churchData.reported
+		} 
 
 		patchData.push({
 			name: bd.properties.full_name,
