@@ -138,36 +138,37 @@ class Zume_Public_Heatmaps {
      */
     public static function activation() {
         // add elements here that need to fire on activation
-      global $wpdb;
+        global $wpdb;
 
-			// Prepping sql
-			$zumeTablePrefix = "euzume_";
-      $syncTableName = $wpdb->prefix . $zumeTablePrefix . "church_count";
-      $settingTableName = $wpdb->prefix . $zumeTablePrefix . "settings";
-      $charset_collate = $wpdb->get_charset_collate();
+        // Prepping sql
+        $zumeTablePrefix = "euzume_";
+        $syncTableName = $wpdb->prefix . $zumeTablePrefix . "church_count";
+        $settingTableName = $wpdb->prefix . $zumeTablePrefix . "settings";
 
-      /*
-      $sql = "CREATE TABLE IF NOT EXISTS $table_name(
-        id BIGINT(20) UNSIGNED NOT NULL AUTO_INCREMENT,
-        `name` TEXT, grid_id BIGINT UNSIGNED DEFAULT 0, population BIGINT UNSIGNED DEFAULT 0, church_count BIGINT UNSIGNED DEFAULT 0, PRIMARY KEY id(id))";
+        $charset_collate = $wpdb->get_charset_collate();
+
+        /*
+        $sql = "CREATE TABLE IF NOT EXISTS $table_name(
+            id BIGINT(20) UNSIGNED NOT NULL AUTO_INCREMENT,
+            `name` TEXT, grid_id BIGINT UNSIGNED DEFAULT 0, population BIGINT UNSIGNED DEFAULT 0, church_count BIGINT UNSIGNED DEFAULT 0, PRIMARY KEY id(id))";
         */
 
-      $createSyncTable = "CREATE TABLE IF NOT EXISTS $syncTableName (
-        id bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT,
-        name text,
-        grid_id bigint UNSIGNED DEFAULT 0,
-        population text,
-        reported bigint UNSIGNED DEFAULT 0,
-        PRIMARY KEY id (id)
-        ) $charset_collate;";
+        $createSyncTable = "CREATE TABLE IF NOT EXISTS $syncTableName (
+            id bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT,
+            name text,
+            grid_id bigint UNSIGNED DEFAULT 0,
+            population text,
+            reported bigint UNSIGNED DEFAULT 0,
+            PRIMARY KEY id (id)
+            ) $charset_collate;";
 
-			$createSettingsTable = "CREATE TABLE IF NOT EXISTS $settingTableName (
-				id bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT,
-				name text,
-				value text,
-				type text,
-				PRIMARY KEY id (id)
-				) $charset_collate;";
+        $createSettingsTable = "CREATE TABLE IF NOT EXISTS $settingTableName (
+            id bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT,
+            name text,
+            value text,
+            type text,
+            PRIMARY KEY id (id)
+            ) $charset_collate;";
 			
 
       require_once(ABSPATH . 'wp-admin/includes/upgrade.php');
@@ -178,10 +179,10 @@ class Zume_Public_Heatmaps {
 			// ADD SETTINGS
 
 			// is synced
-			$isSyncedExists = $wpdb->get_row( "SELECT * FROM wp_euzume_settings WHERE name = 'is_synced'");
+			$isSyncedExists = $wpdb->get_row( "SELECT * FROM $settingTableName WHERE name = 'is_synced'");
 
 			if(!isset($isSyncedExists)) {
-    			$wpdb->insert('wp_euzume_settings', array(
+    			$wpdb->insert($settingTableName, array(
     				'name' => 'is_synced',
     				'value' => 'false',
     				'type' => 'boolean'
@@ -189,10 +190,10 @@ class Zume_Public_Heatmaps {
             }
 
 			// last synced date
-			$lastSyncedDateExists = $wpdb->get_row( "SELECT * FROM wp_euzume_settings WHERE name = 'last_synced_date'");
+			$lastSyncedDateExists = $wpdb->get_row( "SELECT * FROM $settingTableName WHERE name = 'last_synced_date'");
 
 			if(!isset($lastSyncedDateExists)) {
-    			$wpdb->insert('wp_euzume_settings', array(
+    			$wpdb->insert($settingTableName, array(
     				'name' => 'last_synced_date',
     				'value' => '',
     				'type' => 'datetime'
@@ -408,18 +409,25 @@ if ( ! function_exists( 'zume_hook_on_church_added' ) ){
 	function zume_hook_on_church_added($mid, $object_id, $meta_key, $meta_value) {
 		global $wpdb;
 
+        $zumeTablePrefix = "euzume_";
+        $dtTablePrefix = "dt_";
+        $postMetaTableName = $wpdb->prefix . 'post_meta';
+        $churchCountTableName = $wpdb->prefix . $zumeTablePrefix . "church_count";
+        $settingsTableName = $wpdb->prefix . $zumeTablePrefix . "settings";
+        $locationGridTableName = $wpdb->prefix . $dtTablePrefix . "dt_location_grid";
+
 		if($meta_key === 'location_grid_meta') {
 
-			$location_grid_meta = $wpdb->get_results("SELECT * FROM wp_postmeta WHERE meta_id = $mid;", ARRAY_A);
+			$location_grid_meta = $wpdb->get_results("SELECT * FROM $postMetaTableName WHERE meta_id = $mid;", ARRAY_A);
 			$post_id = $location_grid_meta[0]['post_id'];
 
-			$wpdb->insert('wp_euzume_settings', array(
+			$wpdb->insert($settingsTableName, array(
 				'name' => $mid,
 				'value' => 'post_id',
 				'type' => $post_id
 			));
 
-			$sqlGetGroupType = "SELECT * FROM wp_postmeta WHERE post_id = $post_id AND meta_key = 'group_type'";
+			$sqlGetGroupType = "SELECT * FROM $postMetaTableName WHERE post_id = $post_id AND meta_key = 'group_type'";
 			if($wpdb->get_var($sqlGetGroupType)) {
 
 				// get group_type
@@ -428,9 +436,9 @@ if ( ! function_exists( 'zume_hook_on_church_added' ) ){
 				if($gt[0]['meta_value'] === 'church') {
 
 					// get location_grid from post meta
-					$lgpm = $wpdb->get_results("SELECT * FROM wp_postmeta WHERE post_id = $post_id AND meta_key = 'location_grid'", ARRAY_A);
+					$lgpm = $wpdb->get_results("SELECT * FROM $postMetaTableName WHERE post_id = $post_id AND meta_key = 'location_grid'", ARRAY_A);
 					$lggid = $lgpm[0]['meta_value'];
-					$lg = $wpdb->get_results("SELECT * FROM wp_dt_location_grid WHERE grid_id = $lggid", ARRAY_A);
+					$lg = $wpdb->get_results("SELECT * FROM $locationGridTableName WHERE grid_id = $lggid", ARRAY_A);
 
 					$grid_id = $lg[0]['grid_id'];
 					$a0 = $lg[0]['admin0_grid_id'];
@@ -438,13 +446,13 @@ if ( ! function_exists( 'zume_hook_on_church_added' ) ){
 					$a2 = $lg[0]['admin2_grid_id'];
 					$a3 = $lg[0]['admin3_grid_id'];
 
-					$sqlChurchCount = "SELECT * FROM wp_euzume_church_count WHERE grid_id = $grid_id OR grid_id = $a3 OR grid_id = $a2 OR grid_id = $a1 OR grid_id = $a0";
+					$sqlChurchCount = "SELECT * FROM $churchCountTableName WHERE grid_id = $grid_id OR grid_id = $a3 OR grid_id = $a2 OR grid_id = $a1 OR grid_id = $a0";
 					$churchCount = $wpdb->get_results($sqlChurchCount, ARRAY_A);
 
 					$reported = $churchCount[0]['reported'];
 					$newReported = (int)((int)$reported + 1);
 
-					$wpdb->update('wp_euzume_church_count', array('reported' => $newReported), array('grid_id' => $churchCount[0]['grid_id']));
+					$wpdb->update($churchCountTableName, array('reported' => $newReported), array('grid_id' => $churchCount[0]['grid_id']));
 				}
 			}
 		}
@@ -459,18 +467,25 @@ if ( ! function_exists( 'zume_hook_on_before_church_delete' ) ){
 	function zume_hook_on_before_church_delete($post_id, $post) {
 		global $wpdb;
 
-		$sqlGetGroupType = "SELECT * FROM wp_postmeta WHERE post_id = $post_id AND meta_key = 'group_type'";
+        $zumeTablePrefix = "euzume_";
+        $dtTablePrefix = "dt_";
+        $postMetaTableName = $wpdb->prefix . 'post_meta';
+        $churchCountTableName = $wpdb->prefix . $zumeTablePrefix . "church_count";
+        $settingsTableName = $wpdb->prefix . $zumeTablePrefix . "settings";
+        $locationGridTableName = $wpdb->prefix . $dtTablePrefix . "dt_location_grid";
+
+		$sqlGetGroupType = "SELECT * FROM $postMetaTableName WHERE post_id = $post_id AND meta_key = 'group_type'";
 		if($wpdb->get_var($sqlGetGroupType)) {
 			$gt = $wpdb->get_results($sqlGetGroupType, ARRAY_A);
 
 			if($gt[0]['meta_value'] === 'church') {
 
                 // location grid from post meta
-				$lgpm = $wpdb->get_results("SELECT * FROM wp_postmeta WHERE post_id = $post_id AND meta_key = 'location_grid'", ARRAY_A);
+				$lgpm = $wpdb->get_results("SELECT * FROM $postMetaTableName WHERE post_id = $post_id AND meta_key = 'location_grid'", ARRAY_A);
 				$lggid = $lgpm[0]['meta_value'];
 
                 // location grid from location grid table
-				$lg = $wpdb->get_results("SELECT * FROM wp_dt_location_grid WHERE grid_id = $lggid", ARRAY_A);
+				$lg = $wpdb->get_results("SELECT * FROM $locationGridTableName WHERE grid_id = $lggid", ARRAY_A);
 
 				$grid_id = $lg[0]['grid_id'];
 				$a0 = $lg[0]['admin0_grid_id'];
@@ -478,13 +493,13 @@ if ( ! function_exists( 'zume_hook_on_before_church_delete' ) ){
 				$a2 = $lg[0]['admin2_grid_id'];
 				$a3 = $lg[0]['admin3_grid_id'];
 
-				$sqlChurchCount = "SELECT * FROM wp_euzume_church_count WHERE grid_id = $grid_id OR grid_id = $a3 OR grid_id = $a2 OR grid_id = $a1 OR grid_id = $a0";
+				$sqlChurchCount = "SELECT * FROM $churchCountTableName WHERE grid_id = $grid_id OR grid_id = $a3 OR grid_id = $a2 OR grid_id = $a1 OR grid_id = $a0";
 				$churchCount = $wpdb->get_results($sqlChurchCount, ARRAY_A);
 
 				$reported = $churchCount[0]['reported'];
 				$newReported = (int)((int)$reported - 1);
 
-				$wpdb->update('wp_euzume_church_count', array('reported' => $newReported), array('grid_id' => $churchCount[0]['grid_id']));
+				$wpdb->update($churchCountTableName, array('reported' => $newReported), array('grid_id' => $churchCount[0]['grid_id']));
 			}
 		}
 	}

@@ -40,8 +40,10 @@ class Zume_App_Heatmap {
 		try {
             global $wpdb;
 
+            $churchTableName = $wpdb->prefix . 'euzume_church_count';
+
 			foreach($batch as $b) {
-				$wpdb->insert('wp_euzume_church_count', array(
+				$wpdb->insert($churchTableName, array(
 					'name' => $b['name'],
 					'grid_id' => $b['grid_id'],
 					'population' => $b['population'],
@@ -90,14 +92,14 @@ class Zume_App_Heatmap {
             
             // ADD SETTINGS
             // is synced
-            $wpdb->insert('wp_euzume_settings', array(
+            $wpdb->insert($settingTableName, array(
                 'name' => 'is_synced',
                 'value' => 'false',
                 'type' => 'boolean'
             ));
         
             // last synced date
-            $wpdb->insert('wp_euzume_settings', array(
+            $wpdb->insert($settingTableName, array(
                 'name' => 'last_synced_date',
                 'value' => '',
                 'type' => 'datetime'
@@ -112,8 +114,12 @@ class Zume_App_Heatmap {
 		try {
 			global $wpdb;
 
-			$wpdb->update('wp_euzume_settings', array('value' => 'true'), array('name' => 'is_synced'));
-			$wpdb->update('wp_euzume_settings', array('value' => date("m/d/Y")), array('name' => 'last_synced_date'));
+            $zumeTablePrefix = "euzume_";
+            $settingTableName = $wpdb->prefix . $zumeTablePrefix . "settings";
+
+
+			$wpdb->update($settingTableName, array('value' => 'true'), array('name' => 'is_synced'));
+			$wpdb->update($settingTableName, array('value' => date("m/d/Y")), array('name' => 'last_synced_date'));
 
 		} catch(Exception $e) {
 			$result = $e->getMessage();
@@ -127,9 +133,13 @@ class Zume_App_Heatmap {
 		try {
 			global $wpdb;
 
-			$wpdb->query('TRUNCATE TABLE wp_euzume_church_count');
-			$wpdb->update('wp_euzume_settings', array('value' => 'false'), array('name' => 'is_synced'));
-			$wpdb->update('wp_euzume_settings', array('value' => ''), array('name' => 'last_synced_date'));
+            $zumeTablePrefix = "euzume_";
+            $syncTableName = $wpdb->prefix . $zumeTablePrefix . "church_count";
+            $settingTableName = $wpdb->prefix . $zumeTablePrefix . "settings";
+
+			$wpdb->query('TRUNCATE TABLE ' . $syncTableName);
+			$wpdb->update($settingTableName, array('value' => 'false'), array('name' => 'is_synced'));
+			$wpdb->update($settingTableName, array('value' => ''), array('name' => 'last_synced_date'));
 
 		} catch(Exception $e) {
 			$result = $e->getMessage();
@@ -2614,6 +2624,11 @@ class Zume_App_Heatmap {
     public static function update_population($grid_id, $population) {
       global $wpdb;
 
+        $zumeTablePrefix = "euzume_";
+        $syncTableName = $wpdb->prefix . $zumeTablePrefix . "church_count";
+        $settingTableName = $wpdb->prefix . $zumeTablePrefix . "settings";
+
+
       $execute = $wpdb->query
         ("
           UPDATE $wpdb->dt_location_grid
@@ -2625,10 +2640,10 @@ class Zume_App_Heatmap {
       delete_transient( 'Zume_App_Heatmap::query_saturation_list' );
 
       // update church count population if exists
-      $checkIfChurchCountExists = $wpdb->query("SELECT ID from wp_euzume_church_count WHERE grid_id = $grid_id");
+      $checkIfChurchCountExists = $wpdb->query("SELECT ID from $syncTableName WHERE grid_id = $grid_id");
 
       if($checkIfChurchCountExists !== NULL) {
-        $wpdb->update('wp_euzume_church_count', array('population' => $population), array('grid_id' => $grid_id));
+        $wpdb->update($syncTableName, array('population' => $population), array('grid_id' => $grid_id));
       }
       // e.o update church count population if exists
 
