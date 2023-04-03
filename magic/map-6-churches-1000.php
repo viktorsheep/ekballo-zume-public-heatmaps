@@ -241,8 +241,8 @@ class Zume_Public_Heatmap_Churches_1000 extends DT_Magic_Url_Base
                 $offset = sanitize_text_field( wp_unslash( $params['offset'] ) );
                 return Zume_App_Heatmap::query_activity_data( $grid_id, $offset );
             case 'grid_data':
-                $grid_totals = Zume_App_Heatmap::query_church_grid_totals_v2();
-                // $grid_totals = Zume_App_Heatmap::query_church_grid_totals();
+                // $grid_totals = Zume_App_Heatmap::query_church_grid_totals_v2();
+                $grid_totals = Zume_App_Heatmap::query_church_grid_totals();
                 return Zume_App_Heatmap::_initial_polygon_value_list( $grid_totals, $this->global_div, $this->us_div );
             case 'by_region':
                 return Zume_App_Heatmap::query_church_grid_totals_by_regions($params['grid_id']);
