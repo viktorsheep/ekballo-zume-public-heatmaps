@@ -413,19 +413,12 @@ if ( ! function_exists( 'zume_hook_on_church_added' ) ){
         $dtTablePrefix = "dt_";
         $postMetaTableName = $wpdb->prefix . 'post_meta';
         $churchCountTableName = $wpdb->prefix . $zumeTablePrefix . "church_count";
-        $settingsTableName = $wpdb->prefix . $zumeTablePrefix . "settings";
         $locationGridTableName = $wpdb->prefix . $dtTablePrefix . "dt_location_grid";
 
 		if($meta_key === 'location_grid_meta') {
 
 			$location_grid_meta = $wpdb->get_results("SELECT * FROM $postMetaTableName WHERE meta_id = $mid;", ARRAY_A);
 			$post_id = $location_grid_meta[0]['post_id'];
-
-			$wpdb->insert($settingsTableName, array(
-				'name' => $mid,
-				'value' => 'post_id',
-				'type' => $post_id
-			));
 
 			$sqlGetGroupType = "SELECT * FROM $postMetaTableName WHERE post_id = $post_id AND meta_key = 'group_type'";
 			if($wpdb->get_var($sqlGetGroupType)) {
@@ -471,7 +464,6 @@ if ( ! function_exists( 'zume_hook_on_before_church_delete' ) ){
         $dtTablePrefix = "dt_";
         $postMetaTableName = $wpdb->prefix . 'post_meta';
         $churchCountTableName = $wpdb->prefix . $zumeTablePrefix . "church_count";
-        $settingsTableName = $wpdb->prefix . $zumeTablePrefix . "settings";
         $locationGridTableName = $wpdb->prefix . $dtTablePrefix . "dt_location_grid";
 
 		$sqlGetGroupType = "SELECT * FROM $postMetaTableName WHERE post_id = $post_id AND meta_key = 'group_type'";
