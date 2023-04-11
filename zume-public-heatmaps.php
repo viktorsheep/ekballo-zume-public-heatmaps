@@ -406,47 +406,48 @@ if ( ! function_exists( 'persecuted_countries' ) ){
 // increase church count after church post and it's meta are added
 if ( ! function_exists( 'zume_hook_on_church_added' ) ){
 
-	function zume_hook_on_church_added($mid, $object_id, $meta_key, $meta_value) {
+	function zume_hook_on_church_added($mid, $post_id, $meta_key, $meta_value) {
 		global $wpdb;
 
-        $zumeTablePrefix = "euzume_";
+        // SELF NOTE : WORKFLOW
+        // if meta is location_grid_meta and meta group_type is 'church'
+        // get grid_id through location_grid_meta where $meta_key
+        // get specific location grid by grid_id and increase the count by 1 and update the church count
+
+        // set table names
+		$zumeTablePrefix = "euzume_";
         $dtTablePrefix = "dt_";
-        $postMetaTableName = $wpdb->prefix . 'post_meta';
+
+        $postMetaTableName = $wpdb->prefix . 'postmeta';
         $churchCountTableName = $wpdb->prefix . $zumeTablePrefix . "church_count";
-        $locationGridTableName = $wpdb->prefix . $dtTablePrefix . "dt_location_grid";
+        $settingsTableName = $wpdb->prefix . $zumeTablePrefix . "settings";
+        $locationGridTableName = $wpdb->prefix . $dtTablePrefix . "location_grid";
+        $locationGridMetaTableName = $wpdb->prefix . $dtTablePrefix . "location_grid_meta";
 
-		if($meta_key === 'location_grid_meta') {
+		if($meta_key === 'location_grid_meta') { // check if meta key is location_grid_meta
 
-			$location_grid_meta = $wpdb->get_results("SELECT * FROM $postMetaTableName WHERE meta_id = $mid;", ARRAY_A);
-			$post_id = $location_grid_meta[0]['post_id'];
+            // get group type from post meta
+			$pmGroupType = $wpdb->get_results("SELECT * FROM $postMetaTableName WHERE post_id = '$post_id' AND meta_key = 'group_type'", ARRAY_A);
 
-			$sqlGetGroupType = "SELECT * FROM $postMetaTableName WHERE post_id = $post_id AND meta_key = 'group_type'";
-			if($wpdb->get_var($sqlGetGroupType)) {
+			if($pmGroupType[0]['meta_value'] === 'church') { // check if group type is church
 
-				// get group_type
-				$gt = $wpdb->get_results($sqlGetGroupType, ARRAY_A);
+				$lgm = $wpdb->get_results("SELECT * FROM $locationGridMetaTableName WHERE grid_meta_id = '$meta_value';", ARRAY_A); // get location grid meta
+				$grid_id = $lgm[0]['grid_id']; // set grid_id from LGM
+				$lg = $wpdb->get_results("SELECT * FROM $locationGridTableName WHERE grid_id = '$grid_id';", ARRAY_A); // get location grid
 
-				if($gt[0]['meta_value'] === 'church') {
+                // in case another admin is needed to check
+				$a0 = $lg[0]['admin0_grid_id'];
+				$a1 = $lg[0]['admin1_grid_id'];
+				$a2 = $lg[0]['admin2_grid_id'];
+				$a3 = $lg[0]['admin3_grid_id'];
 
-					// get location_grid from post meta
-					$lgpm = $wpdb->get_results("SELECT * FROM $postMetaTableName WHERE post_id = $post_id AND meta_key = 'location_grid'", ARRAY_A);
-					$lggid = $lgpm[0]['meta_value'];
-					$lg = $wpdb->get_results("SELECT * FROM $locationGridTableName WHERE grid_id = $lggid", ARRAY_A);
+				$cc = $wpdb->get_results("SELECT * FROM $churchCountTableName WHERE grid_id = '$grid_id'", ARRAY_A); // get church count
 
-					$grid_id = $lg[0]['grid_id'];
-					$a0 = $lg[0]['admin0_grid_id'];
-					$a1 = $lg[0]['admin1_grid_id'];
-					$a2 = $lg[0]['admin2_grid_id'];
-					$a3 = $lg[0]['admin3_grid_id'];
+                // increase +1
+				$reported = $cc[0]['reported'];
+				$newReported = (int)((int)$reported + 1);
 
-					$sqlChurchCount = "SELECT * FROM $churchCountTableName WHERE grid_id = $grid_id OR grid_id = $a3 OR grid_id = $a2 OR grid_id = $a1 OR grid_id = $a0";
-					$churchCount = $wpdb->get_results($sqlChurchCount, ARRAY_A);
-
-					$reported = $churchCount[0]['reported'];
-					$newReported = (int)((int)$reported + 1);
-
-					$wpdb->update($churchCountTableName, array('reported' => $newReported), array('grid_id' => $churchCount[0]['grid_id']));
-				}
+				$wpdb->update($churchCountTableName, array('reported' => $newReported), array('grid_id' => $cc[0]['grid_id'])); // update church count table
 			}
 		}
 	}
@@ -460,41 +461,45 @@ if ( ! function_exists( 'zume_hook_on_before_church_delete' ) ){
 	function zume_hook_on_before_church_delete($post_id, $post) {
 		global $wpdb;
 
-        $zumeTablePrefix = "euzume_";
+        // SELF NOTE : WORKFLOW : DELETION
+        // if meta group_type is 'church'
+        // get grid_id through location_grid_meta via $post_id
+        // get specific location grid by grid_id and reduce the count by 1 and update the church count
+
+        // sest table names
+		$zumeTablePrefix = "euzume_";
         $dtTablePrefix = "dt_";
-        $postMetaTableName = $wpdb->prefix . 'post_meta';
+
+        $postMetaTableName = $wpdb->prefix . 'postmeta';
         $churchCountTableName = $wpdb->prefix . $zumeTablePrefix . "church_count";
-        $locationGridTableName = $wpdb->prefix . $dtTablePrefix . "dt_location_grid";
+        $settingsTableName = $wpdb->prefix . $zumeTablePrefix . "settings";
+        $locationGridTableName = $wpdb->prefix . $dtTablePrefix . "location_grid";
+        $locationGridMetaTableName = $wpdb->prefix . $dtTablePrefix . "location_grid_meta";
 
-		$sqlGetGroupType = "SELECT * FROM $postMetaTableName WHERE post_id = $post_id AND meta_key = 'group_type'";
-		if($wpdb->get_var($sqlGetGroupType)) {
-			$gt = $wpdb->get_results($sqlGetGroupType, ARRAY_A);
+        // get group_type from post meta
+		$pmGroupType = $wpdb->get_results("SELECT * FROM $postMetaTableName WHERE post_id = '$post_id' AND meta_key = 'group_type'", ARRAY_A);
 
-			if($gt[0]['meta_value'] === 'church') {
+		if($pmGroupType[0]['meta_value'] === 'church') { // check if group_type is church
 
-                // location grid from post meta
-				$lgpm = $wpdb->get_results("SELECT * FROM $postMetaTableName WHERE post_id = $post_id AND meta_key = 'location_grid'", ARRAY_A);
-				$lggid = $lgpm[0]['meta_value'];
+            $lgm = $wpdb->get_results("SELECT * FROM $locationGridMetaTableName WHERE post_id = '$post_id';", ARRAY_A); // get location grid meta
+            $grid_id = $lgm[0]['grid_id']; // set grid_id
+            $lg = $wpdb->get_results("SELECT * FROM $locationGridTableName WHERE grid_id = '$grid_id';", ARRAY_A); // get location grid
 
-                // location grid from location grid table
-				$lg = $wpdb->get_results("SELECT * FROM $locationGridTableName WHERE grid_id = $lggid", ARRAY_A);
+            // in case another admin is needed to check
+            $a0 = $lg[0]['admin0_grid_id'];
+            $a1 = $lg[0]['admin1_grid_id'];
+            $a2 = $lg[0]['admin2_grid_id'];
+            $a3 = $lg[0]['admin3_grid_id'];
 
-				$grid_id = $lg[0]['grid_id'];
-				$a0 = $lg[0]['admin0_grid_id'];
-				$a1 = $lg[0]['admin1_grid_id'];
-				$a2 = $lg[0]['admin2_grid_id'];
-				$a3 = $lg[0]['admin3_grid_id'];
+            $cc = $wpdb->get_results("SELECT * FROM $churchCountTableName WHERE grid_id = '$grid_id'", ARRAY_A); // get church count
 
-				$sqlChurchCount = "SELECT * FROM $churchCountTableName WHERE grid_id = $grid_id OR grid_id = $a3 OR grid_id = $a2 OR grid_id = $a1 OR grid_id = $a0";
-				$churchCount = $wpdb->get_results($sqlChurchCount, ARRAY_A);
+            // reduce -1
+            $reported = $cc[0]['reported'];
+            $newReported = (int)((int)$reported - 1);
 
-				$reported = $churchCount[0]['reported'];
-				$newReported = (int)((int)$reported - 1);
-
-				$wpdb->update($churchCountTableName, array('reported' => $newReported), array('grid_id' => $churchCount[0]['grid_id']));
-			}
+            $wpdb->update($churchCountTableName, array('reported' => $newReported), array('grid_id' => $cc[0]['grid_id'])); // update church count
 		}
 	}
 }
 
-add_action( 'before_delete_post', 'zume_hook_on_before_church_delete', 10, 2 );
+add_action( 'before_delete_post', 'zume_hook_on_before_church_delete', 1, 2 );
